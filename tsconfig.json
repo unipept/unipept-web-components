@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
+    "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
@@ -31,7 +31,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx", "src/logic/data-management/newworker.js", "src/logic/utils.js", "src/logic/functional-annotations/FunctionalAnnotations.js", "src/logic/functional-annotations/old-goterms.js", "src/logic/data-management/searchtree.js", "src/logic/functional-annotations/ecnumbers.js"
   ],
   "exclude": [
     "node_modules"
