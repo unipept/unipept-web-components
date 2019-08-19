@@ -26,6 +26,8 @@ export default class Tree {
 
         for (const peptide of peptides) {
             let currentNode = this.getRoot();
+            // TODO: check this!
+            // @ts-ignore
             for (const taxid of peptide.lineage) {
                 if (taxid !== null) {
                     let newNode = currentNode.getChild(taxid);

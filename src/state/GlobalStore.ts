@@ -1,17 +1,20 @@
-import PeptideContainer from "../logic/data-management/PeptideContainer";
-import {ActionContext, ActionTree, GetterTree, MutationTree} from "vuex";
+import PeptideContainer from '../logic/data-management/PeptideContainer';
+import {ActionContext, ActionTree, GetterTree, MutationTree} from 'vuex';
+import MPAConfig from '../logic/data-management/MPAConfig';
+import DatasetManager from '../logic/data-management/DatasetManager';
+import MpaAnalysisManager from '../logic/data-management/MpaAnalysisManager';
 
 export interface GlobalState {
-    selectedDatasets: PeptideContainer[],
-    storedDatasets: PeptideContainer[],
-    analysis: boolean,
-    searchSettings: MPAConfig,
-    activeDataset: PeptideContainer | null,
-    selectedTerm: string,
-    selectedTaxonId: number,
-    matchedPeptides: number,
-    searchedPeptides: number,
-    missedPeptides: string[]
+    selectedDatasets: PeptideContainer[];
+    storedDatasets: PeptideContainer[];
+    analysis: boolean;
+    searchSettings: MPAConfig;
+    activeDataset: PeptideContainer | null;
+    selectedTerm: string;
+    selectedTaxonId: number;
+    matchedPeptides: number;
+    searchedPeptides: number;
+    missedPeptides: string[];
 }
 
 const mpaState: GlobalState = {
@@ -24,7 +27,7 @@ const mpaState: GlobalState = {
     selectedTaxonId: -1,
     matchedPeptides: 0,
     searchedPeptides: 0,
-    missedPeptides: []
+    missedPeptides: [],
 };
 
 const mpaGetters: GetterTree<GlobalState, any> = {
@@ -57,23 +60,27 @@ const mpaGetters: GetterTree<GlobalState, any> = {
     },
     missedPeptides(state: GlobalState): string[] {
         return state.missedPeptides;
-    }
+    },
 };
 
 const mpaMutations: MutationTree<GlobalState> = {
     SELECT_DATASET(state: GlobalState, dataset: PeptideContainer) {
-        let index: number = state.selectedDatasets.findIndex((value: PeptideContainer, index: number, arr: PeptideContainer[]) => {
-            return value.getId() === dataset.getId();
-        });
+        const index: number = state.selectedDatasets.findIndex(
+            (value: PeptideContainer, idx: number, arr: PeptideContainer[]) => {
+                return value.getId() === dataset.getId();
+            },
+        );
 
         if (index === -1) {
             state.selectedDatasets.push(dataset);
         }
     },
     DESELECT_DATASET(state: GlobalState, dataset: PeptideContainer) {
-        let index: number = state.selectedDatasets.findIndex((value: PeptideContainer, index: number, arr: PeptideContainer[]) => {
-            return value.getId() === dataset.getId();
-        });
+        const index: number = state.selectedDatasets.findIndex(
+            (value: PeptideContainer, idx: number, arr: PeptideContainer[]) => {
+                return value.getId() === dataset.getId();
+            },
+        );
 
         if (index !== -1) {
             state.selectedDatasets.splice(index, 1);
@@ -88,7 +95,9 @@ const mpaMutations: MutationTree<GlobalState> = {
         state.storedDatasets.push(dataset);
     },
     REMOVE_STORED_DATASET(state: GlobalState, dataset: PeptideContainer) {
-        let index: number = state.storedDatasets.findIndex((value: PeptideContainer, index: number) => value.getId() === dataset.getId());
+        const index: number = state.storedDatasets.findIndex(
+            (value: PeptideContainer, idx: number) => value.getId() === dataset.getId()
+        );
         if (index !== -1) {
             state.storedDatasets.splice(index, 1);
         }
@@ -119,7 +128,7 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     SET_MISSED_PEPTIDES(state: GlobalState, value: string[]): void {
         state.missedPeptides = value;
-    }
+    },
 };
 
 const mpaActions: ActionTree<GlobalState, any> = {
@@ -140,7 +149,7 @@ const mpaActions: ActionTree<GlobalState, any> = {
             // Find first processed dataset that could replace the previous active dataset
             let newActiveDataset: PeptideContainer = null;
 
-            for (let current of store.getters.selectedDatasets) {
+            for (const current of store.getters.selectedDatasets) {
                 if (current.getProgress() === 1) {
                     newActiveDataset = current;
                 }
@@ -151,7 +160,7 @@ const mpaActions: ActionTree<GlobalState, any> = {
     },
     deleteDataset(store: ActionContext<GlobalState, any>, dataset: PeptideContainer) {
         store.dispatch('deselectDataset', dataset);
-        let datasetManager: DatasetManager = new DatasetManager();
+        const datasetManager: DatasetManager = new DatasetManager();
         datasetManager.deleteDatasetFromStorage(dataset).then(() => store.commit('REMOVE_STORED_DATASET', dataset));
     },
     clearSelectedDatasets(store: ActionContext<GlobalState, any>) {
@@ -165,7 +174,7 @@ const mpaActions: ActionTree<GlobalState, any> = {
      * Load all datasets stored in the browser's local storage and update the current Vuex's store accordingly.
      */
     loadStoredDatasets(store: ActionContext<GlobalState, any>) {
-        let datasetManager: DatasetManager = new DatasetManager();
+        const datasetManager: DatasetManager = new DatasetManager();
 
         datasetManager.listDatasets()
             .then((values) => {
@@ -187,18 +196,18 @@ const mpaActions: ActionTree<GlobalState, any> = {
                 Promise.all([
                     taxaDataSource.getAmountOfMatchedPeptides(),
                     taxaDataSource.getAmountOfSearchedPeptides(),
-                    taxaDataSource.getMissedPeptides()
+                    taxaDataSource.getMissedPeptides(),
                 ]).then((result) => {
                     store.commit('SET_MATCHED_PEPTIDES', result[0]);
                     store.commit('SET_SEARCHED_PEPTIDES', result[1]);
                     store.commit('SET_MISSED_PEPTIDES', result[2]);
-                })
+                });
             });
         }
-    
+
     },
     processDataset(store: ActionContext<GlobalState, any>, dataset: PeptideContainer): void {
-        let mpaManager = new MpaAnalysisManager();
+        const mpaManager = new MpaAnalysisManager();
         mpaManager.processDataset(dataset, store.getters.searchSettings)
         .then(() => {
             if (store.getters.activeDataset === null) {
@@ -211,12 +220,12 @@ const mpaActions: ActionTree<GlobalState, any> = {
     },
     setSelectedTaxonId(store: ActionContext<GlobalState, any>, taxonId: number): void {
         store.commit('SET_SELECTED_TAXON_ID', taxonId);
-    }
+    },
 };
 
 export const globalStore = {
     state: mpaState,
     mutations: mpaMutations,
     getters: mpaGetters,
-    actions: mpaActions
+    actions: mpaActions,
 };
