@@ -26,7 +26,9 @@
     import AmountTable from "../tables/AmountTable.vue";
     import FASortSettings from "../tables/FASortSettings";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
-    
+    import d3 from "d3";
+    import $ from "jquery";
+
     @Component({
         components: {}
     })
