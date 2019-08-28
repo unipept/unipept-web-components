@@ -6,7 +6,7 @@ import MPAConfig from '../data-management/MPAConfig';
 import TaxonInfo from '../data-management/TaxonInfo';
 
 // @ts-ignore
-import newworker from 'workerize-loader!./../newworker.js';
+import newworker from 'workerize-loader!./../data-management/newworker.js';
 import { postJSON } from '../utils.js';
 import EcDataSource from './EcDataSource';
 

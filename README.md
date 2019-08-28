@@ -1,31 +1,62 @@
-# unipept-web-components
-This repository contains isolated Vue-components that can be reused throughout multiple Unipept-projects.
+# Vue Component Library Starter
 
-## Project setup
-```
+> Create your own component library with [Vue CLI 3](https://cli.vuejs.org/) and [VuePress](https://vuepress.vuejs.org/).
+
+Sooner or later, you will find that creating a component library is much better than having all components inside your app project. A component library force you remove app specific logic from your components, makes it possible to reuse them in other apps. 
+
+Once the components are in a libaray, documentation becomes critical. This starter project includes a documentation app. It not only documents the usage of the component, but also provides a testing bed during development of the components. See example [here](http://wuruoyun.github.io/vue-component-lib-starter).
+
+## Setup
+
+``` bash
+# install dependencies
 npm install
-```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+# start the doc app with hot reload
+npm run docs:dev
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
+# test the library
 npm run test
+
+# build the library
+npm run build
+
+# build the doc app
+npm run docs:build
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
+To start building your own components:
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+* Replace the `base` option in `.vuepress/config.js` accordingly
+* Replace the example components and their docs with your own
 
+## Client demo
+
+The following simple example shows how the components in the library can be used.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head><title>Demo app</title></head>
+  <body>
+    <div id="app">
+      <p>Component A: <component-a/></p>
+      <p>Component B: <component-b @click="onClick"/></p>
+    </div>
+  </body>
+
+  <script src="https://unpkg.com/vue"></script>
+  <script src="./mylib.umd.js"></script>
+  <script>
+      console.log(mylib)
+      var app = new Vue({
+        el: '#app',
+        methods: {
+          onClick (message) {
+            alert(message)
+          }
+        }
+      })
+    </script>
+</html>
+```

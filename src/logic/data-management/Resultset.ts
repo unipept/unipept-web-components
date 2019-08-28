@@ -114,6 +114,7 @@ export default class Resultset {
         ]);
 
         this.fa = new GroupedFA('Functional annotations', {
+            // @ts-ignore
             GO: go,
             EC: ec,
         }, (s) => s.startsWith('GO:') ? 'GO' : 'EC');
