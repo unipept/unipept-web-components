@@ -11,9 +11,9 @@
     "docs:dev": "vuepress dev docs"
   },
   "main": "dist/unipept-web-components.umd.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
-    "dist/*.{js,css}"
+    "dist/*.{js,css,ts}"
   ],
   "dependencies": {
     "@types/jest": "^23.3.14",

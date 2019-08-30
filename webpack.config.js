@@ -3,7 +3,6 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
 module.exports = {
-    watch: true,
     mode: 'production',
     entry: './src/index.ts',
     output: {
@@ -61,16 +60,8 @@ module.exports = {
             'vue$': 'vue/dist/vue.esm.js'
         }
     },
-    externals: [
-        'vuetify',
-        'vue',
-        'vue-class-component',
-        'vue-property-decorator',
-        'vuex',
-        'vuex-class'
-    ],
     optimization: {
-        minimize: true
+        minimize: false
     },
     plugins: [
         new VueLoaderPlugin(),
