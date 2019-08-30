@@ -3,6 +3,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
 module.exports = {
+    watch: true,
     mode: 'production',
     entry: './src/index.ts',
     output: {
@@ -61,6 +62,7 @@ module.exports = {
         }
     },
     externals: [
+        'vuetify',
         'vue',
         'vue-class-component',
         'vue-property-decorator',
@@ -68,7 +70,7 @@ module.exports = {
         'vuex-class'
     ],
     optimization: {
-        minimize: false
+        minimize: true
     },
     plugins: [
         new VueLoaderPlugin(),
