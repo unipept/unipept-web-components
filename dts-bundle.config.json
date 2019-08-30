@@ -1,0 +1,5 @@
+{
+  "name": "unipept-web-components",
+  "main": "dist/src/index.d.ts",
+  "out": "../index.d.ts"
+}

@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name unipept-web-components ./src/index.ts",
+    "build": "webpack && dts-bundle --configJson dts-bundle.config.json",
     "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs"
   },
   "main": "dist/unipept-web-components.umd.js",
+  "types": "dist/src/index.d.ts",
   "files": [
     "dist/*.{js,css}"
   ],
@@ -40,6 +41,7 @@
     "babel-jest": "^24.8.0",
     "eslint": "^6.0.1",
     "eslint-plugin-vue": "^5.2.3",
+    "fibers": "^4.0.1",
     "node-sass": "^4.12.0",
     "sass": "^1.17.4",
     "sass-loader": "^7.1.0",
@@ -48,6 +50,7 @@
     "vue-cli-plugin-vuetify": "^0.6.3",
     "vue-template-compiler": "^2.6.10",
     "vuepress": "^1.0.2",
-    "vuetify-loader": "^1.2.2"
+    "vuetify-loader": "^1.2.2",
+    "webpack-cli": "^3.3.7"
   }
 }
