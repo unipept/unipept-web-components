@@ -3,7 +3,7 @@ import Sample from '../data-management/Sample';
 // @ts-ignore
 import TaxaElement from './TaxaElement';
 import Tree from '../data-management/Tree';
-import Node from '../data-management/Node';
+import {Node} from '../data-management/Node';
 import DataRepository from './DataRepository';
 import GoTerm from '../functional-annotations/GoTerm';
 import PeptideInfo from '../data-management/PeptideInfo';

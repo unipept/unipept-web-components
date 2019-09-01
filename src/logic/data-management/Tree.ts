@@ -1,4 +1,4 @@
-import Node from './Node';
+import {Node} from './Node';
 import PeptideInfo from './PeptideInfo';
 import TaxonInfo from './TaxonInfo';
 

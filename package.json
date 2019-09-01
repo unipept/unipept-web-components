@@ -11,7 +11,6 @@
     "docs:dev": "vuepress dev docs"
   },
   "main": "dist/unipept-web-components.umd.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist/*.{js,css,ts}"
   ],
@@ -24,7 +23,8 @@
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.1.0",
-    "vuetify": "^2.0.0"
+    "vuetify": "^2.0.0",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@mdi/font": "^4.1.95",
@@ -39,6 +39,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.2",
     "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.6",
     "eslint": "^6.0.1",
     "eslint-plugin-vue": "^5.2.3",
     "fibers": "^4.0.1",
@@ -52,5 +53,6 @@
     "vuepress": "^1.0.2",
     "vuetify-loader": "^1.2.2",
     "webpack-cli": "^3.3.7"
-  }
+  },
+  "types": "dist/index.d.ts"
 }
