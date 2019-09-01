@@ -1,4 +1,6 @@
 import Clipboard from "clipboard";
+import $ from "jquery";
+import d3 from "d3";
 
 /**
  * Make clicking on the selector copy to the user clipboard
