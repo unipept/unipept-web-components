@@ -41,9 +41,9 @@
     import CardTitle from "../../components/card/card-title.vue";
     import {addCopy} from "../../logic/utils";
     import {showInfoModal} from "../../logic/modal";
-    import TaxaDataSource from "../datasource/TaxaDataSource";
-    import Sample from "../Sample";
-    import PeptideContainer from "../PeptideContainer";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import Sample from "../../logic/data-management/Sample";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import Tooltip from "./custom/tooltip.vue";
 
     @Component({

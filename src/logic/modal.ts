@@ -11,6 +11,7 @@ function showInfoModal(title: string, content: string, options: {wide: boolean} 
   $body
       .empty()
       .append($content);
+  //@ts-ignore
   $("#info-modal").modal("show");
   return $("#info-modal");
 }

@@ -13,6 +13,7 @@ import d3 from "d3";
 export function addCopy(selector, textFunction, tooltip = "Copy to clipboard", container = null) {
     const $el = $(selector).data("placement", "top")
         .attr("title", tooltip)
+        //@ts-ignore
         .tooltip();
     const clipSettings = {
         text: textFunction,
@@ -107,7 +108,7 @@ export function downloadDataByLink(dataURL, fileName) {
  * @param {string} url
  * @return {Promise<any>}
  */
-export function get(url) {
+export function get(url: string): Promise<any> {
     // Return a new promise.
     return new Promise(function (resolve, reject) {
         // Do the usual XHR stuff
@@ -196,7 +197,7 @@ export function iteratorToArray(iterator) {
  * @param {string} errorMessage
  */
 export function logErrorToGoogle(errorMessage) {
-    logToGoogle("Global", "Exception", errorMessage);
+    this.logToGoogle("Global", "Exception", errorMessage);
 }
 
 /**
@@ -207,12 +208,16 @@ export function logErrorToGoogle(errorMessage) {
  * @param {any} [value]
  */
 export function logToGoogle(page, action, name, value) {
+    //@ts-ignore (global variable injected by script in head)
     if (typeof (_gaq) !== "undefined") {
         if (name === undefined) {
+            //@ts-ignore
             _gaq.push(["_trackEvent", page, action]);
         } else if (value === undefined) {
+            //@ts-ignore
             _gaq.push(["_trackEvent", page, action, name]);
         } else {
+            //@ts-ignore
             _gaq.push(["_trackEvent", page, action, name, value]);
         }
     }
@@ -233,6 +238,7 @@ export function showError(errorMessage, userMessage) {
     if (userMessage) {
         let msg = $("<div class='alert alert-danger alert-dismissible' style='display: none;'><button type='button' class='close' data-dismiss='alert'><span>&times;</span></button><strong>Oh snap!</strong> " + userMessage + "</div>");
         $("#messages").append(msg);
+        //@ts-ignore
         msg.show("normal");
     }
 }
@@ -244,6 +250,7 @@ export function showError(errorMessage, userMessage) {
 export function showInfo(message) {
     let msg = $("<div class='alert alert-info alert-dismissible' style='display: none;'><button type='button' class='close' data-dismiss='alert'><span>&times;</span></button><strong>Heads up!</strong> " + message + "</div>");
     $("#messages").append(msg);
+    //@ts-ignore
     msg.show("normal");
 }
 
@@ -322,6 +329,7 @@ export function triggerDownloadModal(svgSelector, canvasSelector, baseFileName) 
     $image.html("<h3>Loading preview...</h3>" +
         "<div class='progress progress-striped active'>" +
         "<div class='progress-bar'  style='width: 65%'></div></div>");
+    //@ts-ignore
     $("#save-as-modal").modal();
 
     // Generate the image
@@ -334,14 +342,16 @@ export function triggerDownloadModal(svgSelector, canvasSelector, baseFileName) 
     }
     if (canvasSelector) {
         // Use html2canvas to convert canvas to dataURL
-        html2canvas($(canvasSelector), {
+        this.html2canvas($(canvasSelector), {
             onrendered: function (canvas) {
                 showImage(canvas.toDataURL());
             },
         });
     }
 
+    //@ts-ignore
     if (window.fullScreenApi.isFullScreen()) {
+        //@ts-ignore
         window.fullScreenApi.cancelFullScreen();
     }
 
