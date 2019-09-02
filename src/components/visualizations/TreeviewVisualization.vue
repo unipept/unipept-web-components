@@ -16,13 +16,13 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
-    import Tree from "@/logic/data-management/Tree";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Tree from "../../logic/data-management/Tree";
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Treeview from "./Treeview.vue";
-    import {Node} from "@/logic/data-management/Node";
+    import {Node} from "../../logic/data-management/Node";
 
     @Component({
         components: {

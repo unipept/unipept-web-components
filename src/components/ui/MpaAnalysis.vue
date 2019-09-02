@@ -23,7 +23,7 @@
     import LoadDatasetsCard from "./LoadDatasetsCard.vue";
     import FunctionalSummaryCard from "./FunctionalSummaryCard.vue";
 
-    import SingleDatasetVisualizationsCard from "@/components/visualizations/SingleDatasetVisualizationsCard.vue";
+    import SingleDatasetVisualizationsCard from "../visualizations/SingleDatasetVisualizationsCard.vue";
 
     @Component({
         components: {

@@ -68,14 +68,14 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import SearchSettingsForm from "./SearchSettingsForm.vue";
 
     // TODO: fix these imports
     import CardTitle from "../../components/card/card-title.vue";
     import CardHeader from "../../components/card/card-header.vue";
 
-    import Tooltip from "@/components/custom/Tooltip.vue";
+    import Tooltip from "../custom/Tooltip.vue";
 
     @Component({
         components: {CardHeader, CardTitle, SearchSettingsForm, Tooltip}

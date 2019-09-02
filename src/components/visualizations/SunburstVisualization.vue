@@ -28,11 +28,11 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import Tree from "@/logic/data-management/Tree";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
+    import Tree from "../../logic/data-management/Tree";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 
     @Component
     export default class SunburstVisualization extends mixins(VisualizationMixin) {

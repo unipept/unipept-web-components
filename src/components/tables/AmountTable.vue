@@ -62,15 +62,15 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import { toCSVString, logToGoogle } from "@/logic/utils";
-    import { tooltipContent } from "@/components/visualizations/VisualizationHelper";
-    import Treeview from "@/components/visualizations/Treeview.vue";
-    import {Node} from "@/logic/data-management/Node";
+    import { toCSVString, logToGoogle } from "../../logic/utils";
+    import { tooltipContent } from "../visualizations/VisualizationHelper";
+    import Treeview from "../visualizations/Treeview.vue";
+    import {Node} from "../../logic/data-management/Node";
     import FaSortSettings from "./FaSortSettings";
-    import FAElement from "@/logic/functional-annotations/FAElement";
-    import Sample from "@/logic/data-management/Sample";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
-    import Tree from "@/logic/data-management/Tree";
+    import FAElement from "../../logic/functional-annotations/FAElement";
+    import Sample from "../../logic/data-management/Sample";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import Tree from "../../logic/data-management/Tree";
 
     @Component({
         components: {

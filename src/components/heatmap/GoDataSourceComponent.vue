@@ -20,9 +20,9 @@
     import Vue from "vue";
     import Component, { mixins } from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import {GoNameSpace, convertStringToGoNameSpace} from "@/logic/functional-annotations/GoNameSpace";
-    import GoDataSource from "@/logic/data-source/GoDataSource";
-    import GoTerm from "@/logic/functional-annotations/GoTerm";
+    import {GoNameSpace, convertStringToGoNameSpace} from "../../logic/functional-annotations/GoNameSpace";
+    import GoDataSource from "../../logic/data-source/GoDataSource";
+    import GoTerm from "../../logic/functional-annotations/GoTerm";
     import DataSourceMixin from "./DataSourceMixin.vue";
 
     @Component

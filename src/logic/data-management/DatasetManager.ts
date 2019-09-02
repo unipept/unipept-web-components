@@ -1,6 +1,6 @@
 import PeptideContainer from './PeptideContainer';
 import {StorageType} from './StorageType';
-import {get, getJSON} from '../utils.js';
+import {get, getJSON} from '../../logic/utils';
 
 export default class DatasetManager {
     public static readonly MPA_STORAGE_PREFIX: string = 'mpa-';

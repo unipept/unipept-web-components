@@ -2,7 +2,7 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import DataSource from "@/logic/data-source/DataSource";
+    import DataSource from "../../logic/data-source/DataSource";
 
     @Component
     export default class DataSourceMixin extends Vue {

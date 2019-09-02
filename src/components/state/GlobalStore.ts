@@ -1,7 +1,7 @@
-import PeptideContainer from "@/logic/data-management/PeptideContainer";
+import PeptideContainer from "../../logic/data-management/PeptideContainer";
 import {ActionContext, ActionTree, GetterTree, MutationTree} from "vuex";
-import DatasetManager from "@/logic/data-management/DatasetManager";
-import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
+import DatasetManager from "../../logic/data-management/DatasetManager";
+import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
 
 export interface GlobalState {
     selectedDatasets: PeptideContainer[],

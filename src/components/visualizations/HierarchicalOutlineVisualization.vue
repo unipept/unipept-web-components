@@ -21,10 +21,10 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
-    import Tree from "@/logic/data-management/Tree";
-    import {constructSearchtree} from "@/logic/data-management/searchtree";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Tree from "../../logic/data-management/Tree";
+    import {constructSearchtree} from "../../logic/data-management/searchtree";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 
     @Component({
         components: {},

@@ -20,9 +20,9 @@
     import Vue from "vue";
     import Component, { mixins } from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import EcDataSource from "@/logic/data-source/EcDataSource";
-    import { EcNameSpace, convertEcNumberToEcNameSpace, convertStringToEcNameSpace } from "@/logic/functional-annotations/EcNameSpace";
-    import EcNumber from "@/logic/functional-annotations/EcNumber";
+    import EcDataSource from "../../logic/data-source/EcDataSource";
+    import { EcNameSpace, convertEcNumberToEcNameSpace, convertStringToEcNameSpace } from "../../logic/functional-annotations/EcNameSpace";
+    import EcNumber from "../../logic/functional-annotations/EcNumber";
     import DataSourceMixin from "./DataSourceMixin.vue";
 
     @Component

@@ -125,16 +125,16 @@
 
     import Component from "vue-class-component";
     import DatasetForm from "./DatasetForm.vue";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
-    import DatasetManager from "@/logic/data-management/DatasetManager";
-    import {StorageType} from "@/logic/data-management/StorageType";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import DatasetManager from "../../logic/data-management/DatasetManager";
+    import {StorageType} from "../../logic/data-management/StorageType";
 
     // TODO: fix these imports
     import Snackbar from "../../components/snackbar/snackbar.vue";
     import axios from "axios"
 
-    import SampleDataset from "@/logic/data-management/SampleDataset";
-    import Tooltip from "@/components/custom/Tooltip.vue";
+    import SampleDataset from "../../logic/data-management/SampleDataset";
+    import Tooltip from "../custom/Tooltip.vue";
 
     @Component({
         components: {

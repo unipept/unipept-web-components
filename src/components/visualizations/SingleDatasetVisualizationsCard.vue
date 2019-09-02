@@ -140,9 +140,9 @@
     import DatasetVisualizations from "./dataset-visualizations.vue";
     import fullscreen from 'vue-fullscreen';
 
-    import {logToGoogle, triggerDownloadModal} from "@/logic/utils";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
-    import HeatmapWizardSingleSample from "@/components/heatmap/HeatmapWizardSingleSample.vue";
+    import {logToGoogle, triggerDownloadModal} from "../../logic/utils";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
 
     @Component({
         components: {

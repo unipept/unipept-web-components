@@ -16,13 +16,13 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
-    import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
-    import Tree from "@/logic/data-management/Tree";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
+    import Tree from "../../logic/data-management/Tree";
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
-    import { TaxumRank } from "@/logic/data-source/TaxumRank";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import { TaxumRank } from "../../logic/data-source/TaxumRank";
 
     @Component
     export default class TreemapVisualization extends mixins(VisualizationMixin) {

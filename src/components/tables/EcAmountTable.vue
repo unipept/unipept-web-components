@@ -6,13 +6,13 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import EcNumber from "@/logic/functional-annotations/EcNumber";
-    import {Node} from "@/logic/data-management/Node";
-    import { EcNameSpace } from "@/logic/functional-annotations/EcNameSpace";
-    import Treeview from "@/components/visualizations/Treeview.vue";
+    import EcNumber from "../../logic/functional-annotations/EcNumber";
+    import {Node} from "../../logic/data-management/Node";
+    import { EcNameSpace } from "../../logic/functional-annotations/EcNameSpace";
+    import Treeview from "../../components/visualizations/Treeview.vue";
     import AmountTable from "./AmountTable.vue";
-    import Sample from "@/logic/data-management/Sample";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
+    import Sample from "../../logic/data-management/Sample";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import FaSortSettings from "./FaSortSettings";
 
     @Component({

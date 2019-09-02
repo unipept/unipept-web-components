@@ -6,17 +6,17 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import GoTerm from "@/logic/functional-annotations/GoTerm";
-    import { tooltipContent } from "@/components/visualizations/VisualizationHelper";
-    import Sample from "@/logic/data-management/Sample";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
+    import GoTerm from "../../logic/functional-annotations/GoTerm";
+    import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
+    import Sample from "../../logic/data-management/Sample";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Treeview from "../visualizations/treeview.vue";
     import AmountTable from "./AmountTable.vue";
-    import { downloadDataByForm, logToGoogle, triggerDownloadModal } from "@/logic/utils";
-    import { GoNameSpace } from "@/logic/functional-annotations/GoNameSpace";
+    import { downloadDataByForm, logToGoogle, triggerDownloadModal } from "../../logic/utils";
+    import { GoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
     import FaSortSettings from "./FaSortSettings";
-    import {Node} from "@/logic/data-management/Node";
-    import FAElement from "@/logic/functional-annotations/FAElement";
+    import {Node} from "../../logic/data-management/Node";
+    import FAElement from "../../logic/functional-annotations/FAElement";
 
     @Component({
         components: {

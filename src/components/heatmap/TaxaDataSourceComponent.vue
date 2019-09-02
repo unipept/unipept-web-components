@@ -20,14 +20,14 @@
     import Vue from "vue";
     import Component, { mixins } from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import TaxaDataSource from "@/logic/data-source/TaxaDataSource";
-    
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+
     // TODO: fix this import
     import DataSourceComponent from "./data-source-component.vue";
 
     import DataSourceMixin from "./DataSourceMixin.vue";
-    import { TaxumRank, convertStringToTaxumRank } from "@/logic/data-source/TaxumRank";
-    import TaxaElement from "@/logic/data-source/TaxaElement";
+    import { TaxumRank, convertStringToTaxumRank } from "../../logic/data-source/TaxumRank";
+    import TaxaElement from "../../logic/data-source/TaxaElement";
 
     @Component
     export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {

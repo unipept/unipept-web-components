@@ -1,6 +1,6 @@
-import {Normalizer} from "@/logic/heatmap/Normalizer";
-import DataSource from "@/logic/data-source/DataSource";
-import Element from "@/logic/data-source/Element";
+import {Normalizer} from "../../logic/heatmap/Normalizer";
+import DataSource from "../../logic/data-source/DataSource";
+import Element from "../../logic/data-source/Element";
 
 export default class HeatmapConfiguration {
     public normalizer: Normalizer = null;

@@ -1,6 +1,6 @@
-import {FunctionalAnnotations} from "@/logic/functional-annotations/FunctionalAnnotations";
-import {numberToPercent} from "@/logic/utils";
-import GoTerm from "@/logic/functional-annotations/GoTerm";
+import {FunctionalAnnotations} from "../../logic/functional-annotations/FunctionalAnnotations";
+import {numberToPercent} from "../../logic/utils";
+import GoTerm from "../../logic/functional-annotations/GoTerm";
 
 export default class FaSortSettings {
     public format: (x: GoTerm) => string;

@@ -20,15 +20,15 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import {FunctionalAnnotations} from "@/logic/functional-annotations/FunctionalAnnotations";
-    import ECNumbers from "@/logic/functional-annotations/ecnumbers";
-    import {downloadDataByForm, logToGoogle, numberToPercent, toCSVString, triggerDownloadModal} from "@/logic/utils";
+    import {FunctionalAnnotations} from "../../logic/functional-annotations/FunctionalAnnotations";
+    import ECNumbers from "../../logic/functional-annotations/ecnumbers";
+    import {downloadDataByForm, logToGoogle, numberToPercent, toCSVString, triggerDownloadModal} from "../../logic/utils";
 
     // TODO: fix this import
     import {AmountTable} from "../../../components/amount_table";
-    
+
     import FaSortSettings from "./FaSortSettings";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     
     @Component({
         components: {}

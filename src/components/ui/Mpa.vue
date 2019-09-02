@@ -8,13 +8,13 @@
 <script lang="ts">
     import Vue from "vue";
     import Component from "vue-class-component";
-    import MpaHome from "./mpa-home.vue";
+    import MpaHome from "./MpaHome.vue";
     import {Prop} from "vue-property-decorator";
     import MpaAnalysis from "./MpaAnalysis.vue";
-    import PeptideContainer from "@/logic/data-management/PeptideContainer";
-    import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
-    import DatasetManager from "@/logic/data-management/DatasetManager";
-    import { StorageType } from "@/logic/data-management/StorageType";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
+    import DatasetManager from "../../logic/data-management/DatasetManager";
+    import { StorageType } from "../../logic/data-management/StorageType";
 
     @Component({
         components: {MpaAnalysis, MpaHome}

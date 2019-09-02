@@ -10,12 +10,12 @@
     import {Prop, Watch} from "vue-property-decorator";
     
     import VisualizationMixin from "./VisualizationMixin.vue";
-    import Tree from "@/logic/data-management/Tree";
-    import {Node} from "@/logic/data-management/Node";
+    import Tree from "../../logic/data-management/Tree";
+    import {Node} from "../../logic/data-management/Node";
     import {Heatmap, HeatmapSettings} from "unipept-heatmap";
     import {HeatmapData, HeatmapElement, HeatmapValue} from "unipept-heatmap/heatmap/input";
-    import GOTerms from "@/logic/functional-annotations/old-goterms";
-    import Resultset from "@/logic/data-management/Resultset";
+    import GOTerms from "../../logic/functional-annotations/old-goterms";
+    import Resultset from "../../logic/data-management/Resultset";
 
     @Component
     export default class HeatmapVisualization extends mixins(VisualizationMixin) {
