@@ -72,8 +72,8 @@
     import SearchSettingsForm from "./SearchSettingsForm.vue";
 
     // TODO: fix these imports
-    import CardTitle from "../../components/card/card-title.vue";
-    import CardHeader from "../../components/card/card-header.vue";
+    import CardTitle from "../custom/CardTitle.vue";
+    import CardHeader from "../custom/CardHeader.vue";
 
     import Tooltip from "../custom/Tooltip.vue";
 

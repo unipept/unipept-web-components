@@ -109,8 +109,8 @@
     import EcNumbersSummary from "../tables/EcNumbersSummary.vue";
     import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
-    import IndeterminateProgressBar from "../../components/progress/indeterminate-progress-bar.vue";
-    import CardHeader from "../../components/card/card-header.vue";
+    import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
+    import CardHeader from "../../custom/CardHeader.vue";
 
     import {showInfoModal} from "../../../logic/modal";
     import Sample from "../../../logic/data-management/Sample";

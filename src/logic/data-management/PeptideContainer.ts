@@ -19,7 +19,7 @@ export default class PeptideContainer implements ProgressListener {
      *
      * @param id A unique id associated with this dataset.
      */
-    constructor(id: string) {
+    constructor(id: string = undefined) {
         if (id === undefined) {
             id = this.generateUniqueId();
         }

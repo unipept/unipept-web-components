@@ -4,4 +4,4 @@ export * from './dataset';
 export * from './heatmap';
 export * from './tables';
 export * from './visualizations';
-export * from './ui';
+export * from './management';

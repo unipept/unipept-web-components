@@ -8,11 +8,11 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
+    import {Heatmap, HeatmapSettings} from "unipept-heatmap";
     
-    import VisualizationMixin from "./VisualizationMixin.vue";
+    import VisualizationMixin from "./visualization-mixin.vue";
     import Tree from "../../logic/data-management/Tree";
     import {Node} from "../../logic/data-management/Node";
-    import {Heatmap, HeatmapSettings} from "unipept-heatmap";
     import {HeatmapData, HeatmapElement, HeatmapValue} from "unipept-heatmap/heatmap/input";
     import GOTerms from "../../logic/functional-annotations/old-goterms";
     import Resultset from "../../logic/data-management/Resultset";

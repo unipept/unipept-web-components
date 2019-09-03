@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts">
+    import d3 from "d3";
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
@@ -25,7 +26,7 @@
     import {downloadDataByForm, logToGoogle, numberToPercent, toCSVString, triggerDownloadModal} from "../../logic/utils";
 
     // TODO: fix this import
-    import {AmountTable} from "../../../components/amount_table";
+    import {AmountTable} from "./amount_table";
 
     import FaSortSettings from "./FaSortSettings";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
@@ -63,6 +64,7 @@
             $("#save-btn-ec").unbind("click");
             $container.empty();
             if (ecResultSet.getTrust().annotatedCount > 0) {
+                // @ts-ignore
                 const tree = $container.treeview(ecResultSet.treeSequencesData(), {
                     width: 916,
                     height: 500,
@@ -92,6 +94,7 @@
                 // save tree button
                 $("#save-btn-ec").prop("disabled", false)
                     .click(() => {
+                        // @ts-ignore
                         logToGoogle("Multi peptide", "Save EC Image");
                         triggerDownloadModal($container.find("svg"), null, "unipept_treeview");
                     });
@@ -241,6 +244,7 @@
 
             const highlightColor = "#ffc107";
             const highlightColorFunc = d => (d.included ? highlightColor : "lightgrey");
+            // @ts-ignore
             dataset.getFATree(code).then(faTree => $container.treeview(faTree, {
                 width: width,
                 height: 310,
@@ -253,6 +257,7 @@
             }));
 
             $dlbtn.click(() => {
+                // @ts-ignore
                 logToGoogle("Multi peptide", "Save Image for FA");
                 triggerDownloadModal($container.find("svg"), null, "unipept_treeview_" + code);
             });
@@ -278,6 +283,7 @@
                 });
 
             // HACK: d3 to jQuery
+            // @ts-ignore
             $(downloadLink[0]).tooltip();
         }
 

@@ -126,18 +126,17 @@
 </template>
 
 <script lang="ts">
+    import d3 from "d3";
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
     import SunburstVisualization from "./SunburstVisualization.vue";
     import TreemapVisualization from "./TreemapVisualization.vue";
     import TreeviewVisualization from "./TreeviewVisualization.vue";
-    import HeatmapVisualization from "./HeatmapVisualization.vue";
+    import HeatmapVisualization from "../heatmap/HeatmapVisualization.vue";
     import HierarchicalOutlineVisualization from "./HierarchicalOutlineVisualization.vue";
 
-    // TODO: fix these imports
-    import CardHeader from "../../../components/card/card-header.vue";
-    import DatasetVisualizations from "./dataset-visualizations.vue";
+    import CardHeader from "../custom/card/CardHeader.vue";
     import fullscreen from 'vue-fullscreen';
 
     import {logToGoogle, triggerDownloadModal} from "../../logic/utils";
@@ -180,7 +179,9 @@
         private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
         mounted() {
+            // @ts-ignore
             $(document).bind(window.fullScreenApi.fullScreenEventName, () => this.exitFullScreen());
+            // @ts-ignore
             $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
         }
 
@@ -194,9 +195,11 @@
         }
         
         private switchToFullScreen() {
+            // @ts-ignore
             if (window.fullScreenApi.supportsFullScreen) {
                 this.isFullScreen = true;
                 this.$refs.fullScreenContainer.toggle();
+                // @ts-ignore
                 logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
                 $(".tip").appendTo(".full-screen-container");
             }
@@ -220,8 +223,10 @@
         }
 
         private saveAsImage() {
+            // @ts-ignore
             logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
             if (this.tabs[this.tab] === "Sunburst") {
+
                 d3.selectAll(".toHide").attr("class", "arc hidden");
                 triggerDownloadModal("#sunburstWrapper svg", null, "unipept_sunburst");
                 d3.selectAll(".hidden").attr("class", "arc toHide");

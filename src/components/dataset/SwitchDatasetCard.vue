@@ -76,8 +76,8 @@
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
 
     // TODO: fix these imports
-    import CardHeader from "../../components/card/card-header.vue";
-    import CardTitle from "../../components/card/card-title.vue";
+    import CardHeader from "../custom/CardHeader.vue";
+    import CardTitle from "../custom/CardTitle.vue";
 
     import HeatmapWizardMultiSample from "../heatmap/HeatmapWizardMultiSample.vue";
     import Tooltip from "../custom/Tooltip.vue";

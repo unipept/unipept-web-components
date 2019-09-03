@@ -130,7 +130,7 @@
     import {StorageType} from "../../logic/data-management/StorageType";
 
     // TODO: fix these imports
-    import Snackbar from "../../components/snackbar/snackbar.vue";
+    import Snackbar from "../custom/Snackbar.vue";
     import axios from "axios"
 
     import SampleDataset from "../../logic/data-management/SampleDataset";
@@ -213,12 +213,14 @@
 
                 this.prideName = 'PRIDE assay ' + prideNumber.toString();
 
+                // @ts-ignore
                 this.$refs.prideSnackbar.show();
                 datasetManager
                     .loadPrideDataset(prideNumber, (progress) => this.prideProgress = progress * 100)
                     .then((peptides) => {
                         this.pridePeptides = peptides.join("\n");
                         this.prideLoading = false;
+                        // @ts-ignore
                         this.$refs.prideSnackbar.destroy();
                     });
             }
