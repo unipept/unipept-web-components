@@ -1,4 +1,4 @@
-import DatasetForm from 'DatasetForm.vue';
+import DatasetForm from './DatasetForm.vue';
 
 export {
   DatasetForm
