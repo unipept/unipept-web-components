@@ -101,31 +101,30 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
-    import FaSortSettings from "../tables/FaSortSettings";
-    import {numberToPercent, stringTitleize} from "../../logic/utils";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
-    import {FunctionalAnnotations} from "../../logic/functional-annotations/FunctionalAnnotations";
+    import MpaAnalysisManager from "../../../logic/data-management/MpaAnalysisManager";
+    import FaSortSettings from "../../tables/FaSortSettings";
+    import {numberToPercent, stringTitleize} from "../../../logic/utils";
+    import PeptideContainer from "../../../logic/data-management/PeptideContainer";
+    import {FunctionalAnnotations} from "../../../logic/functional-annotations/FunctionalAnnotations";
     import EcNumbersSummary from "../tables/EcNumbersSummary.vue";
     import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
-    // TODO: fix these imports
     import IndeterminateProgressBar from "../../components/progress/indeterminate-progress-bar.vue";
     import CardHeader from "../../components/card/card-header.vue";
 
-    import {showInfoModal} from "../../logic/modal";
-    import Sample from "../../logic/data-management/Sample";
-    import GoDataSource from "../../logic/data-source/GoDataSource";
-    import { GoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
-    import GoTerm from "../../logic/functional-annotations/GoTerm";
+    import {showInfoModal} from "../../../logic/modal";
+    import Sample from "../../../logic/data-management/Sample";
+    import GoDataSource from "../../../logic/data-source/GoDataSource";
+    import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
+    import GoTerm from "../../../logic/functional-annotations/GoTerm";
     import GoAmountTable from "../tables/GoAmountTable.vue";
-    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-    import EcNumber from "../../logic/functional-annotations/EcNumber";
-    import EcDataSource from "../../logic/data-source/EcDataSource";
+    import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
+    import EcNumber from "../../../logic/functional-annotations/EcNumber";
+    import EcDataSource from "../../../logic/data-source/EcDataSource";
     import EcAmountTable from "../tables/EcAmountTable.vue";
-    import TreeViewNode from "../visualizations/TreeViewNode";
+    import TreeViewNode from "../../visualizations/TreeViewNode";
     import Treeview from "../visualizations/Treeview.vue";
-    import FATrust from "../../logic/functional-annotations/FATrust";
+    import FATrust from "../../../logic/functional-annotations/FATrust";
 
     @Component({
         components: {
@@ -354,6 +353,7 @@
                 let ecSource: EcDataSource = await sample.dataRepository.createEcDataSource();
                 this.ecData = await ecSource.getEcNumbers();
                 this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
+                // @ts-ignore
                 this.ecTreeData = await ecSource.getEcTree();
             }
         }
