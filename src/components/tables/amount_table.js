@@ -1,4 +1,4 @@
-import {toCSVString, downloadDataByForm} from "../utils.js";
+import {toCSVString, downloadDataByForm} from "../../logic/utils";
 
 
 /**

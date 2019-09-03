@@ -36,7 +36,7 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import SearchSettingsForm from "./SearchSettingsForm.vue";
+    import SearchSettingsForm from "../SearchSettingsForm.vue";
 
     // TODO: fix these imports
     import CardHeader from "../../custom/CardHeader.vue";
@@ -47,7 +47,7 @@
     import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
     import Sample from "../../../logic/data-management/Sample";
     import PeptideContainer from "../../../logic/data-management/PeptideContainer";
-    import Tooltip from "../custom/Tooltip.vue";
+    import Tooltip from "../../custom/Tooltip.vue";
 
     @Component({
         components: {CardTitle, CardHeader, SearchSettingsForm, Tooltip}

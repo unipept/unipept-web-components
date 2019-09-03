@@ -106,7 +106,7 @@
     import {numberToPercent, stringTitleize} from "../../../logic/utils";
     import PeptideContainer from "../../../logic/data-management/PeptideContainer";
     import {FunctionalAnnotations} from "../../../logic/functional-annotations/FunctionalAnnotations";
-    import EcNumbersSummary from "../tables/EcNumbersSummary.vue";
+    import EcNumbersSummary from "../../tables/EcNumbersSummary.vue";
     import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
     import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
@@ -117,13 +117,13 @@
     import GoDataSource from "../../../logic/data-source/GoDataSource";
     import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
     import GoTerm from "../../../logic/functional-annotations/GoTerm";
-    import GoAmountTable from "../tables/GoAmountTable.vue";
+    import GoAmountTable from "../../tables/GoAmountTable.vue";
     import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
     import EcNumber from "../../../logic/functional-annotations/EcNumber";
     import EcDataSource from "../../../logic/data-source/EcDataSource";
-    import EcAmountTable from "../tables/EcAmountTable.vue";
+    import EcAmountTable from "../../tables/EcAmountTable.vue";
     import TreeViewNode from "../../visualizations/TreeViewNode";
-    import Treeview from "../visualizations/Treeview.vue";
+    import Treeview from "../../visualizations/Treeview.vue";
     import FATrust from "../../../logic/functional-annotations/FATrust";
 
     @Component({

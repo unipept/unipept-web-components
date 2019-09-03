@@ -136,7 +136,7 @@
     import HeatmapVisualization from "../heatmap/HeatmapVisualization.vue";
     import HierarchicalOutlineVisualization from "./HierarchicalOutlineVisualization.vue";
 
-    import CardHeader from "../custom/card/CardHeader.vue";
+    import CardHeader from "../custom/CardHeader.vue";
     import fullscreen from 'vue-fullscreen';
 
     import {logToGoogle, triggerDownloadModal} from "../../logic/utils";
@@ -243,7 +243,7 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="css">
     /* .fullscreen-nav {
         position: absolute;
         z-index: 1;

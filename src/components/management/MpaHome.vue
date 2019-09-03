@@ -15,8 +15,8 @@
 <script lang="ts">
     import Vue from "vue";
     import Component from "vue-class-component";
-    import LoadDatasetsCard from "./LoadDatasetsCard.vue";
-    import SelectDatasetsCard from "./SelectDatasetsCard.vue";
+    import LoadDatasetsCard from "../dataset/LoadDatasetsCard.vue";
+    import SelectDatasetsCard from "../dataset/SelectDatasetsCard.vue";
     import SearchHelp from "./SearchHelp.vue";
 
     @Component({

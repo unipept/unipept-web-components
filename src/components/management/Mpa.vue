@@ -10,7 +10,7 @@
     import Component from "vue-class-component";
     import MpaHome from "./MpaHome.vue";
     import {Prop} from "vue-property-decorator";
-    import MpaAnalysis from "./MpaAnalysis.vue";
+    import MpaAnalysis from "../analysis/MpaAnalysis.vue";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
     import DatasetManager from "../../logic/data-management/DatasetManager";

@@ -69,7 +69,7 @@
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
-    import SearchSettingsForm from "./SearchSettingsForm.vue";
+    import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
 
     // TODO: fix these imports
     import CardTitle from "../custom/CardTitle.vue";

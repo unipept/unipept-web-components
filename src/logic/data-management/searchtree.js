@@ -1,4 +1,4 @@
-import {addCopy, highlight, logToGoogle} from "../utils.js";
+import {addCopy, highlight, logToGoogle} from "../utils";
 /* eslint require-jsdoc: off */
 
 /**

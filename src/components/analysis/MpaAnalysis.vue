@@ -18,10 +18,10 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import ExperimentSummaryCard from "./ExperimentSummaryCard.vue";
-    import SwitchDatasetCard from "./SwitchDatasetCard.vue";
-    import LoadDatasetsCard from "./LoadDatasetsCard.vue";
-    import FunctionalSummaryCard from "./FunctionalSummaryCard.vue";
+    import ExperimentSummaryCard from "./functional/ExperimentSummaryCard.vue";
+    import SwitchDatasetCard from "../dataset/SwitchDatasetCard.vue";
+    import LoadDatasetsCard from "../dataset/LoadDatasetsCard.vue";
+    import FunctionalSummaryCard from "./functional/FunctionalSummaryCard.vue";
 
     import SingleDatasetVisualizationsCard from "../visualizations/SingleDatasetVisualizationsCard.vue";
 

@@ -70,9 +70,10 @@ import {NormalizationType} from "./NormalizationType";
     import EcDataSourceComponent from "./EcDataSourceComponent.vue";
     import TaxaDataSourceComponent from "./TaxaDataSourceComponent.vue";
     import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
-    import HeatmapVisualization from "../visualizations/HeatmapVisualization.vue";
+    import HeatmapVisualization from "./HeatmapVisualization.vue";
     import Element from "../../logic/data-source/Element";
     import sha256 from "crypto-js/sha256";
+    import MPAConfig from "../../logic/data-management/MPAConfig";
 
     @Component({
         components: {GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization}

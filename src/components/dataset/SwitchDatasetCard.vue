@@ -75,7 +75,6 @@
     import {Prop, Watch} from "vue-property-decorator";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
 
-    // TODO: fix these imports
     import CardHeader from "../custom/CardHeader.vue";
     import CardTitle from "../custom/CardTitle.vue";
 
@@ -112,7 +111,7 @@
     }
 </script>
 
-<style>
+<style lang="css">
     .selected-list-tile .v-list__tile:before {
         content: ' ';
         background-color: #2196F3;
