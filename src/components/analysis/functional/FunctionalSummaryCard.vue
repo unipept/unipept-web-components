@@ -106,7 +106,6 @@
     import {numberToPercent, stringTitleize} from "../../../logic/utils";
     import PeptideContainer from "../../../logic/data-management/PeptideContainer";
     import {FunctionalAnnotations} from "../../../logic/functional-annotations/FunctionalAnnotations";
-    import EcNumbersSummary from "../../tables/EcNumbersSummary.vue";
     import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
     import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
@@ -131,7 +130,6 @@
             CardHeader,
             IndeterminateProgressBar,
             FilterFunctionalAnnotationsDropdown,
-            EcNumbersSummary, 
             GoAmountTable,
             EcAmountTable,
             Treeview

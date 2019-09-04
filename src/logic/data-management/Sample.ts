@@ -1,5 +1,4 @@
 import {FunctionalAnnotations} from '../functional-annotations/FunctionalAnnotations.js';
-import Resultset from './Resultset';
 import {postJSON} from '../utils';
 import Tree from './Tree';
 import DataRepository from '../data-source/DataRepository';
@@ -43,7 +42,6 @@ export default class Sample {
     public baseFa: FunctionalAnnotations;
     public id: string;
     public taxonMap: Map<number, TaxonInfo>;
-    public resultSet: Resultset;
 
     private _dataRepository: DataRepository;
 
@@ -80,22 +78,6 @@ export default class Sample {
     }
 
     /**
-     * Creates a tree like structure, that is this.tree where each node has an
-     * `included` property. This property indicates if this node or any of its
-     * children contain the, sought for, functional annotation (code).
-     *
-     * @param code The FA term to look for
-     * @return A taxon tree-like object annotated with `included`
-     */
-    public async getFATree(code: string): Promise<object> {
-        const pepts = (await this.getPeptidesByFA(code, null)).map((pept) => pept.sequence);
-        return this.tree.getRoot().callRecursivelyPostOder((t, c) => {
-            const included = c.some((x) => x.included) || t.values.some((pept) => pepts.includes(pept.sequence));
-            return Object.assign(Object.assign({}, t), {included, children: c});
-        });
-    }
-
-    /**
      * Adds new taxon info to the global taxon map
      *
      * @param taxonInfo A list of new taxon info
@@ -107,16 +89,6 @@ export default class Sample {
     }
 
     /**
-     * Converts the current analysis to the csv format. Each row contains a
-     * peptide and its lineage, with each column being a level in the taxonomy
-     *
-     * @return The analysis result in csv format
-     */
-    public async toCSV(): Promise<string> {
-        return this.resultSet.toCSV();
-    }
-
-    /**
      * Returns the number of matched peptides, taking the deduplication setting
      * into account.
      *
@@ -124,34 +96,5 @@ export default class Sample {
      */
     public getNumberOfMatchedPeptides(): number {
         return this.tree.root.data.count;
-    }
-
-    /**
-     * Returns the number of searched for peptides, taking the deduplication
-     * setting into account.
-     *
-     * @return The number of searched for peptides
-     */
-    public getNumberOfSearchedForPeptides(): number {
-        return this.resultSet.getNumberOfSearchedForPeptides();
-    }
-
-    /**
-     * Returns the list of unmached peptides for the current resultset
-     *
-     * @return An array of peptides without match
-     */
-    public getMissedPeptides(): string[] {
-        return this.resultSet.missedPeptides;
-    }
-
-    /**
-     * Returns a list of sequences that have the specified FA term
-     * @param faName The name of the FA term (GO:000112, EC:1.5.4.1)
-     * @param sequences List of sequences to limit to
-     * @return A list of objects representing the matches
-     */
-    public getPeptidesByFA(faName: string, sequences: string[]): Promise<Array<{sequence, hits, type, annotatedCount, allCount, relativeCount, count}>>  {
-        return this.resultSet.getPeptidesByFA(faName, sequences);
     }
 }

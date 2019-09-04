@@ -4,7 +4,6 @@ import Sample from '../data-management/Sample';
 import TaxaElement from './TaxaElement';
 import Tree from '../data-management/Tree';
 import {Node} from '../data-management/Node';
-import DataRepository from './DataRepository';
 import GoTerm from '../functional-annotations/GoTerm';
 import PeptideInfo from '../data-management/PeptideInfo';
 import EcNumber from '../functional-annotations/EcNumber';
