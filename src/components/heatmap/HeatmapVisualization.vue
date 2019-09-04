@@ -14,7 +14,6 @@
     import Tree from "../../logic/data-management/Tree";
     import {Node} from "../../logic/data-management/Node";
     import {HeatmapData, HeatmapElement, HeatmapValue} from "unipept-heatmap/heatmap/input";
-    import GOTerms from "../../logic/functional-annotations/old-goterms";
 
     @Component
     export default class HeatmapVisualization extends mixins(VisualizationMixin) {
