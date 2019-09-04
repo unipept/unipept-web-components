@@ -35,13 +35,6 @@ let preparedPeptidesLength = 0;
  * @property {number}   numSearched Number of peptides that were matched
  */
 
-/**
- * @typedef {Object} MPAConfig
- * @property  {boolean} il     should we equate I and L
- * @property  {boolean} dupes  should we filter duplicates?
- * @property  {boolean} missed will we perform advancedMissedCleavageHandling
- */
-
 
 /**
  * @typedef {Object} MPAFAResult

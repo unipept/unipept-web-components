@@ -1,4 +1,4 @@
-import {postJSON} from "../utils.js";
+import {postJSON} from "../utils";
 import {SingleFA} from "./FunctionalAnnotations.js";
 
 /**

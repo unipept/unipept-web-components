@@ -83,6 +83,7 @@
                     }
                 }
 
+                // @ts-ignore
                 this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
             }
         }

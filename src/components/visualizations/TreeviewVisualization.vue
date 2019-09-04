@@ -13,6 +13,7 @@
 </template>
 
 <script lang="ts">
+    import d3 from "d3";
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
@@ -42,6 +43,7 @@
             if (d.name === "Archaea") return "#FF8F00"; // orange
             if (d.name === "Eukaryota") return "#2E7D32"; // green
             if (d.name === "Viruses") return "#C62828"; // red
+            // @ts-ignore
             return d3.scale.category10().call(this, d);
         };
 

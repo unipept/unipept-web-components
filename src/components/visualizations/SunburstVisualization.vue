@@ -78,6 +78,7 @@
                 let tree: Tree = await taxaDataSource.getTree();
                 const data = JSON.stringify(tree.getRoot());
 
+                // @ts-ignore
                 this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
                     width: 740,
                     height: 740,

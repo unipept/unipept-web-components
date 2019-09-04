@@ -63,6 +63,7 @@
                 let tree: Tree = await taxaSource.getTree();
                 const data = JSON.stringify(tree.getRoot());
 
+                // @ts-ignore
                 this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
                     width: 916,
                     height: 600,

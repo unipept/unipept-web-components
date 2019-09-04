@@ -137,6 +137,7 @@
         }
 
         private saveImage(term: FAElement): void {
+            // @ts-ignores
             logToGoogle("Multi peptide", "Save Image for FA");
             // Hack to get a reference to the SVG DOM-element
             //@ts-ignore

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "webpack && dts-bundle --configJson dts-bundle.config.json",
+    "build": "webpack && dts-bundle --configJson dts-bundle.config.json --emitOnIncludedFileNotFound",
     "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "docs:build": "vuepress build docs",

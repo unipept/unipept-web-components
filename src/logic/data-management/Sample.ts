@@ -112,7 +112,7 @@ export default class Sample {
      *
      * @return The analysis result in csv format
      */
-    public toCSV(): Promise<string> {
+    public async toCSV(): Promise<string> {
         return this.resultSet.toCSV();
     }
 
