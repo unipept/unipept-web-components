@@ -70,18 +70,16 @@
     import {Prop, Watch} from "vue-property-decorator";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
-
-    // TODO: fix these imports
     import CardTitle from "../custom/CardTitle.vue";
     import CardHeader from "../custom/CardHeader.vue";
-
     import Tooltip from "../custom/Tooltip.vue";
 
     @Component({
         components: {CardHeader, CardTitle, SearchSettingsForm, Tooltip}
     })
     export default class SelectDatasetsCard extends Vue {
-        private selectedDatasets = this.$store.getters.selectedDatasets;
+        @Prop({required: true})
+        private selectedDatasets: PeptideContainer[];
 
         private equateIl: boolean = true;
         private filterDuplicates: boolean = true;
@@ -90,31 +88,44 @@
         private shaking: boolean = false;
 
         created() {
-            this.equateIl = this.$store.getters.searchSettings.il;
-            this.filterDuplicates = this.$store.getters.searchSettings.dupes;
-            this.missingCleavage = this.$store.getters.searchSettings.missed;
+            this.updateSearchSettings();
         }
 
-        deselectDataset(dataset: PeptideContainer) {
-            this.$store.dispatch('deselectDataset', dataset);
+        private deselectDataset(dataset: PeptideContainer) {
+            let idx: number = this.selectedDatasets.indexOf(dataset);
+            this.selectedDatasets.splice(idx, 1);
+            this.updateSelectedDatasets();
         }
 
-        search(): void {
-            if (this.$store.getters.selectedDatasets.length === 0) {
+        public search(): void {
+            if (this.selectedDatasets.length === 0) {
                 this.shaking = true;
                 // Disable the shaking effect after 300ms
                 setTimeout(() => this.shaking = false, 300);
             } else {
-                this.$store.dispatch('setSearchSettings', {il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage});
-                this.$store.dispatch('setAnalysis', true);
+                this.startAnalysis();
             }
         }
 
-        reset(): void {
-            this.equateIl = true;
-            this.filterDuplicates = true;
-            this.missingCleavage = false;
-            this.$store.dispatch('clearSelectedDatasets');
+        private reset(): void {
+            this.selectedDatasets.length = 0;
+            this.updateSelectedDatasets();
+        }
+
+        private startAnalysis() {
+            this.$emit('start-analysis');
+        }
+
+        private updateSelectedDatasets() {
+            this.$emit('update-selected-datasets', this.selectedDatasets);
+        }
+
+        private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
+            this.equateIl = equateIl;
+            this.filterDuplicates = filterDuplicates;
+            this.missingCleavage = missingCleavage;
+
+            this.$emit('update-search-settings', {il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage});
         }
     }
 </script>

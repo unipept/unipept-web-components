@@ -6,16 +6,16 @@
             </card-title>
             <div class="card-title-action">
                 <tooltip message="Add another dataset to the selection.">
-                    <v-icon @click="addDataset()" color="white">{{ this.$store.getters.isDatasetSelectionInProgress ? 'mdi-plus-circle' : 'mdi-plus' }}</v-icon>
+                    <v-icon @click="addDataset()" color="white">{{ this.isDatasetSelectionInProgress ? 'mdi-plus-circle' : 'mdi-plus' }}</v-icon>
                 </tooltip>
             </div>
         </card-header>
-        <v-card-text v-if="this.$store.getters.selectedDatasets.length === 0">
+        <v-card-text v-if="this.selectedDatasets.length === 0">
             <span>Please add one or more datasets by clicking the plus button above...</span>
         </v-card-text>
         <div class="growing-list">
             <v-list two-line>
-                <template v-for="dataset of this.$store.getters.selectedDatasets">
+                <template v-for="dataset of this.selectedDatasets">
                     <v-list-tile :key="dataset.id" ripple @click="() => activeDataset = dataset" :class="activeDataset === dataset ? 'selected-list-tile' : ''">
                         <v-list-tile-action>
                             <v-radio-group v-if="dataset.progress === 1" v-model="activeDataset"><v-radio :value="dataset"></v-radio></v-radio-group>
@@ -57,8 +57,9 @@
                     <h4 class="modal-title">Heatmap wizard</h4>
                 </div>
                 <div class="single-dataset-wizard">
-                    <heatmap-wizard-multi-sample v-if="$store.getters.activeDataset" :dataset="$store.getters.activeDataset"></heatmap-wizard-multi-sample>
-                    <div v-else>
+                    <!-- TODO fix -->
+                    <!-- <heatmap-wizard-multi-sample v-if="$store.getters.activeDataset" :dataset="$store.getters.activeDataset"></heatmap-wizard-multi-sample> -->
+                    <div>
                         <div class="text-xs-center" style="margin-top: 25px;">
                             <v-progress-circular indeterminate color="primary"></v-progress-circular>
                         </div>
@@ -95,18 +96,29 @@
         }
     })
     export default class SwitchDatasetCard extends Vue {
+        @Prop({required: true})
+        private selectedDatasets: PeptideContainer[];
+        @Prop({required: false, default: false})
+        private isDatasetSelectionInProgress: boolean;
+
         private dialogOpen: boolean = false;
 
-        private deselectDataset(dataset: PeptideContainer): void {
-            this.$store.dispatch('deselectDataset', dataset);
+        private deselectDataset(dataset: PeptideContainer) {
+            let idx: number = this.selectedDatasets.indexOf(dataset);
+            this.selectedDatasets.splice(idx, 1);
+            this.updateSelectedDatasets();
         }
 
         private addDataset(): void {
-            this.$store.dispatch('setDatasetSelectionInProgress', !this.$store.getters.isDatasetSelectionInProgress);
+            // this.$store.dispatch('setDatasetSelectionInProgress', !this.$store.getters.isDatasetSelectionInProgress);
         }
 
         private compareDatasets(): void {
             this.dialogOpen = true;
+        }
+
+        private updateSelectedDatasets() {
+            this.$emit('update-selected-datasets', this.selectedDatasets);
         }
     }
 </script>

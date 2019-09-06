@@ -30,12 +30,14 @@
         private searchSettings: FaSortSettings;
         @Prop({required: true})
         private namespace: GoNameSpace;
+        // The Sample that should be summarized in this AmountTable
+        @Prop({required: true})
+        private sample: Sample;
 
         private taxaRetriever: (term: GoTerm) => Promise<Node> = (term: GoTerm) => this.getTaxaTreeByTerm(term);
 
         private async getTaxaTreeByTerm(term: GoTerm): Promise<Node> {
-            let sample: Sample = this.$store.getters.activeDataset.getDataset();
-            let taxaDataSource: TaxaDataSource = await sample.dataRepository.createTaxaDataSource();
+            let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
             return taxaDataSource.getTreeByGoTerm(term);
         }
     }

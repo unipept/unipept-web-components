@@ -40,10 +40,7 @@
             dataset.setPeptides(this.peptides.split(/\\n/));
             dataset.setDate(new Date());
             dataset.setType(StorageType.SessionStorage);
-
-            console.log("From library");
-            console.log(this.$store);
-
+    
             this.$store.dispatch('setSearchSettings', {
                 il: this.il,
                 dupes: this.dupes,
