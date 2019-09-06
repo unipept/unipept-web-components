@@ -137,6 +137,7 @@
     import HierarchicalOutlineVisualization from "./HierarchicalOutlineVisualization.vue";
 
     import CardHeader from "../custom/CardHeader.vue";
+    //@ts-ignore
     import fullscreen from 'vue-fullscreen';
 
     import {logToGoogle, triggerDownloadModal} from "../../logic/utils";

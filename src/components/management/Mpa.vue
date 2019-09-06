@@ -15,6 +15,8 @@
     import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
     import DatasetManager from "../../logic/data-management/DatasetManager";
     import { StorageType } from "../../logic/data-management/StorageType";
+    import {GlobalStore} from './../../state';
+    import {AnalysisStore} from './../../state';
 
     @Component({
         components: {MpaAnalysis, MpaHome}
@@ -38,6 +40,9 @@
             dataset.setPeptides(this.peptides.split(/\\n/));
             dataset.setDate(new Date());
             dataset.setType(StorageType.SessionStorage);
+
+            console.log("From library");
+            console.log(this.$store);
 
             this.$store.dispatch('setSearchSettings', {
                 il: this.il,

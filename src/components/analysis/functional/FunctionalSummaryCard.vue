@@ -105,7 +105,6 @@
     import FaSortSettings from "../../tables/FaSortSettings";
     import {numberToPercent, stringTitleize} from "../../../logic/utils";
     import PeptideContainer from "../../../logic/data-management/PeptideContainer";
-    import {FunctionalAnnotations} from "../../../logic/functional-annotations/FunctionalAnnotations";
     import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
     import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";

@@ -1,4 +1,3 @@
-import {FunctionalAnnotations} from '../functional-annotations/FunctionalAnnotations.js';
 import {postJSON} from '../utils';
 import Tree from './Tree';
 import DataRepository from '../data-source/DataRepository';
@@ -38,8 +37,6 @@ export default class Sample {
 
     public tree: Tree;
     public originalPeptides: string[];
-    public fa: FunctionalAnnotations;
-    public baseFa: FunctionalAnnotations;
     public id: string;
     public taxonMap: Map<number, TaxonInfo>;
 
@@ -55,8 +52,6 @@ export default class Sample {
         this.originalPeptides = Sample.cleanPeptides(peptides);
 
         this.tree = null;
-        this.fa = null;
-        this.baseFa = null;
         this.id = id;
 
         this.taxonMap = new Map();
@@ -68,13 +63,6 @@ export default class Sample {
 
     public getTree(): Tree {
         return this.tree;
-    }
-
-    /**
-     * Sets the current FA summary as base, accessible trough baseFa.
-     */
-    public setBaseFA() {
-        this.baseFa = this.fa.clone();
     }
 
     /**

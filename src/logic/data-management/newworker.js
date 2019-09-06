@@ -1,7 +1,7 @@
 import "babel-polyfill"; // for async await webpacker support
 import "whatwg-fetch";
 // TODO: also include other pollyfills?
-import {postJSON, numberToPercent} from "../utils.js";
+import {postJSON, numberToPercent} from "../utils";
 
 const BATCH_SIZE = 100;
 const FA_BATCH_SIZE = 1000;

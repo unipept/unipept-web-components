@@ -1,5 +1,7 @@
 import * as components from './components'
 import vuetify from './plugins/vuetify';
+import fullscreen from 'vue-fullscreen';
+import Vuex from "vuex";
 
 const install = (Vue: any, options: any = {}) => {
   for (let key in components) {
@@ -8,6 +10,8 @@ const install = (Vue: any, options: any = {}) => {
     Vue.component(_key, components[key]) 
   }
   Vue.use(vuetify);
+  Vue.use(fullscreen);
+  Vue.use(Vuex);
 }
 
 // auto install

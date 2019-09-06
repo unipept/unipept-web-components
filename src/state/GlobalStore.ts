@@ -217,7 +217,7 @@ const mpaActions: ActionTree<GlobalState, any> = {
     }
 };
 
-export const globalStore = {
+export const GlobalStore = {
     state: mpaState,
     mutations: mpaMutations,
     getters: mpaGetters,

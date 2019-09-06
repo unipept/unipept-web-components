@@ -7,7 +7,7 @@ import TaxonInfo from '../data-management/TaxonInfo';
 
 // @ts-ignore
 import newworker from 'workerize-loader!./../data-management/newworker.js';
-import { postJSON } from '../utils.js';
+import { postJSON } from '../utils';
 import EcDataSource from './EcDataSource';
 
 

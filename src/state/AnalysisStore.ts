@@ -1,7 +1,4 @@
-import PeptideContainer from "../logic/data-management/PeptideContainer";
 import {ActionContext, ActionTree, GetterTree, MutationTree} from "vuex";
-import DatasetManager from "../logic/data-management/DatasetManager";
-import DisplaySettings from "../logic/data-management/DisplaySettings";
 
 export interface AnalysisState {
     datasetSelectionInProgress: boolean,
@@ -29,7 +26,7 @@ const analysisActions: ActionTree<AnalysisState, any> = {
     }
 };
 
-export const analysisStore = {
+export const AnalysisStore = {
     state: analysisState,
     mutations: analysisMutations,
     getters: analysisGetters,
