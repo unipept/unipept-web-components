@@ -124,12 +124,12 @@
     import Vue from "vue";
 
     import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
     import DatasetForm from "./DatasetForm.vue";
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import DatasetManager from "../../logic/data-management/DatasetManager";
     import {StorageType} from "../../logic/data-management/StorageType";
-
-    // TODO: fix these imports
+    // TODO can be migrated to Vuetify snackbar!
     import Snackbar from "../custom/Snackbar.vue";
     import axios from "axios"
 
@@ -152,7 +152,9 @@
             prideAssayForm: any
         }
 
-        private storedDatasets = this.$store.getters.storedDatasets;
+        @Prop({required: true})
+        private storedDatasets: PeptideContainer[];
+
         private sampleDatasets: SampleDataset[] = [];
         private prideAssay: string = "";
 
@@ -197,14 +199,6 @@
             }
         }
 
-        selectDataset(dataset: PeptideContainer): void {
-            this.$store.dispatch('selectDataset', dataset);
-        }
-
-        deleteDataset(dataset: PeptideContainer): void {
-            this.$store.dispatch('deleteDataset', dataset);
-        }
-
         fetchPrideAssay(): void {
             if (this.$refs.prideAssayForm.validate()) {
                 this.prideLoading = true;
@@ -240,6 +234,14 @@
             }
         }
 
+        private selectDataset(dataset: PeptideContainer): void {
+            this.$emit('select-dataset', dataset);
+        }
+
+        private deleteDataset(dataset: PeptideContainer): void {
+            this.$emit('deselect-dataset', dataset);
+        }
+
         private storeDataset(peptides: string, name: string, save: boolean): void {
             this.pendingStore = true;
             let peptideContainer: PeptideContainer = new PeptideContainer();
@@ -249,9 +251,9 @@
             peptideContainer.setName(name);
             peptideContainer.store().then(
                 () => {
-                    this.$store.dispatch('selectDataset', peptideContainer);
+                    this.selectDataset(peptideContainer);
                     if (save) {
-                        this.$store.dispatch('addStoredDataset', peptideContainer);
+                        this.$emit('store-dataset', peptideContainer);
                     }
                     this.pendingStore = false;
                 }
