@@ -19,7 +19,7 @@
                 <v-card flat>
                     <v-card-text>
                         <dataset-form ref="createdDatasetForm" v-on:peptide-change="createPeptides = $event" :peptides="createPeptides" v-on:name-change="createName = $event" :name="createName" v-on:save-change="createSave = $event" :save="createSave" :loading="pendingStore"></dataset-form>
-                        <div class="search-buttons-centered">
+                        <div class="card-actions">
                             <v-btn :disabled="pendingStore" @click="storeCreatedDataset()">
                                 <v-icon left>mdi-plus</v-icon>
                                 Add to selected datasets
@@ -65,7 +65,7 @@
                         <v-form ref="prideAssayForm">
                             <v-text-field label="Assay id" placeholder="e.g. 8500" :disabled="prideLoading || pendingStore" v-model="prideAssay" :rules="[value => !!value || 'Please enter a valid PRIDE assay number']" clearable></v-text-field>
                         </v-form>
-                        <div class="search-buttons-centered">
+                        <div class="card-actions">
                             <v-btn v-if="!prideLoading" @click="fetchPrideAssay()">
                                 <v-icon left>mdi-cloud-download</v-icon>
                                 Fetch PRIDE dataset
@@ -73,7 +73,7 @@
                             <v-progress-linear v-if="prideLoading" v-model="prideProgress"></v-progress-linear>
                         </div>
                         <dataset-form ref="prideDatasetForm" v-on:peptide-change="pridePeptides = $event" :peptides="pridePeptides" v-on:name-change="prideName = $event" :name="prideName" v-on:save-change="prideSave = $event" :save="prideSave" :loading="prideLoading || pendingStore"></dataset-form>
-                        <div class="search-buttons-centered">
+                        <div class="card-actions">
                             <v-btn :disabled="prideLoading || pendingStore" @click="storePrideDataset()">
                                 <v-icon left>mdi-plus</v-icon>
                                 Add to selected datasets
@@ -85,37 +85,39 @@
             </v-tab-item>
             <v-tab-item>
                 <v-card flat>
-                    <span v-if="storedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
-                    <v-list two-line>
-                        <template v-for="dataset of storedDatasets">
-                            <v-list-tile :key="dataset.id" ripple @click="selectDataset(dataset)">
-                                <v-list-tile-action>
-                                    <tooltip message="Select this dataset for analysis.">
-                                        <v-icon>mdi-plus</v-icon>
-                                    </tooltip>
-                                </v-list-tile-action>
-                                <v-list-tile-content>
-                                    <v-list-tile-title>
-                                        {{ dataset.getName() }}
-                                    </v-list-tile-title>
-                                    <v-list-tile-sub-title>
-                                        {{ dataset.getAmountOfPeptides() }} peptides
-                                    </v-list-tile-sub-title>
-                                </v-list-tile-content>
+                    <v-card-text>
+                        <span v-if="storedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
+                        <v-list two-line>
+                            <template v-for="dataset of storedDatasets">
+                                <v-list-tile :key="dataset.id" ripple @click="selectDataset(dataset)">
+                                    <v-list-tile-action>
+                                        <tooltip message="Select this dataset for analysis.">
+                                            <v-icon>mdi-plus</v-icon>
+                                        </tooltip>
+                                    </v-list-tile-action>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>
+                                            {{ dataset.getName() }}
+                                        </v-list-tile-title>
+                                        <v-list-tile-sub-title>
+                                            {{ dataset.getAmountOfPeptides() }} peptides
+                                        </v-list-tile-sub-title>
+                                    </v-list-tile-content>
 
-                                <v-list-tile-action>
-                                    <v-list-tile-action-text>
-                                        {{ dataset.getDateFormatted() }}
-                                    </v-list-tile-action-text>
-                                    <tooltip message="Delete this sample from local storage.">
-                                        <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
-                                            <v-icon color="grey darken-1">mdi-close</v-icon>
-                                        </v-btn>
-                                    </tooltip>
-                                </v-list-tile-action>
-                            </v-list-tile>
-                        </template>
-                    </v-list>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text>
+                                            {{ dataset.getDateFormatted() }}
+                                        </v-list-tile-action-text>
+                                        <tooltip message="Delete this sample from local storage.">
+                                            <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
+                                                <v-icon color="grey darken-1">mdi-close</v-icon>
+                                            </v-btn>
+                                        </tooltip>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                            </template>
+                        </v-list>
+                    </v-card-text>
                 </v-card>
             </v-tab-item>
         </v-tabs-items>
@@ -267,7 +269,9 @@
 </script>
 
 <style>
+    @import './../../assets/style/layout.css.less';
     @import './../../assets/style/tabs.css.less';
+    @import './../../assets/style/card.css.less';
 
     .peptide-amount-wrapper {
         display: flex !important;
