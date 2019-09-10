@@ -2,19 +2,19 @@
   <v-app>
     <v-content>
       <ComponentA/>
-      <SearchSettingsForm/>
+      <SelectDatasetsCard :selected-datasets="[]"/>
     </v-content>
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import SearchSettingsForm from './components/analysis/SearchSettingsForm.vue';
+import SelectDatasetsCard from './components/dataset/SelectDatasetsCard.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
-    SearchSettingsForm
+    SelectDatasetsCard
   },
   data: () => ({
     //

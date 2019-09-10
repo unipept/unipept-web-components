@@ -15,6 +15,6 @@
     }
 </script>
 
-<style scoped>
-
+<style lang="less">
+    @import './../../assets/style/card.css.less';
 </style>
