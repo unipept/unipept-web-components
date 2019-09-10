@@ -1,9 +1,20 @@
 <template>
     <v-card>
-        <v-tabs color="primary" dark>
+        <v-tabs color="primary" dark background-color="accent" slider-color="secondary" v-model="currentTab">
             <v-tab>
                 Create
             </v-tab>
+            <v-tab>
+                Sample data
+            </v-tab>
+            <v-tab>
+                Pride
+            </v-tab>
+            <v-tab>
+                Local data
+            </v-tab>
+        </v-tabs>
+        <v-tabs-items v-model="currentTab">
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
@@ -17,9 +28,6 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
-            <v-tab>
-                Sample data
-            </v-tab>
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
@@ -49,9 +57,6 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
-            <v-tab>
-                Pride
-            </v-tab>
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
@@ -78,9 +83,6 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
-            <v-tab>
-                Local data
-            </v-tab>
             <v-tab-item>
                 <v-card flat>
                     <span v-if="storedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
@@ -116,7 +118,7 @@
                     </v-list>
                 </v-card>
             </v-tab-item>
-        </v-tabs>
+        </v-tabs-items>
     </v-card>
 </template>
 
@@ -154,6 +156,8 @@
 
         @Prop({required: true})
         private storedDatasets: PeptideContainer[];
+
+        private currentTab: number = 0;
 
         private sampleDatasets: SampleDataset[] = [];
         private prideAssay: string = "";
@@ -263,6 +267,8 @@
 </script>
 
 <style>
+    @import './../../assets/style/tabs.css.less';
+
     .peptide-amount-wrapper {
         display: flex !important;
         flex-direction: row;

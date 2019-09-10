@@ -1,6 +1,6 @@
 <template>
     <div>
-        <label>Search settings (Test)</label>
+        <label>Search settings</label>
         <v-tooltip top>
             <template v-slot:activator="{ on }">
                 <div v-on="on">

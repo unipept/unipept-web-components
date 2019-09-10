@@ -1,20 +1,17 @@
 <template>
   <v-app>
-    <v-content>
-      <ComponentA/>
-      <SelectDatasetsCard :selected-datasets="[]"/>
-    </v-content>
+    <LoadDatasetsCard :stored-datasets="[]"/>
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import SelectDatasetsCard from './components/dataset/SelectDatasetsCard.vue';
+import LoadDatasetsCard from './components/dataset/LoadDatasetsCard.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
-    SelectDatasetsCard
+    LoadDatasetsCard
   },
   data: () => ({
     //
