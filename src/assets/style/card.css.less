@@ -1,10 +1,35 @@
+/**
+ * This stylesheet defines the lay-out of a simple card that
+ * follows the Material Design guidelines.
+ */
+
+ @import './variables.css.less';
+
 .card-title {
     align-items: flex-start;
-    color: red;
+    color: black;
     display: flex;
     justify-content: stretch;
     line-height: normal;
     padding: 16px;
     box-sizing: border-box;
     flex-direction: column;
+}
+
+.card-title-colored {
+    background-color: @accent-500;
+}
+
+.card-title-text {
+    color: inherit;
+    display: flex;
+    font-size: 24px;
+    font-weight: 300;
+    line-height: normal;
+    overflow: hidden;
+    margin: 0;
+}
+
+.card-title-colored .card-title-text {
+    color: @white-text;
 }

@@ -130,9 +130,7 @@
     }
 </script>
 
-<style lang="less">
-    @import './../../assets/style/card.css.less';
-
+<style>
     .v-input__control label {
         margin-bottom: 0px;
     }
