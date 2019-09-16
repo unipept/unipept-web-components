@@ -87,10 +87,8 @@
             this.updateSearchSettings();
         }
 
-        private deselectDataset(dataset: PeptideContainer) {
-            let idx: number = this.selectedDatasets.indexOf(dataset);
-            this.selectedDatasets.splice(idx, 1);
-            this.updateSelectedDatasets();
+        mounted() {
+            console.log(this.selectedDatasets);
         }
 
         public search(): void {
@@ -104,16 +102,17 @@
         }
 
         private reset(): void {
-            this.selectedDatasets.length = 0;
-            this.updateSelectedDatasets();
+            for (let dataset of this.selectedDatasets) {
+                this.deselectDataset(dataset);
+            }
         }
 
         private startAnalysis() {
             this.$emit('start-analysis');
         }
 
-        private updateSelectedDatasets() {
-            this.$emit('update-selected-datasets', this.selectedDatasets);
+        private deselectDataset(dataset: PeptideContainer) {
+            this.$emit('deselect-dataset', dataset);
         }
 
         private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {

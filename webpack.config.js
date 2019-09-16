@@ -5,6 +5,7 @@ const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 module.exports = {
     mode: 'production',
     entry: './src/index.ts',
+    watch: false,
     output: {
         path: path.resolve(__dirname, './dist'),
         publicPath: '/dist/',

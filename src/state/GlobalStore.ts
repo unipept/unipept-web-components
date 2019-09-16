@@ -3,6 +3,7 @@ import {ActionContext, ActionTree, GetterTree, MutationTree} from "vuex";
 import DatasetManager from "../logic/data-management/DatasetManager";
 import MpaAnalysisManager from "../logic/data-management/MpaAnalysisManager";
 import MPAConfig from "../logic/data-management/MPAConfig";
+import Vue from "vue";
 
 export interface GlobalState {
     selectedDatasets: PeptideContainer[],
@@ -72,6 +73,7 @@ const mpaMutations: MutationTree<GlobalState> = {
         if (index === -1) {
             state.selectedDatasets.push(dataset);
         }
+        Vue.set(state, 'selectedDatasets', state.selectedDatasets);
     },
     DESELECT_DATASET(state: GlobalState, dataset: PeptideContainer) {
         let index: number = state.selectedDatasets.findIndex((value: PeptideContainer, index: number, arr: PeptideContainer[]) => {
@@ -89,6 +91,7 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     ADD_STORED_DATASET(state: GlobalState, dataset: PeptideContainer) {
         state.storedDatasets.push(dataset);
+        this.$set(state, 'storedDatasets', state.storedDatasets);
     },
     REMOVE_STORED_DATASET(state: GlobalState, dataset: PeptideContainer) {
         let index: number = state.storedDatasets.findIndex((value: PeptideContainer, index: number) => value.getId() === dataset.getId());

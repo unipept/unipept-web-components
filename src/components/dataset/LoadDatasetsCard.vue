@@ -86,9 +86,9 @@
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
-                        <span v-if="storedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
+                        <span v-if="selectedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
                         <v-list two-line>
-                            <template v-for="dataset of storedDatasets">
+                            <template v-for="dataset of selectedDatasets">
                                 <v-list-tile :key="dataset.id" ripple @click="selectDataset(dataset)">
                                     <v-list-tile-action>
                                         <tooltip message="Select this dataset for analysis.">
@@ -157,7 +157,7 @@
         }
 
         @Prop({required: true})
-        private storedDatasets: PeptideContainer[];
+        private selectedDatasets: PeptideContainer[];
 
         private currentTab: number = 0;
 
