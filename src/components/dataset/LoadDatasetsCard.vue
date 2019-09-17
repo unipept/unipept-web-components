@@ -88,34 +88,32 @@
                     <v-card-text>
                         <span v-if="selectedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
                         <v-list two-line>
-                            <template v-for="dataset of selectedDatasets">
-                                <v-list-tile :key="dataset.id" ripple @click="selectDataset(dataset)">
-                                    <v-list-tile-action>
-                                        <tooltip message="Select this dataset for analysis.">
-                                            <v-icon>mdi-plus</v-icon>
-                                        </tooltip>
-                                    </v-list-tile-action>
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>
-                                            {{ dataset.getName() }}
-                                        </v-list-tile-title>
-                                        <v-list-tile-sub-title>
-                                            {{ dataset.getAmountOfPeptides() }} peptides
-                                        </v-list-tile-sub-title>
-                                    </v-list-tile-content>
+                            <v-list-item v-for="dataset of selectedDatasets" :key="dataset.id" ripple @click="selectDataset(dataset)">
+                                <v-list-item-action>
+                                    <tooltip message="Select this dataset for analysis.">
+                                        <v-icon>mdi-plus</v-icon>
+                                    </tooltip>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ dataset.getName() }}
+                                    </v-list-item-title>
+                                    <v-list-item-sub-title>
+                                        {{ dataset.getAmountOfPeptides() }} peptides
+                                    </v-list-item-sub-title>
+                                </v-list-item-content>
 
-                                    <v-list-tile-action>
-                                        <v-list-tile-action-text>
-                                            {{ dataset.getDateFormatted() }}
-                                        </v-list-tile-action-text>
-                                        <tooltip message="Delete this sample from local storage.">
-                                            <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
-                                                <v-icon color="grey darken-1">mdi-close</v-icon>
-                                            </v-btn>
-                                        </tooltip>
-                                    </v-list-tile-action>
-                                </v-list-tile>
-                            </template>
+                                <v-list-item-action>
+                                    <v-list-item-action-text>
+                                        {{ dataset.getDateFormatted() }}
+                                    </v-list-item-action-text>
+                                    <tooltip message="Delete this sample from local storage.">
+                                        <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
+                                            <v-icon color="grey darken-1">mdi-close</v-icon>
+                                        </v-btn>
+                                    </tooltip>
+                                </v-list-item-action>
+                            </v-list-item>
                         </v-list>
                     </v-card-text>
                 </v-card>
