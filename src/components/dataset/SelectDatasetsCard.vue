@@ -9,29 +9,27 @@
             <h3>Selected datasets</h3>
             <span v-if="selectedDatasets.length === 0" :class="{'shaking': shaking, 'selected-placeholder': true}">Please select one or more datasets from the right hand panel to continue the analysis..</span>
             <v-list two-line class="switch-datasets-list" style="flex-grow: 1;">
-                <template v-for="dataset of selectedDatasets">
-                    <v-list-tile :key="dataset.id" >
-                        <v-list-tile-content>
-                            <v-list-tile-title>
-                                {{ dataset.getName() }}
-                            </v-list-tile-title>
-                            <v-list-tile-sub-title>
-                                {{ dataset.getAmountOfPeptides() }} peptides
-                            </v-list-tile-sub-title>
-                        </v-list-tile-content>
+                <v-list-item v-for="dataset of selectedDatasets" two-line :key="dataset.id" >
+                    <v-list-item-content>
+                        <v-list-item-title>
+                            {{ dataset.getName() }}
+                        </v-list-item-title>
+                        <v-list-item-sub-title>
+                            {{ dataset.getAmountOfPeptides() }} peptides
+                        </v-list-item-sub-title>
+                    </v-list-item-content>
 
-                        <v-list-tile-action>
-                            <v-list-tile-action-text>
-                                {{ dataset.getDateFormatted() }}
-                            </v-list-tile-action-text>
-                            <tooltip message="Remove dataset from analysis.">
-                                <v-btn class="fix-icon-list-position" text icon @click="deselectDataset(dataset)">
-                                    <v-icon color="grey darken-1">mdi-delete-outline</v-icon>
-                                </v-btn>
-                            </tooltip>
-                        </v-list-tile-action>
-                    </v-list-tile>
-                </template>
+                    <v-list-item-action>
+                        <v-list-item-action-text>
+                            {{ dataset.getDateFormatted() }}
+                        </v-list-item-action-text>
+                        <tooltip message="Remove dataset from analysis.">
+                            <v-btn class="fix-icon-list-position" text icon @click="deselectDataset(dataset)">
+                                <v-icon color="grey darken-1">mdi-delete-outline</v-icon>
+                            </v-btn>
+                        </tooltip>
+                    </v-list-item-action>
+                </v-list-item>
             </v-list>
             <search-settings-form
                 :equate-il="equateIl"
