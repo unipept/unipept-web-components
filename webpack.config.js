@@ -87,5 +87,8 @@ module.exports = {
     plugins: [
         new VueLoaderPlugin(),
         new VuetifyLoaderPlugin()
-    ]
+    ],
+    externals: {
+        vue: "vue"
+    }
 };

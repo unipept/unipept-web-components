@@ -15,6 +15,7 @@
     "dist/*.{js,css,ts}"
   ],
   "dependencies": {
+    "@babel/preset-env": "^7.6.0",
     "@types/d3": "^5.7.2",
     "@types/jest": "^23.3.14",
     "@types/jquery": "^3.3.31",
@@ -27,6 +28,7 @@
     "jquery": "^3.4.1",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
+    "schema-utils": "^2.2.0",
     "unipept-heatmap": "^1.0.26",
     "unipept-visualizations": "^1.7.3",
     "vue": "^2.6.10",
