@@ -16,7 +16,7 @@
                     :missing-cleavage="missingCleavage"
                     v-on:missing-cleavage="missingCleavage = $event">
                 </search-settings-form>
-                <div class="search-buttons-centered">
+                <div class="card-actions">
                     <tooltip message="Restart search with selected samples using the settings chosen above.">
                         <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary"><v-icon left>mdi-restore</v-icon>Update</v-btn>
                     </tooltip>
@@ -102,6 +102,6 @@
     }
 </script>
 
-<style scoped>
-
+<style lang="less">
+    @import './../../../assets/style/card.css.less';
 </style>

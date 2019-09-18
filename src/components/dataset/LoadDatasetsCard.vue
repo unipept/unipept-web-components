@@ -266,7 +266,7 @@
     };
 </script>
 
-<style>
+<style lang="less">
     @import './../../assets/style/layout.css.less';
     @import './../../assets/style/tabs.css.less';
     @import './../../assets/style/card.css.less';

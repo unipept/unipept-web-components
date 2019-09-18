@@ -15,35 +15,33 @@
         </v-card-text>
         <div class="growing-list">
             <v-list two-line>
-                <template v-for="dataset of this.selectedDatasets">
-                    <v-list-tile :key="dataset.id" ripple @click="() => activeDataset = dataset" :class="activeDataset === dataset ? 'selected-list-tile' : ''">
-                        <v-list-tile-action>
-                            <v-radio-group v-if="dataset.progress === 1" v-model="activeDataset"><v-radio :value="dataset"></v-radio></v-radio-group>
-                            <v-progress-circular v-else :rotate="-90" :size="24" :value="dataset.progress * 100" color="primary"></v-progress-circular>
-                        </v-list-tile-action>
-                        <v-list-tile-content>
-                            <v-list-tile-title>
-                                {{ dataset.getName() }}
-                            </v-list-tile-title>
-                            <v-list-tile-sub-title>
-                                {{ dataset.getAmountOfPeptides() }} peptides
-                            </v-list-tile-sub-title>
-                        </v-list-tile-content>
+                <v-list-item v-for="dataset of this.selectedDatasets" :key="dataset.id" ripple @click="() => activeDataset = dataset" :class="activeDataset === dataset ? 'selected-list-item' : ''">
+                    <v-list-item-action>
+                        <v-radio-group v-if="dataset.progress === 1" v-model="activeDataset"><v-radio :value="dataset"></v-radio></v-radio-group>
+                        <v-progress-circular v-else :rotate="-90" :size="24" :value="dataset.progress * 100" color="primary"></v-progress-circular>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>
+                            {{ dataset.getName() }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                            {{ dataset.getAmountOfPeptides() }} peptides
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
 
-                        <v-list-tile-action>
-                            <v-list-tile-action-text>
-                                {{ dataset.getDateFormatted() }}
-                            </v-list-tile-action-text>
-                            <tooltip message="Remove dataset from analysis.">
-                                <v-icon @click="deselectDataset(dataset)" v-on:click.stop>mdi-delete-outline</v-icon>
-                            </tooltip>
-                        </v-list-tile-action>
-                    </v-list-tile>
-                </template>
+                    <v-list-item-action>
+                        <v-list-item-action-text>
+                            {{ dataset.getDateFormatted() }}
+                        </v-list-item-action-text>
+                        <tooltip message="Remove dataset from analysis.">
+                            <v-icon @click="deselectDataset(dataset)" v-on:click.stop>mdi-delete-outline</v-icon>
+                        </tooltip>
+                    </v-list-item-action>
+                </v-list-item>
             </v-list>
             <v-card-text>
                 <hr>
-                <div class="search-buttons-centered">
+                <div class="card-actions">
                     <tooltip message="Compare samples above using a heatmap.">
                         <v-btn @click="compareDatasets()">Compare samples</v-btn>
                     </tooltip>
@@ -98,12 +96,11 @@
     export default class SwitchDatasetCard extends Vue {
         @Prop({required: true})
         private selectedDatasets: PeptideContainer[];
-        @Prop({required: false, default: false})
-        private isDatasetSelectionInProgress: boolean;
         @Prop({required: false, default: null})
         private activatedDataset: PeptideContainer;
 
         private dialogOpen: boolean = false;
+        private isDatasetSelectionInProgress: boolean;
 
         private deselectDataset(dataset: PeptideContainer) {
             let idx: number = this.selectedDatasets.indexOf(dataset);
@@ -140,7 +137,10 @@
     }
 </script>
 
-<style lang="css">
+<style lang="less">
+    @import './../../assets/style/layout.css.less';
+    @import './../../assets/style/card.css.less';
+
     .selected-list-tile .v-list__tile:before {
         content: ' ';
         background-color: #2196F3;
