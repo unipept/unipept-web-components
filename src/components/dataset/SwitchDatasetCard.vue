@@ -6,7 +6,7 @@
             </card-title>
             <div class="card-title-action">
                 <tooltip message="Add another dataset to the selection.">
-                    <v-icon @click="addDataset()" color="white">{{ this.isDatasetSelectionInProgress ? 'mdi-plus-circle' : 'mdi-plus' }}</v-icon>
+                    <v-icon @click="toggleDatasetSelection()" color="white">{{ this.isDatasetSelectionInProgress ? 'mdi-plus-circle' : 'mdi-plus' }}</v-icon>
                 </tooltip>
             </div>
         </card-header>
@@ -87,10 +87,10 @@
         computed: {
             activeDataset: {
                 get() {
-                    return this.$store.getters.activeDataset;
+                    return this.activatedDataset;
                 },
                 set(dataset: PeptideContainer) {
-                    this.$store.dispatch('setActiveDataset', dataset);
+                    this.activateDataset(dataset);
                 }
             }
         }
@@ -100,6 +100,8 @@
         private selectedDatasets: PeptideContainer[];
         @Prop({required: false, default: false})
         private isDatasetSelectionInProgress: boolean;
+        @Prop({required: false, default: null})
+        private activatedDataset: PeptideContainer;
 
         private dialogOpen: boolean = false;
 
@@ -109,8 +111,9 @@
             this.updateSelectedDatasets();
         }
 
-        private addDataset(): void {
-            // this.$store.dispatch('setDatasetSelectionInProgress', !this.$store.getters.isDatasetSelectionInProgress);
+        private toggleDatasetSelection(): void {
+            this.isDatasetSelectionInProgress = !this.isDatasetSelectionInProgress;
+            this.$emit('toggle-dataset-selection', this.isDatasetSelectionInProgress);
         }
 
         private compareDatasets(): void {
@@ -119,6 +122,20 @@
 
         private updateSelectedDatasets() {
             this.$emit('update-selected-datasets', this.selectedDatasets);
+        }
+
+        private selectDataset(container: PeptideContainer) {
+            this.$emit('select-dataset', container);
+        }
+
+        /**
+         * This function gets called whenever the user changes the currently active dataset. The active dataset is the 
+         * dataset for which the visualizations are currently shown.
+         * 
+         * @param container The dataset that's currently activated by the user.
+         */
+        private activateDataset(container: PeptideContainer) {
+            this.$emit('activate-dataset', container);
         }
     }
 </script>

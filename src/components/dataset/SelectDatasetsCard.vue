@@ -14,9 +14,9 @@
                         <v-list-item-title>
                             {{ dataset.getName() }}
                         </v-list-item-title>
-                        <v-list-item-sub-title>
+                        <v-list-item-subtitle>
                             {{ dataset.getAmountOfPeptides() }} peptides
-                        </v-list-item-sub-title>
+                        </v-list-item-subtitle>
                     </v-list-item-content>
 
                     <v-list-item-action>
