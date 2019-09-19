@@ -72,7 +72,7 @@ module.exports = {
                     'css-loader',
                     'less-loader'
                 ]
-            },
+            }
         ]
     },
     resolve: {

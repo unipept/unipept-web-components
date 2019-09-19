@@ -67,7 +67,8 @@
     "vue-template-compiler": "^2.6.10",
     "vuepress": "^1.0.2",
     "vuetify-loader": "^1.2.2",
-    "webpack-cli": "^3.3.7"
+    "webpack-cli": "^3.3.7",
+    "worker-loader": "^2.0.0"
   },
   "types": "dist/index.d.ts"
 }
