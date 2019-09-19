@@ -40,7 +40,7 @@
                 </v-list-item>
             </v-list>
             <v-card-text>
-                <hr>
+                <v-divider></v-divider>
                 <div class="card-actions">
                     <tooltip message="Compare samples above using a heatmap.">
                         <v-btn @click="compareDatasets()">Compare samples</v-btn>
@@ -160,5 +160,10 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+    }
+
+    .v-divider {
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
 </style>

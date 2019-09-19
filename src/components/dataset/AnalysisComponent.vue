@@ -10,8 +10,10 @@
             </v-col>
             <v-col>
                 <experiment-summary-card v-if="!this.datasetSelectionInProgress"></experiment-summary-card>
-                <load-datasets-card v-else></load-datasets-card>
+                <load-datasets-card :selected-datasets="selectedDatasets" v-else></load-datasets-card>
             </v-col>
+        </v-row>
+        <v-row>
         </v-row>
     </v-container>
 </template>
@@ -43,6 +45,9 @@ export default class AnalysisComponent extends Vue {
 }
 </script>
 
-<style>
-
+<style lang="less">
+    .v-divider {
+        margin-top: 15px;
+        margin-bottom: 15px; 
+    }
 </style>
