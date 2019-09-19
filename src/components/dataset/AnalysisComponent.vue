@@ -10,7 +10,13 @@
             </v-col>
             <v-col>
                 <experiment-summary-card v-if="!this.datasetSelectionInProgress"></experiment-summary-card>
-                <load-datasets-card :selected-datasets="selectedDatasets" v-else></load-datasets-card>
+                <load-datasets-card 
+                    :selected-datasets="selectedDatasets" 
+                    v-on:select-dataset="selectDataset"
+                    v-on:deselect-dataset="deselectDataset"
+                    v-on:store-dataset="storeDataset"
+                    v-else>
+                </load-datasets-card>
             </v-col>
         </v-row>
         <v-row>
@@ -41,6 +47,21 @@ export default class AnalysisComponent extends Vue {
 
     private toggleDatasetSelection(status: boolean) {
         this.datasetSelectionInProgress = status;
+    }
+
+    private selectDataset(dataset: PeptideContainer) {
+        this.selectedDatasets.push(dataset);
+    }
+
+    private deselectDataset(dataset: PeptideContainer) {
+        const idx: number = this.selectedDatasets.findIndex((val: PeptideContainer) => val.getId() === dataset.getId());
+        if (idx >= 0) {
+            this.selectedDatasets.splice(idx, 1);
+        }
+    }
+
+    private storeDataset(dataset: PeptideContainer) {
+        // TODO implement this function!
     }
 }
 </script>
