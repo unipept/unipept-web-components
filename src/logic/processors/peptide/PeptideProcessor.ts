@@ -1,4 +1,5 @@
 import PeptideContainer from "../../data-management/PeptideContainer";
+import {CountTable} from "../../data-management/counts/CountTable";
 
 export abstract class PeptideProcessor{
 
@@ -10,9 +11,9 @@ export abstract class PeptideProcessor{
 
     process(peptides: PeptideContainer)
     {
-        return new Promise<string>(resolve => 
+        return new Promise<CountTable>(resolve => 
         {
-            this._worker.onmessage = (event) => resolve(event.data as string);
+            this._worker.onmessage = (event) => resolve(event.data as CountTable);
             this._worker.postMessage(peptides);
         });
     }
