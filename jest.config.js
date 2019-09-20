@@ -20,7 +20,8 @@ module.exports = {
   ],
 
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
+    'worker-loader!\./(.*\.worker)$': '<rootDir>/mocks/workers/$1'
   },
 
   snapshotSerializers: [
