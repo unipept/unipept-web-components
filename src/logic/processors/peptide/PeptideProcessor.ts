@@ -1,5 +1,6 @@
 import PeptideContainer from "../../data-management/PeptideContainer";
 import {CountTable} from "../../data-management/counts/CountTable";
+import MPAConfig from '../../data-management/MPAConfig';
 
 export abstract class PeptideProcessor{
 
@@ -9,12 +10,12 @@ export abstract class PeptideProcessor{
         this._worker = worker;
     }
 
-    process(peptides: PeptideContainer)
+    process(peptides: PeptideContainer, mpaConfig: MPAConfig)
     {
         return new Promise<CountTable>(resolve => 
         {
             this._worker.onmessage = (event) => resolve(event.data as CountTable);
-            this._worker.postMessage(peptides);
+            this._worker.postMessage({peptides: peptides, config: mpaConfig});
         });
     }
 }

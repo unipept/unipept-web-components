@@ -43,5 +43,7 @@ module.exports = {
     'ts-jest': {
       babelConfig: true
     }
-  }
+  },
+
+  setupFiles: ["./setupJest.ts"]
 }

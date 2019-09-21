@@ -9,6 +9,6 @@ export default class WorkerMock {
     }
 
     postMessage(data) {
-        this.onmessage({ data: process(data) });
+        this.onmessage({ data: process(data.peptides, data.config) });
     }
 }
