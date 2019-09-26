@@ -39,4 +39,9 @@ export class pept2dataResponse
     {
         return this._response.has(peptide);
     }
+
+    GetResponse() : Readonly<Response>
+    {
+        return this._response;
+    }
 }
