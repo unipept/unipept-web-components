@@ -1,7 +1,7 @@
-import {PeptideProcessor} from "../PeptideProcessor";
-import {ProcessedPeptideContainer} from '../../../data-management/ProcessedPeptideContainer';
-import {CountTable, OntologyId, Peptide, Count} from '../../../data-management/counts/CountTable';
-import {OntologyType} from '../../../data-management/ontology/OntologyType';
+import {PeptideProcessor} from "./PeptideProcessor";
+import {ProcessedPeptideContainer} from '../../data-management/ProcessedPeptideContainer';
+import {CountTable, OntologyId, Peptide, Count} from '../../data-management/counts/CountTable';
+import {OntologyType} from '../../data-management/ontology/OntologyType';
 
 export class TaxaPeptideProcessor implements PeptideProcessor
 {

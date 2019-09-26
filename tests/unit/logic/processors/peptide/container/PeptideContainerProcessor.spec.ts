@@ -1,21 +1,18 @@
 import {PeptideContainerProcessor} from '@/logic/processors/peptide/container/PeptideContainerProcessor';
-import PeptideContainer from '@/logic/data-management/PeptideContainer';
+import {mockFetch, setupPeptideContainer, peptideContainer} from '../common';
 import MPAConfig from '@/logic/data-management/MPAConfig';
 
+beforeEach(() => {
+    setupPeptideContainer()
+    mockFetch()
+})
+
 test('test PeptideContainerProcessor (1)', done => {
-    var processor: PeptideContainerProcessor = new PeptideContainerProcessor();
-
+    var processor = new PeptideContainerProcessor();
     var mpaConfig: MPAConfig = {il: true, dupes: false, missed: false};
-    var peptideContainer = new PeptideContainer();
-    peptideContainer.setPeptides(["VTPLLMYSDLGYVIHGR", "VTEIDYKDVALLR", "GGMTSHAAVVAR", "HVLIIYDDLSK", "AIGLVIPELNGK"]);
-
-    fetchMock.mockResponse(
-        JSON.stringify({"peptides":[{"sequence":"ALGLVLPELNGK","lca":186826,"lineage":[2,null,null,null,1239,null,null,91061,null,null,null,186826,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"fa":{"counts":{"all":8,"EC":8,"GO":8,"IPR":8},"data":{"GO:0019904":1,"GO:0005737":8,"GO:0002020":1,"GO:0006006":8,"GO:0044045":1,"IPR:IPR020829":8,"IPR:IPR020828":8,"IPR:IPR020831":8,"IPR:IPR020830":7,"GO:0006735":1,"GO:0050661":8,"GO:0004365":8,"GO:0051287":8,"GO:0006096":8,"EC:1.2.1.12":16,"IPR:IPR036291":8,"IPR:IPR006424":8}}},{"sequence":"DVALLR","lca":1,"lineage":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"fa":{"counts":{"all":18,"EC":9,"GO":18,"IPR":18},"data":{"GO:0016887":2,"GO:0005737":1,"GO:0005739":1,"IPR:IPR028971":1,"IPR:IPR001017":2,"GO:0005315":2,"IPR:IPR036130":1,"GO:0004451":1,"IPR:IPR032106":2,"GO:0033856":1,"GO:0019551":1,"EC:1.2.4.2":4,"IPR:IPR017871":2,"IPR:IPR004569":1,"IPR:IPR031717":2,"IPR:IPR005475":2,"GO:0005886":2,"GO:0003676":1,"GO:0003677":1,"GO:0004591":2,"IPR:IPR029061":2,"EC:1.4.1.2":2,"EC:4.1.3.1":2,"GO:0009353":1,"IPR:IPR014001":2,"IPR:IPR036291":1,"GO:0005829":1,"GO:0005840":9,"IPR:IPR007780":1,"IPR:IPR015850":2,"EC:7.3.2.1":4,"IPR:IPR006935":1,"IPR:IPR003439":2,"GO:0006412":9,"GO:0030976":2,"IPR:IPR027417":4,"GO:0005524":4,"GO:0008615":1,"GO:0009514":1,"IPR:IPR001648":9,"IPR:IPR015813":1,"IPR:IPR042179":2,"GO:0046872":1,"EC:2.6.99.2":2,"GO:0003724":2,"GO:0003735":9,"IPR:IPR005670":2,"IPR:IPR018523":1,"IPR:IPR040442":1,"EC:3.6.4.13":4,"GO:0015415":2,"GO:0019843":9,"GO:0004352":1,"IPR:IPR011545":1,"IPR:IPR036870":9,"IPR:IPR013785":1,"IPR:IPR006254":1,"IPR:IPR011603":2,"GO:0006097":1,"GO:0006096":2,"GO:0006099":3,"IPR:IPR018275":9,"IPR:IPR003593":2,"GO:0045252":2,"IPR:IPR039556":1}}},{"sequence":"GGMTSHAAVVAR","lca":1,"lineage":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"fa":{"counts":{"all":16,"EC":16,"GO":16,"IPR":16},"data":{"IPR:IPR036637":16,"IPR:IPR008279":16,"GO:0009507":6,"IPR:IPR002192":16,"IPR:IPR040442":16,"IPR:IPR023151":16,"GO:0009570":2,"IPR:IPR013815":16,"IPR:IPR000121":16,"GO:0005737":2,"EC:2.7.9.1":32,"GO:0015979":8,"GO:0005829":2,"GO:0005524":16,"IPR:IPR010121":16,"IPR:IPR015813":16,"GO:0046872":16,"GO:0005634":2,"GO:0016301":16,"GO:0050242":16,"GO:0006090":16,"IPR:IPR018274":16}}},{"sequence":"HVLLLYDDLSK","lca":31979,"lineage":[2,null,null,null,1239,null,null,186801,null,null,null,186802,null,null,null,null,31979,null,null,null,null,null,null,null,null,null,null,null],"fa":{"counts":{"all":5,"EC":5,"GO":5,"IPR":5},"data":{"IPR:IPR004100":5,"IPR:IPR038376":5,"IPR:IPR023366":5,"IPR:IPR027417":5,"IPR:IPR005294":5,"IPR:IPR020003":5,"GO:0045261":5,"IPR:IPR036121":5,"IPR:IPR000194":5,"GO:0015986":5,"GO:0005886":5,"GO:0005524":5,"IPR:IPR000793":5,"IPR:IPR033732":5,"EC:7.1.2.2":10,"GO:0046933":5}}},{"sequence":"VTELDYK","lca":2,"lineage":[2,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"fa":{"counts":{"all":3,"EC":0,"GO":3,"IPR":3},"data":{"GO:0006412":3,"IPR:IPR001648":3,"GO:0019843":3,"GO:0005840":3,"GO:0003735":3,"IPR:IPR036870":3,"IPR:IPR018275":3}}},{"sequence":"VTPLLMYSDLGYVLHGR","lca":9606,"lineage":[2759,33208,null,null,7711,89593,8287,40674,null,null,314146,9443,376913,314293,9526,314295,9604,207598,null,null,9605,null,null,null,9606,null,null,null],"fa":{"counts":{"all":1,"EC":1,"GO":1,"IPR":1},"data":{"GO:0006684":1,"GO:0006685":1,"GO:0006687":1,"GO:0016020":1,"GO:0008156":1,"GO:0005902":1,"GO:0004767":1,"GO:0008270":1,"GO:0008285":1,"GO:0005794":1,"IPR:IPR017850":1,"IPR:IPR029895":1,"GO:0005886":1,"GO:0005887":1,"IPR:IPR002591":1,"EC:3.1.4.12":2}}}]})
-    )
 
     processor.process(peptideContainer, mpaConfig).then(result => {
         console.log(result);
         done();
     });
 });
-  

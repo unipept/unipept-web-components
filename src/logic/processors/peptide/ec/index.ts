@@ -1,1 +1,1 @@
-export * from './ECPeptideProcessor';
+export * from '../ECPeptideProcessor';
