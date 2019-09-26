@@ -38,7 +38,8 @@
     "vuetify": "^2.0.0",
     "vuex": "^3.0.1",
     "whatwg-fetch": "^3.0.0",
-    "workerize-loader": "^1.1.0"
+    "workerize-loader": "^1.1.0",
+    "worker-loader": "^2.0.0"
   },
   "devDependencies": {
     "@mdi/font": "^4.1.95",
@@ -69,8 +70,6 @@
     "vue-template-compiler": "^2.6.10",
     "vuepress": "^1.0.2",
     "vuetify-loader": "^1.2.2",
-    "webpack-cli": "^3.3.7",
-    "worker-loader": "^2.0.0"
-  },
-  "types": "dist/index.d.ts"
+    "webpack-cli": "^3.3.7"
+  }
 }

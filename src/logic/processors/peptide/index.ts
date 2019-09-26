@@ -1,7 +1,4 @@
-import {PeptideProcessor} from './PeptideProcessor';
-
+export * from './container';
 export * from './taxa';
 
-export{
-    PeptideProcessor
-}
+export * from './PeptideProcessor';

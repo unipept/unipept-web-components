@@ -45,5 +45,5 @@ module.exports = {
     }
   },
 
-  setupFiles: ["./setupJest.ts"]
+  setupFiles: ["<rootDir>/tests/unit/setup/setupJest.ts"]
 }

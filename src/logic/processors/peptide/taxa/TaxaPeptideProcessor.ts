@@ -1,12 +1,11 @@
 import {PeptideProcessor} from "../PeptideProcessor";
-import Worker from 'worker-loader!./TaxaPeptideProcessor.worker';
+import {ProcessedPeptideContainer} from '../../../data-management/ProcessedPeptideContainer';
+import {CountTable} from '../../../data-management/counts/CountTable';
 
-import "babel-polyfill"; // for async await support
-
-export class TaxaPeptideProcessor extends PeptideProcessor
+export class TaxaPeptideProcessor implements PeptideProcessor
 {
-    constructor()
+    process(processedPeptides: ProcessedPeptideContainer): CountTable 
     {
-        super(new Worker())
+        throw new Error("Method not implemented.");
     }
 }

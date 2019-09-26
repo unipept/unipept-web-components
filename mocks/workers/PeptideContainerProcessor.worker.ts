@@ -1,4 +1,4 @@
-import process from "../../src/logic/processors/peptide/taxa/process";
+import process from "../../src/logic/processors/peptide/container/process";
 
 // mock for worker that executes the process function synchronously
 export default class WorkerMock {

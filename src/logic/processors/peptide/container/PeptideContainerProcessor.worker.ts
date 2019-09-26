@@ -1,6 +1,4 @@
-import PeptideContainer from '../../../data-management/PeptideContainer';
 import process from './process';
-import MPAConfig from '../../../data-management/MPAConfig';
 
 const ctx: Worker = self as any;
 
