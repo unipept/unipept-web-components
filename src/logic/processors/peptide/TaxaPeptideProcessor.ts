@@ -1,21 +1,21 @@
 import {PeptideProcessor} from "./PeptideProcessor";
 import {ProcessedPeptideContainer} from '../../data-management/ProcessedPeptideContainer';
-import {CountTable, OntologyId, Peptide, Count} from '../../data-management/counts/CountTable';
-import {OntologyType} from '../../data-management/ontology/OntologyType';
+import {TaxaCountTable} from '../../data-management/counts/TaxaCountTable';
+import {Count} from '../../data-management/counts/CountTable';
 
-export class TaxaPeptideProcessor implements PeptideProcessor
+export class TaxaPeptideProcessor implements PeptideProcessor<TaxaCountTable>
 {
-    process(processedPeptides: ProcessedPeptideContainer): CountTable 
+    process(processedPeptides: ProcessedPeptideContainer): TaxaCountTable 
     {
-        var peptideCounts = processedPeptides.countTable.counts;
+        var peptideCounts = processedPeptides.countTable;
         var pept2dataResponse = processedPeptides.response;
 
-        var lcaCounts = new Map<OntologyId, Count>();
-        var lca2peptides = new Map<OntologyId, Set<Peptide>>();
+        var lcaCounts = new Map<number, Count>();
+        var lca2peptides = new Map<number, Set<string>>();
 
         pept2dataResponse.GetResponse().forEach((data, peptide, _) => 
             {
-                let lca = data.lca.toString()
+                let lca = data.lca
                 let peptideCount = peptideCounts.get(peptide)
 
                 lcaCounts.set(lca, (lcaCounts.get(lca) || 0) + peptideCount)
@@ -25,6 +25,6 @@ export class TaxaPeptideProcessor implements PeptideProcessor
                 lca2peptides.get(lca).add(peptide)
             })
         
-        return new CountTable(OntologyType.NCBI_TAX, lcaCounts, lca2peptides)
+        return new TaxaCountTable(lcaCounts, lca2peptides)
     }
 }

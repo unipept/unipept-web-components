@@ -1,17 +1,17 @@
 import {PeptideProcessor} from "./PeptideProcessor";
 import {ProcessedPeptideContainer} from '../../data-management/ProcessedPeptideContainer';
-import {CountTable, OntologyId, Peptide, Count} from '../../data-management/counts/CountTable';
-import {OntologyType} from '../../data-management/ontology/OntologyType';
+import {Count} from '../../data-management/counts/CountTable';
+import { ECCountTable } from '../../data-management/counts/ECCountTable';
 
-export class ECPeptideProcessor implements PeptideProcessor
+export class ECPeptideProcessor implements PeptideProcessor<ECCountTable>
 {
-    process(processedPeptides: ProcessedPeptideContainer): CountTable 
+    process(processedPeptides: ProcessedPeptideContainer): ECCountTable 
     {
-        var peptideCounts = processedPeptides.countTable.counts;
+        var peptideCounts = processedPeptides.countTable;
         var pept2dataResponse = processedPeptides.response;
 
-        var ecCounts = new Map<OntologyId, Count>();
-        var peptide2ec = new Map<Peptide, Set<OntologyId>>();
+        var ecCounts = new Map<string, Count>();
+        var peptide2ec = new Map<string, Set<string>>();
 
         pept2dataResponse.GetResponse().forEach((data, peptide, _) => 
         {
@@ -30,6 +30,6 @@ export class ECPeptideProcessor implements PeptideProcessor
                     });
         })
 
-        return new CountTable(OntologyType.EC, ecCounts, undefined, peptide2ec);
+        return new ECCountTable(ecCounts, peptide2ec);
     }
 }

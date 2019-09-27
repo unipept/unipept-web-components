@@ -2,8 +2,6 @@ import MPAConfig from '../../../data-management/MPAConfig';
 import { ProcessedPeptideContainer } from '../../../data-management/ProcessedPeptideContainer';
 import { postJSON } from "../../../utils";
 import { pept2dataResponse } from '../../../api/pept2data/Response';
-import { CountTable } from '../../../data-management/counts/CountTable';
-import { OntologyType } from '../../../data-management/ontology/OntologyType';
 
 const BATCH_SIZE = 100;
 const API_ENDPOINT = "/mpa/pept2data";
@@ -37,7 +35,7 @@ export default async function process(peptides: string[], config: MPAConfig) : P
     var missedPeptides = peptideList.filter(p => !response.HasPeptide(p))
 
     return new ProcessedPeptideContainer(
-        new CountTable(OntologyType.PEPTIDE, preparedPeptides),
+        preparedPeptides,
         response,
         missedPeptides,
         numMatched,

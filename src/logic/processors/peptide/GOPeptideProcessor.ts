@@ -1,17 +1,17 @@
 import {PeptideProcessor} from "./PeptideProcessor";
 import {ProcessedPeptideContainer} from '../../data-management/ProcessedPeptideContainer';
-import {CountTable, OntologyId, Peptide, Count} from '../../data-management/counts/CountTable';
-import {OntologyType} from '../../data-management/ontology/OntologyType';
+import { Count } from '../../data-management/counts/CountTable';
+import { GOCountTable } from '../../data-management/counts/GOCountTable';
 
-export class GOPeptideProcessor implements PeptideProcessor
+export class GOPeptideProcessor implements PeptideProcessor<GOCountTable>
 {
-    process(processedPeptides: ProcessedPeptideContainer): CountTable 
+    process(processedPeptides: ProcessedPeptideContainer): GOCountTable 
     {
-        var peptideCounts = processedPeptides.countTable.counts;
+        var peptideCounts = processedPeptides.countTable;
         var pept2dataResponse = processedPeptides.response;
 
-        var goCounts = new Map<OntologyId, Count>();
-        var peptide2go = new Map<Peptide, Set<OntologyId>>();
+        var goCounts = new Map<string, Count>();
+        var peptide2go = new Map<string, Set<string>>();
 
         pept2dataResponse.GetResponse().forEach((data, peptide, _) => 
         {
@@ -30,6 +30,6 @@ export class GOPeptideProcessor implements PeptideProcessor
                     });
         })
 
-        return new CountTable(OntologyType.GO, goCounts, undefined, peptide2go);
+        return new GOCountTable(goCounts, peptide2go);
     }
 }

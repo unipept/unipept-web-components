@@ -1,19 +1,13 @@
-import {OntologyType} from '../ontology/OntologyType'
-
-export type OntologyId = string;
-export type Peptide = string;
+type Peptide = string;
 export type Count = number;
 
-export type Counts = Map<OntologyId, Count>;
-export type Ontology2PeptideMap = Map<OntologyId, Set<Peptide>>;
-export type Peptide2OntologyMap = Map<Peptide, Set<OntologyId>>;
-
-export class CountTable
+export abstract class CountTable<Ontology, OntologyId>
 {
     constructor(
-        readonly ontology: OntologyType, 
-        readonly counts: Counts, 
-        readonly ontology2peptide: Ontology2PeptideMap = undefined, 
-        readonly peptide2ontology: Peptide2OntologyMap = undefined)
+        readonly counts: Map<OntologyId, Count>,
+        readonly ontology2peptide: Map<OntologyId, Set<Peptide>> = undefined, 
+        readonly peptide2ontology: Map<Peptide, Set<OntologyId>> = undefined)
     {}
+
+    abstract GetOntology() : Ontology;
 }

@@ -1,15 +1,17 @@
-import {OntologyType} from './OntologyType'
-
-export abstract class Ontology
+export abstract class Ontology<OntologyId, Definition>
 {
-    private type: OntologyType;
+    private _definitions: Map<OntologyId, Definition>;
 
-    constructor(type: OntologyType)
+    constructor()
     {
-        this.type = type;
+        this._definitions = new Map<OntologyId, Definition>();
+        this.fetchDefinitions();
     }
 
-    abstract init() : void;
+    abstract async fetchDefinitions() : Promise<void>;
 
-    GetType(){return this.type;}
+    getDefinition(id: OntologyId) : Readonly<Definition>
+    {
+        return this._definitions.get(id);
+    }
 }

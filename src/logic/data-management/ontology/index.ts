@@ -1,0 +1,5 @@
+export * from './ec'
+export * from './go'
+export * from './taxa'
+export * from './Ontology'
+export * from './OntologyManager'
