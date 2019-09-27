@@ -1,12 +1,8 @@
 export abstract class Ontology<OntologyId, Definition>
 {
-    private _definitions: Map<OntologyId, Definition>;
-
-    constructor()
-    {
-        this._definitions = new Map<OntologyId, Definition>();
-        this.fetchDefinitions();
-    }
+    constructor(
+        private _definitions = new Map<OntologyId, Definition>()
+    ){}
 
     abstract async fetchDefinitions() : Promise<void>;
 

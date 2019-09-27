@@ -1,5 +1,6 @@
 import {CountTable, Count} from './CountTable';
 import {NCBITaxonomy} from '../ontology/taxa/NCBITaxonomy';
+import {Ontologies} from '../ontology/Ontologies';
 
 export class TaxaCountTable extends CountTable<NCBITaxonomy, number>
 {
@@ -11,6 +12,6 @@ export class TaxaCountTable extends CountTable<NCBITaxonomy, number>
     }
 
     GetOntology(): NCBITaxonomy {
-        throw new Error("Method not implemented.");
+        return Ontologies.ncbiTaxonomy;
     }
 }
