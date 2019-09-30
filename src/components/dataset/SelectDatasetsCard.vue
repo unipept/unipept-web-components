@@ -86,6 +86,7 @@
         }
 
         mounted() {
+            console.log("Select datasets card!");
             console.log(this.selectedDatasets);
         }
 

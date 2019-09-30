@@ -28,6 +28,7 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
+            
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
@@ -45,27 +46,28 @@
                                 </a>
                             </small>
                             <br>
-                            <span class="form-inline">
-                                <select class="form-control dataset" v-model="selectedSampleDataset[dataset.id]">
-                                    <option v-for="data of dataset.datasets" v-bind:value="data" v-bind:key="data.id">{{ data.name }}</option>
-                                </select>
-                                <v-btn @click="storeSampleDataset(dataset.id)">
-                                    Load dataset
-                                </v-btn>
-                            </span>
+                            <v-layout wrap align-center>
+                                <v-flex sm8>
+                                    <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
+                                </v-flex>
+                                <v-flex sm4>
+                                    <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
+                                </v-flex>
+                            </v-layout>
                         </p>
                     </v-card-text>
                 </v-card>
             </v-tab-item>
+            
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
                         <h3>Load data from the PRIDE archive</h3>
                         <p>You can easily load data from the <a href="http://www.ebi.ac.uk/pride/" target="_blank">PRIDE</a> data repository. Simply enter an assay id (e.g. 8500) in the field below and click the 'Load PRIDE Dataset' button. The corresponding dataset will then be fetched using the PRIDE API and loaded into the search form on the left.</p>
-                        <v-form ref="prideAssayForm">
+                        <v-form ref="prideAssayForm" @submit.prevent>
                             <v-text-field label="Assay id" placeholder="e.g. 8500" :disabled="prideLoading || pendingStore" v-model="prideAssay" :rules="[value => !!value || 'Please enter a valid PRIDE assay number']" clearable></v-text-field>
                         </v-form>
-                        <div class="card-actions">
+                        <div class="search-buttons-centered">
                             <v-btn v-if="!prideLoading" @click="fetchPrideAssay()">
                                 <v-icon left>mdi-cloud-download</v-icon>
                                 Fetch PRIDE dataset
@@ -83,39 +85,42 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
+            
             <v-tab-item>
                 <v-card flat>
-                    <v-card-text>
-                        <span v-if="selectedDatasets.length === 0">There are currently no datasets present in your browser's local storage.</span>
-                        <v-list two-line>
-                            <v-list-item v-for="dataset of selectedDatasets" :key="dataset.id" ripple @click="selectDataset(dataset)">
-                                <v-list-item-action>
+                    <v-card-text v-if="storedDatasets.length === 0">
+                        <span>There are currently no datasets present in your browser's local storage.</span>
+                    </v-card-text>
+                    <v-list two-line>
+                        <template v-for="dataset of storedDatasets">
+                            <v-list-tile :key="dataset.id" ripple @click="selectDataset(dataset)">
+                                <v-list-tile-action>
                                     <tooltip message="Select this dataset for analysis.">
                                         <v-icon>mdi-plus</v-icon>
                                     </tooltip>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>
+                                </v-list-tile-action>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
                                         {{ dataset.getName() }}
-                                    </v-list-item-title>
-                                    <v-list-item-subtitle>
+                                    </v-list-tile-title>
+                                    <v-list-tile-sub-title>
                                         {{ dataset.getAmountOfPeptides() }} peptides
-                                    </v-list-item-subtitle>
-                                </v-list-item-content>
+                                    </v-list-tile-sub-title>
+                                </v-list-tile-content>
 
-                                <v-list-item-action>
-                                    <v-list-item-action-text>
+                                <v-list-tile-action>
+                                    <v-list-tile-action-text>
                                         {{ dataset.getDateFormatted() }}
-                                    </v-list-item-action-text>
+                                    </v-list-tile-action-text>
                                     <tooltip message="Delete this sample from local storage.">
                                         <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
                                             <v-icon color="grey darken-1">mdi-close</v-icon>
                                         </v-btn>
                                     </tooltip>
-                                </v-list-item-action>
-                            </v-list-item>
-                        </v-list>
-                    </v-card-text>
+                                </v-list-tile-action>
+                            </v-list-tile>
+                        </template>
+                    </v-list>
                 </v-card>
             </v-tab-item>
         </v-tabs-items>
@@ -137,6 +142,7 @@
 
     import SampleDataset from "../../logic/data-management/SampleDataset";
     import Tooltip from "../custom/Tooltip.vue";
+    import { BASE_URL } from '../../logic/Constants';
 
     @Component({
         components: {
@@ -155,7 +161,7 @@
         }
 
         @Prop({required: true})
-        private selectedDatasets: PeptideContainer[];
+        private storedDatasets: PeptideContainer[];
 
         private currentTab: number = 0;
 
@@ -177,7 +183,7 @@
         private selectedSampleDataset = {};
 
         mounted() {
-            axios.post("/datasets/sampledata")
+            axios.post(BASE_URL + "/datasets/sampledata")
                 .then(result => {
                     for (let item of result.data.sample_data) {
                         let itemDatasets = item.datasets;

@@ -2,10 +2,11 @@ import "babel-polyfill"; // for async await webpacker support
 import "whatwg-fetch";
 // TODO: also include other pollyfills?
 import {postJSON, numberToPercent} from "../utils";
+import { BASE_URL } from "../Constants";
 
 const BATCH_SIZE = 100;
 const FA_BATCH_SIZE = 1000;
-const PEPT2DATA_URL = "/mpa/pept2data";
+const PEPT2DATA_URL = BASE_URL + "/mpa/pept2data";
 
 const GO_NAMESPACES = ["biological process", "cellular component", "molecular function"];
 const EC_NAMESPACES = ["oxidoreductases", "transferases", "hydrolases", "lyases", "isomerases", "ligases", "translocases"];

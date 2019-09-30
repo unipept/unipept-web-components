@@ -11,7 +11,7 @@
             <v-col>
                 <experiment-summary-card v-if="!this.datasetSelectionInProgress"></experiment-summary-card>
                 <load-datasets-card 
-                    :selected-datasets="selectedDatasets" 
+                    :stored-datasets="storedDatasets" 
                     v-on:select-dataset="selectDataset"
                     v-on:deselect-dataset="deselectDataset"
                     v-on:store-dataset="storeDataset"
@@ -20,6 +20,7 @@
             </v-col>
         </v-row>
         <v-row>
+
         </v-row>
     </v-container>
 </template>
@@ -37,9 +38,16 @@ import PeptideContainer from './../../logic/data-management/PeptideContainer';
 export default class AnalysisComponent extends Vue {
     @Prop({required: true})
     private selectedDatasets: PeptideContainer[];
+    @Prop({required: true})
+    private storedDatasets: PeptideContainer[];
 
     private datasetSelectionInProgress: boolean = false;
     private activeDataset: PeptideContainer;
+
+    mounted() {
+        console.log("In ANALYSIS-COMPONENT");
+        console.log(this.storedDatasets);
+    }
 
     private datasetActivated(dataset: PeptideContainer) {
         this.activeDataset = dataset;

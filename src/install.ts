@@ -13,8 +13,6 @@ const install = (Vue: any, options: any = {}) => {
     // @ts-ignore
     Vue.component(_key, components[key]) 
   }
-  console.log("I'm using Vue in library:");
-  console.log(Vue);
   Vue.use(Vuetify);
   Vue.use(options["fullscreen"]);
 }
