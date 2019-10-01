@@ -100,7 +100,7 @@
         private activatedDataset: PeptideContainer;
 
         private dialogOpen: boolean = false;
-        private isDatasetSelectionInProgress: boolean;
+        private isDatasetSelectionInProgress: boolean = false;
 
         private deselectDataset(dataset: PeptideContainer) {
             let idx: number = this.selectedDatasets.indexOf(dataset);

@@ -33,21 +33,25 @@
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import Sample from '../../logic/data-management/Sample';
 
     @Component
     export default class SunburstVisualization extends mixins(VisualizationMixin) {
         // Make field non-reactive by not setting it here, but only after created has been called for the first time.
         sunburst!: any;
 
-        isFixedColors: boolean = false;
+        @Prop({default: false}) 
+        private fullScreen: false;
+        @Prop({required: true})
+        private sample: Sample;
 
-        @Prop({default: false}) fullScreen: false;
+        private isFixedColors: boolean = false;
 
         mounted() {
             this.initTree();
         }
 
-        @Watch('dataset') onDatasetChanged() {
+        @Watch('sample') onSampleChanged() {
             this.initTree();
         }
 
@@ -73,8 +77,8 @@
         }
 
         private async initTree() {
-            if (this.dataset != null && this.dataset.getDataset() != null) {
-                let taxaDataSource: TaxaDataSource = await this.dataset.getDataset().dataRepository.createTaxaDataSource();
+            if (this.sample != null) {
+                let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaDataSource.getTree();
                 const data = JSON.stringify(tree.getRoot());
 

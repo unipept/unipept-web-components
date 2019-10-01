@@ -45,8 +45,10 @@ export default class AnalysisComponent extends Vue {
     private activeDataset: PeptideContainer;
 
     mounted() {
-        console.log("In ANALYSIS-COMPONENT");
-        console.log(this.storedDatasets);
+        // Start analysis of every selected dataset
+        for (let dataset of this.selectedDatasets) {
+            
+        }
     }
 
     private datasetActivated(dataset: PeptideContainer) {
