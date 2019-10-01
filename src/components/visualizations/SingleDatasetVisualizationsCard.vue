@@ -22,31 +22,31 @@
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
-                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.$store.getters.activeDataset || $store.getters.activeDataset.progress !== 1">
+                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.sample">
                     <template v-slot:activator="{ on }">
                         <v-btn text class="align-self-center mr-4" v-on="on">
                             More
-                            <v-icon right>arrow_drop_down</v-icon>
+                            <v-icon right>mdi-menu-down</v-icon>
                         </v-btn>
                     </template>
 
                     <v-list class="grey lighten-3">
-                        <v-list-tile key="enter-full-screen" @click="switchToFullScreen()" >
-                            <v-list-tile-title>
+                        <v-list-item key="enter-full-screen" @click="switchToFullScreen()" >
+                            <v-list-item-title>
                                 <v-icon>
                                     mdi-fullscreen
                                 </v-icon>
                                 Enter full screen
-                            </v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile key="save-as-image" @click="saveAsImage()" >
-                            <v-list-tile-title>
+                            </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item key="save-as-image" @click="saveAsImage()" >
+                            <v-list-item-title>
                                 <v-icon>
                                     mdi-download
                                 </v-icon>
                                 Save as image
-                            </v-list-tile-title>
-                        </v-list-tile>
+                            </v-list-item-title>
+                        </v-list-item>
                     </v-list>
                 </v-menu>
                 <div v-if="isFullScreen">
@@ -144,6 +144,7 @@
     import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
     import Sample from '../../logic/data-management/Sample';
+    import $ from 'jquery';
 
     @Component({
         components: {
@@ -184,10 +185,13 @@
         private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
         mounted() {
-            // @ts-ignore
-            $(document).bind(window.fullScreenApi.fullScreenEventName, () => this.exitFullScreen());
-            // @ts-ignore
-            $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
+            document.addEventListener('fullscreenchange', () => {
+                if (document.fullscreenElement) {
+                    this.exitFullScreen();
+                }
+            }, false);
+            // @ts-ignore (TODO: migrate to Vuetify)
+            // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
         }
 
         @Watch('datasetsChosen') 

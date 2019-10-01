@@ -67,7 +67,7 @@
                         <v-form ref="prideAssayForm" @submit.prevent>
                             <v-text-field label="Assay id" placeholder="e.g. 8500" :disabled="prideLoading || pendingStore" v-model="prideAssay" :rules="[value => !!value || 'Please enter a valid PRIDE assay number']" clearable></v-text-field>
                         </v-form>
-                        <div class="search-buttons-centered">
+                        <div class="card-actions">
                             <v-btn v-if="!prideLoading" @click="fetchPrideAssay()">
                                 <v-icon left>mdi-cloud-download</v-icon>
                                 Fetch PRIDE dataset

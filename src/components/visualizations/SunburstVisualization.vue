@@ -34,6 +34,7 @@
     import VisualizationMixin from "./VisualizationMixin.vue";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Sample from '../../logic/data-management/Sample';
+    import $ from 'jquery';
 
     @Component
     export default class SunburstVisualization extends mixins(VisualizationMixin) {
