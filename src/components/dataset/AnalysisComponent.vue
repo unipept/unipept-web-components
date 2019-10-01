@@ -4,7 +4,7 @@
             <v-col>
                 <switch-dataset-card 
                     :selected-datasets="selectedDatasets"
-                    v-on:activate-dataset="datasetActivated" 
+                    v-on:activate-dataset="activateDataset" 
                     v-on:toggle-dataset-selection="toggleDatasetSelection">
                 </switch-dataset-card>
             </v-col>
@@ -20,7 +20,14 @@
             </v-col>
         </v-row>
         <v-row>
-
+            <v-col>
+                <single-dataset-visualization-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null">
+                </single-dataset-visualization-card>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+            </v-col>
         </v-row>
     </v-container>
 </template>
@@ -33,8 +40,15 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import {Prop, Watch} from 'vue-property-decorator';
 import PeptideContainer from './../../logic/data-management/PeptideContainer';
+import MpaAnalysisManager from '../../logic/data-management/MpaAnalysisManager';
+import Sample from '../../logic/data-management/Sample';
+import SingleDatasetVisualizationCard from '../visualizations/SingleDatasetVisualizationsCard.vue';
 
-@Component
+@Component({
+    components: {
+        SingleDatasetVisualizationCard
+    }
+})
 export default class AnalysisComponent extends Vue {
     @Prop({required: true})
     private selectedDatasets: PeptideContainer[];
@@ -42,16 +56,30 @@ export default class AnalysisComponent extends Vue {
     private storedDatasets: PeptideContainer[];
 
     private datasetSelectionInProgress: boolean = false;
-    private activeDataset: PeptideContainer;
+    private activeDataset: PeptideContainer = null;
 
     mounted() {
-        // Start analysis of every selected dataset
+        // Start analysis of every selected dataset.
         for (let dataset of this.selectedDatasets) {
-            
+            this.processDataset(dataset);
         }
     }
 
-    private datasetActivated(dataset: PeptideContainer) {
+    private processDataset(dataset: PeptideContainer): void {
+        let mpaManager = new MpaAnalysisManager();
+        // TODO: work with the real search settings here
+        mpaManager.processDataset(dataset, {
+            il: true,
+            dupes: true,
+            missed: false
+        }).then(() => {
+            if (this.activeDataset === null) {
+                this.activeDataset = dataset;
+            }
+        });
+    }
+
+    private activateDataset(dataset: PeptideContainer) {
         this.activeDataset = dataset;
     }
 
