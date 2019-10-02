@@ -1,13 +1,13 @@
 <template>
-    <div>
+    <div ref="sunburstWrapper">
         <h2 class="ghead">
             <span class="dir">
-                <v-btn x-small fab @click="reset()"><v-icon>mdi-restore</v-icon></v-btn>
+                <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
             <span class="dir">
                 <v-menu>
                     <template v-slot:activator="{ on }">
-                        <v-btn fab x-small v-on="on">
+                        <v-btn fab x-small v-on="on" :elevation="0">
                             <v-icon>mdi-settings</v-icon>
                         </v-btn>
                     </template>
@@ -23,18 +23,6 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <!-- <div class="btn-group" id="colorswap">
-                    <a class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" id="colorswap-button"><span class="glyphicon glyphicon-cog"></span></a>
-                    <ul class="dropdown-menu dropdown-menu-right dropdown-menu-form">
-                        <li title="Enabling this will assign fixed colors to taxa making it easier to compare samples.">
-                            <div class="checkbox">
-                                <label class="checkbox">
-                                    <input type="checkbox" id="colorswap-checkbox" v-model="isFixedColors">Use fixed colors
-                                </label>
-                            </div>
-                        </li>
-                    </ul>
-                </div> -->
             </span>
             <span class="dir text">Click a slice to zoom in and the center node to zoom out</span>
         </h2>
@@ -62,7 +50,8 @@
         private fullScreen: false;
         @Prop({required: true})
         private sample: Sample;
-        @Prop({required: false, default: 740})
+        // The width of the parent container is chosen if no specific width is set by the user.
+        @Prop({required: false, default: -1})
         private width: number;
         @Prop({required: false, default: 740})
         private height: number;
@@ -108,7 +97,7 @@
 
                 // @ts-ignore
                 this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-                    width: this.width,
+                    width: this.width === -1 ? (this.$refs.sunburstWrapper as Element).clientWidth : this.width,
                     height: this.height,
                     radius: this.radius,
                     getTooltip: tooltipContent,
@@ -120,30 +109,6 @@
     }
 </script>
 
-<style scoped>
-    span.dir.text {
-        margin-top: 10px;
-    }
-
-    span.dir {
-        font-size: 12px;
-        font-weight: normal;
-        color: #555;
-        line-height: 100%;
-        float: right;
-        margin-left: 5px;
-    }
-
-    .ghead {
-        margin-bottom: 8px;
-        margin-top: 5px;
-        margin-right: 16px;
-        font-weight: bold;
-        padding: 0;
-        border: 0;
-        font-size: 13px;
-        line-height: 1.4;
-        color: #333;
-        height: 30px;
-    }
+<style lang="less" scoped>
+    @import './../../assets/style/visualizations.css.less';
 </style>

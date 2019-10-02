@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div ref="treemapWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <a class="btn btn-xs btn-default btn-animate" @click="reset()" title="reset visualisation">
@@ -34,7 +34,7 @@
         private fullScreen: boolean;
         @Prop({required: true})
         private sample: Sample;
-        @Prop({required: false, default: 916})
+        @Prop({required: false, default: -1})
         private width: number;
         @Prop({required: false, default: 600})
         private height: number;
@@ -74,7 +74,7 @@
 
                 // @ts-ignore
                 this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
-                    width: this.width,
+                    width: this.width === -1 ? (this.$refs.treemapWrapper as Element).clientWidth : this.width,
                     height: this.height,
                     levels: this.levels,
                     getBreadcrumbTooltip: d => d.rank,
@@ -88,5 +88,6 @@
     }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+    @import './../../assets/style/visualizations.css.less';
 </style>
