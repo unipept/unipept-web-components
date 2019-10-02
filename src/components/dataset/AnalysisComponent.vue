@@ -110,4 +110,8 @@ export default class AnalysisComponent extends Vue {
         margin-top: 15px;
         margin-bottom: 15px; 
     }
+
+    .unipept-sunburst {
+        width: 100% !important;
+    }
 </style>

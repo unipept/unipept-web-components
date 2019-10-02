@@ -2,10 +2,28 @@
     <div>
         <h2 class="ghead">
             <span class="dir">
-                <a class="btn btn-xs btn-default btn-animate" @click="reset()" title="reset visualisation"><span class="glyphicon glyphicon-repeat spin"></span></a>
+                <v-btn x-small fab @click="reset()"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
             <span class="dir">
-                <div class="btn-group" id="colorswap">
+                <v-menu>
+                    <template v-slot:activator="{ on }">
+                        <v-btn fab x-small v-on="on">
+                            <v-icon>mdi-settings</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-action>
+                                <v-checkbox v-model="isFixedColors" color="primary"></v-checkbox>
+                            </v-list-item-action>
+
+                            <v-list-item-content>
+                                <v-list-item-title>Use fixed colors</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <!-- <div class="btn-group" id="colorswap">
                     <a class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" id="colorswap-button"><span class="glyphicon glyphicon-cog"></span></a>
                     <ul class="dropdown-menu dropdown-menu-right dropdown-menu-form">
                         <li title="Enabling this will assign fixed colors to taxa making it easier to compare samples.">
@@ -16,7 +34,7 @@
                             </div>
                         </li>
                     </ul>
-                </div>
+                </div> -->
             </span>
             <span class="dir text">Click a slice to zoom in and the center node to zoom out</span>
         </h2>
@@ -103,5 +121,29 @@
 </script>
 
 <style scoped>
+    span.dir.text {
+        margin-top: 10px;
+    }
 
+    span.dir {
+        font-size: 12px;
+        font-weight: normal;
+        color: #555;
+        line-height: 100%;
+        float: right;
+        margin-left: 5px;
+    }
+
+    .ghead {
+        margin-bottom: 8px;
+        margin-top: 5px;
+        margin-right: 16px;
+        font-weight: bold;
+        padding: 0;
+        border: 0;
+        font-size: 13px;
+        line-height: 1.4;
+        color: #333;
+        height: 30px;
+    }
 </style>
