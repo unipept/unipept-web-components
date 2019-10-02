@@ -140,7 +140,7 @@ async function cacheGoTerms(goTerms) {
     const todo = goTerms.filter(c => !goTermsCache.has(c));
     if (todo.length > 0) {
         for (let i = 0; i < todo.length; i += FA_BATCH_SIZE) {
-            const res = await postJSON("/private_api/goterms", JSON.stringify({
+            const res = await postJSON(BASE_URL + "/private_api/goterms", JSON.stringify({
                 goterms: todo.slice(i, i + FA_BATCH_SIZE),
             }));
             await addGoTermsToCache(res);
@@ -188,7 +188,7 @@ async function cacheEcNumbers(ecNumbers) {
 
     if (todoList.length > 0) {
         for (let i = 0; i < todoList.length; i += FA_BATCH_SIZE) {
-            const res = await postJSON("/private_api/ecnumbers", JSON.stringify({
+            const res = await postJSON(BASE_URL + "/private_api/ecnumbers", JSON.stringify({
                 ecnumbers: todoList.slice(i, i + FA_BATCH_SIZE),
             }));
             await addEcNumbersToCache(res);

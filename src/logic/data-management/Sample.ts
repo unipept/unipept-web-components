@@ -4,13 +4,14 @@ import DataRepository from '../data-source/DataRepository';
 import ProgressListener from './ProgressListener';
 import MPAConfig from './MPAConfig';
 import TaxonInfo from './TaxonInfo';
+import {BASE_URL} from './../Constants';
 
 export default class Sample {
 
     get dataRepository(): DataRepository {
         return this._dataRepository;
     }
-    public static readonly TAXA_URL: string = '/private_api/taxa';
+    public static readonly TAXA_URL: string = BASE_URL + '/private_api/taxa';
 
     /**
      * Fetches the taxon info from the Unipept API for a list of taxon id's and

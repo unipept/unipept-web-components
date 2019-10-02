@@ -89,6 +89,7 @@ export default class AnalysisComponent extends Vue {
 
     private selectDataset(dataset: PeptideContainer) {
         this.selectedDatasets.push(dataset);
+        this.processDataset(dataset);
     }
 
     private deselectDataset(dataset: PeptideContainer) {
