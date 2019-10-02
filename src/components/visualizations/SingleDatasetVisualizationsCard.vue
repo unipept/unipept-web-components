@@ -78,27 +78,27 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <!-- <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="$store.getters.activeDataset && $store.getters.activeDataset.progress === 1" :dataset="$store.getters.activeDataset"></treemap-visualization> -->
-                        <!-- <div v-else class="mpa-waiting">
+                        <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treemap-visualization>
+                        <div v-else class="mpa-waiting">
                             <img :alt="waitString" class="mpa-placeholder" src="/images/mpa/placeholder_treemap.svg">
-                        </div> -->
+                        </div>
                     </v-card>
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <!-- <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="$store.getters.activeDataset && $store.getters.activeDataset.progress === 1" :dataset="$store.getters.activeDataset"></treeview-visualization> -->
-                        <!-- <div v-else class="mpa-waiting">
+                        <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treeview-visualization>
+                        <div v-else class="mpa-waiting">
                             <img :alt="waitString" class="mpa-placeholder" src="/images/mpa/placeholder_treeview.svg">
-                        </div> -->
+                        </div>
                     </v-card>
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <!-- <hierarchical-outline-visualization v-if="$store.getters.activeDataset" :dataset="$store.getters.activeDataset"></hierarchical-outline-visualization>
+                            <hierarchical-outline-visualization v-if="this.sample" :sample="this.sample"></hierarchical-outline-visualization>
                             <div v-else>
                                 {{ waitString }}
-                            </div> -->
+                            </div>
                         </v-card-text>
                     </v-card>
                 </v-tab-item>
@@ -111,12 +111,12 @@
                             <h4 class="modal-title">Heatmap wizard</h4>
                         </div>
                         <div class="single-dataset-wizard">
-                            <!-- <heatmap-wizard-single-sample v-if="dataset" :dataset="dataset"></heatmap-wizard-single-sample>
+                            <heatmap-wizard-single-sample v-if="dataset" :dataset="dataset"></heatmap-wizard-single-sample>
                             <div v-else>
                                 <div class="text-xs-center" style="margin-top: 25px;">
                                     <v-progress-circular indeterminate color="primary"></v-progress-circular>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                 </v-dialog>
@@ -235,7 +235,6 @@
             // @ts-ignore
             logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
             if (this.tabs[this.tab] === "Sunburst") {
-
                 d3.selectAll(".toHide").attr("class", "arc hidden");
                 triggerDownloadModal("#sunburstWrapper svg", null, "unipept_sunburst");
                 d3.selectAll(".hidden").attr("class", "arc toHide");

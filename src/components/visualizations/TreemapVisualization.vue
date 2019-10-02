@@ -23,6 +23,7 @@
     import VisualizationMixin from "./VisualizationMixin.vue";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import { TaxumRank } from "../../logic/data-source/TaxumRank";
+    import Sample from '../../logic/data-management/Sample';
 
     @Component
     export default class TreemapVisualization extends mixins(VisualizationMixin) {
@@ -31,6 +32,14 @@
 
         @Prop({default: false}) 
         private fullScreen: boolean;
+        @Prop({required: true})
+        private sample: Sample;
+        @Prop({required: false, default: 916})
+        private width: number;
+        @Prop({required: false, default: 600})
+        private height: number;
+        @Prop({required: false, default: 28})
+        private levels: number;
 
         mounted() {
             this.initTreeMap();
@@ -58,16 +67,16 @@
         }
 
         private async initTreeMap() {
-            if (this.dataset != null && this.dataset.getDataset() != null) {
-                let taxaSource: TaxaDataSource = await this.dataset.getDataset().dataRepository.createTaxaDataSource();
+            if (this.sample != null) {
+                let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaSource.getTree();
                 const data = JSON.stringify(tree.getRoot());
 
                 // @ts-ignore
                 this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
-                    width: 916,
-                    height: 600,
-                    levels: 28,
+                    width: this.width,
+                    height: this.height,
+                    levels: this.levels,
                     getBreadcrumbTooltip: d => d.rank,
                     getTooltip: tooltipContent,
                     getLabel: d => `${d.name} (${d.data.self_count}/${d.data.count})`,
