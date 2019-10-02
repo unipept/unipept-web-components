@@ -78,9 +78,90 @@
     }
 </script>
 
-<style scoped>
-    .treeView li:last-child {
-        background-image: url(./assets/list-item-last-d5e2e48….png);
+<style lang="less">
+    @import './../../assets/style/variables.css.less';
+
+    .treeView {
+        -moz-user-select: none;
+        position: relative;
+        margin-top: 5px;
+        float: left;
     }
 
+    .treeView ul {
+        margin: -5px 0 0 -1.5em;
+        padding: 0 0 0 1.5em;
+    }
+
+    .treeView ul ul {
+        background: url(./../../assets/images/hierarchical_outline/list-item-contents.png) repeat-y left;
+    }
+
+    .treeView li:last-child > ul {
+        background-image: none;
+    }
+
+    .treeView li {
+        margin: 0;
+        padding: 5px 0 0;
+        background: url(./../../assets/images/hierarchical_outline/list-item-root.png) no-repeat top left;
+        list-style-position: inside;
+        list-style-image: url(./../../assets/images/hierarchical_outline/button.png);
+        cursor: auto;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .treeView li.collapsibleListOpen {
+        list-style-image: url(./../../assets/images/hierarchical_outline/button-open.png);
+        cursor: pointer;
+    }
+
+    .treeView li.collapsibleListClosed {
+        list-style-image: url(./../../assets/images/hierarchical_outline/button-closed.png);
+        cursor: pointer;
+    }
+
+    .treeView li.collapsibleListClosed ul {
+        display: none;
+    }
+
+    .treeView li li {
+        background-image: url(./../../assets/images/hierarchical_outline/list-item.png);
+        padding-left: 1.5em;
+    }
+
+    .treeView li:last-child {
+        background-image: url(./../../assets/images/hierarchical_outline/list-item-last.png);
+    }
+
+    .treeView li.root {
+        background-image: none;
+        list-style-type: none;
+        list-style-image: none;
+    }
+
+    .treeView li.unmatch {
+        display: none;
+    }
+
+    .treeView li.leaf {
+        background-image: url(./../../assets/images/hierarchical_outline/list-item-leaf.png);
+        list-style-type: none;
+        list-style-image: none;
+    }
+
+    .treeView li.leaf:last-child {
+        background-image: url(./../../assets/images/hierarchical_outline/list-item-last-leaf.png);
+    }
+
+    .treeView span.clicked {
+        background: @gray-lighter !important;
+        border: 1px solid #ccc !important;
+        border-radius: 2px;
+    }
+
+    .treeView li.leaf span {
+        cursor: pointer;
+    }
 </style>
