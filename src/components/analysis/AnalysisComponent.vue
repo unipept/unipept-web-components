@@ -33,9 +33,9 @@
 </template>
 
 <script lang="ts">
-import SwitchDatasetCard from "./SwitchDatasetCard.vue";
+import SwitchDatasetCard from "./../dataset/SwitchDatasetCard.vue";
 import ExperimentSummaryCard from "./../analysis/functional/ExperimentSummaryCard.vue"
-import LoadDatasetsCard from "./LoadDatasetsCard.vue";
+import LoadDatasetsCard from "./../dataset/LoadDatasetsCard.vue";
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {Prop, Watch} from 'vue-property-decorator';
@@ -46,7 +46,10 @@ import SingleDatasetVisualizationCard from '../visualizations/SingleDatasetVisua
 
 @Component({
     components: {
-        SingleDatasetVisualizationCard
+        SwitchDatasetCard,
+        SingleDatasetVisualizationCard,
+        LoadDatasetsCard,
+        ExperimentSummaryCard
     }
 })
 export default class AnalysisComponent extends Vue {

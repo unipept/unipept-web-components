@@ -10,9 +10,8 @@
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs"
   },
-  "main": "dist/unipept-web-components.umd.js",
   "files": [
-    "dist/*.{js,css,ts}"
+    "src/**"
   ],
   "dependencies": {
     "@babel/preset-env": "^7.6.0",
@@ -58,9 +57,11 @@
     "eslint": "^6.0.1",
     "eslint-plugin-vue": "^5.2.3",
     "fibers": "^4.0.1",
+    "file-loader": "^4.2.0",
     "node-sass": "^4.12.0",
     "sass": "^1.17.4",
     "sass-loader": "^7.1.0",
+    "svg-inline-loader": "^0.8.0",
     "ts-jest": "^23.0.0",
     "typescript": "^3.5.1",
     "vue-cli-plugin-vuetify": "^0.6.3",
@@ -68,6 +69,5 @@
     "vuepress": "^1.0.2",
     "vuetify-loader": "^1.2.2",
     "webpack-cli": "^3.3.7"
-  },
-  "types": "dist/index.d.ts"
+  }
 }

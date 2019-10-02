@@ -1,4 +1,4 @@
-import "babel-polyfill"; // for async await webpacker support
+import 'babel-pol'
 import "whatwg-fetch";
 // TODO: also include other pollyfills?
 import GOTerms from "../fa/old-goterms";

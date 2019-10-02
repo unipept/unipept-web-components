@@ -72,7 +72,7 @@
                     <v-card flat>
                         <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.sample" :sample="this.sample"></sunburst-visualization>
                         <div v-else class="mpa-waiting">
-                            <img :alt="waitString" class="mpa-placeholder" src="/images/mpa/placeholder_sunburst.svg">
+                            <img :alt="waitString" class="mpa-placeholder" src="./../../assets/images/placeholder_sunburst.svg">
                         </div>
                     </v-card>
                 </v-tab-item>
