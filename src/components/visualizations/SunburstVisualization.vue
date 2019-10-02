@@ -44,6 +44,12 @@
         private fullScreen: false;
         @Prop({required: true})
         private sample: Sample;
+        @Prop({required: false, default: 740})
+        private width: number;
+        @Prop({required: false, default: 740})
+        private height: number;
+        @Prop({required: false, default: 740 / 2})
+        private radius: number;
 
         private isFixedColors: boolean = false;
 
@@ -84,9 +90,9 @@
 
                 // @ts-ignore
                 this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-                    width: 740,
-                    height: 740,
-                    radius: 740 / 2,
+                    width: this.width,
+                    height: this.height,
+                    radius: this.radius,
                     getTooltip: tooltipContent,
                     getTitleText: d => `${d.name} (${d.rank})`,
                     rerootCallback: d => this.search(d.id, d.name, 1000),
