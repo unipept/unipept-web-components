@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- We cannot use the pre-built simple-button here because we need to attach a specific id to the input-field to allow the non-Vue searchTree to work -->
         <div class="input-group" id="tree_search_group">
             <input type="search" name="tree_search" id="tree_search" v-model="searchTerm" placeholder="search for an organism..." class="form-control">
             <span class="input-group-addon">
@@ -25,6 +24,7 @@
     import Tree from "../../logic/data-management/Tree";
     import {constructSearchtree} from "../../logic/data-management/searchtree";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import Sample from '../../logic/data-management/Sample';
 
     @Component({
         components: {},
@@ -44,7 +44,7 @@
         }
     })
     export default class HierarchicalOutlineVisualization extends Vue {
-        @Prop({default: null}) dataset: PeptideContainer | null;
+        @Prop({required: true}) sample: Sample;
 
         searchTree!: any;
 
@@ -65,8 +65,8 @@
         }
 
         private async initSearchTree() {
-            if (this.dataset != null && this.dataset.getDataset() != null) {
-                let taxaDataSource: TaxaDataSource = await this.dataset.getDataset().dataRepository.createTaxaDataSource();
+            if (this.sample != null) {
+                let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaDataSource.getTree();
                 this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
             }
@@ -79,5 +79,8 @@
 </script>
 
 <style scoped>
+    .treeView li:last-child {
+        background-image: url(./assets/list-item-last-d5e2e48….png);
+    }
 
 </style>
