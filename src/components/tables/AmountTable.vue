@@ -106,15 +106,18 @@
         private tableHeaders = [{
             text: 'Peptides',
             align: 'left',
-            value: 'popularity'
+            value: 'popularity',
+            width: '20%'
         }, {
             text: 'GO term',
             align: 'left',
-            value: 'code'
+            value: 'code',
+            width: '30%'
         }, {
             text: 'Name',
             align: 'left',
-            value: 'name'
+            value: 'name',
+            width: '50%'
         }];
 
     
