@@ -34,17 +34,22 @@
         @Prop({required: true})
         private sample: Sample;
 
+        private nodePerTerm: Map<GoTerm, Node> = new Map();
+
         mounted() {
-            console.log(this.items);
+            this.sample.dataRepository.createTaxaDataSource().then((dataSource: TaxaDataSource) => {
+                for (let term of this.items) {
+                    dataSource.getTreeByGoTerm(term).then((node: Node) => {
+                        this.nodePerTerm.set(term, node);
+                    })
+                }
+            })
         }
 
-        private taxaRetriever: (term: GoTerm) => Promise<Node> = (term: GoTerm) => this.getTaxaTreeByTerm(term);
-
-        private async getTaxaTreeByTerm(term: GoTerm): Promise<Node> {
-            let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
-            let tree = taxaDataSource.getTreeByGoTerm(term);
-            console.log(tree);
-            return tree;
+        private taxaRetriever: (term: GoTerm) => Node = (term: GoTerm) => {
+            let value = this.nodePerTerm.get(term);
+            console.log(value);
+            return value;
         }
     }
 </script>

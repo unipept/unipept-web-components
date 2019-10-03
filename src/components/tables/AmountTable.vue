@@ -1,5 +1,21 @@
 <template>
-    <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5">
+    <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
+        <template v-slot:expanded-item="{ headers, item }">
+            <td :colspan="headers.length">
+                <treeview 
+                    :id="`TreeView-${item.code}`" 
+                    :data="getTaxa(item)" 
+                    :height="310"
+                    :width="800" 
+                    :tooltip="tooltip" 
+                    :colors="highlightColorFunc" 
+                    :enableAutoExpand="0.3" 
+                    :linkStrokeColor="linkStrokeColor" 
+                    :nodeStrokeColor="highlightColorFunc" 
+                    :nodeFillColor="highlightColorFunc">
+                </treeview>
+            </td>
+        </template>
     </v-data-table>
     <!-- <table class="amount-table">
         <thead>
@@ -85,7 +101,7 @@
         @Prop({required: true})
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
-        protected taxaRetriever: (term: FAElement) => Promise<Node>;
+        protected taxaRetriever: (term: FAElement) => Node;
 
         private tableHeaders = [{
             text: 'Peptides',
@@ -101,55 +117,21 @@
             value: 'name'
         }];
 
-        // The amount of items that's always visible in the table (thus the table's minimum length)
-        protected initialItemsVisible: number = 5;
-        // The amount of items that's currently visible in this table
-        protected itemsVisible: number = this.initialItemsVisible;
-        // The amount of items that are shown extra when expanding the table
-        protected visibilityStep: number = 10;
-
+    
         // All settings for each Treeview that remain the same
         protected tooltip: (d: any) => string = tooltipContent;
         protected highlightColor: string = "#ffc107";
         protected highlightColorFunc: (d: any) => string = d => (d.included ? this.highlightColor : "lightgrey");
         protected linkStrokeColor: (d: any) => string = ({target: d}) => this.highlightColorFunc(d);
-
-        // Keeps track of which rows are expanded and which trees should be shown in that case.
-        protected expandedItems: Map<FAElement, Node> = new Map();
-        protected expandedItemsList: FAElement[] = [];
+        protected expandedItemsList = [];
 
         public toCSV(columnNames: string[], columnValues: string[][]): string {
             columnValues.unshift(columnNames);
             return toCSVString(columnValues);
         }
 
-        protected expandView(amount): void {
-            if (this.itemsVisible + amount > this.items.length) {
-                this.itemsVisible = this.items.length;
-            } else {
-                this.itemsVisible += amount;
-            }
-        }
-
-        protected shrinkView(amount): void {
-            if (this.itemsVisible - amount < this.initialItemsVisible) {
-                this.itemsVisible = this.initialItemsVisible;
-            } else {
-                this.itemsVisible -= amount;
-            }
-        }
-
-        protected async toggleTerm(term: FAElement): Promise<void> {
-            let idx: number = this.expandedItemsList.indexOf(term);
-            if (idx >= 0) {
-                this.expandedItemsList.splice(idx, 1);
-            } else {
-                if (!this.expandedItems.has(term)) {
-                    this.expandedItems.set(term, await this.taxaRetriever(term));
-                }
-
-                this.expandedItemsList.push(term);
-            }
+        private getTaxa(term: FAElement): Node {
+            return this.taxaRetriever(term);
         }
 
         private saveImage(term: FAElement): void {

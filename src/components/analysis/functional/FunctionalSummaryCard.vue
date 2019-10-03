@@ -71,10 +71,10 @@
                                 <div v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace">
                                     <h3 style="padding-left: 16px;">{{ goData[idx].title }}</h3>
                                     <v-row>
-                                        <v-col :cols="8">
+                                        <v-col :cols="9">
                                             <go-amount-table :sample="sample" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
-                                        <v-col :cols="4">
+                                        <v-col :cols="3">
                                             <img style="max-width: 100%;" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
                                         </v-col>
                                     </v-row>
