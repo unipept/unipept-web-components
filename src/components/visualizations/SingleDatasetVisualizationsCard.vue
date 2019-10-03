@@ -72,7 +72,7 @@
                     <v-card flat>
                         <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.sample" :sample="this.sample"></sunburst-visualization>
                         <div v-else class="mpa-waiting">
-                            <img :alt="waitString" class="mpa-placeholder" src="./../../assets/images/placeholders/placeholder_sunburst.svg">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
                     </v-card>
                 </v-tab-item>
@@ -80,7 +80,7 @@
                     <v-card flat>
                         <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treemap-visualization>
                         <div v-else class="mpa-waiting">
-                            <img :alt="waitString" class="mpa-placeholder" src="./../../assets/images/placeholders/placeholder_treemap.svg">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
                     </v-card>
                 </v-tab-item>
@@ -88,7 +88,7 @@
                     <v-card flat>
                         <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treeview-visualization>
                         <div v-else class="mpa-waiting">
-                            <img :alt="waitString" class="mpa-placeholder" src="./../../assets/images/placeholders/placeholder_treeview.svg">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
                     </v-card>
                 </v-tab-item>
@@ -96,8 +96,8 @@
                     <v-card flat>
                         <v-card-text>
                             <hierarchical-outline-visualization v-if="this.sample" :sample="this.sample"></hierarchical-outline-visualization>
-                            <div v-else>
-                                {{ waitString }}
+                            <div v-else class="mpa-waiting">
+                                <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                             </div>
                         </v-card-text>
                     </v-card>
@@ -252,6 +252,14 @@
 </script>
 
 <style scoped lang="css">
+    .mpa-waiting {
+        margin-top: 16px;
+        margin-bottom: 16px;
+        position: relative;
+        left: 50%;
+        transform: translate(-35px);
+    }
+    
     /* .fullscreen-nav {
         position: absolute;
         z-index: 1;

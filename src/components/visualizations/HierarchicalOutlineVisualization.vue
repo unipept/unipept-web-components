@@ -1,11 +1,6 @@
 <template>
     <div>
-        <div class="input-group" id="tree_search_group">
-            <input type="search" name="tree_search" id="tree_search" v-model="searchTerm" placeholder="search for an organism..." class="form-control">
-            <span class="input-group-addon">
-                <span class="glyphicon glyphicon-search"></span>
-            </span>
-        </div>
+        <v-text-field style="margin-bottom: -26px;" solo label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
         <div id="searchtree" class="treeView multi"></div>
         <div id="tree_data">
             <p>
@@ -163,5 +158,16 @@
 
     .treeView li.leaf span {
         cursor: pointer;
+    }
+
+    #tree_data {
+        float: right;
+        font-family: Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;
+        font-size: 12px;
+        color: rgb(85, 85, 85);
+    }
+
+    #searchtree {
+        margin-bottom: 16px;
     }
 </style>
