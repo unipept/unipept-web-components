@@ -68,14 +68,16 @@
                                 This panel shows the Gene Ontology annotations that were matched to
                                 your peptides.
                                 <span v-html="goTrustLine"></span>Click on a row in a table to see a taxonomy tree that highlights occurrences.
-                                <div class="row" v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace">
+                                <div v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace">
                                     <h3 style="padding-left: 16px;">{{ goData[idx].title }}</h3>
-                                    <div class="col-xs-8">
-                                        <go-amount-table :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
-                                    </div>
-                                    <div class="col-xs-4">
-                                        <img :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
-                                    </div>
+                                    <v-row>
+                                        <v-col :cols="8">
+                                            <go-amount-table :sample="sample" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
+                                        </v-col>
+                                        <v-col :cols="4">
+                                            <img style="max-width: 100%;" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
+                                        </v-col>
+                                    </v-row>
                                 </div>
                             </div>
                         </v-card-text>
@@ -97,7 +99,7 @@
                                 This panel shows the Enzyme Commission numbers that were matched to your peptides. 
                                 <span v-html="ecTrustLine"></span>
                                 Click on a row in a table to see a taxonomy tree that highlights occurrences.
-                                <ec-amount-table :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
+                                <ec-amount-table :sample="sample" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
                                 <div v-if="ecTreeData">
                                     <treeview :data="ecTreeData" :height="500" :width="916" :tooltip="ecTreeTooltip" :enableAutoExpand="true" style="position: relative; left: -16px; bottom: -16px;"></treeview>
                                 </div>
@@ -233,21 +235,10 @@
                     title: stringTitleize(ns.toString())
                 });
             }
-        }
-
-        @Watch('watchableDataset') onWatchableDatasetChanged() {
             this.onPeptideContainerChanged();
         }
 
-        @Watch('percentSettings') onPercentSettingsChanged() {
-            this.onPeptideContainerChanged();
-        }
-
-        @Watch('watchableSelectedSearchTerm') onWatchableSelectedSearchTermChanged() {
-            this.onPeptideContainerChanged();
-        }
-
-        @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
+        @Watch('sample') onSampleChanged() {
             this.onPeptideContainerChanged();
         }
 
@@ -333,8 +324,7 @@
 
         private async onPeptideContainerChanged() {
             this.faCalculationsInProgress = true;
-            let container: PeptideContainer = this.$store.getters.activeDataset;
-            if (container && container.getDataset()) {
+            if (this.sample) {
                 await this.redoFAcalculations();
             }
             this.faCalculationsInProgress = false;

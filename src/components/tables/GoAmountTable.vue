@@ -34,11 +34,17 @@
         @Prop({required: true})
         private sample: Sample;
 
+        mounted() {
+            console.log(this.items);
+        }
+
         private taxaRetriever: (term: GoTerm) => Promise<Node> = (term: GoTerm) => this.getTaxaTreeByTerm(term);
 
         private async getTaxaTreeByTerm(term: GoTerm): Promise<Node> {
             let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
-            return taxaDataSource.getTreeByGoTerm(term);
+            let tree = taxaDataSource.getTreeByGoTerm(term);
+            console.log(tree);
+            return tree;
         }
     }
 </script>
