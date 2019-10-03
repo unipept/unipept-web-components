@@ -21,13 +21,13 @@
         </v-row>
         <v-row>
             <v-col>
-                <single-dataset-visualization-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null">
+                <single-dataset-visualization-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null" :analysisInProgress="this.datasetsInProgress > 0">
                 </single-dataset-visualization-card>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <functional-summary-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null">
+                <functional-summary-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null" :analysisInProgress="this.datasetsInProgress > 0">
                 </functional-summary-card>
             </v-col>
         </v-row>
@@ -64,10 +64,12 @@ export default class AnalysisComponent extends Vue {
 
     private datasetSelectionInProgress: boolean = false;
     private activeDataset: PeptideContainer = null;
+    private datasetsInProgress: number = 0;
 
     mounted() {
         // Start analysis of every selected dataset.
         for (let dataset of this.selectedDatasets) {
+            this.datasetsInProgress += 1;
             this.processDataset(dataset);
         }
     }
@@ -83,6 +85,7 @@ export default class AnalysisComponent extends Vue {
             if (this.activeDataset === null) {
                 this.activeDataset = dataset;
             }
+            this.datasetsInProgress -= 1;
         });
     }
 

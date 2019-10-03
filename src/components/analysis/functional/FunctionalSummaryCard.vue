@@ -45,17 +45,22 @@
                     <v-card flat>
                         <v-card-text>
                             <div v-if="!this.sample" class="mpa-unavailable go">
-                                <h3>Biological Process</h3>
-                                <div class="go-waiting">
-                                    <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                <div v-if="this.analysisInProgress">
+                                    <h3>Biological Process</h3>
+                                    <div class="go-waiting">
+                                        <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                    </div>
+                                    <h3>Cellular Component</h3>
+                                    <div class="go-waiting">
+                                        <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                    </div>
+                                    <h3>Molecular Function</h3>
+                                    <div class="go-waiting">
+                                        <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                    </div>
                                 </div>
-                                <h3>Cellular Component</h3>
-                                <div class="go-waiting">
-                                    <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                </div>
-                                <h3>Molecular Function</h3>
-                                <div class="go-waiting">
-                                    <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                <div v-else class="placeholder-text">
+                                    Please select at least one dataset for analysis.
                                 </div>
                             </div>
                             <div v-else>
@@ -80,8 +85,11 @@
                     <v-card flat>
                         <v-card-text>
                             <div v-if="!this.sample">
-                                <div class="ec-waiting">
+                                <div class="ec-waiting" v-if="this.analysisInProgress">
                                     <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                                </div>
+                                <div v-else class="placeholder-text">
+                                    Please select at least one dataset for analysis.
                                 </div>
                             </div>
                             <div v-else>
@@ -160,6 +168,8 @@
     export default class FunctionalSummaryCard extends Vue {
         @Prop({required: true})
         private sample: Sample;
+        @Prop({required: false, default: true})
+        private analysisInProgress: boolean;
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
         // directly
@@ -407,7 +417,9 @@
     }
 </script>
 
-<style>
+<style lang="less">
+    @import './../../../assets/style/placeholder.css.less';
+
     .menu-header .v-list__tile {
         height: 28px;
     }

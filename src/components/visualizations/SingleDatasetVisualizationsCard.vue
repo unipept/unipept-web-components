@@ -71,24 +71,45 @@
                 <v-tab-item>
                     <v-card flat>
                         <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.sample" :sample="this.sample"></sunburst-visualization>
-                        <div v-else class="mpa-waiting">
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                        </div>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
+                            </v-card-text>
                         </div>
                     </v-card>
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
                         <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treemap-visualization>
-                        <div v-else class="mpa-waiting">
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                        </div>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
+                            </v-card-text>
                         </div>
                     </v-card>
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
                         <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treeview-visualization>
-                        <div v-else class="mpa-waiting">
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                        </div>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
+                            </v-card-text>
                         </div>
                     </v-card>
                 </v-tab-item>
@@ -96,8 +117,13 @@
                     <v-card flat>
                         <v-card-text>
                             <hierarchical-outline-visualization v-if="this.sample" :sample="this.sample"></hierarchical-outline-visualization>
-                            <div v-else class="mpa-waiting">
+                            <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                                 <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                            </div>
+                            <div v-else>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
                             </div>
                         </v-card-text>
                     </v-card>
@@ -155,13 +181,6 @@
             TreemapVisualization,
             SunburstVisualization,
             HeatmapWizardSingleSample
-        },
-        computed: {
-            datasetsChosen: {
-                get(): boolean {
-                    return this.$store.getters.selectedDatasets.length > 0;
-                }
-            }
         }
     })
     export default class SingleDatasetVisualizationsCard extends Vue {
@@ -175,8 +194,10 @@
 
         @Prop({required: true})
         private sample: Sample;
+        @Prop({required: false, default: true})
+        private analysisInProgress: boolean;
 
-        private waitString = "Please wait while we are preparing your data...";
+        private placeholderText = "Please select at least one dataset for analysis.";
         private isFullScreen: boolean = false;
         private dialogOpen: boolean = false;
 
@@ -192,15 +213,6 @@
             }, false);
             // @ts-ignore (TODO: migrate to Vuetify)
             // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
-        }
-
-        @Watch('datasetsChosen') 
-        private onDatasetsChosenChanged(newValue: boolean, oldValue: boolean) {
-            if (newValue) {
-                this.waitString = "Please wait while we are preparing your data...";
-            } else {
-                this.waitString = "Please select at least one dataset to continue the analysis...";
-            }
         }
         
         private switchToFullScreen() {
@@ -252,6 +264,8 @@
 </script>
 
 <style scoped lang="css">
+    @import './../../assets/style/placeholder.css.less';
+
     .mpa-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
