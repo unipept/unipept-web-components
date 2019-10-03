@@ -1,5 +1,7 @@
 <template>
-    <table class="table table-condensed table-amounttable">
+    <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5">
+    </v-data-table>
+    <!-- <table class="amount-table">
         <thead>
             <tr>
                 <th scope="col">Peptides</th>
@@ -55,7 +57,7 @@
                 </td>
             </tr>
         </tfoot>
-    </table>
+    </table> -->
 </template>
 
 <script lang="ts">
@@ -84,6 +86,20 @@
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
+
+        private tableHeaders = [{
+            text: 'Peptides',
+            align: 'left',
+            value: 'popularity'
+        }, {
+            text: 'GO term',
+            align: 'left',
+            value: 'code'
+        }, {
+            text: 'Name',
+            align: 'left',
+            value: 'name'
+        }];
 
         // The amount of items that's always visible in the table (thus the table's minimum length)
         protected initialItemsVisible: number = 5;
@@ -153,5 +169,8 @@
     }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+    @import './../../assets/style/amount-table.css.less';
+
+
 </style>
