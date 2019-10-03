@@ -102,6 +102,8 @@
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Node;
+        @Prop({required: true})
+        protected annotationName: string;
 
         private tableHeaders = [{
             text: 'Peptides',
