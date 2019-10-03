@@ -75,7 +75,7 @@
                                             <go-amount-table :sample="sample" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
                                         <v-col :cols="3">
-                                            <img style="max-width: 100%;" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
+                                            <img style="max-width: 100%; position: relative; top: 50%; transform: translate(0, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
                                         </v-col>
                                     </v-row>
                                 </div>

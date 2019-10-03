@@ -46,11 +46,7 @@
             })
         }
 
-        private taxaRetriever: (term: GoTerm) => Node = (term: GoTerm) => {
-            let value = this.nodePerTerm.get(term);
-            console.log(value);
-            return value;
-        }
+        private taxaRetriever: (term: GoTerm) => Node = (term: GoTerm) => this.nodePerTerm.get(term);
     }
 </script>
 
