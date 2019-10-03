@@ -27,6 +27,8 @@
         </v-row>
         <v-row>
             <v-col>
+                <functional-summary-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null">
+                </functional-summary-card>
             </v-col>
         </v-row>
     </v-container>
@@ -43,13 +45,15 @@ import PeptideContainer from './../../logic/data-management/PeptideContainer';
 import MpaAnalysisManager from '../../logic/data-management/MpaAnalysisManager';
 import Sample from '../../logic/data-management/Sample';
 import SingleDatasetVisualizationCard from '../visualizations/SingleDatasetVisualizationsCard.vue';
+import FunctionalSummaryCard from './functional/FunctionalSummaryCard.vue';
 
 @Component({
     components: {
         SwitchDatasetCard,
         SingleDatasetVisualizationCard,
         LoadDatasetsCard,
-        ExperimentSummaryCard
+        ExperimentSummaryCard,
+        FunctionalSummaryCard
     }
 })
 export default class AnalysisComponent extends Vue {

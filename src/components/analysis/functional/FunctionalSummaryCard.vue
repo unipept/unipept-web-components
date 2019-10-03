@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-card>
-            <v-tabs color="primary" dark v-model="currentTab">
+            <v-tabs color="primary" dark v-model="currentTab" slider-color="secondary" background-color="accent">
                 <v-tab>
                     GO Terms
                 </v-tab>
@@ -15,42 +15,48 @@
                         <v-btn text class="align-self-center mr-4" v-on="on">
                             <v-icon left>mdi-sort-descending</v-icon>
                             {{ faSortSettings.name }}
-                            <v-icon right>arrow_drop_down</v-icon>
+                            <v-icon right>mdi-menu-down</v-icon>
                         </v-btn>
                     </template>
 
                     <v-list class="grey lighten-3">
-                        <v-list-tile class="menu-header" @click="showSortSettingsModal()">
-                            <v-list-tile-title>
+                        <v-list-item class="menu-header" @click="showSortSettingsModal()">
+                            <v-list-item-title>
                                 Sort by number of peptides in related proteins
                                 <v-icon right>mdi-help-circle</v-icon>
-                            </v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="setFormatSettings('percent', 'fractionOfPepts', 'fractionOfPepts', 'Peptides %')">
-                            <v-list-tile-title>
+                            </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="setFormatSettings('percent', 'fractionOfPepts', 'fractionOfPepts', 'Peptides %')">
+                            <v-list-item-title>
                                 Peptides %
-                            </v-list-tile-title>
+                            </v-list-item-title>
                             
-                        </v-list-tile>
-                        <v-list-tile @click="setFormatSettings('int', 'popularity', 'fractionOfPepts', 'Peptides')">
-                            <v-list-tile-title>
+                        </v-list-item>
+                        <v-list-item @click="setFormatSettings('int', 'popularity', 'fractionOfPepts', 'Peptides')">
+                            <v-list-item-title>
                                 Peptides
-                            </v-list-tile-title>
-                        </v-list-tile>
+                            </v-list-item-title>
+                        </v-list-item>
                     </v-list>
                 </v-menu>
             </v-tabs>
-            <v-tabs-items>
+            <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <div v-if="!$store.getters.activeDataset || $store.getters.activeDataset.progress !== 1" class="mpa-unavailable go">
+                            <div v-if="!this.sample" class="mpa-unavailable go">
                                 <h3>Biological Process</h3>
-                                <img src="/images/mpa/placeholder_GO.svg" alt="Please wait while we are preparing your data..." class="mpa-placeholder">
+                                <div class="go-waiting">
+                                    <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                </div>
                                 <h3>Cellular Component</h3>
-                                <img src="/images/mpa/placeholder_GO.svg" alt="Please wait while we are preparing your data..." class="mpa-placeholder">
+                                <div class="go-waiting">
+                                    <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                </div>
                                 <h3>Molecular Function</h3>
-                                <img src="/images/mpa/placeholder_GO.svg" alt="Please wait while we are preparing your data..." class="mpa-placeholder">
+                                <div class="go-waiting">
+                                    <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
+                                </div>
                             </div>
                             <div v-else>
                                 <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
@@ -73,10 +79,10 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <div v-if="!$store.getters.activeDataset || $store.getters.activeDataset.progress !== 1" style="margin-top: 10px;">
-                                <span style="font-weight: 600;">Please wait while we are preparing your data...</span>
-                                <hr>
-                                <img src="/images/mpa/placeholder_treeview.svg" alt="Please wait while we are preparing your data..." class="mpa-placeholder">
+                            <div v-if="!this.sample">
+                                <div class="ec-waiting">
+                                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                                </div>
                             </div>
                             <div v-else>
                                 <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
@@ -152,6 +158,9 @@
         }
     })
     export default class FunctionalSummaryCard extends Vue {
+        @Prop({required: true})
+        private sample: Sample;
+
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
         // directly
         private goNamespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
@@ -324,10 +333,9 @@
         private async redoFAcalculations(): Promise<void> {
             let peptideContainer = this.$store.getters.activeDataset;
 
-            if (peptideContainer && peptideContainer.getDataset()) {
-                let sample: Sample = peptideContainer.getDataset();
-                let goSource: GoDataSource = await sample.dataRepository.createGoDataSource();
-                let taxaSource: TaxaDataSource = await sample.dataRepository.createTaxaDataSource();
+            if (this.sample) {
+                let goSource: GoDataSource = await this.sample.dataRepository.createGoDataSource();
+                let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
 
                 const percent = parseInt(this.percentSettings);
                 const taxonId = this.$store.getters.selectedTaxonId;
@@ -347,7 +355,7 @@
 
                 this.goTrustLine = this.computeTrustLine(await goSource.getTrust(), "GO term");
 
-                let ecSource: EcDataSource = await sample.dataRepository.createEcDataSource();
+                let ecSource: EcDataSource = await this.sample.dataRepository.createEcDataSource();
                 this.ecData = await ecSource.getEcNumbers();
                 this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
                 // @ts-ignore
@@ -411,5 +419,20 @@
 
     .menu-header .v-icon {
         font-size: 16px;
+    }
+
+    .go-waiting, .ec-waiting {
+        margin-top: 16px;
+        margin-bottom: 16px;
+        position: relative;
+        left: 50%;
+    }
+
+    .go-waiting {
+        transform: translate(-25px);
+    }
+
+    .ec-waiting {
+        transform: translate(-35px);
     }
 </style>
