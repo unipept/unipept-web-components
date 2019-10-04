@@ -16,64 +16,10 @@
                 </treeview>
             </td>
         </template>
+        <template v-slot:item.action="{ item }">
+            <v-icon>mdi-download</v-icon>
+        </template>
     </v-data-table>
-    <!-- <table class="amount-table">
-        <thead>
-            <tr>
-                <th scope="col">Peptides</th>
-                <th scope="col">GO term</th>
-                <th scope="col">Name</th>
-                <th scope="col"></th>
-                <th scope="col">
-                    <button class="btn btn-default btn-xs btn-animate amounttable-download" @click="saveTableAsCSV()">
-                        <span class="glyphicon glyphicon-download down"></span> Save table as CSV
-                    </button>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <template v-for="term of items.slice(0, itemsVisible)">
-                <tr aria-expanded="false" tabindex="0" role="button" style="cursor: pointer;" v-bind:key="term.code + '-1'" @click="toggleTerm(term)">
-                    <td class="shaded-cell" :style="`background-image: linear-gradient(to right, rgb(221, 221, 221) ${term.fractionOfPepts * 100}%, transparent ${term.fractionOfPepts * 100}%); width: 5em;`">
-                        {{ searchSettings.field === "fractionOfPepts" ?  (term.fractionOfPepts * 100).toFixed(0) + '%' : term.popularity }}
-                    </td>
-                    <td style="width: 7em;">
-                        <a :href="`https://www.ebi.ac.uk/QuickGO/term/${term.code}`" target="_blank">
-                            {{ term.code }}
-                        </a>
-                    </td>
-                    <td>
-                        {{ term.name }}
-                    </td>
-                    <td style="width: 6em; text-align: right;">
-                        <span class="glyphicon glyphicon-download glyphicon-inline down btn-icon" title="" role="button" tabindex="0" data-original-title="Download CSV of the matched peptides"></span>
-                    </td>
-                    <td class="glyphicon glyphicon-inline amounttable-chevron">
-                    </td>
-                </tr>
-                <tr v-bind:key="term.code + '-2'" v-if="expandedItemsList.indexOf(term) >= 0">
-                    <td colspan="5">
-                        <div class="amounttable-expandrow-content">
-                            <button class="btn btn-default btn-xs btn-animate pull-right" @click="saveImage(term)">
-                                <span class="glyphicon glyphicon-download down"></span>
-                                Save as image
-                            </button>
-                            <treeview :id="`TreeView-${term.code}`" :data="expandedItems.get(term)" :height="310" :width="535" :tooltip="tooltip" :colors="highlightColorFunc" :enableAutoExpand="0.3" :linkStrokeColor="linkStrokeColor" :nodeStrokeColor="highlightColorFunc" :nodeFillColor="highlightColorFunc"></treeview>
-                        </div>
-                    </td>
-                </tr>
-            </template>
-        </tbody>
-        <tfoot>
-            <tr class="collapse-row">
-                <td colspan="5" tabindex="0" role="button" @click.left.exact="expandView(visibilityStep)" @click.shift.left.exact="expandView(100)">
-                    <span class="glyphicon glyphicon-chevron-down"></span> 
-                    Showing {{ itemsVisible }} of {{ items.length }} rows — <span v-if="itemsVisible >= initialItemsVisible + 2 * visibilityStep"><kbd>SHIFT+click</kbd> to</span> show {{ itemsVisible >= initialItemsVisible + 2 * visibilityStep ? 100 : visibilityStep }} more
-                    <span v-if="itemsVisible > initialItemsVisible" class="glyphicon glyphicon-chevron-up btn-icon pull-right" title="Collapse row" tabindex="0" role="button" @click.left.exact="shrinkView(visibilityStep)" @click.shift.left.exact="shrinkView(100)" v-on:click.left.exact.stop></span>
-                </td>
-            </tr>
-        </tfoot>
-    </table> -->
 </template>
 
 <script lang="ts">
@@ -109,7 +55,7 @@
             text: 'Peptides',
             align: 'left',
             value: 'popularity',
-            width: '20%'
+            width: '15%'
         }, {
             text: 'GO term',
             align: 'left',
@@ -119,7 +65,13 @@
             text: 'Name',
             align: 'left',
             value: 'name',
-            width: '50%'
+            width: '45%'
+        }, {
+            text: 'Actions',
+            align: 'center',
+            width: '15%',
+            sortable: false,
+            value: 'action'
         }];
 
     
