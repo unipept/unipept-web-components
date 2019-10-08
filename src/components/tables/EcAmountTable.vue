@@ -29,16 +29,9 @@
         @Prop({required: true})
         private sample: Sample;
 
-        private nodePerNumber: Map<EcNumber, Node> = new Map();
-
-        private taxaRetriever: (term: EcNumber) => Node = (term: EcNumber) => this.nodePerNumber.get(term);
-
-        mounted() {
-            this.sample.dataRepository.createTaxaDataSource().then((taxaSource: TaxaDataSource) => {
-                for (let item of this.items) {
-                    taxaSource.getTreeByEcNumber(item).then((tree: Node) => this.nodePerNumber.set(item, tree));
-                }
-            })
+        private async taxaRetriever(term: EcNumber): Promise<Node> {
+            let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            return await taxaSource.getTreeByEcNumber(term);
         }
     }
 </script>
