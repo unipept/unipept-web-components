@@ -15,9 +15,9 @@
         </v-card-text>
         <div class="growing-list">
             <v-list two-line>
-                <v-list-item v-for="dataset of this.selectedDatasets" :key="dataset.id" ripple @click="() => activeDataset = dataset" :class="activeDataset === dataset ? 'selected-list-item' : ''">
+                <v-list-item v-for="dataset of this.selectedDatasets" :key="dataset.id" ripple @click="activateDataset(dataset)" :class="activeDatasetModel === dataset ? 'selected-list-item' : ''">
                     <v-list-item-action>
-                        <v-radio-group v-if="dataset.progress === 1" v-model="activeDataset"><v-radio :value="dataset"></v-radio></v-radio-group>
+                        <v-radio-group v-if="dataset.progress === 1" v-model="activeDatasetModel"><v-radio :value="dataset"></v-radio></v-radio-group>
                         <v-progress-circular v-else :rotate="-90" :size="24" :value="dataset.progress * 100" color="primary"></v-progress-circular>
                     </v-list-item-action>
                     <v-list-item-content>
@@ -81,26 +81,29 @@
     import Tooltip from "../custom/Tooltip.vue";
 
     @Component({
-        components: {CardTitle, CardHeader, HeatmapWizardMultiSample, Tooltip},
-        computed: {
-            activeDataset: {
-                get() {
-                    return this.activatedDataset;
-                },
-                set(dataset: PeptideContainer) {
-                    this.activateDataset(dataset);
-                }
-            }
-        }
+        components: {CardTitle, CardHeader, HeatmapWizardMultiSample, Tooltip}
     })
     export default class SwitchDatasetCard extends Vue {
         @Prop({required: true})
         private selectedDatasets: PeptideContainer[];
-        @Prop({required: false, default: null})
-        private activatedDataset: PeptideContainer;
+        @Prop({required: true})
+        private activeDataset: PeptideContainer;
+
+        private activeDatasetModel: PeptideContainer;
 
         private dialogOpen: boolean = false;
         private isDatasetSelectionInProgress: boolean = false;
+
+        mounted() {
+            this.activeDatasetModel = this.activateDataset;
+            console.log("Model:");
+            console.log(this.activeDatasetModel);
+        }
+
+        @Watch('activeDataset')
+        private onActiveDatasetChanged() {
+            this.activeDatasetModel = this.activeDataset;
+        }
 
         private deselectDataset(dataset: PeptideContainer) {
             let idx: number = this.selectedDatasets.indexOf(dataset);
@@ -132,7 +135,7 @@
          * @param container The dataset that's currently activated by the user.
          */
         private activateDataset(container: PeptideContainer) {
-            this.$emit('activate-dataset', container);
+            this.$emit('update:activeDataset', container);
         }
     }
 </script>

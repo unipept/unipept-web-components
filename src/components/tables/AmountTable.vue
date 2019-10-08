@@ -101,11 +101,7 @@
             })
             return true;
         }
-
-        private getTaxa(term: FAElement): Node {
-            return this.taxaRetriever(term);
-        }
-
+        
         private saveImage(term: FAElement): void {
             // @ts-ignores
             logToGoogle("Multi peptide", "Save Image for FA");
