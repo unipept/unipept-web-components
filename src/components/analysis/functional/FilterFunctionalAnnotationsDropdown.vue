@@ -1,23 +1,24 @@
 <template>
-    <div>
-        <div class="btn-group mpa-fa-advanced">
-            <a class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <span class="glyphicon glyphicon-cog"></span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right card-supporting-text">
-                <div class="form-group">
-                    <label for="mpa-fa-filter-precent">Filtering</label>
-                    <span class="small glyphicon glyphicon-question-sign help btn-icon" @click="showFunctionalModal"></span>
+    <span class="filter-annotations-menu">
+        <v-menu :close-on-content-click="false">
+            <template v-slot:activator="{ on }">
+                <v-btn fab x-small v-on="on" :elevation="0">
+                    <v-icon>mdi-settings</v-icon>
+                </v-btn>
+            </template>
+            <v-card>
+                <v-card-text>
+                    <span>Filtering</span>
                     <div class="input-group">
                         <span class="input-group-addon">≥</span>
-                        <input type="number" class="form-control" min="0" max="100" autocomplete="off" step="5" v-model="model" id="mpa-fa-filter-precent" style="min-width: 60px;">
+                        <input type="number" min="0" max="100" autocomplete="off" step="5" class="form-control" v-model="model">
                         <span class="input-group-addon">% of annotated proteins</span>
                     </div>
                     <a v-if="model !== '5'" class="pull-right" @click="model = '5'">reset to 5%</a>
-                </div>
-            </div>
-        </div>
-    </div>
+                </v-card-text>
+            </v-card>
+        </v-menu>
+    </span>
 </template>
 
 <script lang="ts">
@@ -127,6 +128,72 @@
     }
 </script>
 
-<style scoped>
+<style lang="less">
+    .input-group {
+        position: relative;
+        display: table;
+        border-collapse: separate;
+    }
 
+    .input-group-addon:first-child {
+        border-right: 0;
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    .input-group-addon {
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 1;
+        color: #555555;
+        text-align: center;
+        background-color: #eeeeee;
+        border: 1px solid #cccccc;
+        border-radius: 2px;
+        display: table-cell;
+        width: 1%;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .input-group .form-control:not(:first-child):not(:last-child) {
+        border-radius: 0;
+    }
+
+    .input-group-addon, .input-group-btn, .input-group .form-control {
+        display: table-cell;
+    }
+
+    .input-group .form-control {
+        position: relative;
+        z-index: 2;
+        float: left;
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        height: 33px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.38461538;
+        color: #555555;
+        background-color: #ffffff;
+        background-image: none;
+        border: 1px solid #cccccc;
+        border-radius: 2px;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+        transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    }
+
+    .filter-annotations-menu .v-btn {
+        float: right;
+    }
+
+    .filter-annotations-menu .input-group {
+        width: 160px;
+    }
 </style>

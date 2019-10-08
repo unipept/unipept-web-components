@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
+    <amount-table :items="items" annotation-name="EC number" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -29,11 +29,9 @@
         @Prop({required: true})
         private sample: Sample;
 
-        private taxaRetriever: (term: EcNumber) => Promise<Node> = (term: EcNumber) => this.getTaxaTreeByTerm(term);
-
-        protected async getTaxaTreeByTerm(term: EcNumber): Promise<Node> {
-            let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
-            return taxaDataSource.getTreeByEcNumber(term);
+        private async taxaRetriever(term: EcNumber): Promise<Node> {
+            let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            return await taxaSource.getTreeByEcNumber(term);
         }
     }
 </script>

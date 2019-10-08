@@ -1,61 +1,27 @@
 <template>
-    <table class="table table-condensed table-amounttable">
-        <thead>
-            <tr>
-                <th scope="col">Peptides</th>
-                <th scope="col">GO term</th>
-                <th scope="col">Name</th>
-                <th scope="col"></th>
-                <th scope="col">
-                    <button class="btn btn-default btn-xs btn-animate amounttable-download" @click="saveTableAsCSV()">
-                        <span class="glyphicon glyphicon-download down"></span> Save table as CSV
-                    </button>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <template v-for="term of items.slice(0, itemsVisible)">
-                <tr aria-expanded="false" tabindex="0" role="button" style="cursor: pointer;" v-bind:key="term.code + '-1'" @click="toggleTerm(term)">
-                    <td class="shaded-cell" :style="`background-image: linear-gradient(to right, rgb(221, 221, 221) ${term.fractionOfPepts * 100}%, transparent ${term.fractionOfPepts * 100}%); width: 5em;`">
-                        {{ searchSettings.field === "fractionOfPepts" ?  (term.fractionOfPepts * 100).toFixed(0) + '%' : term.popularity }}
-                    </td>
-                    <td style="width: 7em;">
-                        <a :href="`https://www.ebi.ac.uk/QuickGO/term/${term.code}`" target="_blank">
-                            {{ term.code }}
-                        </a>
-                    </td>
-                    <td>
-                        {{ term.name }}
-                    </td>
-                    <td style="width: 6em; text-align: right;">
-                        <span class="glyphicon glyphicon-download glyphicon-inline down btn-icon" title="" role="button" tabindex="0" data-original-title="Download CSV of the matched peptides"></span>
-                    </td>
-                    <td class="glyphicon glyphicon-inline amounttable-chevron">
-                    </td>
-                </tr>
-                <tr v-bind:key="term.code + '-2'" v-if="expandedItemsList.indexOf(term) >= 0">
-                    <td colspan="5">
-                        <div class="amounttable-expandrow-content">
-                            <button class="btn btn-default btn-xs btn-animate pull-right" @click="saveImage(term)">
-                                <span class="glyphicon glyphicon-download down"></span>
-                                Save as image
-                            </button>
-                            <treeview :id="`TreeView-${term.code}`" :data="expandedItems.get(term)" :height="310" :width="535" :tooltip="tooltip" :colors="highlightColorFunc" :enableAutoExpand="0.3" :linkStrokeColor="linkStrokeColor" :nodeStrokeColor="highlightColorFunc" :nodeFillColor="highlightColorFunc"></treeview>
-                        </div>
-                    </td>
-                </tr>
-            </template>
-        </tbody>
-        <tfoot>
-            <tr class="collapse-row">
-                <td colspan="5" tabindex="0" role="button" @click.left.exact="expandView(visibilityStep)" @click.shift.left.exact="expandView(100)">
-                    <span class="glyphicon glyphicon-chevron-down"></span> 
-                    Showing {{ itemsVisible }} of {{ items.length }} rows — <span v-if="itemsVisible >= initialItemsVisible + 2 * visibilityStep"><kbd>SHIFT+click</kbd> to</span> show {{ itemsVisible >= initialItemsVisible + 2 * visibilityStep ? 100 : visibilityStep }} more
-                    <span v-if="itemsVisible > initialItemsVisible" class="glyphicon glyphicon-chevron-up btn-icon pull-right" title="Collapse row" tabindex="0" role="button" @click.left.exact="shrinkView(visibilityStep)" @click.shift.left.exact="shrinkView(100)" v-on:click.left.exact.stop></span>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+    <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
+        <template v-slot:expanded-item="{ headers, item }">
+            <td :colspan="headers.length">
+                <div v-if="computeTree(item) && treeAvailable.get(item)">
+                    <treeview
+                        :id="`TreeView-${item.code}`" 
+                        :data="treeAvailable.get(item)" 
+                        :height="310"
+                        :width="800" 
+                        :tooltip="tooltip" 
+                        :colors="highlightColorFunc" 
+                        :enableAutoExpand="0.3" 
+                        :linkStrokeColor="linkStrokeColor" 
+                        :nodeStrokeColor="highlightColorFunc" 
+                        :nodeFillColor="highlightColorFunc">
+                    </treeview>
+                </div>
+            </td>
+        </template>
+        <template v-slot:item.action="{ item }">
+            <v-icon>mdi-download</v-icon>
+        </template>
+    </v-data-table>
 </template>
 
 <script lang="ts">
@@ -84,56 +50,60 @@
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
+        @Prop({required: true})
+        protected annotationName: string;
+        // Keeps track of the functional annotations for which a Tree has already been calculated.
+        private treeAvailable: Map<FAElement, Node> = new Map();
 
-        // The amount of items that's always visible in the table (thus the table's minimum length)
-        protected initialItemsVisible: number = 5;
-        // The amount of items that's currently visible in this table
-        protected itemsVisible: number = this.initialItemsVisible;
-        // The amount of items that are shown extra when expanding the table
-        protected visibilityStep: number = 10;
+        private tableHeaders = [{
+            text: 'Peptides',
+            align: 'left',
+            value: 'popularity',
+            width: '15%'
+        }, {
+            text: 'GO term',
+            align: 'left',
+            value: 'code',
+            width: '30%'
+        }, {
+            text: 'Name',
+            align: 'left',
+            value: 'name',
+            width: '45%'
+        }, {
+            text: 'Actions',
+            align: 'center',
+            width: '15%',
+            sortable: false,
+            value: 'action'
+        }];
 
+    
         // All settings for each Treeview that remain the same
         protected tooltip: (d: any) => string = tooltipContent;
         protected highlightColor: string = "#ffc107";
         protected highlightColorFunc: (d: any) => string = d => (d.included ? this.highlightColor : "lightgrey");
         protected linkStrokeColor: (d: any) => string = ({target: d}) => this.highlightColorFunc(d);
-
-        // Keeps track of which rows are expanded and which trees should be shown in that case.
-        protected expandedItems: Map<FAElement, Node> = new Map();
-        protected expandedItemsList: FAElement[] = [];
+        protected expandedItemsList = [];
 
         public toCSV(columnNames: string[], columnValues: string[][]): string {
             columnValues.unshift(columnNames);
             return toCSVString(columnValues);
         }
-
-        protected expandView(amount): void {
-            if (this.itemsVisible + amount > this.items.length) {
-                this.itemsVisible = this.items.length;
-            } else {
-                this.itemsVisible += amount;
-            }
+        /**
+         * This function is called by the DataTable whenever it requests a tree. This function then asynchronously
+         * computes this tree and fills in the associated entry in the treeAvailable map. The DataTable watches
+         * changes in this map and reacts appropriatly.
+         */
+        private computeTree(term: FAElement): boolean {
+            this.taxaRetriever(term).then((node) => {
+                this.treeAvailable.set(term, node);
+            })
+            return true;
         }
 
-        protected shrinkView(amount): void {
-            if (this.itemsVisible - amount < this.initialItemsVisible) {
-                this.itemsVisible = this.initialItemsVisible;
-            } else {
-                this.itemsVisible -= amount;
-            }
-        }
-
-        protected async toggleTerm(term: FAElement): Promise<void> {
-            let idx: number = this.expandedItemsList.indexOf(term);
-            if (idx >= 0) {
-                this.expandedItemsList.splice(idx, 1);
-            } else {
-                if (!this.expandedItems.has(term)) {
-                    this.expandedItems.set(term, await this.taxaRetriever(term));
-                }
-
-                this.expandedItemsList.push(term);
-            }
+        private getTaxa(term: FAElement): Node {
+            return this.taxaRetriever(term);
         }
 
         private saveImage(term: FAElement): void {
@@ -153,5 +123,8 @@
     }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+    @import './../../assets/style/amount-table.css.less';
+
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
+    <amount-table :items="items" annotation-name="GO term" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -34,17 +34,9 @@
         @Prop({required: true})
         private sample: Sample;
 
-        mounted() {
-            console.log(this.items);
-        }
-
-        private taxaRetriever: (term: GoTerm) => Promise<Node> = (term: GoTerm) => this.getTaxaTreeByTerm(term);
-
-        private async getTaxaTreeByTerm(term: GoTerm): Promise<Node> {
-            let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
-            let tree = taxaDataSource.getTreeByGoTerm(term);
-            console.log(tree);
-            return tree;
+        private async taxaRetriever(term: GoTerm): Promise<Node> {
+            let dataSource: TaxaDataSource =  await this.sample.dataRepository.createTaxaDataSource();
+            return await dataSource.getTreeByGoTerm(term);
         }
     }
 </script>
