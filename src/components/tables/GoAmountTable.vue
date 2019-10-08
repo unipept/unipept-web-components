@@ -9,6 +9,7 @@
     import GoTerm from "../../logic/functional-annotations/GoTerm";
     import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
     import Sample from "../../logic/data-management/Sample";
+    import GoDataSource from "../../logic/data-source/GoDataSource";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Treeview from "../visualizations/treeview.vue";
     import AmountTable from "./AmountTable.vue";
@@ -34,9 +35,11 @@
         @Prop({required: true})
         private sample: Sample;
 
-        private async taxaRetriever(term: GoTerm): Promise<Node> {
-            let dataSource: TaxaDataSource =  await this.sample.dataRepository.createTaxaDataSource();
-            return await dataSource.getTreeByGoTerm(term);
+        private async taxaRetriever(term: GoTerm): Promise<Node> 
+        {
+            let taxaDataSource: TaxaDataSource =  await this.sample.dataRepository.createTaxaDataSource()
+            let goDataSource: GoDataSource = await this.sample.dataRepository.createGoDataSource();
+            return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
         }
     }
 </script>

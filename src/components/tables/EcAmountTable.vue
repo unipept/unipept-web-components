@@ -12,6 +12,7 @@
     import Treeview from "../../components/visualizations/Treeview.vue";
     import AmountTable from "./AmountTable.vue";
     import Sample from "../../logic/data-management/Sample";
+    import EcDataSource from "../../logic/data-source/EcDataSource";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import FaSortSettings from "./FaSortSettings";
 
@@ -29,9 +30,11 @@
         @Prop({required: true})
         private sample: Sample;
 
-        private async taxaRetriever(term: EcNumber): Promise<Node> {
-            let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
-            return await taxaSource.getTreeByEcNumber(term);
+        private async taxaRetriever(number: EcNumber): Promise<Node> 
+        {
+            let ecDataSource: EcDataSource = await this.sample.dataRepository.createEcDataSource();
+            let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            return await taxaDataSource.getTreeByPeptides(ecDataSource.getPeptidesByEcNumber(number));
         }
     }
 </script>

@@ -2,11 +2,12 @@ import {Ontology} from '../Ontology'
 import {ECDefinition} from './ECDefinition';
 import {postJSON} from "../../../utils";
 import {convertEcNumberToEcNameSpace} from "../../../functional-annotations/EcNameSpace";
+import {BASE_URL} from '../../../Constants';
 
 type OntologyId = string;
 
 const EC_BATCH_SIZE = 100
-const EC_URL = "private_api/ecnumbers"
+const EC_URL = BASE_URL + "/private_api/ecnumbers"
 
 export class ECOntology extends Ontology<OntologyId, ECDefinition>
 {

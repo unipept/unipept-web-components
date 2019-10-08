@@ -1,11 +1,12 @@
 import {Ontology} from '../Ontology'
 import {GODefinition} from './GODefinition';
 import {postJSON} from "../../../utils";
+import {BASE_URL} from '../../../Constants';
 
 type OntologyId = string;
 
 const GO_BATCH_SIZE = 100
-const GO_URL = "private_api/goterms"
+const GO_URL = BASE_URL + "/private_api/goterms"
 
 export class GeneOntology extends Ontology<OntologyId, GODefinition>
 {

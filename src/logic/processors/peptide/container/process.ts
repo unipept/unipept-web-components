@@ -2,9 +2,10 @@ import { ProcessedPeptideContainer } from '../../../data-management/ProcessedPep
 import { postJSON } from "../../../utils";
 import { Pept2DataResponse } from '../../../api/pept2data/Response';
 import MPAConfig from '../../../data-management/MPAConfig';
+import {BASE_URL} from '../../../Constants';
 
 const BATCH_SIZE = 100;
-const API_ENDPOINT = "/mpa/pept2data";
+const API_ENDPOINT = BASE_URL + "/mpa/pept2data";
 
 export default async function process(peptides: string[], config: MPAConfig, setProgress: (number) => void) : Promise<ProcessedPeptideContainer>
 {

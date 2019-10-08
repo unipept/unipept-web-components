@@ -3,7 +3,8 @@ import {StorageType} from './StorageType';
 import Sample from './Sample';
 import ProgressListener from '../patterns/ProgressListener';
 
-export default class PeptideContainer implements ProgressListener {
+export default class PeptideContainer implements ProgressListener 
+{
     public progress: number = 0;
     private id: string;
     private peptides: string[];

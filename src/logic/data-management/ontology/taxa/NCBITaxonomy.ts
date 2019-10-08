@@ -1,14 +1,15 @@
 import {Ontology} from '../Ontology'
 import {NCBITaxon} from './NCBITaxon';
 import {postJSON} from "../../../utils";
+import {BASE_URL} from '../../../Constants';
 
 type OntologyId = number;
 
 const TAXA_BATCH_SIZE = 100
 const LINEAGE_BATCH_SIZE = 100
 
-const TAXA_URL = "/private_api/taxa"
-const LINEAGE_URL = "/private_api/lineages"
+const TAXA_URL = BASE_URL + "/private_api/taxa"
+const LINEAGE_URL = BASE_URL + "/private_api/lineages"
 
 export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon>
 {
