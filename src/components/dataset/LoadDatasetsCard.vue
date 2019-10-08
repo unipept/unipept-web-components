@@ -34,7 +34,9 @@
                     <v-card-text>
                         <v-progress-circular v-if="loadingSampleDatasets"></v-progress-circular>
                         <div v-else-if="errorSampleDatasets">
-                            <v-icon large color="teal darken-2">mdi-email</v-icon>
+                            <v-alert type="error">
+                                Unable to retrieve list of sample datasets.
+                            </v-alert>
                         </div>
                         <p v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
                             <b>Environment:</b> {{ dataset.environment }}
@@ -279,7 +281,7 @@
                 }
             );
         }
-    };
+    }
 </script>
 
 <style lang="less">
