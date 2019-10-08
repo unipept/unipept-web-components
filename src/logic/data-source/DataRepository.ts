@@ -12,6 +12,8 @@ import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideCo
 import { TaxaPeptideProcessor } from '../processors/peptide/TaxaPeptideProcessor';
 import { GOPeptideProcessor } from '../processors/peptide/GOPeptideProcessor';
 import { ECPeptideProcessor } from '../processors/peptide/ECPeptideProcessor';
+import { Ontologies } from "../data-management/ontology/Ontologies";
+import { PeptideData } from '../api/pept2data/Response';
 
 export default class DataRepository extends ProgressPublisher implements ProgressListener
 {
@@ -41,6 +43,11 @@ export default class DataRepository extends ProgressPublisher implements Progres
         if (!this._taxaSourceCache) 
         {
             let processedPeptideContainer = await this._processedPeptideContainer;
+            // set lineages already calculated in the global NCBITaxonomy Ontology
+            processedPeptideContainer.response.response.forEach((data: PeptideData) => {
+                Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
+            });
+
             this._taxaSourceCache = new TaxaDataSource(
                 TaxaPeptideProcessor.process(processedPeptideContainer), this);
         }

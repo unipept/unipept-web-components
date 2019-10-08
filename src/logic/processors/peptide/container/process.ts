@@ -30,7 +30,7 @@ export default async function process(peptides: string[], config: MPAConfig, set
         const res = await postJSON(API_ENDPOINT, data);
 
         res.peptides.forEach(p => {
-            response.setPeptideData(p.sequence, {lca: p.lca, lineage: p.lineage, fa: p.fa})
+            response.setPeptideData(p.sequence, {lca: p.lca, lineage: p.lineage, fa: p.fa});
             numMatched += preparedPeptides.get(p.sequence);
         })
 
