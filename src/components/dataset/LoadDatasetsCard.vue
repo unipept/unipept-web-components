@@ -32,7 +32,13 @@
             <v-tab-item>
                 <v-card flat>
                     <v-card-text>
-                        <p v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
+                        <v-progress-circular v-if="loadingSampleDatasets"></v-progress-circular>
+                        <div v-else-if="errorSampleDatasets">
+                            <v-alert type="error">
+                                Unable to retrieve list of sample datasets.
+                            </v-alert>
+                        </div>
+                        <p v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
                             <b>Environment:</b> {{ dataset.environment }}
                             <br>
                             <b>Reference:</b>
@@ -180,6 +186,8 @@
 
         private pendingStore: boolean = false;
 
+        private loadingSampleDatasets: boolean = true;
+        private errorSampleDatasets: boolean = false;
         private selectedSampleDataset = {};
 
         mounted() {
@@ -200,7 +208,11 @@
                         ));
                         this.selectedSampleDataset[item.id] = itemDatasets[0];
                     }
-                });
+                })
+                .catch((error) => {
+                    this.errorSampleDatasets = true;
+                })
+                .finally(() => this.loadingSampleDatasets = false);
         }
 
         storeSampleDataset(datasetId: string) {
@@ -269,7 +281,7 @@
                 }
             );
         }
-    };
+    }
 </script>
 
 <style lang="less">

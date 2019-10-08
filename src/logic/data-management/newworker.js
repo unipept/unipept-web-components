@@ -1,4 +1,4 @@
-import "babel-polyfill"; // for async await webpacker support
+import "babel-polyfill";
 import "whatwg-fetch";
 // TODO: also include other pollyfills?
 import {postJSON, numberToPercent} from "../utils";
