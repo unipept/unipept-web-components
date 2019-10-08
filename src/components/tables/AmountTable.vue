@@ -2,18 +2,20 @@
     <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
         <template v-slot:expanded-item="{ headers, item }">
             <td :colspan="headers.length">
-                <treeview 
-                    :id="`TreeView-${item.code}`" 
-                    :data="getTaxa(item)" 
-                    :height="310"
-                    :width="800" 
-                    :tooltip="tooltip" 
-                    :colors="highlightColorFunc" 
-                    :enableAutoExpand="0.3" 
-                    :linkStrokeColor="linkStrokeColor" 
-                    :nodeStrokeColor="highlightColorFunc" 
-                    :nodeFillColor="highlightColorFunc">
-                </treeview>
+                <div v-if="computeTree(item) && treeAvailable.get(item)">
+                    <treeview
+                        :id="`TreeView-${item.code}`" 
+                        :data="treeAvailable.get(item)" 
+                        :height="310"
+                        :width="800" 
+                        :tooltip="tooltip" 
+                        :colors="highlightColorFunc" 
+                        :enableAutoExpand="0.3" 
+                        :linkStrokeColor="linkStrokeColor" 
+                        :nodeStrokeColor="highlightColorFunc" 
+                        :nodeFillColor="highlightColorFunc">
+                    </treeview>
+                </div>
             </td>
         </template>
         <template v-slot:item.action="{ item }">
@@ -47,9 +49,11 @@
         @Prop({required: true})
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
-        protected taxaRetriever: (term: FAElement) => Node;
+        protected taxaRetriever: (term: FAElement) => Promise<Node>;
         @Prop({required: true})
         protected annotationName: string;
+        // Keeps track of the functional annotations for which a Tree has already been calculated.
+        private treeAvailable: Map<FAElement, Node> = new Map();
 
         private tableHeaders = [{
             text: 'Peptides',
@@ -85,6 +89,17 @@
         public toCSV(columnNames: string[], columnValues: string[][]): string {
             columnValues.unshift(columnNames);
             return toCSVString(columnValues);
+        }
+        /**
+         * This function is called by the DataTable whenever it requests a tree. This function then asynchronously
+         * computes this tree and fills in the associated entry in the treeAvailable map. The DataTable watches
+         * changes in this map and reacts appropriatly.
+         */
+        private computeTree(term: FAElement): boolean {
+            this.taxaRetriever(term).then((node) => {
+                this.treeAvailable.set(term, node);
+            })
+            return true;
         }
 
         private getTaxa(term: FAElement): Node {
