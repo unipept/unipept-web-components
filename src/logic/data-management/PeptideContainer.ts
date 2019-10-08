@@ -1,7 +1,7 @@
 import DatasetManager from './DatasetManager';
 import {StorageType} from './StorageType';
 import Sample from './Sample';
-import ProgressListener from './ProgressListener';
+import ProgressListener from '../patterns/ProgressListener';
 
 export default class PeptideContainer implements ProgressListener {
     public progress: number = 0;

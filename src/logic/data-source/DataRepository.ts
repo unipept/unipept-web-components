@@ -1,7 +1,7 @@
 import GoDataSource from './GoDataSource';
 import Sample from '../data-management/Sample';
 import TaxaDataSource from './TaxaDataSource';
-import ProgressListener from '../data-management/ProgressListener';
+import ProgressListener from '../patterns/ProgressListener';
 import MPAConfig from '../data-management/MPAConfig';
 import TaxonInfo from '../data-management/TaxonInfo';
 
