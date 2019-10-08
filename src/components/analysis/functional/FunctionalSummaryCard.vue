@@ -46,15 +46,15 @@
                         <v-card-text>
                             <div v-if="!this.sample" class="mpa-unavailable go">
                                 <div v-if="this.analysisInProgress">
-                                    <h3>Biological Process</h3>
+                                    <h2>Biological Process</h2>
                                     <div class="go-waiting">
                                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
                                     </div>
-                                    <h3>Cellular Component</h3>
+                                    <h2>Cellular Component</h2>
                                     <div class="go-waiting">
                                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
                                     </div>
-                                    <h3>Molecular Function</h3>
+                                    <h2>Molecular Function</h2>
                                     <div class="go-waiting">
                                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
                                     </div>
@@ -69,13 +69,13 @@
                                 your peptides.
                                 <span v-html="goTrustLine"></span>Click on a row in a table to see a taxonomy tree that highlights occurrences.
                                 <div v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace">
-                                    <h3 style="padding-left: 16px;">{{ goData[idx].title }}</h3>
+                                    <h2>{{ goData[idx].title }}</h2>
                                     <v-row>
                                         <v-col :cols="9">
                                             <go-amount-table :sample="sample" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
                                         <v-col :cols="3">
-                                            <img style="max-width: 100%; position: relative; top: 50%; transform: translate(0, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
+                                            <img style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
                                         </v-col>
                                     </v-row>
                                 </div>
