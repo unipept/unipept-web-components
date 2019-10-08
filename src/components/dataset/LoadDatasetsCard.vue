@@ -149,6 +149,7 @@
     import SampleDataset from "../../logic/data-management/SampleDataset";
     import Tooltip from "../custom/Tooltip.vue";
     import { BASE_URL } from '../../logic/Constants';
+    import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
 
     @Component({
         components: {
@@ -167,11 +168,13 @@
         }
 
         @Prop({required: true})
+        private selectedDatasets: PeptideContainer[];
+        @Prop({required: true})
         private storedDatasets: PeptideContainer[];
 
         private currentTab: number = 0;
 
-        private sampleDatasets: SampleDataset[] = [];
+        private sampleDatasets: SampleDatasetCollection[] = [];
         private prideAssay: string = "";
 
         private createPeptides: string = "";
@@ -194,11 +197,11 @@
             axios.post(BASE_URL + "/datasets/sampledata")
                 .then(result => {
                     for (let item of result.data.sample_data) {
-                        let itemDatasets = item.datasets;
+                        let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));
                         itemDatasets = itemDatasets.sort((a, b) => {
                             return a.order < b.order;
                         });
-                        this.sampleDatasets.push(new SampleDataset(
+                        this.sampleDatasets.push(new SampleDatasetCollection(
                             item.id,
                             item.environment,
                             item.project_website,
@@ -206,7 +209,7 @@
                             item.url,
                             itemDatasets
                         ));
-                        this.selectedSampleDataset[item.id] = itemDatasets[0];
+                        this.selectedSampleDataset[item.id] = itemDatasets[0].name;
                     }
                 })
                 .catch((error) => {
@@ -216,8 +219,11 @@
         }
 
         storeSampleDataset(datasetId: string) {
-            if (this.selectedSampleDataset[datasetId]) {
-                this.storeDataset(this.selectedSampleDataset[datasetId].data.join("\n"), this.selectedSampleDataset[datasetId].name, true);
+            let name: string = this.selectedSampleDataset[datasetId];
+            if (name && !this.selectedDatasets.some((dataset) => dataset.getName() === name)) {
+                let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find((dataset) => dataset.id == datasetId);
+                let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find((dataset) => dataset.name == this.selectedSampleDataset[datasetId]);
+                this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
             }
         }
 

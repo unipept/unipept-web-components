@@ -4,13 +4,14 @@
             <v-col>
                 <switch-dataset-card 
                     :selected-datasets="selectedDatasets"
-                    v-on:activate-dataset="activateDataset" 
+                    :active-dataset.sync="activeDataset" 
                     v-on:toggle-dataset-selection="toggleDatasetSelection">
                 </switch-dataset-card>
             </v-col>
             <v-col>
                 <experiment-summary-card v-if="!this.datasetSelectionInProgress"></experiment-summary-card>
-                <load-datasets-card 
+                <load-datasets-card
+                    :selected-datasets="selectedDatasets"
                     :stored-datasets="storedDatasets" 
                     v-on:select-dataset="selectDataset"
                     v-on:deselect-dataset="deselectDataset"
@@ -82,7 +83,9 @@ export default class AnalysisComponent extends Vue {
             dupes: true,
             missed: false
         }).then(() => {
-            if (this.activeDataset === null) {
+            if (!this.activeDataset) {
+                console.log("Set active dataset:");
+                console.log(dataset);
                 this.activeDataset = dataset;
             }
             this.datasetsInProgress -= 1;
@@ -98,6 +101,7 @@ export default class AnalysisComponent extends Vue {
     }
 
     private selectDataset(dataset: PeptideContainer) {
+        console.log(dataset);
         this.selectedDatasets.push(dataset);
         this.processDataset(dataset);
     }
