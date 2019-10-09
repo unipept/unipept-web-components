@@ -29,6 +29,7 @@ export class PeptideContainerProcessor extends ProgressPublisher
                         this.updateProgress(event.data.value);
                         break;
                     case "result":
+                        // do this to preserve methods as methods aren't duplicated by the structured cloning algorithm used to pass worker messages
                         resolve(event.data.value as ProcessedPeptideContainer);
                         break;
                 }

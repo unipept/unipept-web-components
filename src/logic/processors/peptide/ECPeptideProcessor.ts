@@ -13,7 +13,7 @@ export namespace ECPeptideProcessor
         var ec2peptide = new Map<string, Set<string>>();
         var peptide2ec = new Map<string, string[]>();
 
-        pept2dataResponse.response.forEach((data, peptide, _) => 
+        pept2dataResponse.forEach((data, peptide, _) => 
         {
             let fas = data.fa.data || [];
             let peptideCount = peptideCounts.get(peptide)

@@ -11,7 +11,7 @@ export namespace TaxaPeptideProcessor
         var lcaCounts = new Map<number, Count>();
         var lca2peptides = new Map<number, Set<string>>();
 
-        processedPeptides.response.response.forEach((data, peptide, _) => 
+        processedPeptides.response.forEach((data, peptide, _) => 
             {
                 let lca = data.lca
                 let peptideCount = peptideCounts.get(peptide)

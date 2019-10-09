@@ -1,13 +1,11 @@
 import {PeptideCountTable} from './counts/PeptideCountTable';
 import {Pept2DataResponse} from '../api/pept2data/Response';
 
-export class ProcessedPeptideContainer
+export type ProcessedPeptideContainer = 
 {
-    constructor(
-        readonly countTable: PeptideCountTable, 
-        readonly response: Pept2DataResponse,
-        readonly missed: string[],
-        readonly numMatched: number,
-        readonly numSearched: number)
-    {}
+    countTable: PeptideCountTable,
+    response: Pept2DataResponse,
+    missed: string[],
+    numMatched: number,
+    numSearched: number
 }

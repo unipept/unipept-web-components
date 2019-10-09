@@ -10,6 +10,8 @@ import { TaxaPeptideProcessor } from '../../processors/peptide/TaxaPeptideProces
 import { GOPeptideProcessor } from "../../processors/peptide/GOPeptideProcessor";
 import { ECPeptideProcessor } from "../../processors/peptide/ECPeptideProcessor";
 import MetaProteomicsAssay from "../../data-management/assay/MetaProteomicsAssay";
+import { PeptideData } from '../../api/pept2data/Response';
+import { Ontologies } from '../../data-management/ontology/Ontologies';
 
 export default class MetaProteomicsDataRepository extends DataRepository
 {
@@ -34,7 +36,11 @@ export default class MetaProteomicsDataRepository extends DataRepository
 
     protected async initTaxaDataSource(): Promise<void> 
     {
-        let processedPeptideContainer = await this._processedPeptideContainer;
+        let processedPeptideContainer = await this._processedPeptideContainer;         
+        processedPeptideContainer.response.forEach((data: PeptideData) => {
+            Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
+        });
+
         this._taxaSourceCache = new TaxaDataSource(
             TaxaPeptideProcessor.process(processedPeptideContainer), 
             processedPeptideContainer,

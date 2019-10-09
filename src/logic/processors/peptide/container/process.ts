@@ -1,6 +1,6 @@
 import { ProcessedPeptideContainer } from '../../../data-management/ProcessedPeptideContainer';
 import { postJSON } from "../../../utils";
-import { Pept2DataResponse } from '../../../api/pept2data/Response';
+import { PeptideData } from '../../../api/pept2data/Response';
 import MPAConfig from '../../../data-management/MPAConfig';
 import {BASE_URL} from '../../../Constants';
 
@@ -15,7 +15,7 @@ export default async function process(peptides: string[], config: MPAConfig, set
     var numSearched = [...preparedPeptides.values()].reduce((a, b) => a + b, 0);
     var numMatched = 0;
 
-    var response = new Pept2DataResponse();
+    var response = new Map<string, PeptideData>();
 
     setProgress(0.1);
 
@@ -30,24 +30,24 @@ export default async function process(peptides: string[], config: MPAConfig, set
         const res = await postJSON(API_ENDPOINT, data);
 
         res.peptides.forEach(p => {
-            response.setPeptideData(p.sequence, {lca: p.lca, lineage: p.lineage, fa: p.fa});
+            response.set(p.sequence, {lca: p.lca, lineage: p.lineage, fa: p.fa});
             numMatched += preparedPeptides.get(p.sequence);
         })
 
         setProgress(0.1 + 0.85 * ((i + BATCH_SIZE) / peptideList.length));
     }
 
-    var missedPeptides = peptideList.filter(p => !response.hasPeptide(p))
+    var missedPeptides = peptideList.filter(p => !response.has(p))
 
     setProgress(1)
 
-    return new ProcessedPeptideContainer(
-        preparedPeptides,
+    return {
+        countTable: preparedPeptides,
         response,
-        missedPeptides,
+        missed: missedPeptides,
         numMatched,
         numSearched
-    );
+    };
 }
 
 /**

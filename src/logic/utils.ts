@@ -383,7 +383,7 @@ export function triggerDownloadModal(svgSelector, canvasSelector, baseFileName) 
  * @param  {string} data The data to post in JSON format
  * @return {Promise} A Promise containing the parsed response data
  */
-export function postJSON(url, data) {
+export async function postJSON(url, data) {
     return fetch(url, {
         method: "POST",
         headers: {
@@ -393,3 +393,5 @@ export function postJSON(url, data) {
         body: data,
     }).then(res => res.json());
 }
+
+export const delay = ms => new Promise(res => setTimeout(res, ms));

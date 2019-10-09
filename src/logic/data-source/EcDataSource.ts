@@ -6,6 +6,7 @@ import { ECOntology } from '../data-management/ontology/ec/ECOntology';
 import { ECCountTable } from '../data-management/counts/ECCountTable';
 import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
 import DataRepository from './DataRepository';
+import { PeptideData } from '../api/pept2data/Response';
 // import TreeViewNode from '../ui/visualizations/TreeViewNode';
 
 export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> 
@@ -227,13 +228,15 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
         if(sequences == null)
         {
-            sequences = Array.from(this._processedPeptideContainer.countTable.keys())
+            sequences = Array.from(this._processedPeptideContainer.response.keys())
         }
 
         for(let namespace of Object.values(EcNameSpace))
         {
             let totalCount = 0;
-            let annotatedCount = 0;
+            let annotatedCount = 0;            
+            let trustCount = 0;
+
             let termCounts = new Map<string, number>()
             // TODO: this shouldn't be calculated here, but only when needed for the heatmap
             let affectedPeptides = new Map<string, string[]>()
@@ -241,6 +244,10 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
             for(const pept of sequences)
             {
                 let peptCount = peptideCountTable.get(pept)
+                let peptideData: PeptideData = this._processedPeptideContainer.response.get(pept);
+                let proteinCount = peptideData.fa.counts.EC;
+                let trust = proteinCount / peptideData.fa.counts.all;
+
                 totalCount += peptCount
 
                 if(!this._countTable.peptide2ontology.has(pept))
@@ -250,15 +257,24 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
                 let terms = this._countTable.peptide2ontology.get(pept).filter(term => ontology.getDefinition(term).namespace === namespace)
                 let peptArray: string[] = Array(peptCount).fill(pept)
+                let atLeastOne = false;
 
                 for(const term of terms)
                 {
+                    let termProteinCount = peptideData.fa.data[term];
+                    if(termProteinCount / proteinCount < percent / 100)
+                    {
+                        continue;
+                    }
+
+                    atLeastOne = true;
                     termCounts.set(term, (termCounts.get(term) || 0) + peptCount)
                     affectedPeptides.set(term, (affectedPeptides.get(term) || []).concat(peptArray))
                 }
 
-                if(terms.length > 0)
+                if(atLeastOne)
                 {
+                    trustCount += peptCount * trust;
                     annotatedCount += peptCount
                 }
             }
@@ -275,7 +291,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
                     })
 
             dataOutput.set(namespace, convertedItems)
-            trustOutput.set(namespace, new FATrust(annotatedCount, totalCount, 0))
+            trustOutput.set(namespace, new FATrust(annotatedCount, totalCount, trustCount))
         }
 
         return [dataOutput, trustOutput];
