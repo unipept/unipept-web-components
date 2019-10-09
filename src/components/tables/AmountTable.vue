@@ -34,7 +34,6 @@
     import {Node} from "../../logic/data-management/Node";
     import FaSortSettings from "./FaSortSettings";
     import FAElement from "../../logic/functional-annotations/FAElement";
-    import Sample from "../../logic/data-management/Sample";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Tree from "../../logic/data-management/Tree";
 

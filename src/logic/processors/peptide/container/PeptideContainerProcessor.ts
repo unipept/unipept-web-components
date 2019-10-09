@@ -2,7 +2,7 @@ import PeptideContainer from '../../../data-management/PeptideContainer';
 import { ProcessedPeptideContainer } from '../../../data-management/ProcessedPeptideContainer';
 
 import Worker from 'worker-loader!./PeptideContainerProcessor.worker';
-import ProgressPublisher from '../../../patterns/ProgressPublisher';
+import ProgressPublisher from '../../../patterns/progress/ProgressPublisher';
 import MPAConfig from '../../../data-management/MPAConfig';
 
 // import "babel-polyfill"; // for async await support
@@ -33,7 +33,7 @@ export class PeptideContainerProcessor extends ProgressPublisher
                         break;
                 }
             };
-            this._worker.postMessage({peptides: peptides.getPeptidesSync(), config: mpaConfig});
+            this._worker.postMessage({peptides: peptides.getPeptides(), config: mpaConfig});
         });
     }
 }

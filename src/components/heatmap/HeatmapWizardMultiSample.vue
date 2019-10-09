@@ -63,8 +63,7 @@ import {NormalizationType} from "./NormalizationType";
     import RowNormalizer from "../../logic/heatmap/RowNormalizer";
     import ColumnNormalizer from "../../logic/heatmap/ColumnNormalizer";
     import { Normalizer } from "../../logic/heatmap/Normalizer";
-    import Sample from "../../logic/data-management/Sample";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Assay from "../../logic/data-management/assay/Assay";
     import GoDataSourceComponent from "./GoDataSourceComponent.vue";
     import EcDataSourceComponent from "./EcDataSourceComponent.vue";
     import TaxaDataSourceComponent from "./TaxaDataSourceComponent.vue";
@@ -79,7 +78,7 @@ import {NormalizationType} from "./NormalizationType";
     })
     export default class HeatmapWizardMultiSample extends Vue {
         @Prop()
-        private dataset: PeptideContainer;
+        private dataset: Assay;
         @Prop()
         private searchSettings: MPAConfig;
 
@@ -101,7 +100,7 @@ import {NormalizationType} from "./NormalizationType";
                 {
                     dataSourceComponent: "taxa-data-source-component",
                     factory: () => {
-                        let dataRepository = this.dataset.getDataset().dataRepository;
+                        let dataRepository = this.dataset.dataRepository;
                         return dataRepository.createTaxaDataSource();
                     }
                 }
@@ -112,7 +111,7 @@ import {NormalizationType} from "./NormalizationType";
                 {
                     dataSourceComponent: "ec-data-source-component",
                     factory: () => {
-                        let dataRepository = this.dataset.getDataset().dataRepository;
+                        let dataRepository = this.dataset.dataRepository;
                         return dataRepository.createEcDataSource();
                     }
                 }
@@ -123,7 +122,7 @@ import {NormalizationType} from "./NormalizationType";
                 {
                     dataSourceComponent: "go-data-source-component",
                     factory: () => {
-                        let dataRepository = this.dataset.getDataset().dataRepository;
+                        let dataRepository = this.dataset.dataRepository;
                         return dataRepository.createGoDataSource();
                     }
                 }
@@ -223,7 +222,7 @@ import {NormalizationType} from "./NormalizationType";
             }
 
             for (let i = 0; i < this.$store.getters.selectedDatasets.length; i++) {
-                let item: PeptideContainer = this.$store.getters.selectedDatasets[i];
+                let item: Assay = this.$store.getters.selectedDatasets[i];
                 cols.push({id: i.toString(), name: item.getName()});
             }
 

@@ -8,7 +8,7 @@
     import {Prop, Watch} from "vue-property-decorator";
     import GoTerm from "../../logic/functional-annotations/GoTerm";
     import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
-    import Sample from "../../logic/data-management/Sample";
+    import DataRepository from "../../logic/data-source/DataRepository";
     import GoDataSource from "../../logic/data-source/GoDataSource";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Treeview from "../visualizations/treeview.vue";
@@ -33,13 +33,16 @@
         private namespace: GoNameSpace;
         // The Sample that should be summarized in this AmountTable
         @Prop({required: true})
-        private sample: Sample;
+        private dataRepository: DataRepository;
 
         private async taxaRetriever(term: GoTerm): Promise<Node> 
         {
-            let taxaDataSource: TaxaDataSource =  await this.sample.dataRepository.createTaxaDataSource()
-            let goDataSource: GoDataSource = await this.sample.dataRepository.createGoDataSource();
-            return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
+            if(this.dataRepository)
+            {
+                let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
+                let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
+            }
         }
     }
 </script>

@@ -62,7 +62,7 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Assay from "../../logic/data-management/assay/Assay";
     import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
     import CardTitle from "../custom/CardTitle.vue";
     import CardHeader from "../custom/CardHeader.vue";
@@ -73,7 +73,7 @@
     })
     export default class SelectDatasetsCard extends Vue {
         @Prop({required: true})
-        private selectedDatasets: PeptideContainer[];
+        private selectedDatasets: Assay[];
 
         private equateIl: boolean = true;
         private filterDuplicates: boolean = true;
@@ -110,7 +110,7 @@
             this.$emit('start-analysis');
         }
 
-        private deselectDataset(dataset: PeptideContainer) {
+        private deselectDataset(dataset: Assay) {
             this.$emit('deselect-dataset', dataset);
         }
 

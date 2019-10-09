@@ -44,7 +44,7 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <div v-if="!this.sample" class="mpa-unavailable go">
+                            <div v-if="!this.dataRepository" class="mpa-unavailable go">
                                 <div v-if="this.analysisInProgress">
                                     <h2>Biological Process</h2>
                                     <div class="go-waiting">
@@ -72,7 +72,7 @@
                                     <h2>{{ goData[idx].title }}</h2>
                                     <v-row>
                                         <v-col :cols="9">
-                                            <go-amount-table :sample="sample" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
+                                            <go-amount-table :dataRepository="dataRepository" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
                                         <v-col :cols="3">
                                             <img style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
@@ -86,7 +86,7 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <div v-if="!this.sample">
+                            <div v-if="!this.dataRepository">
                                 <div class="ec-waiting" v-if="this.analysisInProgress">
                                     <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                                 </div>
@@ -99,7 +99,7 @@
                                 <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
                                 <span v-html="ecTrustLine"></span>
                                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                                <ec-amount-table :sample="sample" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
+                                <ec-amount-table :dataRepository="dataRepository" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
                                 <div v-if="ecTreeData">
                                     <treeview :data="ecTreeData" :height="500" :width="916" :tooltip="ecTreeTooltip" :enableAutoExpand="true" style="position: relative; left: -16px; bottom: -16px;"></treeview>
                                 </div>
@@ -127,7 +127,7 @@
     import CardHeader from "../../custom/CardHeader.vue";
 
     import {showInfoModal} from "../../../logic/modal";
-    import Sample from "../../../logic/data-management/Sample";
+    import DataRepository from "../../../logic/data-source/DataRepository";
     import GoDataSource from "../../../logic/data-source/GoDataSource";
     import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
     import GoTerm from "../../../logic/functional-annotations/GoTerm";
@@ -169,7 +169,7 @@
     })
     export default class FunctionalSummaryCard extends Vue {
         @Prop({required: true})
-        private sample: Sample;
+        private dataRepository: DataRepository;
         @Prop({required: false, default: true})
         private analysisInProgress: boolean;
 
@@ -235,11 +235,11 @@
                     title: stringTitleize(ns.toString())
                 });
             }
-            this.onPeptideContainerChanged();
+            this.onDataRepositoryChanged();
         }
 
-        @Watch('sample') onSampleChanged() {
-            this.onPeptideContainerChanged();
+        @Watch('dataRepository') onDataRepositoryChange() {
+            this.onDataRepositoryChanged();
         }
 
         setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
@@ -252,7 +252,7 @@
             this.faSortSettings.sortFunc = (a, b) => b[fieldType] - a[fieldType];
 
             // Recalculate stuff
-            this.onPeptideContainerChanged();
+            this.onDataRepositoryChanged();
         }
 
         reset() {
@@ -322,9 +322,9 @@
             return `https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/${terms.sort().join(",")}/chart?showKey=${showKey}`;
         }
 
-        private async onPeptideContainerChanged() {
+        private async onDataRepositoryChanged() {
             this.faCalculationsInProgress = true;
-            if (this.sample) {
+            if (this.dataRepository) {
                 await this.redoFAcalculations();
             }
             this.faCalculationsInProgress = false;
@@ -333,9 +333,9 @@
         private async redoFAcalculations(): Promise<void> {
             let peptideContainer = this.$store.getters.activeDataset;
 
-            if (this.sample) {
-                let goSource: GoDataSource = await this.sample.dataRepository.createGoDataSource();
-                let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            if (this.dataRepository) {
+                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
 
                 const percent = parseInt(this.percentSettings);
                 const taxonId = this.$store.getters.selectedTaxonId;
@@ -355,7 +355,7 @@
 
                 this.goTrustLine = this.computeTrustLine(await goSource.getTrust(), "GO term");
 
-                let ecSource: EcDataSource = await this.sample.dataRepository.createEcDataSource();
+                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
                 this.ecData = await ecSource.getEcNumbers();
                 this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
                 // @ts-ignore

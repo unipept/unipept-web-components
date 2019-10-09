@@ -22,7 +22,7 @@
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
-                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.sample">
+                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.dataRepository">
                     <template v-slot:activator="{ on }">
                         <v-btn text class="align-self-center mr-4" v-on="on">
                             More
@@ -70,7 +70,7 @@
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <v-card flat>
-                        <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.sample" :sample="this.sample"></sunburst-visualization>
+                        <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -85,7 +85,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treemap-visualization>
+                        <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -100,7 +100,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.sample" :sample="this.sample"></treeview-visualization>
+                        <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -116,7 +116,7 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <hierarchical-outline-visualization v-if="this.sample" :sample="this.sample"></hierarchical-outline-visualization>
+                            <hierarchical-outline-visualization v-if="this.dataRepository" :dataRepository="this.dataRepository"></hierarchical-outline-visualization>
                             <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                                 <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                             </div>
@@ -167,9 +167,8 @@
     import fullscreen from 'vue-fullscreen';
 
     import {logToGoogle, triggerDownloadModal} from "../../logic/utils";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
-    import Sample from '../../logic/data-management/Sample';
+    import DataRepository from '../../logic/data-source/DataRepository';
     import $ from 'jquery';
 
     @Component({
@@ -193,7 +192,7 @@
         }
 
         @Prop({required: true})
-        private sample: Sample;
+        private dataRepository: DataRepository;
         @Prop({required: false, default: true})
         private analysisInProgress: boolean;
 
