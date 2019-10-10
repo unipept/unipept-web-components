@@ -13,7 +13,13 @@ const LINEAGE_URL = BASE_URL + "/private_api/lineages"
 
 export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon>
 {
-    async getTaxaInfo(ids: OntologyId[])
+    async fetchDefinitions(ids: number[]): Promise<void> 
+    {
+        await this.fetchTaxaInfo(ids);
+        await this.fetchLineages(ids);
+    }
+
+    async fetchTaxaInfo(ids: OntologyId[])
     {
         ids = ids.filter(id => 
             !this._definitions.has(id) 
@@ -43,7 +49,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon>
         }
     }
 
-    async getLineages(ids: OntologyId[])
+    async fetchLineages(ids: OntologyId[])
     {
         // first check which ids need to be fetched
         ids = ids.filter(id => 

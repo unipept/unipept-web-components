@@ -8,10 +8,10 @@ export namespace TaxaCountProcessor
         var ontologyIds = taxaCountTable.getOntologyIds();
         var ontology = taxaCountTable.getOntology();
 
-        await ontology.getLineages(ontologyIds);
+        await ontology.fetchLineages(ontologyIds);
         let tree = new Tree(taxaCountTable);
 
-        await ontology.getTaxaInfo(tree.taxa);
+        await ontology.fetchTaxaInfo(tree.taxa);
         tree.setTaxonNames(tree.taxa.map(id => ontology.getDefinition(id)));
         tree.sortTree();
         
