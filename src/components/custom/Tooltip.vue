@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip top>
+  <v-tooltip :top="position === 'top'" :bottom="position === 'bottom'" :left="position === 'left'" :right="position === 'right'" >
     <template v-slot:activator="{ on }">
       <span v-on="on">
        <slot></slot>
@@ -18,6 +18,8 @@
   export default class Tooltip extends Vue {
     @Prop()
     private message!: string;
+    @Prop({default: "top"})
+    private position: string;
   }
 </script>
 
