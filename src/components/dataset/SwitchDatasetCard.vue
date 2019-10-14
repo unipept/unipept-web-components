@@ -102,10 +102,6 @@
         private dialogOpen: boolean = false;
         private isDatasetSelectionInProgress: boolean = false;
 
-        mounted() {
-            this.activeDatasetModel = this.activateDataset;
-        }
-
         private deselectDataset(dataset: PeptideContainer) {
             let idx: number = this.selectedDatasets.indexOf(dataset);
             this.selectedDatasets.splice(idx, 1);

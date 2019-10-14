@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
         <v-row>
             <v-col>
                 <switch-dataset-card 
@@ -100,9 +100,9 @@ export default class AnalysisComponent extends Vue {
     }
 
     private selectDataset(dataset: Assay) {
-        console.log(dataset);
         this.selectedDatasets.push(dataset);
         this.processDataset(dataset);
+        this.$emit('select-dataset', dataset);
     }
 
     private deselectDataset(dataset: Assay) {
