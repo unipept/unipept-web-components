@@ -242,6 +242,10 @@
             this.onDataRepositoryChanged();
         }
 
+        @Watch('percentSettings') onPercentSettingsChange() {
+            this.onDataRepositoryChanged();
+        }
+
         setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
             this.formatType = formatType;
 
