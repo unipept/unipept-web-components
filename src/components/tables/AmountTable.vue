@@ -1,5 +1,8 @@
 <template>
     <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
+        <template v-slot:top>
+            <v-icon @click="saveTableAsCSV()" class="table-to-csv-button">mdi-download</v-icon>
+        </template>
         <template v-slot:expanded-item="{ headers, item }">
             <td :colspan="headers.length">
                 <div v-if="computeTree(item) && treeAvailable.get(item)">
@@ -28,7 +31,7 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import { toCSVString, logToGoogle } from "../../logic/utils";
+    import { downloadDataByForm, toCSVString, logToGoogle } from "../../logic/utils";
     import { tooltipContent } from "../visualizations/VisualizationHelper";
     import Treeview from "../visualizations/Treeview.vue";
     import {Node} from "../../logic/data-management/Node";
@@ -60,7 +63,7 @@
             value: 'popularity',
             width: '15%'
         }, {
-            text: 'GO term',
+            text: this.annotationName,
             align: 'left',
             value: 'code',
             width: '30%'
@@ -110,10 +113,10 @@
         }
 
         private saveTableAsCSV(): void {
-            let columnNames: string[] = ["Peptides", "GO term", "Name"];
+            let columnNames: string[] = ["Peptides", this.annotationName, "Name"];
             let grid: string[][] = this.items.map(term => [term.popularity.toString(), term.code, term.name]);
-            // TODO: check!
-            // downloadDataByForm(this.toCSV(columnNames, grid), "GO_terms-" + this.namespace.replace(" ", "_") + "-export.csv", "text/csv");
+            // TODO: include namespace in export name
+            downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName + "-export.csv", "text/csv");
         }
     }
 </script>
