@@ -360,11 +360,11 @@
                     this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
                 }
 
-                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(), "GO term");
+                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
 
                 // recalculate ec-data for those sequences
                 this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
-                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
+                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
                 // @ts-ignore
                 this.ecTreeData = await ecSource.getEcTree();
             }
