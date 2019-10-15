@@ -64,8 +64,7 @@ import {NormalizationType} from "./NormalizationType";
     import RowNormalizer from "../../logic/heatmap/RowNormalizer";
     import ColumnNormalizer from "../../logic/heatmap/ColumnNormalizer";
     import { Normalizer } from "../../logic/heatmap/Normalizer";
-    import Sample from "../../logic/data-management/Sample";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Assay from "../../logic/data-management/assay/Assay";
     import GoDataSourceComponent from "./GoDataSourceComponent.vue";
     import EcDataSourceComponent from "./EcDataSourceComponent.vue";
     import TaxaDataSourceComponent from "./TaxaDataSourceComponent.vue";
@@ -80,7 +79,7 @@ import {NormalizationType} from "./NormalizationType";
     })
     export default class HeatmapWizardSingleSample extends Vue {
         @Prop()
-        private dataset: PeptideContainer;
+        private dataset: Assay;
         @Prop()
         private searchSettings: MPAConfig;
 
@@ -97,7 +96,7 @@ import {NormalizationType} from "./NormalizationType";
                 {
                     dataSourceComponent: "taxa-data-source-component",
                     factory: () => {
-                        let dataRepository = this.dataset.getDataset().dataRepository;
+                        let dataRepository = this.dataset.dataRepository;
                         return dataRepository.createTaxaDataSource();
                     }
                 }
@@ -108,7 +107,7 @@ import {NormalizationType} from "./NormalizationType";
                 {
                     dataSourceComponent: "ec-data-source-component",
                     factory: () => {
-                        let dataRepository = this.dataset.getDataset().dataRepository;
+                        let dataRepository = this.dataset.dataRepository;
                         return dataRepository.createEcDataSource();
                     }
                 }
@@ -119,7 +118,7 @@ import {NormalizationType} from "./NormalizationType";
                 {
                     dataSourceComponent: "go-data-source-component",
                     factory: () => {
-                        let dataRepository = this.dataset.getDataset().dataRepository;
+                        let dataRepository = this.dataset.dataRepository;
                         return dataRepository.createGoDataSource();
                     }
                 }
@@ -223,7 +222,7 @@ import {NormalizationType} from "./NormalizationType";
             for (let vertical of this.heatmapConfiguration.verticalSelectedItems) {
                 let gridRow: number[] = [];
                 for (let horizontal of this.heatmapConfiguration.horizontalSelectedItems) {
-                    let value: number = await vertical.computeCrossPopularity(horizontal, this.dataset.getDataset());
+                    let value: number = await vertical.computeCrossPopularity(horizontal, this.dataset.dataRepository);
                     gridRow.push(value);
                 }
                 grid.push(gridRow);

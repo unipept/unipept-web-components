@@ -16,14 +16,13 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
     import Tree from "../../logic/data-management/Tree";
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import { TaxumRank } from "../../logic/data-source/TaxumRank";
-    import Sample from '../../logic/data-management/Sample';
+    import DataRepository from '../../logic/data-source/DataRepository';
 
     @Component
     export default class TreemapVisualization extends mixins(VisualizationMixin) {
@@ -33,7 +32,7 @@
         @Prop({default: false}) 
         private fullScreen: boolean;
         @Prop({required: true})
-        private sample: Sample;
+        private dataRepository: DataRepository;
         @Prop({required: false, default: -1})
         private width: number;
         @Prop({required: false, default: 600})
@@ -67,8 +66,8 @@
         }
 
         private async initTreeMap() {
-            if (this.sample != null) {
-                let taxaSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            if (this.dataRepository != null) {
+                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaSource.getTree();
                 const data = JSON.stringify(tree.getRoot());
 

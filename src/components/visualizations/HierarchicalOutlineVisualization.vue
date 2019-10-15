@@ -15,11 +15,11 @@
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Assay from "../../logic/data-management/assay/Assay";
     import Tree from "../../logic/data-management/Tree";
     import {constructSearchtree} from "../../logic/data-management/searchtree";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-    import Sample from '../../logic/data-management/Sample';
+    import DataRepository from '../../logic/data-source/DataRepository';
 
     @Component({
         components: {},
@@ -39,7 +39,7 @@
         }
     })
     export default class HierarchicalOutlineVisualization extends Vue {
-        @Prop({required: true}) sample: Sample;
+        @Prop({required: true}) dataRepository: DataRepository;
 
         searchTree!: any;
 
@@ -60,8 +60,8 @@
         }
 
         private async initSearchTree() {
-            if (this.sample != null) {
-                let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            if (this.dataRepository != null) {
+                let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaDataSource.getTree();
                 this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
             }

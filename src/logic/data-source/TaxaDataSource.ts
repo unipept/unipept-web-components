@@ -1,15 +1,20 @@
-import DataSource from './DataSource';
-import Sample from '../data-management/Sample';
-// @ts-ignore
-import TaxaElement from './TaxaElement';
-import Tree from '../data-management/Tree';
-import {Node} from '../data-management/Node';
-import GoTerm from '../functional-annotations/GoTerm';
-import PeptideInfo from '../data-management/PeptideInfo';
-import EcNumber from '../functional-annotations/EcNumber';
-import { TaxumRank, convertStringToTaxumRank } from './TaxumRank';
+import DataSource from "./DataSource";
+import TaxaElement from "./TaxaElement";
+import Tree from "../data-management/Tree";
+import { Node } from "../data-management/Node";
 
-export default class TaxaDataSource extends DataSource {
+import DataRepository from "./DataRepository";
+
+import { TaxumRank, convertStringToTaxumRank } from "./TaxumRank";
+import { TaxaCountTable } from "../data-management/counts/TaxaCountTable";
+import { TaxaCountProcessor } from "../processors/count/TaxaCountProcessor";
+import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
+
+export default class TaxaDataSource extends DataSource 
+{
+    private _countTable: TaxaCountTable;
+    private _processedPeptideContainer: ProcessedPeptideContainer;
+
     private _tree: Tree;
     // These are the peptides that couldn't be matched with the database.
     private _missedPeptides: string[];
@@ -18,40 +23,47 @@ export default class TaxaDataSource extends DataSource {
     // The amount of peptides that have been looked up in the database. This is the total amount of peptides that were
     // searched.
     private _searchedPeptides: number;
+ 
+    constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository)
+    {
+        super(repository);
+        this._countTable = countTable;
+        this._processedPeptideContainer = processedPeptideContainer;
+    }
 
     /**
      * Get the n most popular items from this DataSource. The popularity is based on the amount of peptides that
      * associated with a particular DataElement.
-     *
+     * 
      * @param n The amount of items that should be listed. If n is larger than the amount of available items in this
-     * DataSource, all items will be returned. The returned list is sorted on the amount of peptides associated with
+     * DataSource, all items will be returned. The returned list is sorted on the amount of peptides associated with 
      * each item.
-     * @param level The TaxumRank with whome the returned TaxaElement's must be associated.
+     * @param level The TaxumRank with whome the returned TaxaElement's must be associated. 
      */
     public async getTopItems(n: number, level: TaxumRank = null): Promise<TaxaElement[]> {
         await this.process();
         if (level) {
-            const output: TaxaElement[] = [];
+            let output: TaxaElement[] = [];
 
-            const nodes: Set<Node> = this._tree.getNodesWithRank(level);
+            let nodes: Set<Node> = this._tree.getNodesWithRank(level);
             if (!nodes) {
                 return [];
             }
 
-            for (const node of nodes) {
+            for (let node of nodes) {
                 // TODO: should we use count or self_count here?
                 output.push(new TaxaElement(node.name, level, node.data.count));
             }
             return output;
         } else {
-            const output: TaxaElement[] = [];
+            let output: TaxaElement[] = [];
 
-            const nodes: Set<Node> = this._tree.getAllNodes();
+            let nodes: Set<Node> = this._tree.getAllNodes();
             if (!nodes) {
                 return [];
             }
 
-            for (const node of nodes) {
+            for (let node of nodes) {
                 // TODO: should we use count or self_count here?
                 output.push(new TaxaElement(node.name, convertStringToTaxumRank(node.rank), node.data.count));
             }
@@ -66,49 +78,21 @@ export default class TaxaDataSource extends DataSource {
         await this.process();
         return this._tree;
     }
-
-    /**
-     * Returns a tree based on the taxonomic lineage of a specific GO-term. Only the peptides that are associated with
-     * the given GO-term are taken into account here.
-     *
-     * @param term The GO-Term that should be used for filtering the peptides that are part of the tree.
-     * @return A new Node (root of the tree) that represents the taxonomic lineage of the given GO-term.
-     */
-    public async getTreeByGoTerm(term: GoTerm): Promise<Node> {
+    
+    public async getTreeByPeptides(peptides: string[]) : Promise<Node> {
         await this.process();
-        const pepts = await (await this._repository.getWorker()).getPeptidesByFA(term.code, null);
-        const sequences = pepts.map((pept) => pept.sequence);
-
         return this._tree.getRoot().callRecursivelyPostOder((t: Node, c: any) => {
-            const included = c.some((x) => x.included) || t.values.some((pept) => sequences.includes(pept.sequence));
-            return Object.assign(Object.assign({}, t), {included, children: c});
-        });
-    }
-
-    /**
-     * Returns a tree based on the taxonomic lineage of a specific EC-number. Only the peptides that are associated with
-     * the given EC-number are taken into account here.
-     *
-     * @param number The EC-Number that should be used for filtering the peptides that are part of the tree.
-     * @return A new Node (root of the tree) that represents the taxonomic lineage of the given EC-Number.
-     */
-    public async getTreeByEcNumber(number: EcNumber): Promise<Node> {
-        await this.process();
-        const pepts = await (await this._repository.getWorker()).getPeptidesByFA(number.code, null);
-        const sequences = pepts.map((pept) => pept.sequence);
-
-        return this._tree.getRoot().callRecursivelyPostOder((t: Node, c: any) => {
-            const included = c.some((x) => x.included) || t.values.some((pept) => sequences.includes(pept.sequence));
-            return Object.assign(Object.assign({}, t), {included, children: c});
+            const included = c.some(x => x.included) || t.values.some(pept => peptides.includes(pept));
+            return Object.assign(Object.assign({}, t), {included: included, children: c});
         });
     }
 
     public async getAffectedPeptides(element: TaxaElement): Promise<string[]> {
         await this.process();
         // TODO enumerating all nodes here should not be necessary!
-        const nodesForRank: Set<Node> = this._tree.getNodesWithRank(element.rank);
-        for (const node of nodesForRank) {
-            if (node.name === element.name) {
+        let nodesForRank: Set<Node> = this._tree.getNodesWithRank(element.rank);
+        for (let node of nodesForRank) {
+            if (node.name === element.name) {                
                 return this._tree.getAllSequences(node.id);
             }
         }
@@ -131,25 +115,14 @@ export default class TaxaDataSource extends DataSource {
     }
 
     private async process(): Promise<void> {
-        if (!this._tree || !this._missedPeptides || this._matchedPeptides === undefined || this._searchedPeptides === undefined) {
-            const worker = await this._repository.getWorker();
-            const {processed, missed, numMatched, numSearched}: {processed: PeptideInfo[], missed: string[], numMatched: number, numSearched: number}
-                = await worker.getResult();
+        if (!this._tree || !this._missedPeptides || this._matchedPeptides === undefined || this._searchedPeptides === undefined) 
+        {
+            this._tree = await TaxaCountProcessor.process(this._countTable);
 
-            const processedPeptides: Map<string, PeptideInfo> = new Map();
-            for (const p of processed) {
-                processedPeptides.set(p.sequence, p);
-            }
-
-            this._tree = new Tree(processed);
-
-            const taxonInfo = await Sample.getTaxonInfo(this._tree.getTaxa());
-            this._tree.setTaxonNames(taxonInfo);
-            this._tree.sortTree();
-
-            this._missedPeptides = missed;
-            this._matchedPeptides = numMatched;
-            this._searchedPeptides = numSearched;
+            // TODO: these values shouldn't be stored here
+            this._missedPeptides = this._processedPeptideContainer.missed;
+            this._matchedPeptides = this._processedPeptideContainer.numMatched;
+            this._searchedPeptides = this._processedPeptideContainer.numSearched;
         }
     }
 }

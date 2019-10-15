@@ -17,14 +17,13 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import Tree from "../../logic/data-management/Tree";
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Treeview from "./Treeview.vue";
     import {Node} from "../../logic/data-management/Node";
-    import Sample from '../../logic/data-management/Sample';
+    import DataRepository from '../../logic/data-source/DataRepository';
 
     @Component({
         components: {
@@ -40,7 +39,7 @@
         @Prop({default: false}) 
         private fullScreen: boolean;
         @Prop({required: true})
-        private sample: Sample;
+        private dataRepository: DataRepository;
         @Prop({required: false, default: -1})
         private width: number;
         @Prop({required: false, default: 600})
@@ -83,8 +82,8 @@
 
         private async initTreeview() {
             this.width = this.width === -1 ? this.$refs.treeviewWrapper.clientWidth : this.width;
-            if (this.sample != null) {
-                let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            if (this.dataRepository != null) {
+                let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaDataSource.getTree();
                 this.data = tree.getRoot();
             }

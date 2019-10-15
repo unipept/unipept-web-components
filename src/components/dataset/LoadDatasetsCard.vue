@@ -139,7 +139,8 @@
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
     import DatasetForm from "./DatasetForm.vue";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Assay from "../../logic/data-management/assay/Assay";
+    import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
     import DatasetManager from "../../logic/data-management/DatasetManager";
     import {StorageType} from "../../logic/data-management/StorageType";
     // TODO can be migrated to Vuetify snackbar!
@@ -150,6 +151,7 @@
     import Tooltip from "../custom/Tooltip.vue";
     import { BASE_URL } from '../../logic/Constants';
     import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
+    import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
 
     @Component({
         components: {
@@ -158,6 +160,7 @@
             Tooltip
         }
     })
+
     export default class LoadDatasetsCard extends Vue {
         $refs!: {
             createdDatasetForm: DatasetForm,
@@ -168,9 +171,9 @@
         }
 
         @Prop({required: true})
-        private selectedDatasets: PeptideContainer[];
+        private selectedDatasets: Assay[];
         @Prop({required: true})
-        private storedDatasets: PeptideContainer[];
+        private storedDatasets: Assay[];
 
         private currentTab: number = 0;
 
@@ -262,26 +265,32 @@
             }
         }
 
-        private selectDataset(dataset: PeptideContainer): void {
+        private selectDataset(dataset: Assay): void {
             this.$emit('select-dataset', dataset);
         }
 
-        private deleteDataset(dataset: PeptideContainer): void {
+        private deleteDataset(dataset: Assay): void {
             this.$emit('deselect-dataset', dataset);
         }
 
-        private storeDataset(peptides: string, name: string, save: boolean): void {
+        private storeDataset(peptides: string, name: string, save: boolean): void 
+        {
             this.pendingStore = true;
-            let peptideContainer: PeptideContainer = new PeptideContainer();
-            peptideContainer.setPeptides(peptides.split('\n'));
-            peptideContainer.setDate(new Date());
-            peptideContainer.setType(save ? StorageType.LocalStorage : StorageType.SessionStorage);
-            peptideContainer.setName(name);
-            peptideContainer.store().then(
+
+            let assay: MetaProteomicsAssay = new MetaProteomicsAssay();            
+            let storageType = save ? StorageType.LocalStorage : StorageType.SessionStorage;
+            let storageWriter: StorageWriter = new StorageWriter();
+
+            assay.setPeptides(peptides.split('\n'));
+            assay.setDate(new Date());
+            assay.setStorageType(save ? StorageType.LocalStorage : StorageType.SessionStorage);
+            assay.setName(name);
+
+            assay.visit(storageWriter).then(
                 () => {
-                    this.selectDataset(peptideContainer);
+                    this.selectDataset(assay);
                     if (save) {
-                        this.$emit('store-dataset', peptideContainer);
+                        this.$emit('store-dataset', assay);
                     }
                     this.pendingStore = false;
                 }
