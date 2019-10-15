@@ -35,11 +35,10 @@
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
     import Tree from "../../logic/data-management/Tree";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
     import {tooltipContent} from "./VisualizationHelper";
     import VisualizationMixin from "./VisualizationMixin.vue";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-    import Sample from '../../logic/data-management/Sample';
+    import DataRepository from '../../logic/data-source/DataRepository';
 
     @Component
     export default class SunburstVisualization extends mixins(VisualizationMixin) {
@@ -49,7 +48,7 @@
         @Prop({default: false}) 
         private fullScreen: false;
         @Prop({required: true})
-        private sample: Sample;
+        private dataRepository: DataRepository;
         // The width of the parent container is chosen if no specific width is set by the user.
         @Prop({required: false, default: -1})
         private width: number;
@@ -64,7 +63,7 @@
             this.initTree();
         }
 
-        @Watch('sample') onSampleChanged() {
+        @Watch('dataRepository') onDataRepositoryChanged() {
             this.initTree();
         }
 
@@ -90,8 +89,8 @@
         }
 
         private async initTree() {
-            if (this.sample != null) {
-                let taxaDataSource: TaxaDataSource = await this.sample.dataRepository.createTaxaDataSource();
+            if (this.dataRepository != null) {
+                let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
                 let tree: Tree = await taxaDataSource.getTree();
                 const data = JSON.stringify(tree.getRoot());
 

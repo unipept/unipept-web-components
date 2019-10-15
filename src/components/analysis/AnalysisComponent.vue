@@ -22,13 +22,13 @@
         </v-row>
         <v-row>
             <v-col>
-                <single-dataset-visualization-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null" :analysisInProgress="this.datasetsInProgress > 0">
+                <single-dataset-visualization-card :dataRepository="this.activeDataset ? this.activeDataset.dataRepository : null" :analysisInProgress="this.datasetsInProgress > 0">
                 </single-dataset-visualization-card>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <functional-summary-card :sample="this.activeDataset ? this.activeDataset.getDataset() : null" :analysisInProgress="this.datasetsInProgress > 0">
+                <functional-summary-card :dataRepository="this.activeDataset ? this.activeDataset.dataRepository : null" :analysisInProgress="this.datasetsInProgress > 0">
                 </functional-summary-card>
             </v-col>
         </v-row>
@@ -42,9 +42,8 @@ import LoadDatasetsCard from "./../dataset/LoadDatasetsCard.vue";
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {Prop, Watch} from 'vue-property-decorator';
-import PeptideContainer from './../../logic/data-management/PeptideContainer';
+import Assay from "../../logic/data-management/assay/Assay";
 import MpaAnalysisManager from '../../logic/data-management/MpaAnalysisManager';
-import Sample from '../../logic/data-management/Sample';
 import SingleDatasetVisualizationCard from '../visualizations/SingleDatasetVisualizationsCard.vue';
 import FunctionalSummaryCard from './functional/FunctionalSummaryCard.vue';
 
@@ -59,12 +58,12 @@ import FunctionalSummaryCard from './functional/FunctionalSummaryCard.vue';
 })
 export default class AnalysisComponent extends Vue {
     @Prop({required: true})
-    private selectedDatasets: PeptideContainer[];
+    private selectedDatasets: Assay[];
     @Prop({required: true})
-    private storedDatasets: PeptideContainer[];
+    private storedDatasets: Assay[];
 
     private datasetSelectionInProgress: boolean = false;
-    private activeDataset: PeptideContainer = null;
+    private activeDataset: Assay = null;
     private datasetsInProgress: number = 0;
 
     mounted() {
@@ -75,7 +74,7 @@ export default class AnalysisComponent extends Vue {
         }
     }
 
-    private processDataset(dataset: PeptideContainer): void {
+    private processDataset(dataset: Assay): void {
         let mpaManager = new MpaAnalysisManager();
         // TODO: work with the real search settings here
         mpaManager.processDataset(dataset, {
@@ -92,7 +91,7 @@ export default class AnalysisComponent extends Vue {
         });
     }
 
-    private activateDataset(dataset: PeptideContainer) {
+    private activateDataset(dataset: Assay) {
         this.activeDataset = dataset;
     }
 
@@ -100,20 +99,20 @@ export default class AnalysisComponent extends Vue {
         this.datasetSelectionInProgress = status;
     }
 
-    private selectDataset(dataset: PeptideContainer) {
+    private selectDataset(dataset: Assay) {
         this.selectedDatasets.push(dataset);
         this.processDataset(dataset);
         this.$emit('select-dataset', dataset);
     }
 
-    private deselectDataset(dataset: PeptideContainer) {
-        const idx: number = this.selectedDatasets.findIndex((val: PeptideContainer) => val.getId() === dataset.getId());
+    private deselectDataset(dataset: Assay) {
+        const idx: number = this.selectedDatasets.findIndex((val: Assay) => val.getId() === dataset.getId());
         if (idx >= 0) {
             this.selectedDatasets.splice(idx, 1);
         }
     }
 
-    private storeDataset(dataset: PeptideContainer) {
+    private storeDataset(dataset: Assay) {
         // TODO implement this function!
     }
 }
