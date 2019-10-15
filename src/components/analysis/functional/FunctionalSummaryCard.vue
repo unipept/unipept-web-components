@@ -242,6 +242,10 @@
             this.onDataRepositoryChanged();
         }
 
+        @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
+            this.onDataRepositoryChanged();
+        }
+
         setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
             this.formatType = formatType;
 
@@ -335,11 +339,13 @@
 
             if (this.dataRepository) {
                 let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
                 let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
 
                 const percent = parseInt(this.percentSettings);
                 const taxonId = this.$store.getters.selectedTaxonId;
 
+                // get sequences corresponding to selected taxon id
                 let sequences = null;
                 if (taxonId > 0) {
                     let tree = await taxaSource.getTree();
@@ -348,6 +354,7 @@
                     this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
                 }
 
+                // recalculate go-data for those sequences
                 for (let i = 0; i < this.goNamespaces.length; i++) {
                     let namespace: GoNameSpace = this.goNamespaces[i];
                     this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
@@ -355,8 +362,8 @@
 
                 this.goTrustLine = this.computeTrustLine(await goSource.getTrust(), "GO term");
 
-                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
-                this.ecData = await ecSource.getEcNumbers();
+                // recalculate ec-data for those sequences
+                this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
                 this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
                 // @ts-ignore
                 this.ecTreeData = await ecSource.getEcTree();
