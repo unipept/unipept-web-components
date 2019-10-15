@@ -54,6 +54,9 @@
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
         @Prop({required: true})
         protected annotationName: string;
+        @Prop({required: false})
+        protected namespace: string;
+
         // Keeps track of the functional annotations for which a Tree has already been calculated.
         private treeAvailable: Map<FAElement, Node> = new Map();
 
@@ -116,7 +119,7 @@
             let columnNames: string[] = ["Peptides", this.annotationName, "Name"];
             let grid: string[][] = this.items.map(term => [term.popularity.toString(), term.code, term.name]);
             // TODO: include namespace in export name
-            downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName + "-export.csv", "text/csv");
+            downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName + (this.namespace? "-" + this.namespace: "") + "-export.csv", "text/csv");
         }
     }
 </script>

@@ -69,9 +69,13 @@ export function downloadDataByForm(data, fileName, fileType = null)
     {
         const fs = require('fs');
         const {dialog} = require('electron').remote;
-        dialog.showSaveDialog({title: "save to CSV", defaultPath: fileName}, (filename) => {
-            fs.writeFileSync(filename, data, 'utf-8');
-          })
+        dialog.showSaveDialog(null, {title: "save to CSV", defaultPath: fileName}).then((saveDialogReturnValue) => 
+        {
+            if(!saveDialogReturnValue.canceled)
+            {
+                fs.writeFileSync(saveDialogReturnValue.filePath, data, 'utf-8');
+            }
+        })
     }
     else
     {
