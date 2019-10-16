@@ -19,11 +19,11 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component"
+import Vue from "vue";
+import Component from "vue-class-component"
 
-    import {Prop, Watch} from "vue-property-decorator";
-    import PeptideContainer from "../../logic/data-management/PeptideContainer";
+import { Prop, Watch } from "vue-property-decorator";
+import PeptideContainer from "../../logic/data-management/PeptideContainer";
 
     @Component({
         components: {},
@@ -34,7 +34,7 @@
                 },
                 set(val) {
                     this.peptidesData = val;
-                    this.$emit('peptide-change', val);
+                    this.$emit("peptide-change", val);
                 }
             },
             nameModel: {
@@ -43,7 +43,7 @@
                 },
                 set(val) {
                     this.nameData = val;
-                    this.$emit('name-change', val);
+                    this.$emit("name-change", val);
                 }
             },
             saveModel: {
@@ -52,32 +52,32 @@
                 },
                 set(val) {
                     this.saveData = val;
-                    this.$emit('save-change', val);
+                    this.$emit("save-change", val);
                 }
             }
         }
     })
-    export default class DatasetForm extends Vue {
-        @Prop({default: "" }) peptides;
-        @Prop({default: ""}) name;
-        @Prop({default: true}) save;
-        @Prop({default: false}) loading;
+export default class DatasetForm extends Vue {
+        @Prop({ default: "" }) peptides;
+        @Prop({ default: "" }) name;
+        @Prop({ default: true }) save;
+        @Prop({ default: false }) loading;
 
         private peptidesData: string = this.peptides;
         private nameData: string = this.name;
         private saveData: boolean = this.save;
 
-        @Watch('peptides') 
+        @Watch("peptides") 
         private onPeptidesChange(newPeptides: string, oldPeptides: string) {
             this.peptidesData = newPeptides;
         }
 
-        @Watch('name') 
+        @Watch("name") 
         private onNameChange(newName: string, oldName: string) {
             this.nameData = newName;
         }
 
-        @Watch('save') 
+        @Watch("save") 
         private onSaveChanged(newSave: boolean, oldSave: boolean) {
             this.saveData = newSave;
         }
@@ -86,7 +86,7 @@
             //@ts-ignore
             return this.$refs.datasetForm.validate();
         }
-    };
+}
 </script>
 
 <style scoped>

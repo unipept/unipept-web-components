@@ -1,4 +1,4 @@
-import {Normalizer} from './Normalizer';
+import { Normalizer } from "./Normalizer";
 
 export default class ColumnNormalizer implements Normalizer {
     public normalize(data: number[][]): number[][] {
@@ -16,10 +16,10 @@ export default class ColumnNormalizer implements Normalizer {
             // Find the minimum and maximum value by iterating over every value in the current column
             const minMax: number[] = Array.from(
                 Array(data[0].length).keys())
-                    .map(
-                        (row) => data[row][col]).reduce((acc, current) => [Math.min(acc[0], current),
-                        Math.max(acc[1], current)], [Infinity, -Infinity],
-                    );
+                .map(
+                    (row) => data[row][col]).reduce((acc, current) => [Math.min(acc[0], current),
+                    Math.max(acc[1], current)], [Infinity, -Infinity],
+                );
             const min = minMax[0];
             const max = minMax[1];
 

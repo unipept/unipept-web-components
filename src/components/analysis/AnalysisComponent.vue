@@ -39,13 +39,13 @@
 import SwitchDatasetCard from "./../dataset/SwitchDatasetCard.vue";
 import ExperimentSummaryCard from "./../analysis/functional/ExperimentSummaryCard.vue"
 import LoadDatasetsCard from "./../dataset/LoadDatasetsCard.vue";
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import {Prop, Watch} from 'vue-property-decorator';
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
 import Assay from "../../logic/data-management/assay/Assay";
-import MpaAnalysisManager from '../../logic/data-management/MpaAnalysisManager';
-import SingleDatasetVisualizationCard from '../visualizations/SingleDatasetVisualizationsCard.vue';
-import FunctionalSummaryCard from './functional/FunctionalSummaryCard.vue';
+import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
+import SingleDatasetVisualizationCard from "../visualizations/SingleDatasetVisualizationsCard.vue";
+import FunctionalSummaryCard from "./functional/FunctionalSummaryCard.vue";
 
 @Component({
     components: {
@@ -57,9 +57,9 @@ import FunctionalSummaryCard from './functional/FunctionalSummaryCard.vue';
     }
 })
 export default class AnalysisComponent extends Vue {
-    @Prop({required: true})
+    @Prop({ required: true })
     private selectedDatasets: Assay[];
-    @Prop({required: true})
+    @Prop({ required: true })
     private storedDatasets: Assay[];
 
     private datasetSelectionInProgress: boolean = false;
@@ -102,7 +102,7 @@ export default class AnalysisComponent extends Vue {
     private selectDataset(dataset: Assay) {
         this.selectedDatasets.push(dataset);
         this.processDataset(dataset);
-        this.$emit('select-dataset', dataset);
+        this.$emit("select-dataset", dataset);
     }
 
     private deselectDataset(dataset: Assay) {

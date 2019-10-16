@@ -22,10 +22,10 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import {showInfoModal} from "../../../logic/modal";
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import { showInfoModal } from "../../../logic/modal";
 
     @Component({
         components: {},
@@ -36,17 +36,17 @@
                 },
                 set(val) {
                     this.content = val;
-                    this.$emit('input', val);
+                    this.$emit("input", val);
                 }
             }
         }
     })
-    export default class FilterFunctionalAnnotationsDropdown extends Vue {
-        @Prop({default: "5"}) value: string;
+export default class FilterFunctionalAnnotationsDropdown extends Vue {
+        @Prop({ default: "5" }) value: string;
 
         content: string = this.value;
 
-        @Watch('value') onValueChanged(newValue: string, oldValue: string) {
+        @Watch("value") onValueChanged(newValue: string, oldValue: string) {
             this.content = newValue;
         }
 
@@ -123,9 +123,9 @@
                 </ol>
             `;
 
-            showInfoModal("Functional Annotation filtering", modalContent, {wide: true})
+            showInfoModal("Functional Annotation filtering", modalContent, { wide: true })
         }
-    }
+}
 </script>
 
 <style lang="less">

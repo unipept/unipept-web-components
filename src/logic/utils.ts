@@ -62,7 +62,7 @@ export function brightness(rgb) {
  * @return {Promise.<string>}
  */
 export function downloadDataByForm(data, fileName, fileType = null) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
         let nonce = Math.random();
         $("form.download").remove();
         $("body").append("<form class='download' method='post' action='/download'></form>");
@@ -110,12 +110,12 @@ export function downloadDataByLink(dataURL, fileName) {
  */
 export function get(url: string): Promise<any> {
     // Return a new promise.
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
         // Do the usual XHR stuff
         let req = new XMLHttpRequest();
         req.open("GET", url);
 
-        req.onload = function () {
+        req.onload = function() {
             // This is called even on 404 etc
             // so check the status
             if (req.status === 200) {
@@ -129,7 +129,7 @@ export function get(url: string): Promise<any> {
         };
 
         // Handle network errors
-        req.onerror = function () {
+        req.onerror = function() {
             reject(Error("Network Error"));
         };
 
@@ -169,7 +169,7 @@ export function getReadableColorFor(color) {
  */
 export function highlight(element) {
     $(element).addClass("flash");
-    setTimeout(function () {
+    setTimeout(function() {
         $(element).removeClass("flash");
     }, 2000);
 }
@@ -261,7 +261,7 @@ export function showInfo(message) {
  * @return {string}
  */
 export function stringTitleize(s) {
-    return s.replace(/\w\S*/g, function (txt) {
+    return s.replace(/\w\S*/g, function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 }
@@ -338,12 +338,12 @@ export function triggerDownloadModal(svgSelector, canvasSelector, baseFileName) 
         $element = $(svgSelector);
         svg = $element.wrap("<div></div>").parent().html();
         $element.unwrap();
-        $.post("/convert", {image: svg}, showImage);
+        $.post("/convert", { image: svg }, showImage);
     }
     if (canvasSelector) {
         // Use html2canvas to convert canvas to dataURL
         this.html2canvas($(canvasSelector), {
-            onrendered: function (canvas) {
+            onrendered: function(canvas) {
                 showImage(canvas.toDataURL());
             },
         });
@@ -364,12 +364,12 @@ export function triggerDownloadModal(svgSelector, canvasSelector, baseFileName) 
         $buttons.empty();
         if (svgSelector) {
             $buttons.append("<button id='download-svg' class='btn btn-primary btn-animate'><span class='glyphicon glyphicon-download down'></span> Download as SVG</button>");
-            $("#download-svg").click(function () {
+            $("#download-svg").click(function() {
                 downloadDataByForm(svg, baseFileName + ".svg", "image/svg+xml");
             });
         }
         $buttons.append("<button id='download-png' class='btn btn-primary btn-animate'><span class='glyphicon glyphicon-download down'></span> Download as PNG</button>");
-        $("#download-png").click(function () {
+        $("#download-png").click(function() {
             downloadDataByLink($("#save-as-modal .image img").attr("src"), baseFileName + ".png");
         });
     }

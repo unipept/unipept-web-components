@@ -1,5 +1,5 @@
-import { GoNameSpace } from './GoNameSpace';
-import FAElement from './FAElement';
+import { GoNameSpace } from "./GoNameSpace";
+import FAElement from "./FAElement";
 
 export default class GoTerm extends FAElement {
     // The GO-namespace associated with this code. Must be a valid namespace!

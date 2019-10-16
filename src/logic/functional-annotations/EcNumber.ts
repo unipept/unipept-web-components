@@ -1,5 +1,5 @@
-import FAElement from './FAElement';
-import { EcNameSpace } from './EcNameSpace';
+import FAElement from "./FAElement";
+import { EcNameSpace } from "./EcNameSpace";
 
 export default class EcNumber extends FAElement {
 
@@ -26,23 +26,23 @@ export default class EcNumber extends FAElement {
      */
     public static computeAncestors(code: string, includeRoot: boolean = false): string[] {
         const result = [];
-        const parts = code.split('.');
-        const numSpecific = parts.includes('-') ? parts.indexOf('-') : parts.length;
+        const parts = code.split(".");
+        const numSpecific = parts.includes("-") ? parts.indexOf("-") : parts.length;
 
         for (let i = numSpecific - 1; i >= 1; i--) {
-            parts[i] = '-';
-            result.push(parts.join('.'));
+            parts[i] = "-";
+            result.push(parts.join("."));
         }
 
         if (includeRoot) {
-            result.push('-.-.-.-');
+            result.push("-.-.-.-");
         }
 
         return result;
     }
 
     public static computeLevel(code: string): number {
-        return (code + '.-').split('.').indexOf('-');
+        return (code + ".-").split(".").indexOf("-");
     }
     public namespace: EcNameSpace;
 

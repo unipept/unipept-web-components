@@ -1,20 +1,19 @@
-import MPAConfig from '../../data-management/MPAConfig';
+import MPAConfig from "../../data-management/MPAConfig";
 import DataRepository from "../DataRepository";
 import GoDataSource from "./../GoDataSource";
 import TaxaDataSource from "./../TaxaDataSource";
 import EcDataSource from "./../EcDataSource";
 
-import { PeptideContainerProcessor } from '../../processors/peptide/container/PeptideContainerProcessor';
+import { PeptideContainerProcessor } from "../../processors/peptide/container/PeptideContainerProcessor";
 import { ProcessedPeptideContainer } from "../../data-management/ProcessedPeptideContainer";
-import { TaxaPeptideProcessor } from '../../processors/peptide/TaxaPeptideProcessor'
+import { TaxaPeptideProcessor } from "../../processors/peptide/TaxaPeptideProcessor"
 import { GOPeptideProcessor } from "../../processors/peptide/GOPeptideProcessor";
 import { ECPeptideProcessor } from "../../processors/peptide/ECPeptideProcessor";
 import MetaProteomicsAssay from "../../data-management/assay/MetaProteomicsAssay";
-import { PeptideData } from '../../api/pept2data/Response';
-import { Ontologies } from '../../data-management/ontology/Ontologies';
+import { PeptideData } from "../../api/pept2data/Response";
+import { Ontologies } from "../../data-management/ontology/Ontologies";
 
-export default class MetaProteomicsDataRepository extends DataRepository
-{
+export default class MetaProteomicsDataRepository extends DataRepository {
     private _metaproteomicsAssay: MetaProteomicsAssay;
 
     private _processor: PeptideContainerProcessor;
@@ -22,8 +21,7 @@ export default class MetaProteomicsDataRepository extends DataRepository
 
     private _mpaConfig: MPAConfig;
 
-    public constructor(metaProteomicsAssay: MetaProteomicsAssay, mpaConfig: MPAConfig) 
-    {
+    public constructor(metaProteomicsAssay: MetaProteomicsAssay, mpaConfig: MPAConfig) {
         super()
         
         this._metaproteomicsAssay = metaProteomicsAssay;
@@ -34,8 +32,7 @@ export default class MetaProteomicsDataRepository extends DataRepository
         this._mpaConfig = mpaConfig;
     }
 
-    protected async initTaxaDataSource(): Promise<void> 
-    {
+    protected async initTaxaDataSource(): Promise<void> {
         let processedPeptideContainer = await this._processedPeptideContainer;         
         processedPeptideContainer.response.forEach((data: PeptideData) => {
             Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
@@ -47,28 +44,25 @@ export default class MetaProteomicsDataRepository extends DataRepository
             this);
     }
 
-    protected async initGoDataSource(): Promise<void> 
-    {
+    protected async initGoDataSource(): Promise<void> {
         let processedPeptideContainer = await this._processedPeptideContainer;
         this._goSourceCache = new GoDataSource(
-                GOPeptideProcessor.process(processedPeptideContainer),
-                processedPeptideContainer, 
-                this
-            );
+            GOPeptideProcessor.process(processedPeptideContainer),
+            processedPeptideContainer, 
+            this
+        );
     }
 
-    protected async initEcDataSource(): Promise<void> 
-    {
+    protected async initEcDataSource(): Promise<void> {
         let processedPeptideContainer = await this._processedPeptideContainer;
         this._ecSourceCache = new EcDataSource(
-                ECPeptideProcessor.process(processedPeptideContainer),
-                processedPeptideContainer,
-                this
-            );
+            ECPeptideProcessor.process(processedPeptideContainer),
+            processedPeptideContainer,
+            this
+        );
     }
 
-    async initProcessedPeptideContainer() : Promise<ProcessedPeptideContainer>
-    {
+    async initProcessedPeptideContainer() : Promise<ProcessedPeptideContainer> {
         if (!this._processedPeptideContainer) {
             this._processedPeptideContainer = this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig);
         }
