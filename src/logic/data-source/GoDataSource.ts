@@ -32,6 +32,38 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
         return Array.from(this._countTable.ontology2peptide.get(term.code) || [])
     }
 
+    public getGoTermSummary(term: GoTerm): string[][]
+    {
+        if(this._processedPeptideContainer)
+        {
+            return [[
+                "peptide",
+                "spectral count",
+                "matching proteins",
+                "matching proteins with " + term.code,
+                "percentage proteins with " + term.code,
+            ]]
+                .concat(term.affectedPeptides
+                    .map(peptide => {
+
+                        let peptideCount = this._processedPeptideContainer.countTable.get(peptide)
+                        let peptideData = this._processedPeptideContainer.response.get(peptide)
+                        let goProteinCount = peptideData.fa.data.hasOwnProperty(term.code)? peptideData.fa.data[term.code] : 0
+
+                        return [
+                            peptide, 
+                            peptideCount, 
+                            peptideData.fa.counts.all, 
+                            goProteinCount, 
+                            100 * (goProteinCount / peptideData.fa.counts.all)
+                        ] as string[]
+
+                    }));
+        }
+
+        return []
+    }
+
     /**
      * Get the n most popular GO-Terms for a specific namespace. The returned GO-Terms are sorted by popularity.
      *

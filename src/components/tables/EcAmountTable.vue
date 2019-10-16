@@ -40,9 +40,14 @@
             }
         }
 
-        private async summaryRetriever(number: EcNumber): Promise<any>
+        private async summaryRetriever(number: EcNumber): Promise<string[][]>
         {
-            console.log(number)
+            if(this.dataRepository)
+            {
+                let ecDataSource: EcDataSource = await this.dataRepository.createEcDataSource();
+                return ecDataSource.getECNumberSummary(number);
+            }
+            return []
         }
     }
 </script>

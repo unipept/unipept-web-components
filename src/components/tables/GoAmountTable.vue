@@ -45,9 +45,14 @@
             }
         }
 
-        private async summaryRetriever(term: GoTerm): Promise<any>
+        private async summaryRetriever(term: GoTerm): Promise<string[][]>
         {
-            console.log(term)
+            if(this.dataRepository)
+            {
+                let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                return goDataSource.getGoTermSummary(term);
+            }
+            return []
         }
     }
 </script>

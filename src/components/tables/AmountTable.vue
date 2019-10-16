@@ -58,7 +58,7 @@
         @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
         @Prop({required: true})
-        protected summaryRetriever: (term: FAElement) => Promise<any>;
+        protected summaryRetriever: (term: FAElement) => Promise<string[][]>;
         @Prop({required: true})
         protected annotationName: string;
         @Prop({required: false})
@@ -131,7 +131,7 @@
         private async saveSummaryAsCSV(term: FAElement)
         {
             let data = await this.summaryRetriever(term)
-            console.log(data)
+            downloadDataByForm(toCSVString(data), term.code + "-summary.csv", "text/csv");
         }
     }
 </script>

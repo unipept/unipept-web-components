@@ -31,6 +31,38 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
         return Array.from(this._countTable.ontology2peptide.get(code) || [])
     }
 
+    public getECNumberSummary(number: EcNumber): string[][]
+    {
+        if(this._processedPeptideContainer)
+        {
+            return [[
+                "peptide",
+                "spectral count",
+                "matching proteins",
+                "matching proteins with " + number.code,
+                "percentage proteins with " + number.code,
+            ]]
+                .concat(number.affectedPeptides
+                    .map(peptide => {
+
+                        let peptideCount = this._processedPeptideContainer.countTable.get(peptide)
+                        let peptideData = this._processedPeptideContainer.response.get(peptide)
+                        let ecProteinCount = peptideData.fa.data.hasOwnProperty(number.code)? peptideData.fa.data[number.code] : 0
+
+                        return [
+                            peptide, 
+                            peptideCount, 
+                            peptideData.fa.counts.all, 
+                            ecProteinCount, 
+                            100 * (ecProteinCount / peptideData.fa.counts.all)
+                        ] as string[]
+
+                    }));
+        }
+
+        return []
+    }
+
     /**
      * Retrieve the top n EC-Numbers for a specific namespace. If the namespace is not specified (null), the resulting
      * EC-Numbers will not be restricted to a specific namespace.
