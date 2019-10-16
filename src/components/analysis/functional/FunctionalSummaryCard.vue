@@ -48,6 +48,14 @@
                     </v-col>
                 </v-row>
             </v-alert>
+            <v-alert v-if="!this.showTaxonInfo && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
+                <v-row dense align="center">
+                    <v-col class="grow"><b>Unfiltered results:</b> filtered results are available specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).</v-col>
+                    <v-col class="shrink">
+                        <v-btn @click="redoFAcalculations(); showTaxonInfo = true;">Redo</v-btn>
+                    </v-col>
+                </v-row>
+            </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <v-card flat>
