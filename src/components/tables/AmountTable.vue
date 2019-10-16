@@ -1,7 +1,12 @@
 <template>
     <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
         <template v-slot:top>
-            <v-icon @click="saveTableAsCSV()" class="table-to-csv-button">mdi-download</v-icon>
+            <v-tooltip :open-delay=1000 bottom>
+                <template v-slot:activator="{ on }">
+                    <v-icon @click="saveTableAsCSV()" class="table-to-csv-button" v-on="on">mdi-download</v-icon>
+                </template>
+                <span>Download table as CSV</span>
+            </v-tooltip>
         </template>
         <template v-slot:expanded-item="{ headers, item }">
             <td :colspan="headers.length">
