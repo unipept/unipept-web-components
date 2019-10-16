@@ -40,8 +40,13 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
-            <v-alert v-if="this.watchableSelectedTaxonId != -1 && this.selectedNCBITaxon && this.totalPeptides" dense colored-border type="warning" id="filtered-taxon-information">
-                <b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).
+            <v-alert v-if="this.showTaxonInfo" dense colored-border id="filtered-taxon-information">
+                <v-row dense align="center">
+                    <v-col class="grow"><b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to <b>{{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}})</b>.</v-col>
+                    <v-col class="shrink">
+                        <v-btn @click="doFAcalculations(); showTaxonInfo = false;">Undo</v-btn>
+                    </v-col>
+                </v-row>
             </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
@@ -182,6 +187,7 @@
 
         private totalPeptides: number;
         private selectedNCBITaxon: NCBITaxon; 
+        private showTaxonInfo: boolean = false;
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
         // directly
@@ -356,21 +362,16 @@
                 if(taxonId != -1)
                 {
                     this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
-                    this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId)
-                    console.log(this.selectedNCBITaxon)
+                    this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
+                    this.showTaxonInfo = true;
                 }
             }
         }
 
-        private async redoFAcalculations(): Promise<void> {
-            let peptideContainer = this.$store.getters.activeDataset;
-
+        private async redoFAcalculations(): Promise<void> 
+        {
             if (this.dataRepository) {
-                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
                 let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-
-                const percent = parseInt(this.percentSettings);
                 const taxonId = this.$store.getters.selectedTaxonId;
 
                 // get sequences corresponding to selected taxon id
@@ -381,6 +382,19 @@
                     let taxonData = tree.nodes.get(taxonId);
                     this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
                 }
+
+                this.doFAcalculations(sequences);
+            }
+        }
+
+        private async doFAcalculations(sequences: string[] = null)
+        {
+            if(this.dataRepository)
+            {
+                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
+
+                const percent = parseInt(this.percentSettings);
 
                 // recalculate go-data for those sequences
                 for (let i = 0; i < this.goNamespaces.length; i++) {
