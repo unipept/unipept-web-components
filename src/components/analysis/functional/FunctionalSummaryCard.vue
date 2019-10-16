@@ -75,12 +75,9 @@
                                             <go-amount-table :dataRepository="dataRepository" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
                                         <v-col :cols="3">
-                                            <img style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
+                                            <quick-go-card :sort-settings="faSortSettings" :items="goData[idx].goTerms"></quick-go-card>
                                         </v-col>
                                     </v-row>
-                                    <v-dialog v-if="goModals" v-model="goModals[namespace]">
-                                        <!-- <QuickGoCard :sort-settings="faSortSettings" :go-terms="goData[goNamespaces.indexOf(ns)].goTerms"></QuickGoCard> -->
-                                    </v-dialog>
                                 </div>
                             </div>
                         </v-card-text>
@@ -182,8 +179,6 @@
         // directly
         private goNamespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
         private goData: {goTerms: GoTerm[], title: string}[] = [];
-        // Keeps track of which QuickGO-modals are shown for which namespace.
-        private goModals: Map<GoNameSpace, boolean> = null;
 
         private ecData: EcNumber[] = [];
         private ecTreeData: TreeViewNode = null;
@@ -236,15 +231,12 @@
         private faCalculationsInProgress: boolean = false;
 
         mounted() {
-            let modals: Map<GoNameSpace, boolean> = new Map();
             for (let ns of this.goNamespaces) {
                 this.goData.push({
                     goTerms: [],
                     title: stringTitleize(ns.toString())
                 });
-                modals.set(ns, false);
             }
-            this.goModals = modals;
             this.onDataRepositoryChanged();
         }
 
@@ -284,11 +276,6 @@
             `;
 
             showInfoModal("Sorting functional annotations", modalContent);
-        }
-
-        private getQuickGoSmallUrl(ns: GoNameSpace): string {
-            let goTerms: GoTerm[] = this.goData[this.goNamespaces.indexOf(ns)].goTerms;
-            return `https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/${goTerms.sort().join(",")}/chart?showKey=true`;
         }
 
         private showGoModal(ns: GoNameSpace): void {
