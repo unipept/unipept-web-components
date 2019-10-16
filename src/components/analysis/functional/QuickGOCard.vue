@@ -1,15 +1,15 @@
 <template>
-    <div>
-        <img v-if="items" style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);" :src="getQuickGoSmallUrl()" class="quickGoThumb" @click="showModal = !showModal">
-        <v-dialog v-if="items" v-model="showModal">
+    <div style="height: 100%;">
+        <img v-if="items" style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); cursor: pointer;" :src="getQuickGoSmallUrl()" class="quickGoThumb" @click="showModal = !showModal">
+        <v-dialog v-if="items" v-model="showModal" max-width="90%">
             <v-card>
                 <v-card-title>QuickGo biological process</v-card-title>
                 <v-card-text v-if="top5 && top5.length > 0">
                     This chart shows the relationship between the {{ top5.length }} most occurring GO terms: 
                     {{ top5Sentence }}.
                     <br/>
-                    <a :href="quickGOChartURL(top5.map(x => x.code), true)">
-                        <img style="max-width: 100%; position: relative; left: 50%; transform: translateY(-50%);" :src="quickGOChartURL(top5.map(x => x.code), true)" :alt="'QuickGO chart of ' + top5Sentence"/>
+                    <a @click="openInBrowser(quickGOChartURL(top5.map(x => x.code), true))">
+                        <img style="max-width: 100%; position: relative; left: 50%; transform: translateX(-50%);" :src="quickGOChartURL(top5.map(x => x.code), true)" :alt="'QuickGO chart of ' + top5Sentence"/>
                     </a>
                     <div>
                         Provided by <a @click="openInBrowser('https://www.ebi.ac.uk/QuickGO/annotations?goId=' + top5.map(x => x.code).join(','))" target="_blank">QuickGO</a>.
