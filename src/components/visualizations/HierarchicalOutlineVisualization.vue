@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-text-field style="margin-bottom: -26px;" solo label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
+        <v-text-field style="margin-bottom: -26px;" outlined single-line label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
         <div id="searchtree" class="treeView multi"></div>
         <div id="tree_data">
             <p>
@@ -35,6 +35,11 @@
                 set(val) {
                     // should do nothing!
                 }
+            },
+            watchableSelectedSearchTerm: {
+                get(): string {
+                    return this.$store.getters.selectedTerm
+                }
             }
         }
     })
@@ -51,11 +56,18 @@
             this.initSearchTree();
         }
 
-        @Watch('activeSearchTerm') onActiveSearchTermChanged(newSearchTerm: string, oldSearchTerm: string) {
+        @Watch('watchableSelectedS') onActiveSearchTermChanged(newSearchTerm: string, oldSearchTerm: string) {
             if (this.searchTree && newSearchTerm !== "") {
                 setTimeout(() => {
                     this.searchTree.search(newSearchTerm);
                 }, 500);
+            }
+        }
+
+        @Watch('watchableSelectedSearchTerm')
+        private onSelectedSearchTermChanged(newSearchTerm: string) {
+            if(this.searchTree && newSearchTerm) {
+                this.searchTree.search(newSearchTerm);
             }
         }
 
