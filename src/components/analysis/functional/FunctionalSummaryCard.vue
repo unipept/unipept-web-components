@@ -78,6 +78,9 @@
                                             <img style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
                                         </v-col>
                                     </v-row>
+                                    <v-dialog v-if="goModals" v-model="goModals[namespace]">
+                                        <!-- <QuickGoCard :sort-settings="faSortSettings" :go-terms="goData[goNamespaces.indexOf(ns)].goTerms"></QuickGoCard> -->
+                                    </v-dialog>
                                 </div>
                             </div>
                         </v-card-text>
@@ -125,6 +128,7 @@
 
     import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
     import CardHeader from "../../custom/CardHeader.vue";
+    import QuickGoCard from "./QuickGOCard.vue";
 
     import {showInfoModal} from "../../../logic/modal";
     import DataRepository from "../../../logic/data-source/DataRepository";
@@ -147,7 +151,8 @@
             FilterFunctionalAnnotationsDropdown,
             GoAmountTable,
             EcAmountTable,
-            Treeview
+            Treeview,
+            QuickGoCard
         },
         computed: {
             watchableDataset: {
@@ -177,6 +182,8 @@
         // directly
         private goNamespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
         private goData: {goTerms: GoTerm[], title: string}[] = [];
+        // Keeps track of which QuickGO-modals are shown for which namespace.
+        private goModals: Map<GoNameSpace, boolean> = null;
 
         private ecData: EcNumber[] = [];
         private ecTreeData: TreeViewNode = null;
@@ -229,12 +236,15 @@
         private faCalculationsInProgress: boolean = false;
 
         mounted() {
+            let modals: Map<GoNameSpace, boolean> = new Map();
             for (let ns of this.goNamespaces) {
                 this.goData.push({
                     goTerms: [],
                     title: stringTitleize(ns.toString())
                 });
+                modals.set(ns, false);
             }
+            this.goModals = modals;
             this.onDataRepositoryChanged();
         }
 
@@ -278,48 +288,11 @@
 
         private getQuickGoSmallUrl(ns: GoNameSpace): string {
             let goTerms: GoTerm[] = this.goData[this.goNamespaces.indexOf(ns)].goTerms;
-            const top5: string[] = goTerms.slice(0, 5).map(x => x.code);
-
-            if (top5.length > 0) {
-                return this.quickGOChartURL(top5, false);
-            }
-            return null;
+            return `https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/${goTerms.sort().join(",")}/chart?showKey=true`;
         }
 
         private showGoModal(ns: GoNameSpace): void {
-            let goTerms: GoTerm[] = this.goData[this.goNamespaces.indexOf(ns)].goTerms;
-            const top5: GoTerm[] = goTerms.slice(0, 5);
-
-            if (top5.length > 0) {
-                const top5WithNames = top5.map(x => `${x.name} (${this.faSortSettings.format(x)})`);
-                const top5Sentence = top5WithNames.slice(0, -1).join(", ")
-                    + (top5.length > 1 ? " and " : "")
-                    + top5WithNames[top5WithNames.length - 1];
-                const quickGoChartURL: string = this.quickGOChartURL(top5.map(x => x.code), true);
-                
-                let modalContent = `
-                    This chart shows the relationship between the ${top5.length} most occurring GO terms: ${top5Sentence}.
-                    <br/>
-                    <a href="${quickGoChartURL}" target="_blank" title="Click to enlarge in new tab">
-                        <img style="max-width: 100%;" src="${quickGoChartURL}" alt="QuickGO chart of ${top5Sentence}"/>
-                    </a>
-                    <div>
-                        Provided by <a href="https://www.ebi.ac.uk/QuickGO/annotations?goId=${top5.map(x => x.code).join(',')}" target="_blank">QuickGO</a>.
-                    </div>
-                `;
-
-                showInfoModal("QuickGo " + ns, modalContent, {wide: true});
-            }
-        }
-
-        /**
-         * @param {string[]} terms the terms to show in the chart (at least one)
-         * @param {boolean} showKey Show the legend of the colors
-         * @return {string} The QuickGo chart URL of the given GO terms
-         */
-        private quickGOChartURL(terms, showKey = true): string {
-            // sort the terms to improve caching
-            return `https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/${terms.sort().join(",")}/chart?showKey=${showKey}`;
+            this.goModals.set(ns, true);
         }
 
         private async onDataRepositoryChanged() {
