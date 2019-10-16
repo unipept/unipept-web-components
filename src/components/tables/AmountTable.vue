@@ -27,7 +27,12 @@
             </td>
         </template>
         <template v-slot:item.action="{ item }">
-            <v-icon @click="saveSummaryAsCSV(item)" class="row-to-csv-button">mdi-download</v-icon>
+            <v-tooltip :open-delay=1000 bottom>
+                <template v-slot:activator="{ on }">
+                    <v-icon @click="saveSummaryAsCSV(item)" class="row-to-csv-button" v-on="on">mdi-download</v-icon>
+                </template>
+                <span>Download CSV summary of the filtered functional annotation</span>
+            </v-tooltip>
         </template>
     </v-data-table>
 </template>
