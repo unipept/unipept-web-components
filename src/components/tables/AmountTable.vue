@@ -27,7 +27,7 @@
             </td>
         </template>
         <template v-slot:item.action="{ item }">
-            <v-icon @click="saveSummaryAsCSV(item)">mdi-download</v-icon>
+            <v-icon @click="saveSummaryAsCSV(item)" class="row-to-csv-button">mdi-download</v-icon>
         </template>
     </v-data-table>
 </template>
