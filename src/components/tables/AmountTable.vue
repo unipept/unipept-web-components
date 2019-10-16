@@ -27,7 +27,7 @@
             </td>
         </template>
         <template v-slot:item.action="{ item }">
-            <v-icon>mdi-download</v-icon>
+            <v-icon @click="saveSummaryAsCSV(item)">mdi-download</v-icon>
         </template>
     </v-data-table>
 </template>
@@ -57,6 +57,8 @@
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
+        @Prop({required: true})
+        protected summaryRetriever: (term: FAElement) => Promise<any>;
         @Prop({required: true})
         protected annotationName: string;
         @Prop({required: false})
@@ -124,6 +126,12 @@
             let columnNames: string[] = ["Peptides", this.annotationName, "Name"];
             let grid: string[][] = this.items.map(term => [term.popularity.toString(), term.code, term.name]);
             downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName.replace(/ /g, "_") + (this.namespace? "-" + this.namespace: "") + "-export.csv", "text/csv");
+        }
+
+        private async saveSummaryAsCSV(term: FAElement)
+        {
+            let data = await this.summaryRetriever(term)
+            console.log(data)
         }
     }
 </script>

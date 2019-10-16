@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
+    <amount-table :items="items" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -43,6 +43,11 @@
                 let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
                 return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
             }
+        }
+
+        private async summaryRetriever(term: GoTerm): Promise<any>
+        {
+            console.log(term)
         }
     }
 </script>

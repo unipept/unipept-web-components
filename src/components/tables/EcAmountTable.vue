@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" annotation-name="EC number" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
+    <amount-table :items="items" annotation-name="EC number" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -38,6 +38,11 @@
                 let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
                 return await taxaDataSource.getTreeByPeptides(ecDataSource.getPeptidesByEcNumber(number));
             }
+        }
+
+        private async summaryRetriever(number: EcNumber): Promise<any>
+        {
+            console.log(number)
         }
     }
 </script>
