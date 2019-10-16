@@ -99,6 +99,16 @@ export default class TaxaDataSource extends DataSource
         return [];
     }
 
+    public getNrOfPeptidesByTaxonId(taxonId: number) : number
+    {
+        if(this._tree.nodes.has(taxonId))
+        {
+            return this._tree.nodes.get(taxonId).data.count;
+        }
+
+        return 0;
+    }
+
     public async getMissedPeptides(): Promise<string[]> {
         await this.process();
         return this._missedPeptides;

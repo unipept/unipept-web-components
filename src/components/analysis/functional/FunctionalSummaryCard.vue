@@ -40,6 +40,9 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
+            <v-alert v-if="this.watchableSelectedTaxonId != -1 && this.selectedNCBITaxon && this.totalPeptides" dense colored-border type="warning" id="filtered-taxon-information">
+                <b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).
+            </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <v-card flat>
@@ -140,6 +143,10 @@
     import Treeview from "../../visualizations/Treeview.vue";
     import FATrust from "../../../logic/functional-annotations/FATrust";
 
+    import {NCBITaxon} from "../../../logic/data-management/ontology/taxa/NCBITaxon";
+    import {NCBITaxonomy} from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
+    import {Ontologies} from "../../../logic/data-management/ontology/Ontologies";
+
     @Component({
         components: {
             CardHeader,
@@ -172,6 +179,9 @@
         private dataRepository: DataRepository;
         @Prop({required: false, default: true})
         private analysisInProgress: boolean;
+
+        private totalPeptides: number;
+        private selectedNCBITaxon: NCBITaxon; 
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
         // directly
@@ -244,6 +254,7 @@
 
         @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
             this.onDataRepositoryChanged();
+            this.getSelectedTaxonInfo();
         }
 
         setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
@@ -332,6 +343,23 @@
                 await this.redoFAcalculations();
             }
             this.faCalculationsInProgress = false;
+        }
+
+        private async getSelectedTaxonInfo()
+        {
+            if(this.dataRepository)
+            {
+                const taxaSource = await this.dataRepository.createTaxaDataSource();
+                const taxonId = this.$store.getters.selectedTaxonId;
+
+                // get selecton taxon information
+                if(taxonId != -1)
+                {
+                    this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
+                    this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId)
+                    console.log(this.selectedNCBITaxon)
+                }
+            }
         }
 
         private async redoFAcalculations(): Promise<void> {
@@ -443,5 +471,10 @@
 
     .ec-waiting {
         transform: translate(-35px);
+    }
+
+    #filtered-taxon-information
+    {
+        background-color: #ffe57f;
     }
 </style>
