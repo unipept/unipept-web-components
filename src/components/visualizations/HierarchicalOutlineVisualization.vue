@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-text-field style="margin-bottom: -26px;" outlined single-line label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
+        <v-text-field style="margin-bottom: -26px;" name="tree_search" id="tree_search" outlined single-line label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
         <div id="searchtree" class="treeView multi"></div>
         <div id="tree_data">
             <p>
@@ -24,18 +24,6 @@
     @Component({
         components: {},
         computed: {
-            searchTerm: {
-                get() {
-                    let term = this.$store.getters.selectedTerm;
-                    if (term === 'Organism') {
-                        return '';
-                    }
-                    return term;
-                },
-                set(val) {
-                    // should do nothing!
-                }
-            },
             watchableSelectedSearchTerm: {
                 get(): string {
                     return this.$store.getters.selectedTerm
@@ -44,31 +32,33 @@
         }
     })
     export default class HierarchicalOutlineVisualization extends Vue {
-        @Prop({required: true}) dataRepository: DataRepository;
-
-        searchTree!: any;
+        @Prop({required: true}) 
+        private dataRepository: DataRepository;
+        
+        private searchTerm: string = "";
+        private searchTree!: any;
 
         mounted() {
+            this.searchTerm = this.$store.getters.selectedTerm;
             this.initSearchTree();
         }
 
-        @Watch('dataset') onDatasetChanged() {
+        @Watch('dataRepository') 
+        private onDataRepositoryChanged() {
             this.initSearchTree();
         }
 
-        @Watch('watchableSelectedS') onActiveSearchTermChanged(newSearchTerm: string, oldSearchTerm: string) {
+        @Watch('searchTerm') 
+        private onActiveSearchTermChanged(newSearchTerm: string) {
             if (this.searchTree && newSearchTerm !== "") {
-                setTimeout(() => {
-                    this.searchTree.search(newSearchTerm);
-                }, 500);
+                this.searchTree.search(newSearchTerm);
             }
         }
+
 
         @Watch('watchableSelectedSearchTerm')
         private onSelectedSearchTermChanged(newSearchTerm: string) {
-            if(this.searchTree && newSearchTerm) {
-                this.searchTree.search(newSearchTerm);
-            }
+            this.searchTerm = newSearchTerm;
         }
 
         private async initSearchTree() {
@@ -77,10 +67,6 @@
                 let tree: Tree = await taxaDataSource.getTree();
                 this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
             }
-        }
-
-        get activeSearchTerm() {
-            return this.$store.getters.selectedTerm;
         }
     }
 </script>

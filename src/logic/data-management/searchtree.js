@@ -100,7 +100,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         // add search
         $("#tree_search").keyup(function() {
             let text = $(this).val().toLowerCase();
-            delay(function() {
+            setTimeout(function() {
                 resetinfoPandAndClick();
                 $("#searchtree li").removeClass("match unmatch");
                 if (text !== "") {
