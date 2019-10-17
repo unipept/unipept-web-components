@@ -39,7 +39,7 @@
                                 Enter full screen
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item key="save-as-image" @click="saveAsImage()" >
+                        <v-list-item key="save-as-image" @click="downloadDialogOpen = true">
                             <v-list-item-title>
                                 <v-icon>
                                     mdi-download
@@ -49,6 +49,32 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
+                <v-dialog v-model="downloadDialogOpen" max-width="800">
+                    <v-card v-if="preparingImage">
+                        <v-card-title>
+                            Please wait while we are preparing your image
+                        </v-card-title>
+                        <v-card-text>
+                            Loading preview...
+                            <v-progress-linear indeterminate rounded/>
+                        </v-card-text>
+                    </v-card>
+                    <v-card v-else>
+                        <v-card-title class="justify-center">
+                            Your image is ready
+                        </v-card-title>
+                        <v-card-actions class="justify-center">
+                            <v-btn color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
+                            <v-btn color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
+                        </v-card-actions>
+                        <v-divider/>
+                        <v-card-text>
+                            <br>
+                            If you use this figure in a publication, please cite: <br>
+                            Mesuere et al. (2015) Proteomics <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">doi:10.1002/pmic.201400361</a>
+                        </v-card-text>
+                    </v-card>
+                </v-dialog>
                 <div v-if="isFullScreen">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
@@ -199,6 +225,9 @@
         private placeholderText = "Please select at least one dataset for analysis.";
         private isFullScreen: boolean = false;
         private dialogOpen: boolean = false;
+
+        private downloadDialogOpen: boolean = false;
+        private preparingImage: boolean = false;
 
         private tab = null;
 
