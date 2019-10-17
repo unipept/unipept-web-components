@@ -1,5 +1,5 @@
 <template>
-    <div ref="sunburstWrapper">
+    <div id="sunburstWrapper" ref="sunburstWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>

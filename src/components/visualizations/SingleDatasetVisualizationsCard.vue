@@ -39,7 +39,7 @@
                                 Enter full screen
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item key="save-as-image" @click="downloadDialogOpen = true">
+                        <v-list-item key="save-as-image" @click="prepareImage()">
                             <v-list-item-title>
                                 <v-icon>
                                     mdi-download
@@ -49,32 +49,7 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <v-dialog v-model="downloadDialogOpen" max-width="800">
-                    <v-card v-if="preparingImage">
-                        <v-card-title>
-                            Please wait while we are preparing your image
-                        </v-card-title>
-                        <v-card-text>
-                            Loading preview...
-                            <v-progress-linear indeterminate rounded/>
-                        </v-card-text>
-                    </v-card>
-                    <v-card v-else>
-                        <v-card-title class="justify-center">
-                            Your image is ready
-                        </v-card-title>
-                        <v-card-actions class="justify-center">
-                            <v-btn color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
-                            <v-btn color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
-                        </v-card-actions>
-                        <v-divider/>
-                        <v-card-text>
-                            <br>
-                            If you use this figure in a publication, please cite: <br>
-                            Mesuere et al. (2015) Proteomics <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">doi:10.1002/pmic.201400361</a>
-                        </v-card-text>
-                    </v-card>
-                </v-dialog>
+                <image-download-modal ref="imageDownloadModal"/>
                 <div v-if="isFullScreen">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
@@ -192,7 +167,8 @@
     //@ts-ignore
     import fullscreen from 'vue-fullscreen';
 
-    import {logToGoogle, triggerDownloadModal} from "../../logic/utils";
+    import {logToGoogle, prepareDownload} from "../../logic/utils";
+    import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
     import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
     import DataRepository from '../../logic/data-source/DataRepository';
     import $ from 'jquery';
@@ -205,7 +181,8 @@
             TreeviewVisualization,
             TreemapVisualization,
             SunburstVisualization,
-            HeatmapWizardSingleSample
+            HeatmapWizardSingleSample,
+            ImageDownloadModal
         }
     })
     export default class SingleDatasetVisualizationsCard extends Vue {
@@ -214,7 +191,8 @@
             sunburst: SunburstVisualization,
             treeview: TreeviewVisualization,
             treemap: TreemapVisualization,
-            heatmap: HeatmapVisualization
+            heatmap: HeatmapVisualization,
+            imageDownloadModal: ImageDownloadModal
         }
 
         @Prop({required: true})
@@ -225,9 +203,6 @@
         private placeholderText = "Please select at least one dataset for analysis.";
         private isFullScreen: boolean = false;
         private dialogOpen: boolean = false;
-
-        private downloadDialogOpen: boolean = false;
-        private preparingImage: boolean = false;
 
         private tab = null;
 
@@ -271,17 +246,20 @@
             (this.$refs.heatmap as HeatmapVisualization).reset();
         }
 
-        private saveAsImage() {
+        private prepareImage() 
+        {
+            const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+
             // @ts-ignore
-            logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
+            //logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
             if (this.tabs[this.tab] === "Sunburst") {
-                d3.selectAll(".toHide").attr("class", "arc hidden");
-                triggerDownloadModal("#sunburstWrapper svg", null, "unipept_sunburst");
-                d3.selectAll(".hidden").attr("class", "arc toHide");
+                imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
+                //d3.selectAll(".toHide").attr("class", "arc hidden");
+                //d3.selectAll(".hidden").attr("class", "arc toHide");
             } else if (this.tabs[this.tab] === "Treemap") {
-                triggerDownloadModal(null, "#treemap", "unipept_treemap");
+                imageDownloadModal.downloadCanvas("unipept_treemap", "#treemap")
             } else {
-                triggerDownloadModal("#treeviewWrapper svg", null, "unipept_treeview");
+                imageDownloadModal.downloadCanvas("unipept_treeview", "#treeviewWrapper svg")
             }
         }
 
