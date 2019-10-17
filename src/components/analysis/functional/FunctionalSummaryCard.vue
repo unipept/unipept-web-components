@@ -30,7 +30,6 @@
                             <v-list-item-title>
                                 Peptides %
                             </v-list-item-title>
-                            
                         </v-list-item>
                         <v-list-item @click="setFormatSettings('int', 'popularity', 'fractionOfPepts', 'Peptides')">
                             <v-list-item-title>
