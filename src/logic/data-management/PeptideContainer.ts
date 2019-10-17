@@ -1,26 +1,32 @@
-export default class PeptideContainer {
+export default class PeptideContainer
+{
     private _peptides: string[];
     private _peptideAmount: number;
 
-    constructor(peptides: string[] = []) {
+    constructor(peptides: string[] = []) 
+    {
         this._peptides = peptides;
         this._peptideAmount = peptides.length
     }
 
-    getPeptides(): string[] {
+    getPeptides(): string[]
+    {
         return this._peptides;
     }
 
-    setPeptides(peptides: string[]) {
+    setPeptides(peptides: string[])
+    {
         this._peptides = peptides;
         this._peptideAmount = this._peptides.length;
     }
 
-    getAmountOfPeptides(): number {
+    getAmountOfPeptides(): number
+    {
         return this._peptideAmount;
     }
 
-    setAmountOfPeptides(amount: number) {
+    setAmountOfPeptides(amount: number)
+    {
         this._peptideAmount = amount;
     }
 }

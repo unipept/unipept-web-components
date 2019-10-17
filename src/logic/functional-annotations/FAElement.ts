@@ -1,5 +1,5 @@
-import Element from "../data-source/Element";
-import DataRepository from "../data-source/DataRepository";
+import Element from '../data-source/Element';
+import DataRepository from '../data-source/DataRepository';
 
 export default abstract class FAElement extends Element {
     public code: string;

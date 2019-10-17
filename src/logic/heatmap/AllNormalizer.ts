@@ -1,4 +1,4 @@
-import { Normalizer } from "./Normalizer";
+import {Normalizer} from './Normalizer';
 
 export default class AllNormalizer implements Normalizer {
     public normalize(data: number[][]): number[][] {

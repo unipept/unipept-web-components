@@ -1,4 +1,4 @@
-import { Normalizer } from "./Normalizer";
+import {Normalizer} from './Normalizer';
 
 export default class RowNormalizer implements Normalizer {
     public normalize(data: number[][]): number[][] {

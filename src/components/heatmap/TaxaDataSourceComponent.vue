@@ -17,20 +17,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component, { mixins } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import Vue from "vue";
+    import Component, { mixins } from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 
-// TODO: fix this import
-import DataSourceComponent from "./data-source-component.vue";
+    // TODO: fix this import
+    import DataSourceComponent from "./data-source-component.vue";
 
-import DataSourceMixin from "./DataSourceMixin.vue";
-import { TaxumRank, convertStringToTaxumRank } from "../../logic/data-source/TaxumRank";
-import TaxaElement from "../../logic/data-source/TaxaElement";
+    import DataSourceMixin from "./DataSourceMixin.vue";
+    import { TaxumRank, convertStringToTaxumRank } from "../../logic/data-source/TaxumRank";
+    import TaxaElement from "../../logic/data-source/TaxaElement";
 
     @Component
-export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
+    export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
         private taxaRanks: string[] = ["all"].concat(Object.values(TaxumRank)).map(el => this.capitalize(el));
         private selectedRank: string = this.taxaRanks[0];
         
@@ -41,23 +41,23 @@ export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
 
         private headers = [
             {
-                text: "Name",
-                align: "left",
-                value: "name"
+                text: 'Name',
+                align: 'left',
+                value: 'name'
             }, 
             {
-                text: "Rank",
-                align: "left",
-                value: "rank"
+                text: 'Rank',
+                align: 'left',
+                value: 'rank'
             },
             {
-                text: "# peptides",
-                align: "left",
-                value: "popularity"
+                text: '# peptides',
+                align: 'left',
+                value: 'popularity'
             }
         ];
 
-        private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
+        private pagination = {'sortBy': 'popularity', 'descending': true, 'rowsPerPage': 5};
 
         mounted() {
             this.onSelectedRankChanged();
@@ -81,7 +81,7 @@ export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
             
             this.$emit("selected-items", this.selectedItems);
         }
-}
+    }
 </script>
 
 <style scoped>

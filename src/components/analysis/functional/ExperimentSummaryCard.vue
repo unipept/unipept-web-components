@@ -33,25 +33,25 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import SearchSettingsForm from "../SearchSettingsForm.vue";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import SearchSettingsForm from "../SearchSettingsForm.vue";
 
-// TODO: fix these imports
-import CardHeader from "../../custom/CardHeader.vue";
-import CardTitle from "../../custom/CardTitle.vue";
+    // TODO: fix these imports
+    import CardHeader from "../../custom/CardHeader.vue";
+    import CardTitle from "../../custom/CardTitle.vue";
 
-import { addCopy } from "../../../logic/utils";
-import { showInfoModal } from "../../../logic/modal";
-import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
-import PeptideContainer from "../../../logic/data-management/PeptideContainer";
-import Tooltip from "../../custom/Tooltip.vue";
+    import {addCopy} from "../../../logic/utils";
+    import {showInfoModal} from "../../../logic/modal";
+    import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
+    import PeptideContainer from "../../../logic/data-management/PeptideContainer";
+    import Tooltip from "../../custom/Tooltip.vue";
 
     @Component({
-        components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip }
+        components: {CardTitle, CardHeader, SearchSettingsForm, Tooltip}
     })
-export default class ExperimentSummaryCard extends Vue {
+    export default class ExperimentSummaryCard extends Vue {
         private equateIl: boolean = true;
         private filterDuplicates: boolean = true;
         private missingCleavage: boolean = false;
@@ -63,17 +63,17 @@ export default class ExperimentSummaryCard extends Vue {
         }
 
         reprocess(): void {
-            this.$store.dispatch("setSearchSettings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
+            this.$store.dispatch('setSearchSettings', {il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage});
 
-            this.$store.dispatch("setActiveDataset", null);
+            this.$store.dispatch('setActiveDataset', null);
             let promises: Promise<any>[] = [];
             for (let dataset of this.$store.getters.selectedDatasets) {
-                promises.push(this.$store.dispatch("processDataset", dataset));
+                promises.push(this.$store.dispatch('processDataset', dataset));
             }
         }
 
         showNotFoundPeptidesModal() {
-            let missedPeptidesHTML = "";
+            let missedPeptidesHTML = '';
             for (let missedPeptide of this.$store.getters.missedPeptides) {
                 missedPeptidesHTML += `
                     <li>
@@ -95,10 +95,10 @@ export default class ExperimentSummaryCard extends Vue {
                 </ul>
             `;
 
-            let modal = showInfoModal(missedPeptidesCount + " missed peptides", modalContent);
-            addCopy($(".copy-button")[0], () => this.$store.getters.missedPeptides.join("\n"), "Copy list to clipboard", modal[0]);
+            let modal = showInfoModal(missedPeptidesCount + ' missed peptides', modalContent);
+            addCopy($(".copy-button")[0], () => this.$store.getters.missedPeptides.join('\n'), "Copy list to clipboard", modal[0]);
         }
-}
+    }
 </script>
 
 <style lang="less">

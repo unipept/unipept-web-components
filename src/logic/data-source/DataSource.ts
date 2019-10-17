@@ -1,4 +1,4 @@
-import DataRepository from "./DataRepository";
+import DataRepository from './DataRepository';
 
 export default abstract class DataSource {
     protected _repository: DataRepository;

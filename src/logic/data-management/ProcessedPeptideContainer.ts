@@ -1,5 +1,5 @@
-import { PeptideCountTable } from "./counts/PeptideCountTable";
-import { Pept2DataResponse } from "../api/pept2data/Response";
+import {PeptideCountTable} from './counts/PeptideCountTable';
+import {Pept2DataResponse} from '../api/pept2data/Response';
 
 export type ProcessedPeptideContainer = 
 {

@@ -1,26 +1,30 @@
-import { StorageType } from "./StorageType";
-import { get, getJSON } from "../utils";
+import {StorageType} from "./StorageType";
+import {get, getJSON} from "../utils";
 import Assay from "./assay/Assay";
 import MetaProteomicsAssay from "./assay/MetaProteomicsAssay";
 import { BrowserStorageConsts } from "./visitors/storage/browser/BrowserStorageConsts";
 import StorageMetadataReader from "./visitors/storage/StorageMetadataReader";
 import StorageRemover from "./visitors/storage/StorageRemover";
 
-export default class DatasetManager {
+export default class DatasetManager 
+{
     /**
      * List all datasets that are stored in local storage memory.
      *
      * @return A list containing all datasets stored in this manager's corresponding storage type and sorted
      *         alphabetically by name.
      */
-    async listDatasets(): Promise<Assay[]> {
+    async listDatasets(): Promise<Assay[]> 
+    {
         let output: MetaProteomicsAssay[] = [];
         let metadataReader: StorageMetadataReader = new StorageMetadataReader()
         let storage = window.localStorage;
 
-        for (let i = 0; i < storage.length; i++) {
+        for (let i = 0; i < storage.length; i++) 
+        {
             let key = storage.key(i);
-            if (key.startsWith(BrowserStorageConsts.MPA_METADATA_PREFIX)) {
+            if (key.startsWith(BrowserStorageConsts.MPA_METADATA_PREFIX)) 
+            {
                 let dataset = new MetaProteomicsAssay(key.substr(BrowserStorageConsts.MPA_METADATA_PREFIX.length), StorageType.LocalStorage);
                 await dataset.visit(metadataReader)
                 output.push(dataset);
@@ -56,14 +60,14 @@ export default class DatasetManager {
 
         page = 0;
         await urls.map(getJSON).reduce(
-            function(sequence: Promise<void>, batchPromise) {
-                return sequence.then(function() {
+            function (sequence: Promise<void>, batchPromise) {
+                return sequence.then(function () {
                     return batchPromise;
-                }).then(function(response: any) {
+                }).then(function (response: any) {
                     page++;
 
                     progressCallback((10 + (90 * page * batchSize) / datasetSize) / 100);
-                    peptides = peptides.concat(response.list.map(function(d) {
+                    peptides = peptides.concat(response.list.map(function (d) {
                         return d.sequence;
                     }));
                 });
@@ -73,7 +77,8 @@ export default class DatasetManager {
         return peptides;
     }
 
-    async deleteDatasetFromStorage(dataSet: Assay): Promise<void> {
+    async deleteDatasetFromStorage(dataSet: Assay): Promise<void> 
+    {
         let storageRemover = new StorageRemover();
         dataSet.visit(storageRemover);
     }

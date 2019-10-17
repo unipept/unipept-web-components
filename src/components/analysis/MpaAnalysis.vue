@@ -15,19 +15,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import ExperimentSummaryCard from "./functional/ExperimentSummaryCard.vue";
-import SwitchDatasetCard from "../dataset/SwitchDatasetCard.vue";
-import LoadDatasetsCard from "../dataset/LoadDatasetsCard.vue";
-import FunctionalSummaryCard from "./functional/FunctionalSummaryCard.vue";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import ExperimentSummaryCard from "./functional/ExperimentSummaryCard.vue";
+    import SwitchDatasetCard from "../dataset/SwitchDatasetCard.vue";
+    import LoadDatasetsCard from "../dataset/LoadDatasetsCard.vue";
+    import FunctionalSummaryCard from "./functional/FunctionalSummaryCard.vue";
 
-import SingleDatasetVisualizationsCard from "../visualizations/SingleDatasetVisualizationsCard.vue";
+    import SingleDatasetVisualizationsCard from "../visualizations/SingleDatasetVisualizationsCard.vue";
 
     @Component({
         components: {
-            FunctionalSummaryCard, SingleDatasetVisualizationsCard, LoadDatasetsCard, SwitchDatasetCard, ExperimentSummaryCard },
+            FunctionalSummaryCard, SingleDatasetVisualizationsCard, LoadDatasetsCard, SwitchDatasetCard, ExperimentSummaryCard},
         computed: {
             selectedDatasets: {
                 get() {
@@ -36,13 +36,13 @@ import SingleDatasetVisualizationsCard from "../visualizations/SingleDatasetVisu
             }
         }
     })
-export default class MpaAnalysis extends Vue {
-    created() {
-        for (let dataset of this.$store.getters.selectedDatasets) {
-            this.$store.dispatch("processDataset", dataset);
+    export default class MpaAnalysis extends Vue {
+        created() {
+            for (let dataset of this.$store.getters.selectedDatasets) {
+                this.$store.dispatch('processDataset', dataset);
+            }
         }
     }
-}
 </script>
 
 <style scoped>

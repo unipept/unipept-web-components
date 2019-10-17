@@ -1,7 +1,7 @@
-import DataSource from "./DataSource";
-import FAElement from "../functional-annotations/FAElement";
-import FATrust from "../functional-annotations/FATrust";
-import sha256 from "crypto-js/sha256";
+import DataSource from './DataSource';
+import FAElement from '../functional-annotations/FAElement';
+import FATrust from '../functional-annotations/FATrust';
+import sha256 from 'crypto-js/sha256';
 
 /**
  * This abstract class provides a generic caching mechanism that can be used for each kind of functional annotation
@@ -92,7 +92,7 @@ export abstract class CachedDataSource<T, S extends FAElement> extends DataSourc
 
     protected agregateTrust(trusts: FATrust[]): FATrust {
         // TODO this should be fixed!
-        const result = { annotatedCount: 0, totalCount: null, trustCount: 0 };
+        const result = {annotatedCount: 0, totalCount: null, trustCount: 0};
         let sumAnnotated = 0;
         for (const c of trusts) {
             sumAnnotated += c.annotatedCount;

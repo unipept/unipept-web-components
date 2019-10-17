@@ -31,30 +31,30 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component, { mixins } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import Tree from "../../logic/data-management/Tree";
-import { tooltipContent } from "./VisualizationHelper";
-import VisualizationMixin from "./VisualizationMixin.vue";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import DataRepository from "../../logic/data-source/DataRepository";
+    import Vue from "vue";
+    import Component, {mixins} from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import Tree from "../../logic/data-management/Tree";
+    import {tooltipContent} from "./VisualizationHelper";
+    import VisualizationMixin from "./VisualizationMixin.vue";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import DataRepository from '../../logic/data-source/DataRepository';
 
     @Component
-export default class SunburstVisualization extends mixins(VisualizationMixin) {
+    export default class SunburstVisualization extends mixins(VisualizationMixin) {
         // Make field non-reactive by not setting it here, but only after created has been called for the first time.
         sunburst!: any;
 
-        @Prop({ default: false }) 
+        @Prop({default: false}) 
         private fullScreen: false;
-        @Prop({ required: true })
+        @Prop({required: true})
         private dataRepository: DataRepository;
         // The width of the parent container is chosen if no specific width is set by the user.
-        @Prop({ required: false, default: -1 })
+        @Prop({required: false, default: -1})
         private width: number;
-        @Prop({ required: false, default: 740 })
+        @Prop({required: false, default: 740})
         private height: number;
-        @Prop({ required: false, default: 740 / 2 })
+        @Prop({required: false, default: 740 / 2})
         private radius: number;
 
         private isFixedColors: boolean = false;
@@ -63,21 +63,21 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
             this.initTree();
         }
 
-        @Watch("dataRepository") onDataRepositoryChanged() {
+        @Watch('dataRepository') onDataRepositoryChanged() {
             this.initTree();
         }
 
-        @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
+        @Watch('watchableTaxonId') onWatchableTaxonIdChanged() {
             if (this.watchableTaxonId === -1) {
                 this.reset();
             }
         }
 
-        @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
+        @Watch('fullScreen') onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
             this.sunburst.setFullScreen(newFullScreen)
         }
 
-        @Watch("isFixedColors") onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
+        @Watch('isFixedColors') onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
             this.sunburst.settings.useFixedColors = newFixedColors;
             this.sunburst.redrawColors();
         }
@@ -105,7 +105,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                 });
             }
         }
-}
+    }
 </script>
 
 <style lang="less" scoped>

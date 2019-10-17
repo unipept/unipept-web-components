@@ -7,20 +7,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
 
     @Component
-export default class IndeterminateProgressBar extends Vue {
-        @Prop({ default: false }) active;
+    export default class IndeterminateProgressBar extends Vue {
+        @Prop({default: false}) active;
 
         content: boolean = this.active;
 
-        @Watch("active") onActiveChanged() {
+        @Watch('active') onActiveChanged() {
             this.content = this.active;
         }
-}
+    }
 </script>
 
 <style scoped>

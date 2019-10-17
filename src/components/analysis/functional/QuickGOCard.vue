@@ -26,17 +26,17 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import GoTerm from "@/logic/functional-annotations/GoTerm";
-import FaSortSettings from "../../tables/FaSortSettings";
-import { GoNameSpace } from "@/logic/functional-annotations/GoNameSpace";
-import Utils from "./../../custom/Utils";
+import {Prop, Watch} from "vue-property-decorator";
+import GoTerm from '@/logic/functional-annotations/GoTerm';
+import FaSortSettings from '../../tables/FaSortSettings';
+import { GoNameSpace } from '@/logic/functional-annotations/GoNameSpace';
+import Utils from './../../custom/Utils';
 
 @Component
 export default class QuickGOCard extends Vue {
-    @Prop({ required: true })
+    @Prop({required: true})
     private items: GoTerm[];
-    @Prop({ required: true })
+    @Prop({required: true})
     private sortSettings: FaSortSettings;
 
     private top5: GoTerm[] = null;

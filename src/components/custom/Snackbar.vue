@@ -7,13 +7,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
 
     @Component
-export default class Snackbar extends Vue {
-        @Prop({ default: 7500 }) timeout: number;
+    export default class Snackbar extends Vue {
+        @Prop({default: 7500}) timeout: number;
 
         snackbarActive: boolean = false;
         timeoutHandler = null;
@@ -36,7 +36,7 @@ export default class Snackbar extends Vue {
                 this.snackbarActive = false;
             }
         }
-}
+    }
 </script>
 
 <style scoped>

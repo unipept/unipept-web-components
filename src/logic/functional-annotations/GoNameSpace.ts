@@ -1,7 +1,7 @@
 export enum GoNameSpace {
-    CellularComponent = "cellular component",
-    MolecularFunction = "molecular function",
-    BiologicalProcess = "biological process",
+    CellularComponent = 'cellular component',
+    MolecularFunction = 'molecular function',
+    BiologicalProcess = 'biological process',
 }
 
 export function convertStringToGoNameSpace(input: string): GoNameSpace {

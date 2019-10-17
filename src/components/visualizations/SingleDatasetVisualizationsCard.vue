@@ -152,24 +152,24 @@
 </template>
 
 <script lang="ts">
-import d3 from "d3";
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import SunburstVisualization from "./SunburstVisualization.vue";
-import TreemapVisualization from "./TreemapVisualization.vue";
-import TreeviewVisualization from "./TreeviewVisualization.vue";
-import HeatmapVisualization from "../heatmap/HeatmapVisualization.vue";
-import HierarchicalOutlineVisualization from "./HierarchicalOutlineVisualization.vue";
+    import d3 from "d3";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import SunburstVisualization from "./SunburstVisualization.vue";
+    import TreemapVisualization from "./TreemapVisualization.vue";
+    import TreeviewVisualization from "./TreeviewVisualization.vue";
+    import HeatmapVisualization from "../heatmap/HeatmapVisualization.vue";
+    import HierarchicalOutlineVisualization from "./HierarchicalOutlineVisualization.vue";
 
-import CardHeader from "../custom/CardHeader.vue";
-//@ts-ignore
-import fullscreen from "vue-fullscreen";
+    import CardHeader from "../custom/CardHeader.vue";
+    //@ts-ignore
+    import fullscreen from 'vue-fullscreen';
 
-import { logToGoogle, triggerDownloadModal } from "../../logic/utils";
-import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
-import DataRepository from "../../logic/data-source/DataRepository";
-import $ from "jquery";
+    import {logToGoogle, triggerDownloadModal} from "../../logic/utils";
+    import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
+    import DataRepository from '../../logic/data-source/DataRepository';
+    import $ from 'jquery';
 
     @Component({
         components: {
@@ -182,7 +182,7 @@ import $ from "jquery";
             HeatmapWizardSingleSample
         }
     })
-export default class SingleDatasetVisualizationsCard extends Vue {
+    export default class SingleDatasetVisualizationsCard extends Vue {
         $refs!: {
             fullScreenContainer: fullscreen,
             sunburst: SunburstVisualization,
@@ -191,9 +191,9 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             heatmap: HeatmapVisualization
         }
 
-        @Prop({ required: true })
+        @Prop({required: true})
         private dataRepository: DataRepository;
-        @Prop({ required: false, default: true })
+        @Prop({required: false, default: true})
         private analysisInProgress: boolean;
 
         private placeholderText = "Please select at least one dataset for analysis.";
@@ -205,7 +205,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
         mounted() {
-            document.addEventListener("fullscreenchange", () => {
+            document.addEventListener('fullscreenchange', () => {
                 if (document.fullscreenElement) {
                     this.exitFullScreen();
                 }
@@ -259,7 +259,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         private openHeatmapWizard(): void {
             this.dialogOpen = true;
         }
-}
+    }
 </script>
 
 <style scoped lang="css">

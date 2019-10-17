@@ -25,56 +25,56 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import { toCSVString, logToGoogle } from "../../logic/utils";
-import { tooltipContent } from "../visualizations/VisualizationHelper";
-import Treeview from "../visualizations/Treeview.vue";
-import { Node } from "../../logic/data-management/Node";
-import FaSortSettings from "./FaSortSettings";
-import FAElement from "../../logic/functional-annotations/FAElement";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import Tree from "../../logic/data-management/Tree";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import { toCSVString, logToGoogle } from "../../logic/utils";
+    import { tooltipContent } from "../visualizations/VisualizationHelper";
+    import Treeview from "../visualizations/Treeview.vue";
+    import {Node} from "../../logic/data-management/Node";
+    import FaSortSettings from "./FaSortSettings";
+    import FAElement from "../../logic/functional-annotations/FAElement";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import Tree from "../../logic/data-management/Tree";
 
     @Component({
         components: {
             Treeview
         }
     })
-export default class AmountTable extends Vue {
-        @Prop({ required: true })
+    export default class AmountTable extends Vue {
+        @Prop({required: true})
         protected items: FAElement[];
-        @Prop({ required: true })
+        @Prop({required: true})
         protected searchSettings: FaSortSettings;
-        @Prop({ required: true })
+        @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
-        @Prop({ required: true })
+        @Prop({required: true})
         protected annotationName: string;
         // Keeps track of the functional annotations for which a Tree has already been calculated.
         private treeAvailable: Map<FAElement, Node> = new Map();
 
         private tableHeaders = [{
-            text: "Peptides",
-            align: "left",
-            value: "popularity",
-            width: "15%"
+            text: 'Peptides',
+            align: 'left',
+            value: 'popularity',
+            width: '15%'
         }, {
-            text: "GO term",
-            align: "left",
-            value: "code",
-            width: "30%"
+            text: 'GO term',
+            align: 'left',
+            value: 'code',
+            width: '30%'
         }, {
-            text: "Name",
-            align: "left",
-            value: "name",
-            width: "45%"
+            text: 'Name',
+            align: 'left',
+            value: 'name',
+            width: '45%'
         }, {
-            text: "Actions",
-            align: "center",
-            width: "15%",
+            text: 'Actions',
+            align: 'center',
+            width: '15%',
             sortable: false,
-            value: "action"
+            value: 'action'
         }];
 
     
@@ -82,7 +82,7 @@ export default class AmountTable extends Vue {
         protected tooltip: (d: any) => string = tooltipContent;
         protected highlightColor: string = "#ffc107";
         protected highlightColorFunc: (d: any) => string = d => (d.included ? this.highlightColor : "lightgrey");
-        protected linkStrokeColor: (d: any) => string = ({ target: d }) => this.highlightColorFunc(d);
+        protected linkStrokeColor: (d: any) => string = ({target: d}) => this.highlightColorFunc(d);
         protected expandedItemsList = [];
 
         public toCSV(columnNames: string[], columnValues: string[][]): string {
@@ -115,7 +115,7 @@ export default class AmountTable extends Vue {
             // TODO: check!
             // downloadDataByForm(this.toCSV(columnNames, grid), "GO_terms-" + this.namespace.replace(" ", "_") + "-export.csv", "text/csv");
         }
-}
+    }
 </script>
 
 <style lang="less" scoped>

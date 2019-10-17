@@ -1,19 +1,22 @@
-import { Ontology } from "../Ontology"
-import { GODefinition } from "./GODefinition";
-import { postJSON } from "../../../utils";
-import { BASE_URL } from "../../../Constants";
+import {Ontology} from '../Ontology'
+import {GODefinition} from './GODefinition';
+import {postJSON} from "../../../utils";
+import {BASE_URL} from '../../../Constants';
 
 type OntologyId = string;
 
 const GO_BATCH_SIZE = 100
 const GO_URL = BASE_URL + "/private_api/goterms"
 
-export class GeneOntology extends Ontology<OntologyId, GODefinition> {
-    async fetchDefinitions(ids: OntologyId[]) {
+export class GeneOntology extends Ontology<OntologyId, GODefinition>
+{
+    async fetchDefinitions(ids: OntologyId[])
+    {
         ids = ids.filter(id => !this._definitions.has(id))
 
         // get GO info
-        for (let i = 0; i < ids.length; i += GO_BATCH_SIZE) {
+        for (let i = 0; i < ids.length; i += GO_BATCH_SIZE) 
+        {
             const data = JSON.stringify({
                 goterms: ids.slice(i, i + GO_BATCH_SIZE)
             });
@@ -21,7 +24,8 @@ export class GeneOntology extends Ontology<OntologyId, GODefinition> {
             const res = await postJSON(GO_URL, data);
             
             res.forEach(term => {
-                if (!this._definitions.has(term.code)) {
+                if(!this._definitions.has(term.code))
+                {
                     this._definitions.set(term.code, term)
                 }
             })

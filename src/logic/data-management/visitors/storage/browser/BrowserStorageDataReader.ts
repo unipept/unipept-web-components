@@ -6,15 +6,18 @@ import { StorageType } from "../../../StorageType";
 
 export namespace BrowserStorageDataReader
 {
-    export async function readMetaGenomicsAssay(mgAssay: MetaGenomicsAssay, storageType: StorageType): Promise<void> {
+    export async function readMetaGenomicsAssay(mgAssay: MetaGenomicsAssay, storageType: StorageType): Promise<void> 
+    {
         throw new Error("Method not implemented.");
     }
     
-    export async function readMetaProteomicsAssay(mpAssay: MetaProteomicsAssay, storageType: StorageType): Promise<void> {
+    export async function readMetaProteomicsAssay(mpAssay: MetaProteomicsAssay, storageType: StorageType): Promise<void> 
+    {
         let storage: Storage = BrowserStorageCommon.getStorage(storageType);
         let peptidesSerialized = storage.getItem(BrowserStorageConsts.MPA_PEPTIDE_PREFIX + mpAssay.getId());
 
-        if (peptidesSerialized == null) {
+        if (peptidesSerialized == null) 
+        {
             throw "Peptides for dataset " + mpAssay.getId() + " are not available in browser's storage!";
         }
 

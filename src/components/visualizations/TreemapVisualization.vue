@@ -13,48 +13,48 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component, { mixins } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
-import Tree from "../../logic/data-management/Tree";
-import { tooltipContent } from "./VisualizationHelper";
-import VisualizationMixin from "./VisualizationMixin.vue";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import { TaxumRank } from "../../logic/data-source/TaxumRank";
-import DataRepository from "../../logic/data-source/DataRepository";
+    import Vue from "vue";
+    import Component, {mixins} from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
+    import Tree from "../../logic/data-management/Tree";
+    import {tooltipContent} from "./VisualizationHelper";
+    import VisualizationMixin from "./VisualizationMixin.vue";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import { TaxumRank } from "../../logic/data-source/TaxumRank";
+    import DataRepository from '../../logic/data-source/DataRepository';
 
     @Component
-export default class TreemapVisualization extends mixins(VisualizationMixin) {
+    export default class TreemapVisualization extends mixins(VisualizationMixin) {
         // Make field non-reactive by not setting the value here, but only after created() has been fired.
         treemap!: any;
 
-        @Prop({ default: false }) 
+        @Prop({default: false}) 
         private fullScreen: boolean;
-        @Prop({ required: true })
+        @Prop({required: true})
         private dataRepository: DataRepository;
-        @Prop({ required: false, default: -1 })
+        @Prop({required: false, default: -1})
         private width: number;
-        @Prop({ required: false, default: 600 })
+        @Prop({required: false, default: 600})
         private height: number;
-        @Prop({ required: false, default: 28 })
+        @Prop({required: false, default: 28})
         private levels: number;
 
         mounted() {
             this.initTreeMap();
         }
 
-        @Watch("dataset") onDatasetChanged() {
+        @Watch('dataset') onDatasetChanged() {
             this.initTreeMap();
         }
 
-        @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
+        @Watch('watchableTaxonId') onWatchableTaxonIdChanged() {
             if (this.watchableTaxonId === -1) {
                 this.reset();
             }
         }
 
-        @Watch("fullScreen")
+        @Watch('fullScreen')
         private onFullScreenChanged(isFullScreen: boolean) {
             this.treemap.setFullScreen(isFullScreen);
         }
@@ -84,7 +84,7 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
                 });
             }
         }
-}
+    }
 </script>
 
 <style lang="less" scoped>

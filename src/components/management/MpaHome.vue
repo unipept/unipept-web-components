@@ -13,17 +13,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import LoadDatasetsCard from "../dataset/LoadDatasetsCard.vue";
-import SelectDatasetsCard from "../dataset/SelectDatasetsCard.vue";
-import SearchHelp from "./SearchHelp.vue";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import LoadDatasetsCard from "../dataset/LoadDatasetsCard.vue";
+    import SelectDatasetsCard from "../dataset/SelectDatasetsCard.vue";
+    import SearchHelp from "./SearchHelp.vue";
 
     @Component({
-        components: { LoadDatasetsCard, SelectDatasetsCard, SearchHelp }
+        components: {LoadDatasetsCard, SelectDatasetsCard, SearchHelp}
     })
-export default class MpaHome extends Vue {
-}
+    export default class MpaHome extends Vue {
+    };
 </script>
 
 <style scoped>

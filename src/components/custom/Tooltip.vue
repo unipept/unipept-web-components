@@ -10,17 +10,17 @@
 </template>
 
 <script lang='ts'>
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator"
+  import Vue from 'vue';
+  import Component from 'vue-class-component';
+  import {Prop, Watch} from 'vue-property-decorator'
 
   @Component
-export default class Tooltip extends Vue {
+  export default class Tooltip extends Vue {
     @Prop()
     private message!: string;
-    @Prop({ default: "top" })
+    @Prop({default: "top"})
     private position: string;
-}
+  }
 </script>
 
 <style scoped>

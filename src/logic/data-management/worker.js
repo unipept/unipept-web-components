@@ -1,9 +1,9 @@
-import "babel-pol"
+import 'babel-pol'
 import "whatwg-fetch";
 // TODO: also include other pollyfills?
 import GOTerms from "../fa/old-goterms";
 import ECNumbers from "../fa/ecnumbers.js";
-import { postJSON, numberToPercent } from "../utils.js";
+import {postJSON, numberToPercent} from "../utils.js";
 import NewGoTerms from "../fa/NewGoTerms";
 
 const BATCH_SIZE = 100;
@@ -93,7 +93,7 @@ export async function process(originalPeptides, config) {
     }
     setProgress(1);
     return {
-        processed: [...processedPeptides.values()].map(({ fa, faGrouped, ...y }) => y),
+        processed: [...processedPeptides.values()].map(({fa, faGrouped, ...y}) => y),
         missed: peptideList.filter(p => !processedPeptides.has(p)),
         numMatched: numMatched,
         numSearched: [...preparedPeptides.values()].reduce((a, b) => a + b, 0)
@@ -107,18 +107,18 @@ export async function process(originalPeptides, config) {
  * @param {PeptideMPAInfo} peptide
  */
 function makeFaGrouped(peptide) {
-    peptide.faGrouped = { "EC": [], "GO": {} };
+    peptide.faGrouped = {"EC": [], "GO": {}};
     // @ts-ignore
     for (const [annotation, count] of Object.entries(peptide.fa.data || {})) {
         const type = annotation.split(":", 1)[0];
         switch (type) {
-        case "EC": peptide.faGrouped["EC"].push({ code: annotation.substr(3), value: count }); break;
+        case "EC": peptide.faGrouped["EC"].push({code: annotation.substr(3), value: count}); break;
         case "GO": {
             let ns = GOTerms.namespaceOf(annotation);
             if (!(ns in peptide.faGrouped["GO"])) {
                 peptide.faGrouped["GO"][ns] = [];
             }
-            peptide.faGrouped["GO"][ns].push({ code: annotation, value: count });
+            peptide.faGrouped["GO"][ns].push({code: annotation, value: count});
             break;
         }
         }
@@ -239,12 +239,12 @@ export async function summarizeGo(percent = 50, sequences = null) {
     const trustExtractor = pept => countExtractor(pept) / pept.fa.counts["all"];
     for (let namespace of GOTerms.NAMESPACES) {
         const dataExtractor = pept => pept.faGrouped.GO[namespace] || [];
-        const { data, trust: curStats } = summarizeFa(dataExtractor, countExtractor, trustExtractor, percent, sequences);
+        const {data, trust: curStats} = summarizeFa(dataExtractor, countExtractor, trustExtractor, percent, sequences);
         trust[namespace] = curStats;
         res[namespace] = data;
     }
 
-    return { data: res, trust: trust };
+    return {data: res, trust: trust};
 }
 
 /**
@@ -306,7 +306,7 @@ function summarizeFa(extract, countExtractor, trustExtractor, cutoff = 50, seque
 
         if (totalNumAnnotations > 0) {
             let atLeastOne = false;
-            for (const { code, value } of extract(pept)) {
+            for (const {code, value} of extract(pept)) {
                 const weight = value / totalNumAnnotations;
                 if (weight < fraction) continue; // skip if insignificant weight TODO: remove
                 atLeastOne = true;
@@ -451,7 +451,7 @@ export function getPeptidesByFA(faName, sequences = null) {
  */
 function setProgress(value) {
     // @ts-ignore
-    self.postMessage({ type: "progress", value: value });
+    self.postMessage({type: "progress", value: value});
 }
 
 /**

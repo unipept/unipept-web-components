@@ -69,19 +69,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import PeptideContainer from "../../logic/data-management/PeptideContainer";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import PeptideContainer from "../../logic/data-management/PeptideContainer";
 
-import CardHeader from "../custom/CardHeader.vue";
-import CardTitle from "../custom/CardTitle.vue";
+    import CardHeader from "../custom/CardHeader.vue";
+    import CardTitle from "../custom/CardTitle.vue";
 
-import HeatmapWizardMultiSample from "../heatmap/HeatmapWizardMultiSample.vue";
-import Tooltip from "../custom/Tooltip.vue";
+    import HeatmapWizardMultiSample from "../heatmap/HeatmapWizardMultiSample.vue";
+    import Tooltip from "../custom/Tooltip.vue";
 
     @Component({
-        components: { CardTitle, CardHeader, HeatmapWizardMultiSample, Tooltip },
+        components: {CardTitle, CardHeader, HeatmapWizardMultiSample, Tooltip},
         computed: {
             activeDatasetModel: {
                 get(): PeptideContainer {
@@ -93,10 +93,10 @@ import Tooltip from "../custom/Tooltip.vue";
             }
         }
     })
-export default class SwitchDatasetCard extends Vue {
-        @Prop({ required: true })
+    export default class SwitchDatasetCard extends Vue {
+        @Prop({required: true})
         private selectedDatasets: PeptideContainer[];
-        @Prop({ required: true })
+        @Prop({required: true})
         private activeDataset: PeptideContainer;
 
         private dialogOpen: boolean = false;
@@ -110,7 +110,7 @@ export default class SwitchDatasetCard extends Vue {
 
         private toggleDatasetSelection(): void {
             this.isDatasetSelectionInProgress = !this.isDatasetSelectionInProgress;
-            this.$emit("toggle-dataset-selection", this.isDatasetSelectionInProgress);
+            this.$emit('toggle-dataset-selection', this.isDatasetSelectionInProgress);
         }
 
         private compareDatasets(): void {
@@ -118,11 +118,11 @@ export default class SwitchDatasetCard extends Vue {
         }
 
         private updateSelectedDatasets() {
-            this.$emit("update-selected-datasets", this.selectedDatasets);
+            this.$emit('update-selected-datasets', this.selectedDatasets);
         }
 
         private selectDataset(container: PeptideContainer) {
-            this.$emit("select-dataset", container);
+            this.$emit('select-dataset', container);
         }
 
         /**
@@ -132,9 +132,9 @@ export default class SwitchDatasetCard extends Vue {
          * @param container The dataset that's currently activated by the user.
          */
         private activateDataset(container: PeptideContainer) {
-            this.$emit("update:activeDataset", container);
+            this.$emit('update:activeDataset', container);
         }
-}
+    }
 </script>
 
 <style lang="less">

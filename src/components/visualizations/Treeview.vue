@@ -3,22 +3,22 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component, { mixins } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import TreeViewNode from "./TreeViewNode";
+    import Vue from "vue";
+    import Component, {mixins} from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import TreeViewNode from "./TreeViewNode";
 
     @Component
-export default class Treeview extends Vue {
-        @Prop({ required: true })
+    export default class Treeview extends Vue {
+        @Prop({required: true})
         private data: TreeViewNode;
-        @Prop({ required: true })
+        @Prop({required: true})
         private width: number;
-        @Prop({ required: true })
+        @Prop({required: true})
         private height: number;
         @Prop()
         private tooltip: (d: any) => string; 
-        @Prop({ default: false })
+        @Prop({default: false})
         private enableAutoExpand: number | boolean;
         @Prop()
         private colors: (d: any) => string;
@@ -87,7 +87,7 @@ export default class Treeview extends Vue {
                 this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
             }
         }
-}
+    }
 </script>
 
 <style scoped>

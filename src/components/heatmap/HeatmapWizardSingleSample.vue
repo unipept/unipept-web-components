@@ -52,32 +52,32 @@ import {NormalizationType} from "./NormalizationType";
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Watch, Prop } from "vue-property-decorator";
-import HeatmapConfiguration from "./HeatmapConfiguration";
-import DataSource from "../../logic/data-source/DataSource";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import EcDataSource from "../../logic/data-source/EcDataSource";
-import GoDataSource from "../../logic/data-source/GoDataSource";
-import AllNormalizer from "../../logic/heatmap/AllNormalizer";
-import RowNormalizer from "../../logic/heatmap/RowNormalizer";
-import ColumnNormalizer from "../../logic/heatmap/ColumnNormalizer";
-import { Normalizer } from "../../logic/heatmap/Normalizer";
-import Assay from "../../logic/data-management/assay/Assay";
-import GoDataSourceComponent from "./GoDataSourceComponent.vue";
-import EcDataSourceComponent from "./EcDataSourceComponent.vue";
-import TaxaDataSourceComponent from "./TaxaDataSourceComponent.vue";
-import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
-import HeatmapVisualization from "./HeatmapVisualization.vue";
-import Element from "../../logic/data-source/Element";
-import sha256 from "crypto-js/sha256";
-import MPAConfig from "../../logic/data-management/MPAConfig";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Watch, Prop} from "vue-property-decorator";
+    import HeatmapConfiguration from "./HeatmapConfiguration";
+    import DataSource from "../../logic/data-source/DataSource";
+    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+    import EcDataSource from "../../logic/data-source/EcDataSource";
+    import GoDataSource from "../../logic/data-source/GoDataSource";
+    import AllNormalizer from "../../logic/heatmap/AllNormalizer";
+    import RowNormalizer from "../../logic/heatmap/RowNormalizer";
+    import ColumnNormalizer from "../../logic/heatmap/ColumnNormalizer";
+    import { Normalizer } from "../../logic/heatmap/Normalizer";
+    import Assay from "../../logic/data-management/assay/Assay";
+    import GoDataSourceComponent from "./GoDataSourceComponent.vue";
+    import EcDataSourceComponent from "./EcDataSourceComponent.vue";
+    import TaxaDataSourceComponent from "./TaxaDataSourceComponent.vue";
+    import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
+    import HeatmapVisualization from "./HeatmapVisualization.vue";
+    import Element from "../../logic/data-source/Element";
+    import sha256 from "crypto-js/sha256";
+    import MPAConfig from "../../logic/data-management/MPAConfig";
 
     @Component({
-        components: { GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization }
+        components: {GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization}
     })
-export default class HeatmapWizardSingleSample extends Vue {
+    export default class HeatmapWizardSingleSample extends Vue {
         @Prop()
         private dataset: Assay;
         @Prop()
@@ -211,12 +211,12 @@ export default class HeatmapWizardSingleSample extends Vue {
 
             for (let i = 0; i < this.heatmapConfiguration.verticalSelectedItems.length; i++) {
                 let vertical: Element = this.heatmapConfiguration.verticalSelectedItems[i];
-                rows.push({ id: i.toString(), name: vertical.name });
+                rows.push({id: i.toString(), name: vertical.name});
             }
 
             for (let i = 0; i < this.heatmapConfiguration.horizontalSelectedItems.length; i++) {
                 let horizontal: Element = this.heatmapConfiguration.horizontalSelectedItems[i];
-                cols.push({ id: i.toString(), name: horizontal.name });
+                cols.push({id: i.toString(), name: horizontal.name});
             }
 
             for (let vertical of this.heatmapConfiguration.verticalSelectedItems) {
@@ -234,7 +234,7 @@ export default class HeatmapWizardSingleSample extends Vue {
                 values: this.heatmapConfiguration.normalizer.normalize(grid)
             };
         }
-}
+    }
 </script>
 
 <style scoped>

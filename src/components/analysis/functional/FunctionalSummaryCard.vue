@@ -114,32 +114,32 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
-import MpaAnalysisManager from "../../../logic/data-management/MpaAnalysisManager";
-import FaSortSettings from "../../tables/FaSortSettings";
-import { numberToPercent, stringTitleize } from "../../../logic/utils";
-import PeptideContainer from "../../../logic/data-management/PeptideContainer";
-import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
+    import Vue from "vue";
+    import Component from "vue-class-component";
+    import {Prop, Watch} from "vue-property-decorator";
+    import MpaAnalysisManager from "../../../logic/data-management/MpaAnalysisManager";
+    import FaSortSettings from "../../tables/FaSortSettings";
+    import {numberToPercent, stringTitleize} from "../../../logic/utils";
+    import PeptideContainer from "../../../logic/data-management/PeptideContainer";
+    import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
-import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
-import CardHeader from "../../custom/CardHeader.vue";
-import QuickGoCard from "./QuickGOCard.vue";
+    import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
+    import CardHeader from "../../custom/CardHeader.vue";
+    import QuickGoCard from "./QuickGOCard.vue";
 
-import { showInfoModal } from "../../../logic/modal";
-import DataRepository from "../../../logic/data-source/DataRepository";
-import GoDataSource from "../../../logic/data-source/GoDataSource";
-import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
-import GoTerm from "../../../logic/functional-annotations/GoTerm";
-import GoAmountTable from "../../tables/GoAmountTable.vue";
-import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
-import EcNumber from "../../../logic/functional-annotations/EcNumber";
-import EcDataSource from "../../../logic/data-source/EcDataSource";
-import EcAmountTable from "../../tables/EcAmountTable.vue";
-import TreeViewNode from "../../visualizations/TreeViewNode";
-import Treeview from "../../visualizations/Treeview.vue";
-import FATrust from "../../../logic/functional-annotations/FATrust";
+    import {showInfoModal} from "../../../logic/modal";
+    import DataRepository from "../../../logic/data-source/DataRepository";
+    import GoDataSource from "../../../logic/data-source/GoDataSource";
+    import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
+    import GoTerm from "../../../logic/functional-annotations/GoTerm";
+    import GoAmountTable from "../../tables/GoAmountTable.vue";
+    import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
+    import EcNumber from "../../../logic/functional-annotations/EcNumber";
+    import EcDataSource from "../../../logic/data-source/EcDataSource";
+    import EcAmountTable from "../../tables/EcAmountTable.vue";
+    import TreeViewNode from "../../visualizations/TreeViewNode";
+    import Treeview from "../../visualizations/Treeview.vue";
+    import FATrust from "../../../logic/functional-annotations/FATrust";
 
     @Component({
         components: {
@@ -169,10 +169,10 @@ import FATrust from "../../../logic/functional-annotations/FATrust";
             }
         }
     })
-export default class FunctionalSummaryCard extends Vue {
-        @Prop({ required: true })
+    export default class FunctionalSummaryCard extends Vue {
+        @Prop({required: true})
         private dataRepository: DataRepository;
-        @Prop({ required: false, default: true })
+        @Prop({required: false, default: true})
         private analysisInProgress: boolean;
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
@@ -240,7 +240,7 @@ export default class FunctionalSummaryCard extends Vue {
             this.onDataRepositoryChanged();
         }
 
-        @Watch("dataRepository") onDataRepositoryChange() {
+        @Watch('dataRepository') onDataRepositoryChange() {
             this.onDataRepositoryChanged();
         }
 
@@ -258,8 +258,8 @@ export default class FunctionalSummaryCard extends Vue {
         }
 
         reset() {
-            this.$store.dispatch("setSelectedTerm", "Organism");
-            this.$store.dispatch("setSelectedTaxonId", -1);
+            this.$store.dispatch('setSelectedTerm', 'Organism');
+            this.$store.dispatch('setSelectedTaxonId', -1);
         }
 
         showSortSettingsModal() {
@@ -364,7 +364,7 @@ export default class FunctionalSummaryCard extends Vue {
             }
             return `<strong>${trust.annotatedCount} peptides</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) have at least one ${kind} assigned to them. `;
         }
-}
+    }
 </script>
 
 <style lang="less">
