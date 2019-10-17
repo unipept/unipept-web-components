@@ -123,14 +123,11 @@
         private saveTableAsCSV(): void {
             let columnNames: string[] = ["Peptides", this.annotationName, "Name"];
             let grid: string[][] = this.items.map(term => [term.popularity.toString(), term.code, term.name]);
-            // TODO: include namespace in export name
-            downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName + (this.namespace? "-" + this.namespace: "") + "-export.csv", "text/csv");
+            downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName.replace(/ /g, "_") + (this.namespace? "-" + this.namespace: "") + "-export.csv", "text/csv");
         }
     }
 </script>
 
 <style lang="less" scoped>
     @import './../../assets/style/amount-table.css.less';
-
-
 </style>

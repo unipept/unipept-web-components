@@ -73,7 +73,7 @@ export function downloadDataByForm(data, fileName, fileType = null)
         {
             if(!saveDialogReturnValue.canceled)
             {
-                fs.writeFileSync(saveDialogReturnValue.filePath, data, 'utf-8');
+                fs.writeFileSync(saveDialogReturnValue.filePath, data);
             }
         })
     }
@@ -299,7 +299,7 @@ export function stringTitleize(s) {
  * @return {string}      The csv string
  */
 export function toCSVString(grid) {
-    return grid.map(line =>
+    return grid.map(line => 
         line.map(cell => {
             let content = cell.toString();
             if (content.includes(",") || content.includes("\"") ||
@@ -308,7 +308,7 @@ export function toCSVString(grid) {
             } else {
                 return content;
             }
-        }).join(",")).join("\n\r") + "\n\r";
+        }).join(",")).join("\n") + "\n\r";
 }
 
 
