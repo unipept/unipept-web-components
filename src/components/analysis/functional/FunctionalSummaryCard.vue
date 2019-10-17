@@ -10,7 +10,7 @@
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
-                <v-menu bottom left ref="sortMenu">
+                <v-menu :close-on-content-click="false" bottom left ref="sortMenu">
                     <template v-slot:activator="{ on }">
                         <v-btn text class="align-self-center mr-4" v-on="on">
                             <v-icon left>mdi-sort-descending</v-icon>
@@ -20,10 +20,39 @@
                     </template>
 
                     <v-list class="grey lighten-3">
-                        <v-list-item class="menu-header" @click="showSortSettingsModal()">
+                        <v-list-item :ripple="false" dense class="menu-header">
                             <v-list-item-title>
                                 Sort by number of peptides in related proteins
-                                <v-icon right>mdi-help-circle</v-icon>
+                                <v-dialog v-model="dialogOpen" max-width="600">
+                                    <template v-slot:activator="{ on }">
+                                        <v-icon right v-on="on">mdi-help-circle</v-icon>
+                                    </template>
+                                    <v-card>
+                                        <v-card-title>
+                                            <v-icon left>mdi-help-circle</v-icon> Sorting functional annotations
+                                        </v-card-title>
+                                        <v-card-text>
+                                            <p>The functional annotations can be sorted on two metrics:</p>
+                                            <ul>
+                                                <li><strong>Peptides</strong>: The absolute number of peptides that are associated with a given functional annotation.</li>
+                                                <li><strong>Peptides%</strong>: Like peptides, but the reported value is represented as a percentage indicating the fraction of the total number of peptides.</li>
+                                            </ul>
+                                            <p>
+                                                <br>Your "Filter duplicate peptides" setting is taken into account. If it is enabled, peptides that occur multiple times
+                                                in your input list are counted that many times.
+                                            </p>
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn
+                                                color="primary"
+                                                text
+                                                @click="dialogOpen = false">
+                                                I understand
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-dialog>
                             </v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="setFormatSettings('percent', 'fractionOfPepts', 'fractionOfPepts', 'Peptides %')">
@@ -213,6 +242,8 @@
 
         private currentTab: number = 0;
 
+        private dialogOpen: boolean = false;
+
         private ecTreeTooltip: (d: any) => string = (d: any) => {
             const fullCode = (d.name + ".-.-.-.-").split(".").splice(0, 4).join(".");
             let tip = "";
@@ -292,22 +323,6 @@
         reset() {
             this.$store.dispatch('setSelectedTerm', 'Organism');
             this.$store.dispatch('setSelectedTaxonId', -1);
-        }
-
-        showSortSettingsModal() {
-            let modalContent = `
-                <p>The functional annotations can be sorted on two metrics:</p>
-                <ul>
-                    <li><strong>Peptides</strong>: The absolute number of peptides that are associated with a given functional annotation.</li>
-                    <li><strong>Peptides%</strong>: Like peptides, but the reported value is represented as a percentage indicating the fraction of the total number of peptides.</li>
-                </ul>
-                <p>
-                    Your "Filter duplicate peptides" setting is taken into account. If it is enabled, peptides that occur multiple times
-                    in your input list are counted that many times.
-                </p>
-            `;
-
-            showInfoModal("Sorting functional annotations", modalContent);
         }
 
         private showGoModal(ns: GoNameSpace): void {
