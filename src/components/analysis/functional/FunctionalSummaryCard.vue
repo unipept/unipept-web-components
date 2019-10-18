@@ -40,7 +40,7 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
-            <v-alert v-if="this.showTaxonInfo" dense colored-border id="filtered-taxon-information">
+            <v-alert v-if="this.showTaxonInfo && this.selectedNCBITaxon" dense colored-border id="filtered-taxon-information">
                 <v-row dense align="center">
                     <v-col class="grow"><b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to <b>{{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}})</b>.</v-col>
                     <v-col class="shrink">
@@ -48,7 +48,7 @@
                     </v-col>
                 </v-row>
             </v-alert>
-            <v-alert v-if="!this.showTaxonInfo && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
+            <v-alert v-if="!this.showTaxonInfo && this.selectedNCBITaxon && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
                 <v-row dense align="center">
                     <v-col class="grow"><b>Unfiltered results:</b> filtered results are available specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).</v-col>
                     <v-col class="shrink">
@@ -193,8 +193,8 @@
         @Prop({required: false, default: true})
         private analysisInProgress: boolean;
 
-        private totalPeptides: number;
-        private selectedNCBITaxon: NCBITaxon; 
+        private totalPeptides: number = 0;
+        private selectedNCBITaxon: NCBITaxon = null; 
         private showTaxonInfo: boolean = false;
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
