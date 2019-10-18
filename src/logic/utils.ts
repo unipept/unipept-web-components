@@ -324,20 +324,20 @@ export function numberToPercent(number, digits = 0) {
 }
 
 /**
- * Sends the SVG-code to the server to convert it to a PNG. 
- * The server returns a data URL containing the PNG data.
+ * Sends the SVG-code to the server to convert it to a PNG.
  *
  * @param {string} svgSelector The DOM selector of the SVG or jQuery object
+ * @returns {string} A dataURL containing the resulting PNG
 */
-export function prepareSVG(svgSelector)
+export async function prepareSVG(svgSelector: string) : Promise<string>
 {
     // Send the SVG code to the server for png conversion
-    let $element = $(svgSelector);
-    let svg = $element.wrap("<div></div>").parent().html();
-    $element.unwrap();
     return new Promise(resolve => 
-    {
-        $.post("/convert", {image: svg}, () => resolve(svg));
+    {    
+        let $element = $(svgSelector);
+        let svg = $element.wrap("<div></div>").parent().html();
+        $element.unwrap();
+        $.post("/convert", {image: svg}, resolve);
     })
 }
 
@@ -345,18 +345,15 @@ export function prepareSVG(svgSelector)
  * Uses html2canvas to convert canvas to a PNG.
  *
  * @param {string} canvasSelector The DOM selector of the canvas
+ * @returns {string} A dataURL containing the resulting PNG
 */
-export function prepareCanvas(canvasSelector)
+export async function prepareCanvas(canvasSelector: string) : Promise<string>
 {
-    // Use html2canvas to convert canvas to dataURL
-    return new Promise(resolve => 
-    {
-        this.html2canvas($(canvasSelector), {
-            onrendered: function (canvas) {
-                resolve(canvas.toDataURL());
-            }
-        });
-    })
+    const html2canvas = require('html2canvas');
+    // Use html2canvas to convert selected element to canvas, 
+    // then convert that canvas to a dataURL
+    return html2canvas($(canvasSelector).get(0))
+            .then((canvasElement) => canvasElement.toDataURL())
 }
 
 /**

@@ -10,12 +10,15 @@
             </v-card-text>
         </v-card>
         <v-card v-else>
-            <v-card-title class="justify-center">
-                Your image is ready
-            </v-card-title>
+            <v-img
+                class="white--text align-end"
+                max-height="600px"
+                min-height="200px"
+                :src="dataURL"
+            />
             <v-card-actions class="justify-center">
-                <v-btn id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
-                <v-btn id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
+                <v-btn v-if="svgDownload" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
+                <v-btn @click="downloadPNG(baseFileName)" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
             </v-card-actions>
             <v-divider/>
             <v-card-text>
@@ -31,6 +34,7 @@
     import Vue from "vue";
     import Component, {mixins} from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
+    import {prepareCanvas, prepareSVG, downloadDataByLink} from "../../logic/utils";
 
     @Component
     export default class ImageDownloadModal extends Vue 
@@ -38,16 +42,37 @@
         private downloadDialogOpen: boolean = false;
         private preparingImage: boolean = false;
 
-        downloadSVG(baseFileName, svgSelector)
+        private svgDownload: boolean = false;
+
+        private baseFileName: string = "";
+        private dataURL: string = "";
+
+        async download(baseFileName, canvasSelector, svgSelector=undefined)
         {
+            let svg;
+            this.svgDownload = false;
+
+            this.baseFileName = baseFileName;
             this.preparingImage = true;
             this.downloadDialogOpen = true;
+
+            if(canvasSelector)
+            {
+                this.dataURL = await prepareCanvas(canvasSelector);
+            }
+
+            /*if(svgSelector)
+            {
+                svg = await prepareSVG(svgSelector);
+                this.svgDownload = true;
+            }*/
+
+            this.preparingImage = false;
         }
 
-        downloadCanvas(baseFileName, canvasSelector)
+        private async downloadPNG(baseFileName)
         {
-            this.preparingImage = true;
-            this.downloadDialogOpen = true;
+            downloadDataByLink(this.dataURL, this.baseFileName)
         }
     }
 </script>

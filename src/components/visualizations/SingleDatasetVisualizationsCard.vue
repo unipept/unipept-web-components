@@ -167,7 +167,7 @@
     //@ts-ignore
     import fullscreen from 'vue-fullscreen';
 
-    import {logToGoogle, prepareDownload} from "../../logic/utils";
+    import {logToGoogle} from "../../logic/utils";
     import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
     import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
     import DataRepository from '../../logic/data-source/DataRepository';
@@ -253,13 +253,13 @@
             // @ts-ignore
             //logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
             if (this.tabs[this.tab] === "Sunburst") {
-                imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
+                imageDownloadModal.download("unipept_sunburst", "#sunburstWrapper > div", "#sunburstWrapper svg")
                 //d3.selectAll(".toHide").attr("class", "arc hidden");
                 //d3.selectAll(".hidden").attr("class", "arc toHide");
             } else if (this.tabs[this.tab] === "Treemap") {
-                imageDownloadModal.downloadCanvas("unipept_treemap", "#treemap")
+                imageDownloadModal.download("unipept_treemap", "#treemap")
             } else {
-                imageDownloadModal.downloadCanvas("unipept_treeview", "#treeviewWrapper svg")
+                imageDownloadModal.download("unipept_treeview", "#treeviewWrapper > div", "#treeviewWrapper svg")
             }
         }
 
