@@ -1,5 +1,5 @@
 <template>
-    <div ref="treeviewWrapper">
+    <div id="treeviewWrapper" ref="treeviewWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <a class="btn btn-xs btn-default btn-animate" @click="reset()" title="reset visualisation">
