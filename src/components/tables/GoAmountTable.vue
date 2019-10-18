@@ -13,7 +13,7 @@
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Treeview from "../visualizations/treeview.vue";
     import AmountTable from "./AmountTable.vue";
-    import { downloadDataByForm, logToGoogle, triggerDownloadModal } from "../../logic/utils";
+    import { downloadDataByForm, logToGoogle } from "../../logic/utils";
     import { GoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
     import FaSortSettings from "./FaSortSettings";
     import {Node} from "../../logic/data-management/Node";
