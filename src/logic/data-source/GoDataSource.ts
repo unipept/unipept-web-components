@@ -7,6 +7,7 @@ import { GeneOntology } from '../data-management/ontology/go/GeneOntology';
 import { GOCountTable } from '../data-management/counts/GOCountTable';
 import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
 import { PeptideData } from '../api/pept2data/Response';
+import { DataSourceCommon } from './DataSourceCommon';
 
 /**
  * A GoDataSource can be used to access all GoTerms associated with a specific Sample. Note that this class contains
@@ -34,34 +35,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
 
     public getGoTermSummary(term: GoTerm): string[][]
     {
-        if(this._processedPeptideContainer)
-        {
-            return [[
-                "peptide",
-                "spectral count",
-                "matching proteins",
-                "matching proteins with " + term.code,
-                "percentage proteins with " + term.code,
-            ]]
-                .concat(term.affectedPeptides
-                    .map(peptide => {
-
-                        let peptideCount = this._processedPeptideContainer.countTable.get(peptide)
-                        let peptideData = this._processedPeptideContainer.response.get(peptide)
-                        let goProteinCount = peptideData.fa.data.hasOwnProperty(term.code)? peptideData.fa.data[term.code] : 0
-
-                        return [
-                            peptide, 
-                            peptideCount, 
-                            peptideData.fa.counts.all, 
-                            goProteinCount, 
-                            100 * (goProteinCount / peptideData.fa.counts.all)
-                        ] as string[]
-
-                    }));
-        }
-
-        return []
+        return DataSourceCommon.getFASummary(term, this._processedPeptideContainer);
     }
 
     /**

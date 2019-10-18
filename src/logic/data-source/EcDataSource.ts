@@ -7,6 +7,7 @@ import { ECCountTable } from '../data-management/counts/ECCountTable';
 import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
 import DataRepository from './DataRepository';
 import { PeptideData } from '../api/pept2data/Response';
+import { DataSourceCommon } from './DataSourceCommon';
 // import TreeViewNode from '../ui/visualizations/TreeViewNode';
 
 export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> 
@@ -33,34 +34,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
     public getECNumberSummary(number: EcNumber): string[][]
     {
-        if(this._processedPeptideContainer)
-        {
-            return [[
-                "peptide",
-                "spectral count",
-                "matching proteins",
-                "matching proteins with " + number.code,
-                "percentage proteins with " + number.code,
-            ]]
-                .concat(number.affectedPeptides
-                    .map(peptide => {
-
-                        let peptideCount = this._processedPeptideContainer.countTable.get(peptide)
-                        let peptideData = this._processedPeptideContainer.response.get(peptide)
-                        let ecProteinCount = peptideData.fa.data.hasOwnProperty(number.code)? peptideData.fa.data[number.code] : 0
-
-                        return [
-                            peptide, 
-                            peptideCount, 
-                            peptideData.fa.counts.all, 
-                            ecProteinCount, 
-                            100 * (ecProteinCount / peptideData.fa.counts.all)
-                        ] as string[]
-
-                    }));
-        }
-
-        return []
+        return DataSourceCommon.getFASummary(number, this._processedPeptideContainer)
     }
 
     /**
