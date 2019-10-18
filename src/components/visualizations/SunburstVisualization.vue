@@ -1,5 +1,5 @@
 <template>
-    <div ref="sunburstWrapper">
+    <div id="sunburstWrapper" ref="sunburstWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
@@ -96,13 +96,18 @@
 
                 // @ts-ignore
                 this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-                    width: this.width === -1 ? (this.$refs.sunburstWrapper as Element).clientWidth : this.width,
-                    height: this.height,
-                    radius: this.radius,
                     getTooltip: tooltipContent,
                     getTitleText: d => `${d.name} (${d.rank})`,
                     rerootCallback: d => this.search(d.id, d.name, 1000),
                 });
+
+                $("#sunburstWrapper svg").removeAttr("height")
+                $("#sunburstWrapper svg").removeAttr("width")
+
+                // for some reason this dynamic svg doesn't register stylesheet css
+                $("#sunburstWrapper svg").css("position", "absolute")
+                $("#sunburstWrapper svg").css("width", "100%")
+                $("#sunburstWrapper svg").css("height", "100%")
             }
         }
     }
