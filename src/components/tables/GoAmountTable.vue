@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" annotation-name="GO term" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
+    <amount-table :items="items" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever"></amount-table>
 </template>
 
 <script lang="ts">
