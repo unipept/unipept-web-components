@@ -153,7 +153,7 @@
 </template>
 
 <script lang="ts">
-    import d3 from "d3";
+    import * as d3 from "d3";
     import Vue from "vue";
     import Component from "vue-class-component";
     import {Prop, Watch} from "vue-property-decorator";
@@ -246,16 +246,16 @@
             (this.$refs.heatmap as HeatmapVisualization).reset();
         }
 
-        private prepareImage() 
+        private async prepareImage() 
         {
             const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
             // @ts-ignore
-            //logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
+            logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
             if (this.tabs[this.tab] === "Sunburst") {
-                imageDownloadModal.download("unipept_sunburst", "#sunburstWrapper > div", "#sunburstWrapper svg")
-                //d3.selectAll(".toHide").attr("class", "arc hidden");
-                //d3.selectAll(".hidden").attr("class", "arc toHide");
+                d3.selectAll(".toHide").attr("class", "arc hidden");
+                await imageDownloadModal.download("unipept_sunburst", "#sunburstWrapper > div", "#sunburstWrapper svg")
+                d3.selectAll(".hidden").attr("class", "arc toHide");
             } else if (this.tabs[this.tab] === "Treemap") {
                 imageDownloadModal.download("unipept_treemap", "#treemap")
             } else {
