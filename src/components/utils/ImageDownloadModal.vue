@@ -61,11 +61,11 @@
                 this.dataURL = await prepareCanvas(canvasSelector);
             }
 
-            /*if(svgSelector)
+            if(svgSelector)
             {
                 svg = await prepareSVG(svgSelector);
                 this.svgDownload = true;
-            }*/
+            }
 
             this.preparingImage = false;
         }

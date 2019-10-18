@@ -2,6 +2,8 @@ import Clipboard from "clipboard";
 import $ from "jquery";
 import d3 from "d3";
 
+export const runningInElectron = navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
+
 /**
  * Make clicking on the selector copy to the user clipboard
  * @param {any} selector Anything that goes in $(...)
@@ -61,27 +63,43 @@ export function brightness(rgb) {
  * @param  {String}  [fileType] file type like "text/csv"
  * @return {Promise.<string>}
  */
-export function downloadDataByForm(data, fileName, fileType = null) {
-    return new Promise(function (resolve, reject) {
-        let nonce = Math.random();
-        $("form.download").remove();
-        $("body").append("<form class='download' method='post' action='/download'></form>");
-        let $downloadForm = $("form.download").append("<input type='hidden' name='filename' value='" + fileName + "'/>");
-        $downloadForm.append("<input type='hidden' name='data' class='data'/>");
-        if (fileType !== null) {
-            $downloadForm.append(`<input type='hidden' name='filetype' value='${fileType}'/>`);
-        }
-        $downloadForm.append("<input type='hidden' name='nonce' value='" + nonce + "'/>");
-        // The x-www-form-urlencoded spec replaces newlines with \n\r
-        $downloadForm.find(".data").val(data.replace(/\n\r/g, "\n"));
-        let downloadTimer = setInterval(() => {
-            if (document.cookie.indexOf(nonce.toString()) !== -1) {
-                clearInterval(downloadTimer);
-                resolve(fileName);
+export function downloadDataByForm(data, fileName, fileType = null) 
+{
+    if(runningInElectron)
+    {
+        const fs = require('fs');
+        const {dialog} = require('electron').remote;
+        dialog.showSaveDialog(null, {title: "save to CSV", defaultPath: fileName}).then((saveDialogReturnValue) => 
+        {
+            if(!saveDialogReturnValue.canceled)
+            {
+                fs.writeFileSync(saveDialogReturnValue.filePath, data, 'utf-8');
             }
-        }, 100);
-        $downloadForm.submit();
-    });
+        })
+    }
+    else
+    {
+        return new Promise(function (resolve, reject) {
+            let nonce = Math.random();
+            $("form.download").remove();
+            $("body").append("<form class='download' method='post' action='/download'></form>");
+            let $downloadForm = $("form.download").append("<input type='hidden' name='filename' value='" + fileName + "'/>");
+            $downloadForm.append("<input type='hidden' name='data' class='data'/>");
+            if (fileType !== null) {
+                $downloadForm.append(`<input type='hidden' name='filetype' value='${fileType}'/>`);
+            }
+            $downloadForm.append("<input type='hidden' name='nonce' value='" + nonce + "'/>");
+            // The x-www-form-urlencoded spec replaces newlines with \n\r
+            $downloadForm.find(".data").val(data.replace(/\n\r/g, "\n"));
+            let downloadTimer = setInterval(() => {
+                if (document.cookie.indexOf(nonce.toString()) !== -1) {
+                    clearInterval(downloadTimer);
+                    resolve(fileName);
+                }
+            }, 100);
+            $downloadForm.submit();
+        });
+    }
 }
 
 /**
