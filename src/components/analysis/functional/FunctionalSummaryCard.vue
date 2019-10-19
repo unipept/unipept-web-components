@@ -40,6 +40,22 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
+            <v-alert v-if="this.showTaxonInfo && this.selectedNCBITaxon" dense colored-border id="filtered-taxon-information">
+                <v-row dense align="center">
+                    <v-col class="grow"><b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to <b>{{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}})</b>.</v-col>
+                    <v-col class="shrink">
+                        <v-btn @click="doFAcalculations(); showTaxonInfo = false;">Undo</v-btn>
+                    </v-col>
+                </v-row>
+            </v-alert>
+            <v-alert v-if="!this.showTaxonInfo && this.selectedNCBITaxon && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
+                <v-row dense align="center">
+                    <v-col class="grow"><b>Unfiltered results:</b> filtered results are available specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).</v-col>
+                    <v-col class="shrink">
+                        <v-btn @click="redoFAcalculations(); showTaxonInfo = true;">Redo</v-btn>
+                    </v-col>
+                </v-row>
+            </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <v-card flat>
@@ -141,6 +157,10 @@
     import Treeview from "../../visualizations/Treeview.vue";
     import FATrust from "../../../logic/functional-annotations/FATrust";
 
+    import {NCBITaxon} from "../../../logic/data-management/ontology/taxa/NCBITaxon";
+    import {NCBITaxonomy} from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
+    import {Ontologies} from "../../../logic/data-management/ontology/Ontologies";
+
     @Component({
         components: {
             CardHeader,
@@ -174,6 +194,10 @@
         private dataRepository: DataRepository;
         @Prop({required: false, default: true})
         private analysisInProgress: boolean;
+
+        private totalPeptides: number = 0;
+        private selectedNCBITaxon: NCBITaxon = null; 
+        private showTaxonInfo: boolean = false;
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
         // directly
@@ -244,6 +268,11 @@
             this.onDataRepositoryChanged();
         }
 
+        @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
+            this.onDataRepositoryChanged();
+            this.getSelectedTaxonInfo();
+        }
+
         setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
             this.formatType = formatType;
 
@@ -290,16 +319,30 @@
             this.faCalculationsInProgress = false;
         }
 
-        private async redoFAcalculations(): Promise<void> {
-            let peptideContainer = this.$store.getters.activeDataset;
-
-            if (this.dataRepository) {
-                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-
-                const percent = parseInt(this.percentSettings);
+        private async getSelectedTaxonInfo()
+        {
+            if(this.dataRepository)
+            {
+                const taxaSource = await this.dataRepository.createTaxaDataSource();
                 const taxonId = this.$store.getters.selectedTaxonId;
 
+                // get selecton taxon information
+                if(taxonId != -1)
+                {
+                    this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
+                    this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
+                    this.showTaxonInfo = true;
+                }
+            }
+        }
+
+        private async redoFAcalculations(): Promise<void> 
+        {
+            if (this.dataRepository) {
+                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
+                const taxonId = this.$store.getters.selectedTaxonId;
+
+                // get sequences corresponding to selected taxon id
                 let sequences = null;
                 if (taxonId > 0) {
                     let tree = await taxaSource.getTree();
@@ -308,16 +351,30 @@
                     this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
                 }
 
+                this.doFAcalculations(sequences);
+            }
+        }
+
+        private async doFAcalculations(sequences: string[] = null)
+        {
+            if(this.dataRepository)
+            {
+                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
+
+                const percent = parseInt(this.percentSettings);
+
+                // recalculate go-data for those sequences
                 for (let i = 0; i < this.goNamespaces.length; i++) {
                     let namespace: GoNameSpace = this.goNamespaces[i];
                     this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
                 }
 
-                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(), "GO term");
+                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
 
-                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
-                this.ecData = await ecSource.getEcNumbers();
-                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
+                // recalculate ec-data for those sequences
+                this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
+                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
                 // @ts-ignore
                 this.ecTreeData = await ecSource.getEcTree();
             }
@@ -396,5 +453,10 @@
 
     .ec-waiting {
         transform: translate(-35px);
+    }
+
+    #filtered-taxon-information
+    {
+        background-color: #ffe57f;
     }
 </style>
