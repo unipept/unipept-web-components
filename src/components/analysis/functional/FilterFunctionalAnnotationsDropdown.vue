@@ -6,12 +6,12 @@
                     <v-icon>mdi-settings</v-icon>
                 </v-btn>
             </template>
-            <v-card>
+            <v-card max-width="310px">
                 <v-card-text>
                     <span>Filtering</span>
                     <div class="input-group">
                         <span class="input-group-addon">≥</span>
-                        <input type="number" min="0" max="100" autocomplete="off" step="5" class="form-control" v-model="model">
+                        <input type="number" min="0" max="100" autocomplete="off" step="5" class="form-control" v-model.lazy="model" @change="model = Math.min(Math.max(parseInt(model), 0), 100)">
                         <span class="input-group-addon">% of annotated proteins</span>
                     </div>
                     <a v-if="model !== '5'" class="pull-right" @click="model = '5'">reset to 5%</a>

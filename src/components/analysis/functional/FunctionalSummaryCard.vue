@@ -268,6 +268,10 @@
             this.onDataRepositoryChanged();
         }
 
+        @Watch('percentSettings') onPercentSettingsChange() {
+            this.onDataRepositoryChanged();
+        }
+        
         @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
             this.onDataRepositoryChanged();
             this.getSelectedTaxonInfo();
