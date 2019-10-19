@@ -40,6 +40,22 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
+            <v-alert v-if="this.showTaxonInfo && this.selectedNCBITaxon" dense colored-border id="filtered-taxon-information">
+                <v-row dense align="center">
+                    <v-col class="grow"><b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to <b>{{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}})</b>.</v-col>
+                    <v-col class="shrink">
+                        <v-btn @click="doFAcalculations(); showTaxonInfo = false;">Undo</v-btn>
+                    </v-col>
+                </v-row>
+            </v-alert>
+            <v-alert v-if="!this.showTaxonInfo && this.selectedNCBITaxon && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
+                <v-row dense align="center">
+                    <v-col class="grow"><b>Unfiltered results:</b> filtered results are available specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).</v-col>
+                    <v-col class="shrink">
+                        <v-btn @click="redoFAcalculations(); showTaxonInfo = true;">Redo</v-btn>
+                    </v-col>
+                </v-row>
+            </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <v-card flat>
@@ -75,7 +91,7 @@
                                             <go-amount-table :dataRepository="dataRepository" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
                                         <v-col :cols="3">
-                                            <img style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%);" :src="getQuickGoSmallUrl(goNamespaces[idx])" class="quickGoThumb" @click="showGoModal(goNamespaces[idx])">
+                                            <quick-go-card :sort-settings="faSortSettings" :items="goData[idx].goTerms"></quick-go-card>
                                         </v-col>
                                     </v-row>
                                 </div>
@@ -125,6 +141,7 @@
 
     import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
     import CardHeader from "../../custom/CardHeader.vue";
+    import QuickGoCard from "./QuickGOCard.vue";
 
     import {showInfoModal} from "../../../logic/modal";
     import DataRepository from "../../../logic/data-source/DataRepository";
@@ -140,6 +157,10 @@
     import Treeview from "../../visualizations/Treeview.vue";
     import FATrust from "../../../logic/functional-annotations/FATrust";
 
+    import {NCBITaxon} from "../../../logic/data-management/ontology/taxa/NCBITaxon";
+    import {NCBITaxonomy} from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
+    import {Ontologies} from "../../../logic/data-management/ontology/Ontologies";
+
     @Component({
         components: {
             CardHeader,
@@ -147,7 +168,8 @@
             FilterFunctionalAnnotationsDropdown,
             GoAmountTable,
             EcAmountTable,
-            Treeview
+            Treeview,
+            QuickGoCard
         },
         computed: {
             watchableDataset: {
@@ -172,6 +194,10 @@
         private dataRepository: DataRepository;
         @Prop({required: false, default: true})
         private analysisInProgress: boolean;
+
+        private totalPeptides: number = 0;
+        private selectedNCBITaxon: NCBITaxon = null; 
+        private showTaxonInfo: boolean = false;
 
         // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
         // directly
@@ -245,6 +271,11 @@
         @Watch('percentSettings') onPercentSettingsChange() {
             this.onDataRepositoryChanged();
         }
+        
+        @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
+            this.onDataRepositoryChanged();
+            this.getSelectedTaxonInfo();
+        }
 
         setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
             this.formatType = formatType;
@@ -280,50 +311,8 @@
             showInfoModal("Sorting functional annotations", modalContent);
         }
 
-        private getQuickGoSmallUrl(ns: GoNameSpace): string {
-            let goTerms: GoTerm[] = this.goData[this.goNamespaces.indexOf(ns)].goTerms;
-            const top5: string[] = goTerms.slice(0, 5).map(x => x.code);
-
-            if (top5.length > 0) {
-                return this.quickGOChartURL(top5, false);
-            }
-            return null;
-        }
-
         private showGoModal(ns: GoNameSpace): void {
-            let goTerms: GoTerm[] = this.goData[this.goNamespaces.indexOf(ns)].goTerms;
-            const top5: GoTerm[] = goTerms.slice(0, 5);
-
-            if (top5.length > 0) {
-                const top5WithNames = top5.map(x => `${x.name} (${this.faSortSettings.format(x)})`);
-                const top5Sentence = top5WithNames.slice(0, -1).join(", ")
-                    + (top5.length > 1 ? " and " : "")
-                    + top5WithNames[top5WithNames.length - 1];
-                const quickGoChartURL: string = this.quickGOChartURL(top5.map(x => x.code), true);
-                
-                let modalContent = `
-                    This chart shows the relationship between the ${top5.length} most occurring GO terms: ${top5Sentence}.
-                    <br/>
-                    <a href="${quickGoChartURL}" target="_blank" title="Click to enlarge in new tab">
-                        <img style="max-width: 100%;" src="${quickGoChartURL}" alt="QuickGO chart of ${top5Sentence}"/>
-                    </a>
-                    <div>
-                        Provided by <a href="https://www.ebi.ac.uk/QuickGO/annotations?goId=${top5.map(x => x.code).join(',')}" target="_blank">QuickGO</a>.
-                    </div>
-                `;
-
-                showInfoModal("QuickGo " + ns, modalContent, {wide: true});
-            }
-        }
-
-        /**
-         * @param {string[]} terms the terms to show in the chart (at least one)
-         * @param {boolean} showKey Show the legend of the colors
-         * @return {string} The QuickGo chart URL of the given GO terms
-         */
-        private quickGOChartURL(terms, showKey = true): string {
-            // sort the terms to improve caching
-            return `https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/${terms.sort().join(",")}/chart?showKey=${showKey}`;
+            this.goModals.set(ns, true);
         }
 
         private async onDataRepositoryChanged() {
@@ -334,16 +323,30 @@
             this.faCalculationsInProgress = false;
         }
 
-        private async redoFAcalculations(): Promise<void> {
-            let peptideContainer = this.$store.getters.activeDataset;
-
-            if (this.dataRepository) {
-                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-
-                const percent = parseInt(this.percentSettings);
+        private async getSelectedTaxonInfo()
+        {
+            if(this.dataRepository)
+            {
+                const taxaSource = await this.dataRepository.createTaxaDataSource();
                 const taxonId = this.$store.getters.selectedTaxonId;
 
+                // get selecton taxon information
+                if(taxonId != -1)
+                {
+                    this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
+                    this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
+                    this.showTaxonInfo = true;
+                }
+            }
+        }
+
+        private async redoFAcalculations(): Promise<void> 
+        {
+            if (this.dataRepository) {
+                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
+                const taxonId = this.$store.getters.selectedTaxonId;
+
+                // get sequences corresponding to selected taxon id
                 let sequences = null;
                 if (taxonId > 0) {
                     let tree = await taxaSource.getTree();
@@ -352,16 +355,30 @@
                     this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
                 }
 
+                this.doFAcalculations(sequences);
+            }
+        }
+
+        private async doFAcalculations(sequences: string[] = null)
+        {
+            if(this.dataRepository)
+            {
+                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
+
+                const percent = parseInt(this.percentSettings);
+
+                // recalculate go-data for those sequences
                 for (let i = 0; i < this.goNamespaces.length; i++) {
                     let namespace: GoNameSpace = this.goNamespaces[i];
                     this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
                 }
 
-                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(), "GO term");
+                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
 
-                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
-                this.ecData = await ecSource.getEcNumbers();
-                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(), "EC number");
+                // recalculate ec-data for those sequences
+                this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
+                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
                 // @ts-ignore
                 this.ecTreeData = await ecSource.getEcTree();
             }
@@ -440,5 +457,10 @@
 
     .ec-waiting {
         transform: translate(-35px);
+    }
+
+    #filtered-taxon-information
+    {
+        background-color: #ffe57f;
     }
 </style>
