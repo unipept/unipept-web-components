@@ -70,12 +70,12 @@
 
         private async downloadPNG()
         {
-            downloadDataByLink(this.pngDataURL, this.baseFileName)
+            downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
         }
 
         private async downloadSVG()
         {
-            downloadDataByLink(this.svgDataURL, this.baseFileName)
+            downloadDataByLink(this.svgDataURL, this.baseFileName + ".svg")
         }
     }
 </script>

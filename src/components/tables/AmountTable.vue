@@ -1,27 +1,34 @@
 <template>
-    <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
-        <template v-slot:expanded-item="{ headers, item }">
-            <td :colspan="headers.length">
-                <div v-if="computeTree(item) && treeAvailable.get(item)">
-                    <treeview
-                        :id="`TreeView-${item.code}`" 
-                        :data="treeAvailable.get(item)" 
-                        :height="310"
-                        :width="800" 
-                        :tooltip="tooltip" 
-                        :colors="highlightColorFunc" 
-                        :enableAutoExpand="0.3" 
-                        :linkStrokeColor="linkStrokeColor" 
-                        :nodeStrokeColor="highlightColorFunc" 
-                        :nodeFillColor="highlightColorFunc">
-                    </treeview>
-                </div>
-            </td>
-        </template>
-        <template v-slot:item.action="{ item }">
-            <v-icon>mdi-download</v-icon>
-        </template>
-    </v-data-table>
+    <div>
+        <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
+            <template v-slot:expanded-item="{ headers, item }">
+                <td class="item-treeview" :colspan="headers.length">
+                    <div v-if="computeTree(item) && treeAvailable.get(item)">
+                        <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
+                            <v-icon>mdi-download</v-icon>
+                            Save as image
+                        </v-btn>
+                        <treeview
+                            :id="treeViewId(item)" 
+                            :data="treeAvailable.get(item)" 
+                            :height="310"
+                            :width="800" 
+                            :tooltip="tooltip" 
+                            :colors="highlightColorFunc" 
+                            :enableAutoExpand="0.3" 
+                            :linkStrokeColor="linkStrokeColor" 
+                            :nodeStrokeColor="highlightColorFunc" 
+                            :nodeFillColor="highlightColorFunc">
+                        </treeview>
+                    </div>
+                </td>
+            </template>
+            <template v-slot:item.action="{ item }">
+                <v-icon>mdi-download</v-icon>
+            </template>
+        </v-data-table>
+        <image-download-modal ref="imageDownloadModal"/>
+    </div>
 </template>
 
 <script lang="ts">
@@ -36,13 +43,19 @@
     import FAElement from "../../logic/functional-annotations/FAElement";
     import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
     import Tree from "../../logic/data-management/Tree";
+    import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 
     @Component({
         components: {
-            Treeview
+            Treeview,
+            ImageDownloadModal
         }
     })
     export default class AmountTable extends Vue {
+        $refs!: {
+            imageDownloadModal: ImageDownloadModal
+        }
+
         @Prop({required: true})
         protected items: FAElement[];
         @Prop({required: true})
@@ -100,13 +113,17 @@
             })
             return true;
         }
+
+        private treeViewId(term: FAElement)
+        {
+            return "TreeView-" + term.code.replace(/[.:]/g, "-")
+        }
         
         private saveImage(term: FAElement): void {
             // @ts-ignores
             logToGoogle("Multi peptide", "Save Image for FA");
-            // Hack to get a reference to the SVG DOM-element
-            //@ts-ignore
-            triggerDownloadModal(document.getElementById(`TreeView-${term.code}`).getElementsByTagName("svg")[0], null, `unipept_treeview_${goTerm.code}`);
+            let downloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+            downloadModal.download("unipept_treeview_" + term.code.replace(":", "_"), "#" + this.treeViewId(term), "#" + this.treeViewId(term) + " > svg")
         }
 
         private saveTableAsCSV(): void {
@@ -120,6 +137,4 @@
 
 <style lang="less" scoped>
     @import './../../assets/style/amount-table.css.less';
-
-
 </style>
