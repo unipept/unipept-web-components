@@ -136,7 +136,7 @@
         private async saveSummaryAsCSV(term: FAElement)
         {
             let data = await this.summaryRetriever(term)
-            downloadDataByForm(toCSVString(data), term.code + "-summary.csv", "text/csv");
+            downloadDataByForm(toCSVString(data), term.code.replace(/:/g, "_") + ".csv", "text/csv");
         }
     }
 </script>
