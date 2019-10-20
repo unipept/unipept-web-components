@@ -14,7 +14,7 @@
                     <treeview
                         :id="`TreeView-${item.code}`" 
                         :data="treeAvailable.get(item)" 
-                        :height="310"
+                        :height="320"
                         :width="800" 
                         :tooltip="tooltip" 
                         :colors="highlightColorFunc" 
