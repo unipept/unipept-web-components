@@ -86,7 +86,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
+                        <treemap-visualization ref="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -257,7 +257,7 @@
                 await imageDownloadModal.download("unipept_sunburst", "#sunburstWrapper > div", "#sunburstWrapper svg")
                 d3.selectAll(".hidden").attr("class", "arc toHide");
             } else if (this.tabs[this.tab] === "Treemap") {
-                imageDownloadModal.download("unipept_treemap", "#treemap")
+                imageDownloadModal.download("unipept_treemap", "#treemapWrapper > div")
             } else {
                 imageDownloadModal.download("unipept_treeview", "#treeviewWrapper > div", "#treeviewWrapper svg")
             }
