@@ -1,13 +1,11 @@
-import FAElement from '../functional-annotations/FAElement';
-import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
-import { Ontologies } from '../data-management/ontology/Ontologies';
+import FAElement from "../functional-annotations/FAElement";
+import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
+import { Ontologies } from "../data-management/ontology/Ontologies";
 
 export namespace DataSourceCommon
 {
-    export function getFASummary(faElement: FAElement, processedPeptideContainer: ProcessedPeptideContainer = undefined): string[][]
-    {
-        if(processedPeptideContainer)
-        {
+    export function getFASummary(faElement: FAElement, processedPeptideContainer: ProcessedPeptideContainer = undefined): string[][] {
+        if (processedPeptideContainer) {
             return [[
                 "peptide",
                 "spectral count",

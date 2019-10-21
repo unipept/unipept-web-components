@@ -1,4 +1,4 @@
-import {Normalizer} from "../../logic/heatmap/Normalizer";
+import { Normalizer } from "../../logic/heatmap/Normalizer";
 import DataSource from "../../logic/data-source/DataSource";
 import Element from "../../logic/data-source/Element";
 

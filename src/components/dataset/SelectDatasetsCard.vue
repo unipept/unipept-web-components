@@ -59,20 +59,20 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import Assay from "../../logic/data-management/assay/Assay";
-    import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
-    import CardTitle from "../custom/CardTitle.vue";
-    import CardHeader from "../custom/CardHeader.vue";
-    import Tooltip from "../custom/Tooltip.vue";
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import Assay from "../../logic/data-management/assay/Assay";
+import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
+import CardTitle from "../custom/CardTitle.vue";
+import CardHeader from "../custom/CardHeader.vue";
+import Tooltip from "../custom/Tooltip.vue";
 
     @Component({
-        components: {CardHeader, CardTitle, SearchSettingsForm, Tooltip}
+        components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
     })
-    export default class SelectDatasetsCard extends Vue {
-        @Prop({required: true})
+export default class SelectDatasetsCard extends Vue {
+        @Prop({ required: true })
         private selectedDatasets: Assay[];
 
         private equateIl: boolean = true;
@@ -107,11 +107,11 @@
         }
 
         private startAnalysis() {
-            this.$emit('start-analysis');
+            this.$emit("start-analysis");
         }
 
         private deselectDataset(dataset: Assay) {
-            this.$emit('deselect-dataset', dataset);
+            this.$emit("deselect-dataset", dataset);
         }
 
         private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
@@ -119,9 +119,9 @@
             this.filterDuplicates = filterDuplicates;
             this.missingCleavage = missingCleavage;
 
-            this.$emit('update-search-settings', {il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage});
+            this.$emit("update-search-settings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
         }
-    }
+}
 </script>
 
 <style lang="less">

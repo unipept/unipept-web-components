@@ -1,12 +1,12 @@
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import Assay from "../../logic/data-management/assay/Assay";
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import Assay from "../../logic/data-management/assay/Assay";
 
     @Component
-    export default class VisualizationMixin extends Vue {
-        @Prop({default: null}) dataset: Assay | null;
+export default class VisualizationMixin extends Vue {
+        @Prop({ default: null }) dataset: Assay | null;
 
         /**
          * Propagate selections in the visualisation to the search tree and
@@ -18,13 +18,13 @@
          */
         public search(id: number, searchTerm, timeout = 500) {
             setTimeout(() => {
-                this.$store.dispatch('setSelectedTerm', searchTerm);
-                this.$store.dispatch('setSelectedTaxonId', id);
+                this.$store.dispatch("setSelectedTerm", searchTerm);
+                this.$store.dispatch("setSelectedTaxonId", id);
             }, timeout);
         }
 
         get watchableTaxonId() {
             return this.$store.getters.selectedTaxonId;
         }
-    }
+}
 </script>

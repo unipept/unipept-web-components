@@ -1,4 +1,4 @@
-import {toCSVString, downloadDataByForm} from "../../logic/utils";
+import { toCSVString, downloadDataByForm } from "../../logic/utils";
 
 
 /**
@@ -84,7 +84,7 @@ class AmountTable {
 
         this.table = null;
 
-        this.header = this.settings.contents.map(({title = ""}) => title);
+        this.header = this.settings.contents.map(({ title = "" }) => title);
         if (this.settings.more !== null) {
             this.header.push("");
         }
@@ -179,7 +179,7 @@ class AmountTable {
 
         const row = rows.enter().append("tr");
         for (const colSpec of this.settings.contents) {
-            const {html = null, text = null, builder = null, style = null, shade = false} = colSpec;
+            const { html = null, text = null, builder = null, style = null, shade = false } = colSpec;
             const cell = row.append("td");
 
             if (shade !== false) {
@@ -316,12 +316,12 @@ class AmountTable {
      * @return {string} the CSV version of the table
      */
     toCSV() {
-        const result = [this.settings.contents.filter(({exported = true}) => exported).map(({title = ""}) => title)];
+        const result = [this.settings.contents.filter(({ exported = true }) => exported).map(({ title = "" }) => title)];
         const htmlHelperSpan = document.createElement("span");
         for (const entry of this.settings.data) {
             const values = [];
             for (const colSpec of this.settings.contents) {
-                const {html = null, text = null, exported = true} = colSpec;
+                const { html = null, text = null, exported = true } = colSpec;
                 if (!exported) continue; // skip non-exported cols
                 if (text !== null) {
                     values.push(text(entry));
@@ -366,7 +366,7 @@ class AmountTable {
             row.attr("role", "button");
 
             const that = this;
-            const toggler = function (d) {
+            const toggler = function(d) {
                 if (this.amountTableExpandRow) {
                     this.classList.toggle("amounttable-expanded");
                     this.attributes["aria-expanded"].nodeValue = this.classList.contains("amounttable-expanded");
@@ -393,7 +393,7 @@ class AmountTable {
             };
 
             row.on("click", toggler);
-            row.on("keydown", function (d) {
+            row.on("keydown", function(d) {
                 if (d3.event.key === "Enter" || d3.event.key === " ") {
                     d3.event.preventDefault();
                     toggler.call(this, d);
@@ -470,4 +470,4 @@ class AmountTable {
     }
 }
 
-export {AmountTable};
+export { AmountTable };

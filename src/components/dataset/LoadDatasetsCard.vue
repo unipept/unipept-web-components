@@ -134,24 +134,24 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
+import Vue from "vue";
 
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import DatasetForm from "./DatasetForm.vue";
-    import Assay from "../../logic/data-management/assay/Assay";
-    import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
-    import DatasetManager from "../../logic/data-management/DatasetManager";
-    import {StorageType} from "../../logic/data-management/StorageType";
-    // TODO can be migrated to Vuetify snackbar!
-    import Snackbar from "../custom/Snackbar.vue";
-    import axios from "axios"
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import DatasetForm from "./DatasetForm.vue";
+import Assay from "../../logic/data-management/assay/Assay";
+import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
+import DatasetManager from "../../logic/data-management/DatasetManager";
+import { StorageType } from "../../logic/data-management/StorageType";
+// TODO can be migrated to Vuetify snackbar!
+import Snackbar from "../custom/Snackbar.vue";
+import axios from "axios"
 
-    import SampleDataset from "../../logic/data-management/SampleDataset";
-    import Tooltip from "../custom/Tooltip.vue";
-    import { BASE_URL } from '../../logic/Constants';
-    import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
-    import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
+import SampleDataset from "../../logic/data-management/SampleDataset";
+import Tooltip from "../custom/Tooltip.vue";
+import { BASE_URL } from "../../logic/Constants";
+import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
+import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
 
     @Component({
         components: {
@@ -161,7 +161,7 @@
         }
     })
 
-    export default class LoadDatasetsCard extends Vue {
+export default class LoadDatasetsCard extends Vue {
         $refs!: {
             createdDatasetForm: DatasetForm,
             prideDatasetForm: DatasetForm,
@@ -170,9 +170,9 @@
             prideAssayForm: any
         }
 
-        @Prop({required: true})
+        @Prop({ required: true })
         private selectedDatasets: Assay[];
-        @Prop({required: true})
+        @Prop({ required: true })
         private storedDatasets: Assay[];
 
         private currentTab: number = 0;
@@ -236,7 +236,7 @@
                 let datasetManager: DatasetManager = new DatasetManager();
                 let prideNumber: number = parseInt(this.prideAssay);
 
-                this.prideName = 'PRIDE assay ' + prideNumber.toString();
+                this.prideName = "PRIDE assay " + prideNumber.toString();
 
                 // @ts-ignore
                 this.$refs.prideSnackbar.show();
@@ -266,22 +266,21 @@
         }
 
         private selectDataset(dataset: Assay): void {
-            this.$emit('select-dataset', dataset);
+            this.$emit("select-dataset", dataset);
         }
 
         private deleteDataset(dataset: Assay): void {
-            this.$emit('deselect-dataset', dataset);
+            this.$emit("deselect-dataset", dataset);
         }
 
-        private storeDataset(peptides: string, name: string, save: boolean): void 
-        {
+        private storeDataset(peptides: string, name: string, save: boolean): void {
             this.pendingStore = true;
 
             let assay: MetaProteomicsAssay = new MetaProteomicsAssay();            
             let storageType = save ? StorageType.LocalStorage : StorageType.SessionStorage;
             let storageWriter: StorageWriter = new StorageWriter();
 
-            assay.setPeptides(peptides.split('\n'));
+            assay.setPeptides(peptides.split("\n"));
             assay.setDate(new Date());
             assay.setStorageType(save ? StorageType.LocalStorage : StorageType.SessionStorage);
             assay.setName(name);
@@ -290,13 +289,13 @@
                 () => {
                     this.selectDataset(assay);
                     if (save) {
-                        this.$emit('store-dataset', assay);
+                        this.$emit("store-dataset", assay);
                     }
                     this.pendingStore = false;
                 }
             );
         }
-    }
+}
 </script>
 
 <style lang="less">

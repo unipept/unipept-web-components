@@ -1,8 +1,8 @@
-import PeptideContainer from './PeptideContainer';
+import PeptideContainer from "./PeptideContainer";
 
 export {
     PeptideContainer,
 }
 
-export * from './Node';
-export * from './MPAConfig';
+export * from "./Node";
+export * from "./MPAConfig";

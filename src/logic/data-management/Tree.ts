@@ -1,9 +1,8 @@
-import {Node} from './Node';
-import TaxonInfo from './TaxonInfo';
+import { Node } from "./Node";
+import TaxonInfo from "./TaxonInfo";
 import { TaxaCountTable } from "./counts/TaxaCountTable";
 
-export default class Tree 
-{
+export default class Tree {
     public root: Node;
     public nodes: Map<number, Node>;
     public taxa: number[];
@@ -27,8 +26,7 @@ export default class Tree
 
         let ontology = taxaCountTable.getOntology();
 
-        taxaCountTable.counts.forEach((count, id) => 
-        {
+        taxaCountTable.counts.forEach((count, id) => {
             let currentNode = this.getRoot();
             let taxonDef = ontology.getDefinition(id);
             for (const taxid of taxonDef.lineage) {
@@ -193,8 +191,8 @@ export default class Tree
      * Sorts all children of the tree by name of the organism
      */
     sortTree() {
-        this.root.callRecursively( function () {
-            this.children.sort(function (a, b) {
+        this.root.callRecursively( function() {
+            this.children.sort(function(a, b) {
                 if (a.name < b.name) return -1;
                 if (a.name > b.name) return 1;
                 return 0;

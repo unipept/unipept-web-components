@@ -8,10 +8,9 @@ import DataRepository from "./DataRepository";
 import { TaxumRank, convertStringToTaxumRank } from "./TaxumRank";
 import { TaxaCountTable } from "../data-management/counts/TaxaCountTable";
 import { TaxaCountProcessor } from "../processors/count/TaxaCountProcessor";
-import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
+import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
 
-export default class TaxaDataSource extends DataSource 
-{
+export default class TaxaDataSource extends DataSource {
     private _countTable: TaxaCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
 
@@ -24,8 +23,7 @@ export default class TaxaDataSource extends DataSource
     // searched.
     private _searchedPeptides: number;
  
-    constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository)
-    {
+    constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository) {
         super(repository);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
@@ -83,7 +81,7 @@ export default class TaxaDataSource extends DataSource
         await this.process();
         return this._tree.getRoot().callRecursivelyPostOder((t: Node, c: any) => {
             const included = c.some(x => x.included) || t.values.some(pept => peptides.includes(pept));
-            return Object.assign(Object.assign({}, t), {included: included, children: c});
+            return Object.assign(Object.assign({}, t), { included: included, children: c });
         });
     }
 
@@ -99,10 +97,8 @@ export default class TaxaDataSource extends DataSource
         return [];
     }
 
-    public getNrOfPeptidesByTaxonId(taxonId: number) : number
-    {
-        if(this._tree.nodes.has(taxonId))
-        {
+    public getNrOfPeptidesByTaxonId(taxonId: number) : number {
+        if (this._tree.nodes.has(taxonId)) {
             return this._tree.nodes.get(taxonId).data.count;
         }
 
@@ -125,8 +121,7 @@ export default class TaxaDataSource extends DataSource
     }
 
     private async process(): Promise<void> {
-        if (!this._tree || !this._missedPeptides || this._matchedPeptides === undefined || this._searchedPeptides === undefined) 
-        {
+        if (!this._tree || !this._missedPeptides || this._matchedPeptides === undefined || this._searchedPeptides === undefined) {
             this._tree = await TaxaCountProcessor.process(this._countTable);
 
             // TODO: these values shouldn't be stored here

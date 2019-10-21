@@ -1,5 +1,4 @@
-export class Node 
-{
+export class Node {
     public id: number;
     public name: string;
     public rank: string;
@@ -21,7 +20,7 @@ export class Node
         this.rank = rank;
         this.children = [];
         this.values = [];
-        this.data = {count: undefined, self_count: 0}
+        this.data = { count: undefined, self_count: 0 }
     }
 
     /**
