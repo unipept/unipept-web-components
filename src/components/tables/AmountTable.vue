@@ -26,6 +26,9 @@
                 </div>
             </td>
         </template>
+        <template v-slot:[`item.${searchSettings.field}`]="{ item }">
+            {{searchSettings.format(item)}}
+        </template>
         <template v-slot:item.action="{ item }">
             <v-tooltip :open-delay=1000 bottom>
                 <template v-slot:activator="{ on }">
@@ -53,6 +56,34 @@
     @Component({
         components: {
             Treeview
+        },
+        computed: 
+        {
+            tableHeaders: function()
+            {
+                return [{
+                    text: this.searchSettings.name,
+                    align: 'left',
+                    value: this.searchSettings.field,
+                    width: '15%'
+                }, {
+                    text: 'GO term',
+                    align: 'left',
+                    value: 'code',
+                    width: '30%'
+                }, {
+                    text: 'Name',
+                    align: 'left',
+                    value: 'name',
+                    width: '45%'
+                }, {
+                    text: 'Actions',
+                    align: 'center',
+                    width: '15%',
+                    sortable: false,
+                    value: 'action'
+                }]
+            }
         }
     })
     export default class AmountTable extends Vue {
@@ -71,30 +102,6 @@
 
         // Keeps track of the functional annotations for which a Tree has already been calculated.
         private treeAvailable: Map<FAElement, Node> = new Map();
-
-        private tableHeaders = [{
-            text: 'Peptides',
-            align: 'left',
-            value: 'popularity',
-            width: '15%'
-        }, {
-            text: this.annotationName,
-            align: 'left',
-            value: 'code',
-            width: '30%'
-        }, {
-            text: 'Name',
-            align: 'left',
-            value: 'name',
-            width: '45%'
-        }, {
-            text: 'Actions',
-            align: 'center',
-            width: '15%',
-            sortable: false,
-            value: 'action'
-        }];
-
     
         // All settings for each Treeview that remain the same
         protected tooltip: (d: any) => string = tooltipContent;
