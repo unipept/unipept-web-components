@@ -153,7 +153,7 @@
 </template>
 
 <script lang="ts">
-import * as d3 from "d3";
+import d3 from "d3";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
@@ -167,24 +167,24 @@ import CardHeader from "../custom/CardHeader.vue";
 //@ts-ignore
 import fullscreen from "vue-fullscreen";
 
-import { logToGoogle } from "../../logic/utils";
-import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
+import { logToGoogle, triggerDownloadModal } from "../../logic/utils";
 import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
 import DataRepository from "../../logic/data-source/DataRepository";
+import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 import $ from "jquery";
 
-    @Component({
-        components: {
-            HeatmapVisualization,
-            CardHeader,
-            HierarchicalOutlineVisualization,
-            TreeviewVisualization,
-            TreemapVisualization,
-            SunburstVisualization,
-            HeatmapWizardSingleSample,
-            ImageDownloadModal
-        }
-    })
+@Component({
+    components: {
+        HeatmapVisualization,
+        CardHeader,
+        HierarchicalOutlineVisualization,
+        TreeviewVisualization,
+        TreemapVisualization,
+        SunburstVisualization,
+        HeatmapWizardSingleSample,
+        ImageDownloadModal
+    }
+})
 export default class SingleDatasetVisualizationsCard extends Vue {
         $refs!: {
             fullScreenContainer: fullscreen,

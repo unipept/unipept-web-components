@@ -329,7 +329,6 @@ export function svg2svgDataURL(svgSelector: string) {
     var decoded = unescape(encodeURIComponent(svgString));
     // convert the svg to base64
     var base64 = btoa(decoded);
-
     return `data:image/svg+xml;base64,${base64}`;
 }
 
