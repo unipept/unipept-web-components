@@ -19,7 +19,7 @@ module.exports = {
     "space-before-function-paren": ["error", "never"],
     "no-inner-declarations": "off",
     "brace-style": ["error", "1tbs"],
-    "keyword-spacing": "error"
+    "keyword-spacing": "error",
   },
   parserOptions: {
     "parser": "@typescript-eslint/parser",

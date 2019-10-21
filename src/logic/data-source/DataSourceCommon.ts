@@ -19,7 +19,7 @@ export namespace DataSourceCommon
 
                         let peptideCount = processedPeptideContainer.countTable.get(peptide)
                         let peptideData = processedPeptideContainer.response.get(peptide)
-                        let ecProteinCount = peptideData.fa.data.hasOwnProperty(faElement.code)? peptideData.fa.data[faElement.code] : 0
+                        let ecProteinCount = faElement.code in peptideData.fa.data? peptideData.fa.data[faElement.code] : 0
 
                         return [
                             peptide, 
