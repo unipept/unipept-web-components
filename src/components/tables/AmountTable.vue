@@ -27,7 +27,12 @@
             </td>
         </template>
         <template v-slot:item.action="{ item }">
-            <v-icon>mdi-download</v-icon>
+            <v-tooltip :open-delay=1000 bottom>
+                <template v-slot:activator="{ on }">
+                    <v-icon @click="saveSummaryAsCSV(item)" class="row-to-csv-button" v-on="on">mdi-download</v-icon>
+                </template>
+                <span>Download CSV summary of the filtered functional annotation</span>
+            </v-tooltip>
         </template>
     </v-data-table>
 </template>
@@ -57,6 +62,8 @@
         protected searchSettings: FaSortSettings;
         @Prop({required: true})
         protected taxaRetriever: (term: FAElement) => Promise<Node>;
+        @Prop({required: true})
+        protected summaryRetriever: (term: FAElement) => Promise<string[][]>;
         @Prop({required: true})
         protected annotationName: string;
         @Prop({required: false})
@@ -124,6 +131,12 @@
             let columnNames: string[] = ["Peptides", this.annotationName, "Name"];
             let grid: string[][] = this.items.map(term => [term.popularity.toString(), term.code, term.name]);
             downloadDataByForm(this.toCSV(columnNames, grid), this.annotationName.replace(/ /g, "_") + (this.namespace? "-" + this.namespace: "") + "-export.csv", "text/csv");
+        }
+
+        private async saveSummaryAsCSV(term: FAElement)
+        {
+            let data = await this.summaryRetriever(term)
+            downloadDataByForm(toCSVString(data), term.code.replace(/:/g, "_") + ".csv", "text/csv");
         }
     }
 </script>

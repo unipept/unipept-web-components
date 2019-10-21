@@ -7,6 +7,7 @@ import { ECCountTable } from '../data-management/counts/ECCountTable';
 import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
 import DataRepository from './DataRepository';
 import { PeptideData } from '../api/pept2data/Response';
+import { DataSourceCommon } from './DataSourceCommon';
 // import TreeViewNode from '../ui/visualizations/TreeViewNode';
 
 export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> 
@@ -29,6 +30,11 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
     public getPeptidesByEcCode(code: string)
     {
         return Array.from(this._countTable.ontology2peptide.get(code) || [])
+    }
+
+    public getECNumberSummary(number: EcNumber): string[][]
+    {
+        return DataSourceCommon.getFASummary(number, this._processedPeptideContainer)
     }
 
     /**

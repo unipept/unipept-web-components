@@ -7,6 +7,7 @@ import { GeneOntology } from '../data-management/ontology/go/GeneOntology';
 import { GOCountTable } from '../data-management/counts/GOCountTable';
 import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
 import { PeptideData } from '../api/pept2data/Response';
+import { DataSourceCommon } from './DataSourceCommon';
 
 /**
  * A GoDataSource can be used to access all GoTerms associated with a specific Sample. Note that this class contains
@@ -30,6 +31,11 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
     public getPeptidesByGoTerm(term: GoTerm): string[]
     {
         return Array.from(this._countTable.ontology2peptide.get(term.code) || [])
+    }
+
+    public getGoTermSummary(term: GoTerm): string[][]
+    {
+        return DataSourceCommon.getFASummary(term, this._processedPeptideContainer);
     }
 
     /**
