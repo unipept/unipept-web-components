@@ -7,7 +7,7 @@ export default class Utils {
      */
     static openInBrowser(url: string): void {
         if (Utils.isElectron()) {
-            const shell = require('electron').shell;
+            const shell = require("electron").shell;
             shell.openExternal(url);
         } else {
             window.open(url);
@@ -21,6 +21,6 @@ export default class Utils {
      */
     static isElectron(): boolean {
         const userAgent = navigator.userAgent.toLowerCase();
-        return userAgent.indexOf(' electron/') > -1;
+        return userAgent.indexOf(" electron/") > -1;
     }
 }

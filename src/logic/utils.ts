@@ -1,7 +1,7 @@
 import Clipboard from "clipboard";
 import $ from "jquery";
 import d3 from "d3";
-import Utils from './../components/custom/Utils';
+import Utils from "./../components/custom/Utils";
 
 /**
  * Make clicking on the selector copy to the user clipboard
@@ -62,23 +62,17 @@ export function brightness(rgb) {
  * @param  {String}  [fileType] file type like "text/csv"
  * @return {Promise.<string>}
  */
-export function downloadDataByForm(data, fileName, fileType = null) 
-{
-    if(Utils.isElectron())
-    {
-        const fs = require('fs');
-        const {dialog} = require('electron').remote;
-        dialog.showSaveDialog(null, {title: "save to CSV", defaultPath: fileName}).then((saveDialogReturnValue) => 
-        {
-            if(!saveDialogReturnValue.canceled)
-            {
+export function downloadDataByForm(data, fileName, fileType = null) {
+    if (Utils.isElectron()) {
+        const fs = require("fs");
+        const { dialog } = require("electron").remote;
+        dialog.showSaveDialog(null, { title: "save to CSV", defaultPath: fileName }).then((saveDialogReturnValue) => {
+            if (!saveDialogReturnValue.canceled) {
                 fs.writeFileSync(saveDialogReturnValue.filePath, data);
             }
         })
-    }
-    else
-    {
-        return new Promise(function (resolve, reject) {
+    } else {
+        return new Promise(function(resolve, reject) {
             let nonce = Math.random();
             $("form.download").remove();
             $("body").append("<form class='download' method='post' action='/download'></form>");
@@ -89,7 +83,7 @@ export function downloadDataByForm(data, fileName, fileType = null)
             }
             $downloadForm.submit();
         });
-    };
+    }
 }
 
 /**
@@ -118,12 +112,12 @@ export function downloadDataByLink(dataURL, fileName) {
  */
 export function get(url: string): Promise<any> {
     // Return a new promise.
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
         // Do the usual XHR stuff
         let req = new XMLHttpRequest();
         req.open("GET", url);
 
-        req.onload = function () {
+        req.onload = function() {
             // This is called even on 404 etc
             // so check the status
             if (req.status === 200) {
@@ -137,7 +131,7 @@ export function get(url: string): Promise<any> {
         };
 
         // Handle network errors
-        req.onerror = function () {
+        req.onerror = function() {
             reject(Error("Network Error"));
         };
 
@@ -177,7 +171,7 @@ export function getReadableColorFor(color) {
  */
 export function highlight(element) {
     $(element).addClass("flash");
-    setTimeout(function () {
+    setTimeout(function() {
         $(element).removeClass("flash");
     }, 2000);
 }
@@ -269,7 +263,7 @@ export function showInfo(message) {
  * @return {string}
  */
 export function stringTitleize(s) {
-    return s.replace(/\w\S*/g, function (txt) {
+    return s.replace(/\w\S*/g, function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 }
@@ -319,20 +313,17 @@ export function numberToPercent(number, digits = 0) {
  * @param {string} svgSelector The DOM selector of the SVG or jQuery object
  * @returns {string} A dataURL containing the resulting PNG
 */
-export async function svg2png(svgSelector: string) : Promise<string>
-{
+export async function svg2png(svgSelector: string) : Promise<string> {
     // Send the SVG code to the server for png conversion
-    return new Promise(resolve => 
-    {    
+    return new Promise(resolve => {    
         let $element = $(svgSelector);
         let svg = $element.wrap("<div></div>").parent().html();
         $element.unwrap();
-        $.post("/convert", {image: svg}, resolve);
+        $.post("/convert", { image: svg }, resolve);
     })
 }
 
-export function svg2svgDataURL(svgSelector: string)
-{
+export function svg2svgDataURL(svgSelector: string) {
     var el = $(svgSelector).get(0)
     var svgString = new XMLSerializer().serializeToString(el);
     var decoded = unescape(encodeURIComponent(svgString));
@@ -348,13 +339,12 @@ export function svg2svgDataURL(svgSelector: string)
  * @param {string} selector The DOM selector
  * @returns {string} A dataURL containing the resulting PNG
 */
-export async function dom2pngDataURL(selector: string) : Promise<string>
-{
-    const html2canvas = require('html2canvas');
+export async function dom2pngDataURL(selector: string) : Promise<string> {
+    const html2canvas = require("html2canvas");
     // Use html2canvas to convert selected element to canvas, 
     // then convert that canvas to a dataURL
     return html2canvas($(selector).get(0))
-            .then((canvasElement) => canvasElement.toDataURL())
+        .then((canvasElement) => canvasElement.toDataURL())
 }
 
 /**

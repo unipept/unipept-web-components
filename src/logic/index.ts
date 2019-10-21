@@ -1,1 +1,1 @@
-export * from './data-management';
+export * from "./data-management";

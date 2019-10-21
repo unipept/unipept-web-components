@@ -1,7 +1,6 @@
 import ProgressListener from "./ProgressListener";
 
-export default class ProgressPublisher
-{
+export default class ProgressPublisher {
     private _progressListeners: ProgressListener[] = [];
 
     public registerProgressListener(listener: ProgressListener): void {

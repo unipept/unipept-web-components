@@ -6,13 +6,11 @@ import { StorageType } from "../../../StorageType";
 
 export namespace BrowserStorageMetadataReader
 {
-    export async function readMetaGenomicsAssay(mgAssay: MetaGenomicsAssay, storageType: StorageType): Promise<void> 
-    {
+    export async function readMetaGenomicsAssay(mgAssay: MetaGenomicsAssay, storageType: StorageType): Promise<void> {
         throw new Error("Method not implemented.");
     }
     
-    export async function readMetaProteomicsAssay(mpAssay: MetaProteomicsAssay, storageType: StorageType): Promise<void> 
-    {
+    export async function readMetaProteomicsAssay(mpAssay: MetaProteomicsAssay, storageType: StorageType): Promise<void> {
         let storage: Storage = BrowserStorageCommon.getStorage(storageType);
         let serializedMetadata = storage.getItem(BrowserStorageConsts.MPA_METADATA_PREFIX + mpAssay.getId());
         let parsedMeta = JSON.parse(serializedMetadata);

@@ -31,14 +31,13 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component, {mixins} from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import {dom2pngDataURL, svg2svgDataURL, downloadDataByLink} from "../../logic/utils";
+import Vue from "vue";
+import Component, { mixins } from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import { dom2pngDataURL, svg2svgDataURL, downloadDataByLink } from "../../logic/utils";
 
     @Component
-    export default class ImageDownloadModal extends Vue 
-    {
+export default class ImageDownloadModal extends Vue {
         private downloadDialogOpen: boolean = false;
         private preparingImage: boolean = false;
 
@@ -49,16 +48,14 @@
         private svgDataURL: string = "";
         private pngDataURL: string = "";
 
-        async download(baseFileName, canvasSelector, svgSelector=undefined)
-        {
+        async download(baseFileName, canvasSelector, svgSelector=undefined) {
             this.svgDownload = false;
 
             this.baseFileName = baseFileName;
             this.preparingImage = true;
             this.downloadDialogOpen = true;
 
-            if(svgSelector)
-            {
+            if (svgSelector) {
                 this.svgDataURL = await svg2svgDataURL(svgSelector);
                 this.svgDownload = true;
             }
@@ -68,16 +65,14 @@
             this.preparingImage = false;
         }
 
-        private async downloadPNG()
-        {
+        private async downloadPNG() {
             downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
         }
 
-        private async downloadSVG()
-        {
+        private async downloadSVG() {
             downloadDataByLink(this.svgDataURL, this.baseFileName + ".svg")
         }
-    }
+}
 </script>
 
 <style scoped>

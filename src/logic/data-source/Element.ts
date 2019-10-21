@@ -1,4 +1,4 @@
-import DataRepository from './DataRepository';
+import DataRepository from "./DataRepository";
 
 export default abstract class Element {
     // The name associated with this element

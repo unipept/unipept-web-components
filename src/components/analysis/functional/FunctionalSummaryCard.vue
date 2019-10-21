@@ -130,36 +130,36 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import MpaAnalysisManager from "../../../logic/data-management/MpaAnalysisManager";
-    import FaSortSettings from "../../tables/FaSortSettings";
-    import {numberToPercent, stringTitleize} from "../../../logic/utils";
-    import PeptideContainer from "../../../logic/data-management/PeptideContainer";
-    import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import MpaAnalysisManager from "../../../logic/data-management/MpaAnalysisManager";
+import FaSortSettings from "../../tables/FaSortSettings";
+import { numberToPercent, stringTitleize } from "../../../logic/utils";
+import PeptideContainer from "../../../logic/data-management/PeptideContainer";
+import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
-    import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
-    import CardHeader from "../../custom/CardHeader.vue";
-    import QuickGoCard from "./QuickGOCard.vue";
+import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
+import CardHeader from "../../custom/CardHeader.vue";
+import QuickGoCard from "./QuickGOCard.vue";
 
-    import {showInfoModal} from "../../../logic/modal";
-    import DataRepository from "../../../logic/data-source/DataRepository";
-    import GoDataSource from "../../../logic/data-source/GoDataSource";
-    import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
-    import GoTerm from "../../../logic/functional-annotations/GoTerm";
-    import GoAmountTable from "../../tables/GoAmountTable.vue";
-    import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
-    import EcNumber from "../../../logic/functional-annotations/EcNumber";
-    import EcDataSource from "../../../logic/data-source/EcDataSource";
-    import EcAmountTable from "../../tables/EcAmountTable.vue";
-    import TreeViewNode from "../../visualizations/TreeViewNode";
-    import Treeview from "../../visualizations/Treeview.vue";
-    import FATrust from "../../../logic/functional-annotations/FATrust";
+import { showInfoModal } from "../../../logic/modal";
+import DataRepository from "../../../logic/data-source/DataRepository";
+import GoDataSource from "../../../logic/data-source/GoDataSource";
+import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
+import GoTerm from "../../../logic/functional-annotations/GoTerm";
+import GoAmountTable from "../../tables/GoAmountTable.vue";
+import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
+import EcNumber from "../../../logic/functional-annotations/EcNumber";
+import EcDataSource from "../../../logic/data-source/EcDataSource";
+import EcAmountTable from "../../tables/EcAmountTable.vue";
+import TreeViewNode from "../../visualizations/TreeViewNode";
+import Treeview from "../../visualizations/Treeview.vue";
+import FATrust from "../../../logic/functional-annotations/FATrust";
 
-    import {NCBITaxon} from "../../../logic/data-management/ontology/taxa/NCBITaxon";
-    import {NCBITaxonomy} from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
-    import {Ontologies} from "../../../logic/data-management/ontology/Ontologies";
+import { NCBITaxon } from "../../../logic/data-management/ontology/taxa/NCBITaxon";
+import { NCBITaxonomy } from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
+import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
 
     @Component({
         components: {
@@ -189,10 +189,10 @@
             }
         }
     })
-    export default class FunctionalSummaryCard extends Vue {
-        @Prop({required: true})
+export default class FunctionalSummaryCard extends Vue {
+        @Prop({ required: true })
         private dataRepository: DataRepository;
-        @Prop({required: false, default: true})
+        @Prop({ required: false, default: true })
         private analysisInProgress: boolean;
 
         private totalPeptides: number = 0;
@@ -264,15 +264,15 @@
             this.onDataRepositoryChanged();
         }
 
-        @Watch('dataRepository') onDataRepositoryChange() {
+        @Watch("dataRepository") onDataRepositoryChange() {
             this.onDataRepositoryChanged();
         }
 
-        @Watch('percentSettings') onPercentSettingsChange() {
+        @Watch("percentSettings") onPercentSettingsChange() {
             this.onDataRepositoryChanged();
         }
         
-        @Watch('watchableSelectedTaxonId') onWatchableSelectedTaxonIdChanged() {
+        @Watch("watchableSelectedTaxonId") onWatchableSelectedTaxonIdChanged() {
             this.onDataRepositoryChanged();
             this.getSelectedTaxonInfo();
         }
@@ -291,8 +291,8 @@
         }
 
         reset() {
-            this.$store.dispatch('setSelectedTerm', 'Organism');
-            this.$store.dispatch('setSelectedTaxonId', -1);
+            this.$store.dispatch("setSelectedTerm", "Organism");
+            this.$store.dispatch("setSelectedTaxonId", -1);
         }
 
         showSortSettingsModal() {
@@ -319,16 +319,13 @@
             this.faCalculationsInProgress = false;
         }
 
-        private async getSelectedTaxonInfo()
-        {
-            if(this.dataRepository)
-            {
+        private async getSelectedTaxonInfo() {
+            if (this.dataRepository) {
                 const taxaSource = await this.dataRepository.createTaxaDataSource();
                 const taxonId = this.$store.getters.selectedTaxonId;
 
                 // get selecton taxon information
-                if(taxonId != -1)
-                {
+                if (taxonId != -1) {
                     this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
                     this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
                     this.showTaxonInfo = true;
@@ -336,8 +333,7 @@
             }
         }
 
-        private async redoFAcalculations(): Promise<void> 
-        {
+        private async redoFAcalculations(): Promise<void> {
             if (this.dataRepository) {
                 let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
                 const taxonId = this.$store.getters.selectedTaxonId;
@@ -355,10 +351,8 @@
             }
         }
 
-        private async doFAcalculations(sequences: string[] = null)
-        {
-            if(this.dataRepository)
-            {
+        private async doFAcalculations(sequences: string[] = null) {
+            if (this.dataRepository) {
                 let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
                 let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
 
@@ -421,7 +415,7 @@
             }
             return `<strong>${trust.annotatedCount} peptides</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) have at least one ${kind} assigned to them. `;
         }
-    }
+}
 </script>
 
 <style lang="less">

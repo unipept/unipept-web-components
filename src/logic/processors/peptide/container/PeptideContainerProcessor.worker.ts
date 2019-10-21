@@ -1,12 +1,12 @@
-import process from './process';
+import process from "./process";
 
 const ctx: Worker = self as any;
 
 ctx.addEventListener("message", handleEvent);
 
 async function handleEvent(event){
-   let result = await process(event.data.peptides, event.data.config, setProgress)
-   ctx.postMessage({type: "result", value: result});
+    let result = await process(event.data.peptides, event.data.config, setProgress)
+    ctx.postMessage({ type: "result", value: result });
 }
 
 /**
@@ -15,6 +15,6 @@ async function handleEvent(event){
  * @param {number} value progress in [0,1]
  */
 function setProgress(value) {
-   // @ts-ignore
-   self.postMessage({type: "progress", value: value});
+    // @ts-ignore
+    self.postMessage({ type: "progress", value: value });
 }

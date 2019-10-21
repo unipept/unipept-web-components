@@ -1,18 +1,18 @@
 export enum EcNameSpace {
     // EC 1.x.x.x class
-    Oxidoreductases = 'oxidoreductases',
+    Oxidoreductases = "oxidoreductases",
     // EC 2.x.x.x class
-    Transferases = 'transferases',
+    Transferases = "transferases",
     // EC 3.x.x.x class
-    Hydrolases = 'hydrolases',
+    Hydrolases = "hydrolases",
     // EC 4.x.x.x class
-    Lyases = 'lyases',
+    Lyases = "lyases",
     // EC 5.x.x.x class
-    Isomerases = 'isomerases',
+    Isomerases = "isomerases",
     // EC 6.x.x.x class
-    Ligases = 'ligases',
+    Ligases = "ligases",
     // EC 7.x.x.x class
-    Translocases = 'translocases',
+    Translocases = "translocases",
 }
 
 /**

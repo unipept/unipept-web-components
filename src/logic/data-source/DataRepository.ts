@@ -1,32 +1,28 @@
-import TaxaDataSource from './TaxaDataSource';
-import GoDataSource from './GoDataSource';
-import EcDataSource from './EcDataSource';
+import TaxaDataSource from "./TaxaDataSource";
+import GoDataSource from "./GoDataSource";
+import EcDataSource from "./EcDataSource";
 
-export default abstract class DataRepository
-{
+export default abstract class DataRepository {
     protected _taxaSourceCache: TaxaDataSource;
     protected _goSourceCache: GoDataSource;
     protected _ecSourceCache: EcDataSource;
 
     public async createTaxaDataSource(): Promise<TaxaDataSource> {
-        if (!this._taxaSourceCache) 
-        {
+        if (!this._taxaSourceCache) {
             await this.initTaxaDataSource();
         }
         return this._taxaSourceCache;
     }
 
     public async createGoDataSource(): Promise<GoDataSource> {
-        if (!this._goSourceCache) 
-        {
+        if (!this._goSourceCache) {
             await this.initGoDataSource();
         }
         return this._goSourceCache;
     }
 
     public async createEcDataSource(): Promise<EcDataSource> {
-        if (!this._ecSourceCache) 
-        {
+        if (!this._ecSourceCache) {
             await this.initEcDataSource();
         }
         return this._ecSourceCache;

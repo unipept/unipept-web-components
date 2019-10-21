@@ -7,18 +7,15 @@ import { StorageType } from "../../../StorageType";
 
 export namespace BrowserStorageWriter
 {
-    export async function writeMetaGenomicsAssay(mgAssay: MetaGenomicsAssay, storageType: StorageType): Promise<void> 
-    {
+    export async function writeMetaGenomicsAssay(mgAssay: MetaGenomicsAssay, storageType: StorageType): Promise<void> {
         throw new Error("Method not implemented.");
     }
     
-    export async function writeMetaProteomicsAssay(mpAssay: MetaProteomicsAssay, storageType: StorageType): Promise<void> 
-    {
+    export async function writeMetaProteomicsAssay(mpAssay: MetaProteomicsAssay, storageType: StorageType): Promise<void> {
         let storage: Storage = BrowserStorageCommon.getStorage(storageType);
         let peptideContainer: PeptideContainer = mpAssay.peptideContainer;
 
-        if(!mpAssay.getId())
-        {
+        if (!mpAssay.getId()) {
             mpAssay.setId(BrowserStorageCommon.generateUniqueId())
         }
 
@@ -31,6 +28,6 @@ export namespace BrowserStorageWriter
         });
 
         storage.setItem(BrowserStorageConsts.MPA_METADATA_PREFIX + mpAssay.getId(), metadata);
-        storage.setItem(BrowserStorageConsts.MPA_PEPTIDE_PREFIX + mpAssay.getId(), JSON.stringify({peptides: peptideContainer.getPeptides()}));
+        storage.setItem(BrowserStorageConsts.MPA_PEPTIDE_PREFIX + mpAssay.getId(), JSON.stringify({ peptides: peptideContainer.getPeptides() }));
     }
 }
