@@ -22,8 +22,7 @@
     @Component({
         components: {LoadDatasetsCard, SelectDatasetsCard, SearchHelp}
     })
-    export default class MpaHome extends Vue {
-    };
+    export default class MpaHome extends Vue {}
 </script>
 
 <style scoped>
