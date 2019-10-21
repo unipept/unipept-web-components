@@ -68,7 +68,7 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
-            <v-alert v-if="this.showTaxonInfo && this.selectedNCBITaxon" dense colored-border id="filtered-taxon-information">
+            <v-alert v-if="this.showTaxonInfo && this.selectedNCBITaxon && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
                 <v-row dense align="center">
                     <v-col class="grow"><b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to <b>{{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}})</b>.</v-col>
                     <v-col class="shrink">
@@ -323,10 +323,6 @@
         reset() {
             this.$store.dispatch('setSelectedTerm', 'Organism');
             this.$store.dispatch('setSelectedTaxonId', -1);
-        }
-
-        private showGoModal(ns: GoNameSpace): void {
-            this.goModals.set(ns, true);
         }
 
         private async onDataRepositoryChanged() {

@@ -36,10 +36,7 @@ export default class MetaProteomicsDataRepository extends DataRepository
 
     protected async initTaxaDataSource(): Promise<void> 
     {
-        let processedPeptideContainer = await this._processedPeptideContainer;         
-        processedPeptideContainer.response.forEach((data: PeptideData) => {
-            Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
-        });
+        let processedPeptideContainer = await this._processedPeptideContainer;
 
         this._taxaSourceCache = new TaxaDataSource(
             TaxaPeptideProcessor.process(processedPeptideContainer), 
@@ -69,9 +66,28 @@ export default class MetaProteomicsDataRepository extends DataRepository
 
     async initProcessedPeptideContainer() : Promise<ProcessedPeptideContainer>
     {
-        if (!this._processedPeptideContainer) {
-            this._processedPeptideContainer = this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig);
+        if (!this._processedPeptideContainer) 
+        {
+            this._processedPeptideContainer = this.processPeptideContainer()
         }
+
         return this._processedPeptideContainer;
+    }
+
+    private async processPeptideContainer()
+    {
+        let processedPeptideContainer = await this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig)
+        let lcas = [];
+
+        // set lineages in ncbiTaxonomy
+        processedPeptideContainer.response.forEach((data: PeptideData) => {
+            Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
+            lcas.push(data.lca)
+        });
+
+        // fetch taxa info for these lcas
+        await Ontologies.ncbiTaxonomy.fetchTaxaInfo(lcas);
+
+        return processedPeptideContainer;
     }
 }

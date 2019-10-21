@@ -1,0 +1,18 @@
+name: Test
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+    - name: Install dependencies
+      run: npm install
+    - name: Install Jest CLI
+      run: npm i -g jest-cli
+    - name: Run tests
+      run: jest
+    
