@@ -4,6 +4,7 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import GoTerm from '@/logic/functional-annotations/GoTerm';
 import { GoNameSpace } from '@/logic/functional-annotations/GoNameSpace';
+import FaSortSettings from '@/components/tables/FaSortSettings';
 
 Vue.use(Vuetify);
 
@@ -35,21 +36,29 @@ describe('QuickGOSummaryCard', () => {
         expect(wrapper.find("v-card-text-stub").html()).toMatchSnapshot();
     });
 
-    // it('renders valid GO-terms correctly', () => {
-    //     let goTerms: GoTerm[] = [];
-    //     goTerms.push(new GoTerm("GO:0006412", "translation", GoNameSpace.BiologicalProcess, 157, 0.13, []));
-    //     goTerms.push(new GoTerm("GO:0043312", "neutrophil degranulation", GoNameSpace.BiologicalProcess, 100, 0.09, []));
-    //     goTerms.push(new GoTerm("GO:0042026", "protein refolding", GoNameSpace.BiologicalProcess, 73, 0.06, []));
+    it('renders valid GO-terms correctly', () => {
+        let goTerms: GoTerm[] = [];
+        goTerms.push(new GoTerm("GO:0006412", "translation", GoNameSpace.BiologicalProcess, 157, 0.13, []));
+        goTerms.push(new GoTerm("GO:0043312", "neutrophil degranulation", GoNameSpace.BiologicalProcess, 100, 0.09, []));
+        goTerms.push(new GoTerm("GO:0042026", "protein refolding", GoNameSpace.BiologicalProcess, 73, 0.06, []));
 
-    //     const wrapper = shallowMount(QuickGOCard, {
-    //         localVue,
-    //         vuetify,
-    //         propsData: {
-    //             items: goTerms,
-    //             sortSettings: null
-    //         }
-    //     });
+        let sortSettings: FaSortSettings = new FaSortSettings(
+            (x: GoTerm) => x.toString(),
+            "popularity",
+            "fractionOfPepts",
+            "Peptides",
+            (a, b) => b["popularity"] - a["popularity"]
+        );
 
-    //     expect(wrapper.find("v-card-text-stub")).toMatchSnapshot();
-    // });
+        const wrapper = shallowMount(QuickGOCard, {
+            localVue,
+            vuetify,
+            propsData: {
+                items: goTerms,
+                sortSettings: sortSettings
+            }
+        });
+
+        expect(wrapper.find("v-card-text-stub").html()).toMatchSnapshot();
+    });
 })
