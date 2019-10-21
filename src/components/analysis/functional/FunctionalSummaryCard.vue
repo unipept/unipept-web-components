@@ -311,10 +311,6 @@
             showInfoModal("Sorting functional annotations", modalContent);
         }
 
-        private showGoModal(ns: GoNameSpace): void {
-            this.goModals.set(ns, true);
-        }
-
         private async onDataRepositoryChanged() {
             this.faCalculationsInProgress = true;
             if (this.dataRepository) {

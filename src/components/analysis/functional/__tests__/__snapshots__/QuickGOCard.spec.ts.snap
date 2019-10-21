@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QuickGOSummaryCard renders a placeholder when no GO-terms are found 1`] = `"<div style=\\"height: 100%;\\"><img class=\\"quickGoThumb\\" style=\\"max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); cursor: pointer;\\"> <div role=\\"dialog\\" class=\\"v-dialog__container\\" style=\\"display: block;\\"><div role=\\"document\\" tabindex=\\"0\\" class=\\"v-dialog__content\\" style=\\"z-index: 0;\\"><div class=\\"v-dialog\\" style=\\"max-width: 90%; display: none;\\"></div></div></div></div>"`;
