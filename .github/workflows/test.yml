@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 
 on: [push]
 
@@ -11,8 +11,8 @@ jobs:
     - uses: actions/setup-node@v1
     - name: Install dependencies
       run: npm install
-    - name: Install ESLint CLI
-      run: npm i -g eslint
-    - name: Run ESLint
-      run: eslint "src/**" --ext .ts,.js,.vue
+    - name: Install Jest CLI
+      run: npm i -g jest-cli
+    - name: Run tests
+      run: jest
     
