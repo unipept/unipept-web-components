@@ -2,9 +2,9 @@ import { shallowMount, createLocalVue } from "@vue/test-utils"
 import QuickGOCard from "./../QuickGOCard.vue";
 import Vue from "vue"
 import Vuetify from "vuetify"
-import GoTerm from "@/logic/functional-annotations/GoTerm";
-import { GoNameSpace } from "@/logic/functional-annotations/GoNameSpace";
-import FaSortSettings from "@/components/tables/FaSortSettings";
+import GoTerm from "../../../../logic/functional-annotations/GoTerm";
+import { GoNameSpace } from "../../../../logic/functional-annotations/GoNameSpace";
+import FaSortSettings from "../../../tables/FaSortSettings";
 
 Vue.use(Vuetify);
 
@@ -12,14 +12,10 @@ const localVue = createLocalVue();
 
 describe("QuickGOSummaryCard", () => {
     let vuetify;
-    let el;
 
     beforeEach(() => {
-        el = document.createElement("div");
-        el.setAttribute("data-app", "true");
-        document.body.appendChild(el);
         vuetify = new Vuetify();
-    })
+    });
 
     it("renders a placeholder when no GO-terms are found", () => {
         const wrapper = shallowMount(QuickGOCard, {

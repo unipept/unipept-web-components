@@ -27,9 +27,9 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import GoTerm from "@/logic/functional-annotations/GoTerm";
+import GoTerm from "../../../logic/functional-annotations/GoTerm";
 import FaSortSettings from "../../tables/FaSortSettings";
-import { GoNameSpace } from "@/logic/functional-annotations/GoNameSpace";
+import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
 import Utils from "./../../custom/Utils";
 
 @Component

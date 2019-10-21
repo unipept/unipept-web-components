@@ -1,6 +1,15 @@
 <template>
     <div>
-        <v-text-field style="margin-bottom: -26px;" name="tree_search" id="tree_search" outlined single-line label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
+        <v-text-field 
+            style="margin-bottom: -26px;" 
+            name="tree_search" 
+            id="tree_search" 
+            outlined 
+            single-line 
+            label="Search for an organism" 
+            append-icon="mdi-magnify" 
+            v-model="searchTerm">
+        </v-text-field>
         <div id="searchtree" class="treeView multi"></div>
         <div id="tree_data">
             <p>
@@ -21,53 +30,53 @@ import { constructSearchtree } from "../../logic/data-management/searchtree";
 import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 import DataRepository from "../../logic/data-source/DataRepository";
 
-    @Component({
-        components: {},
-        computed: {
-            watchableSelectedSearchTerm: {
-                get(): string {
-                    return this.$store.getters.selectedTerm
-                }
+@Component({
+    components: {},
+    computed: {
+        watchableSelectedSearchTerm: {
+            get(): string {
+                return this.$store.getters.selectedTerm
             }
         }
-    })
+    }
+})
 export default class HierarchicalOutlineVisualization extends Vue {
-        @Prop({ required: true }) 
-        private dataRepository: DataRepository;
-        
-        private searchTerm: string = "";
-        private searchTree!: any;
+    @Prop({ required: true }) 
+    private dataRepository: DataRepository;
 
-        mounted() {
-            this.searchTerm = this.$store.getters.selectedTerm;
-            this.initSearchTree();
+    private searchTerm: string = "";
+    private searchTree!: any;
+
+    mounted() {
+        this.searchTerm = this.$store.getters.selectedTerm;
+        this.initSearchTree();
+    }
+
+    @Watch("dataRepository") 
+    private onDataRepositoryChanged() {
+        this.initSearchTree();
+    }
+
+    @Watch("searchTerm") 
+    private onActiveSearchTermChanged(newSearchTerm: string) {
+        if (this.searchTree && newSearchTerm !== "") {
+            this.searchTree.search(newSearchTerm);
         }
+    }
 
-        @Watch("dataRepository") 
-        private onDataRepositoryChanged() {
-            this.initSearchTree();
+
+    @Watch("watchableSelectedSearchTerm")
+    private onSelectedSearchTermChanged(newSearchTerm: string) {
+        this.searchTerm = newSearchTerm;
+    }
+
+    private async initSearchTree() {
+        if (this.dataRepository != null) {
+            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
+            let tree: Tree = await taxaDataSource.getTree();
+            this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
         }
-
-        @Watch("searchTerm") 
-        private onActiveSearchTermChanged(newSearchTerm: string) {
-            if (this.searchTree && newSearchTerm !== "") {
-                this.searchTree.search(newSearchTerm);
-            }
-        }
-
-
-        @Watch("watchableSelectedSearchTerm")
-        private onSelectedSearchTermChanged(newSearchTerm: string) {
-            this.searchTerm = newSearchTerm;
-        }
-
-        private async initSearchTree() {
-            if (this.dataRepository != null) {
-                let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-                let tree: Tree = await taxaDataSource.getTree();
-                this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
-            }
-        }
+    }
 }
 </script>
 
