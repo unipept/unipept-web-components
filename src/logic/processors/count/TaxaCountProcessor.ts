@@ -3,8 +3,7 @@ import Tree from "../../data-management/Tree";
 
 export namespace TaxaCountProcessor
 {
-    export async function process(taxaCountTable: TaxaCountTable) : Promise<Tree>
-    {
+    export async function process(taxaCountTable: TaxaCountTable) : Promise<Tree> {
         var ontologyIds = taxaCountTable.getOntologyIds();
         var ontology = taxaCountTable.getOntology();
 

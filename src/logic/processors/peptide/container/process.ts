@@ -1,14 +1,13 @@
-import { ProcessedPeptideContainer } from '../../../data-management/ProcessedPeptideContainer';
+import { ProcessedPeptideContainer } from "../../../data-management/ProcessedPeptideContainer";
 import { postJSON } from "../../../utils";
-import { PeptideData } from '../../../api/pept2data/Response';
-import MPAConfig from '../../../data-management/MPAConfig';
-import {BASE_URL} from '../../../Constants';
+import { PeptideData } from "../../../api/pept2data/Response";
+import MPAConfig from "../../../data-management/MPAConfig";
+import { BASE_URL } from "../../../Constants";
 
 const BATCH_SIZE = 100;
 const API_ENDPOINT = BASE_URL + "/mpa/pept2data";
 
-export default async function process(peptides: string[], config: MPAConfig, setProgress: (number) => void) : Promise<ProcessedPeptideContainer>
-{
+export default async function process(peptides: string[], config: MPAConfig, setProgress: (number) => void) : Promise<ProcessedPeptideContainer> {
     var preparedPeptides = preparePeptides(peptides, config);
     const peptideList = Array.from(preparedPeptides.keys());
 
@@ -19,8 +18,7 @@ export default async function process(peptides: string[], config: MPAConfig, set
 
     setProgress(0.1);
 
-    for (let i = 0; i < peptideList.length; i += BATCH_SIZE) 
-    {
+    for (let i = 0; i < peptideList.length; i += BATCH_SIZE) {
         const data = JSON.stringify({
             peptides: peptideList.slice(i, i + BATCH_SIZE),
             equate_il: config.il,
@@ -30,7 +28,7 @@ export default async function process(peptides: string[], config: MPAConfig, set
         const res = await postJSON(API_ENDPOINT, data);
 
         res.peptides.forEach(p => {
-            response.set(p.sequence, {lca: p.lca, lineage: p.lineage, fa: p.fa});
+            response.set(p.sequence, { lca: p.lca, lineage: p.lineage, fa: p.fa });
             numMatched += preparedPeptides.get(p.sequence);
         })
 

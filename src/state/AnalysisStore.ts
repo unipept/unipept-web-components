@@ -1,4 +1,4 @@
-import {ActionContext, ActionTree, GetterTree, MutationTree} from "vuex";
+import { ActionContext, ActionTree, GetterTree, MutationTree } from "vuex";
 
 export interface AnalysisState {
     datasetSelectionInProgress: boolean,
@@ -22,7 +22,7 @@ const analysisMutations: MutationTree<AnalysisState> = {
 
 const analysisActions: ActionTree<AnalysisState, any> = {
     setDatasetSelectionInProgress(store: ActionContext<AnalysisState, any>, inProgress: boolean): void {
-        store.commit('SET_DATASET_SELECTION_IN_PROGRESS', inProgress);
+        store.commit("SET_DATASET_SELECTION_IN_PROGRESS", inProgress);
     }
 };
 

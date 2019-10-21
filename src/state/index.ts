@@ -1,5 +1,5 @@
-import {GlobalStore} from './GlobalStore'; 
-import {AnalysisStore} from './AnalysisStore';
+import { GlobalStore } from "./GlobalStore"; 
+import { AnalysisStore } from "./AnalysisStore";
 
 export {
     GlobalStore,

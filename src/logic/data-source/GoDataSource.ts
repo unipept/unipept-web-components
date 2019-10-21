@@ -1,13 +1,13 @@
-import DataRepository from './DataRepository';
-import { GoNameSpace } from '../functional-annotations/GoNameSpace';
-import GoTerm from '../functional-annotations/GoTerm';
-import FATrust from '../functional-annotations/FATrust';
-import { CachedDataSource } from './CachedDataSource';
-import { GeneOntology } from '../data-management/ontology/go/GeneOntology';
-import { GOCountTable } from '../data-management/counts/GOCountTable';
-import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
-import { PeptideData } from '../api/pept2data/Response';
-import { DataSourceCommon } from './DataSourceCommon';
+import DataRepository from "./DataRepository";
+import { GoNameSpace } from "../functional-annotations/GoNameSpace";
+import GoTerm from "../functional-annotations/GoTerm";
+import FATrust from "../functional-annotations/FATrust";
+import { CachedDataSource } from "./CachedDataSource";
+import { GeneOntology } from "../data-management/ontology/go/GeneOntology";
+import { GOCountTable } from "../data-management/counts/GOCountTable";
+import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
+import { PeptideData } from "../api/pept2data/Response";
+import { DataSourceCommon } from "./DataSourceCommon";
 
 /**
  * A GoDataSource can be used to access all GoTerms associated with a specific Sample. Note that this class contains
@@ -16,25 +16,21 @@ import { DataSourceCommon } from './DataSourceCommon';
  *
  * @see Sample
  */
-export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
-{
+export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> {
     private _countTable: GOCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
 
-    constructor(countTable: GOCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository)
-    {
+    constructor(countTable: GOCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository) {
         super(repository);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
     }
 
-    public getPeptidesByGoTerm(term: GoTerm): string[]
-    {
+    public getPeptidesByGoTerm(term: GoTerm): string[] {
         return Array.from(this._countTable.ontology2peptide.get(term.code) || [])
     }
 
-    public getGoTermSummary(term: GoTerm): string[][]
-    {
+    public getGoTermSummary(term: GoTerm): string[][] {
         return DataSourceCommon.getFASummary(term, this._processedPeptideContainer);
     }
 
@@ -102,8 +98,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
     }
 
     // TODO: use percent in calculations
-    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<GoNameSpace, GoTerm[]>, Map<GoNameSpace, FATrust>]> 
-    {
+    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<GoNameSpace, GoTerm[]>, Map<GoNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
         var ontology: GeneOntology = this._countTable.getOntology()
         await ontology.fetchDefinitions(this._countTable.getOntologyIds())
@@ -112,28 +107,24 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
         var trustOutput: Map<GoNameSpace, FATrust> = new Map()
 
         // calculate terms without peptide information if it is not available
-        if(!this._processedPeptideContainer)
-        {
+        if (!this._processedPeptideContainer) {
             let namespaceCounts = new Map<string, number>()
 
             // first calculated the total counts for each namespace
-            this._countTable.counts.forEach((count, term) => 
-            {
+            this._countTable.counts.forEach((count, term) => {
                 let namespace = ontology.getDefinition(term).namespace
                 namespaceCounts.set(namespace, (namespaceCounts.get(namespace) || 0) + count)
             })
 
             // create FATrusts for each namespace, at the same time init dataOutput arrays
-            for(let namespace of Object.values(GoNameSpace))
-            {
+            for (let namespace of Object.values(GoNameSpace)) {
                 let namespaceCount = namespaceCounts.get(namespace) || 0
                 trustOutput.set(namespace, new FATrust(namespaceCount, namespaceCount, 0));
                 dataOutput.set(namespace, [])
             }
 
             // create GoTerms
-            this._countTable.counts.forEach((count, term) => 
-            {
+            this._countTable.counts.forEach((count, term) => {
                 let def = ontology.getDefinition(term)
                 let namespaceCount = namespaceCounts.get(def.namespace)
                 let goNameSpace: GoNameSpace = def.namespace as GoNameSpace
@@ -143,8 +134,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
             })
 
             // sort the GoTerms for each namespace
-            for(let namespace of Object.values(GoNameSpace))
-            {
+            for (let namespace of Object.values(GoNameSpace)) {
                 dataOutput.set(namespace, dataOutput.get(namespace).sort((a, b) => b.popularity - a.popularity))
             }
 
@@ -153,13 +143,11 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
 
         var peptideCountTable = this._processedPeptideContainer.countTable
 
-        if(sequences == null)
-        {
+        if (sequences == null) {
             sequences = Array.from(this._processedPeptideContainer.response.keys())
         }
 
-        for(let namespace of Object.values(GoNameSpace))
-        {
+        for (let namespace of Object.values(GoNameSpace)) {
             let totalCount = 0;
             let annotatedCount = 0;
             let trustCount = 0;
@@ -168,8 +156,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
             // TODO: this shouldn't be calculated here, but only when needed for the heatmap
             let affectedPeptides = new Map<string, string[]>()
 
-            for(const pept of sequences)
-            {
+            for (const pept of sequences) {
                 let peptCount = peptideCountTable.get(pept)
                 let peptideData: PeptideData = this._processedPeptideContainer.response.get(pept);
                 let proteinCount = peptideData.fa.counts.GO;
@@ -177,8 +164,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
 
                 totalCount += peptCount
 
-                if(!this._countTable.peptide2ontology.has(pept))
-                {
+                if (!this._countTable.peptide2ontology.has(pept)) {
                     continue;
                 }
 
@@ -186,11 +172,9 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
                 let peptArray: string[] = Array(peptCount).fill(pept)
                 let atLeastOne = false;
 
-                for(const term of terms)
-                {
+                for (const term of terms) {
                     let termProteinCount = peptideData.fa.data[term];
-                    if(termProteinCount / proteinCount < percent / 100)
-                    {
+                    if (termProteinCount / proteinCount < percent / 100) {
                         continue;
                     }
 
@@ -199,8 +183,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
                     affectedPeptides.set(term, (affectedPeptides.get(term) || []).concat(peptArray))
                 }
 
-                if(atLeastOne)
-                {
+                if (atLeastOne) {
                     trustCount += peptCount * trust;
                     annotatedCount += peptCount
                 }
@@ -208,14 +191,13 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm>
             
             // convert calculated data to GoTerms
             let convertedItems: GoTerm[] = [...termCounts].sort((a, b) => b[1] - a[1])
-                .map(term => 
-                    {
-                        let code = term[0]
-                        let count = term[1]
-                        let ontologyData = ontology.getDefinition(code)
-                        let fractionOfPepts = count / totalCount
-                        return new GoTerm(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
-                    })
+                .map(term => {
+                    let code = term[0]
+                    let count = term[1]
+                    let ontologyData = ontology.getDefinition(code)
+                    let fractionOfPepts = count / totalCount
+                    return new GoTerm(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
+                })
 
             dataOutput.set(namespace, convertedItems);
             // convert calculated data to FATrust

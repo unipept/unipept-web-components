@@ -17,16 +17,16 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component, { mixins } from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import {GoNameSpace, convertStringToGoNameSpace} from "../../logic/functional-annotations/GoNameSpace";
-    import GoDataSource from "../../logic/data-source/GoDataSource";
-    import GoTerm from "../../logic/functional-annotations/GoTerm";
-    import DataSourceMixin from "./DataSourceMixin.vue";
+import Vue from "vue";
+import Component, { mixins } from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import { GoNameSpace, convertStringToGoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
+import GoDataSource from "../../logic/data-source/GoDataSource";
+import GoTerm from "../../logic/functional-annotations/GoTerm";
+import DataSourceMixin from "./DataSourceMixin.vue";
 
     @Component
-    export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
+export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
         private goNameSpaces: string[] = ["all"].concat(Object.values(GoNameSpace)).map(el => this.capitalize(el));
         private selectedNameSpace: string = this.goNameSpaces[0];
 
@@ -37,24 +37,24 @@
 
         private headers = [
             {
-                text: 'Name',
-                align: 'left',
-                value: 'name'
+                text: "Name",
+                align: "left",
+                value: "name"
             },
             {
-                text: 'Code',
-                align: 'left',
-                value: 'code'
+                text: "Code",
+                align: "left",
+                value: "code"
             }, 
             
             {
-                text: '# peptides',
-                align: 'left',
-                value: 'popularity'
+                text: "# peptides",
+                align: "left",
+                value: "popularity"
             }
         ];
 
-        private pagination = {'sortBy': 'popularity', 'descending': true, 'rowsPerPage': 5};
+        private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
 
 
         mounted() {
@@ -77,7 +77,7 @@
         async onSelectedItemsChanged() {
             this.$emit("selected-items", this.selectedItems);
         }
-    }
+}
 </script>
 
 <style scoped>

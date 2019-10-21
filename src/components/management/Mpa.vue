@@ -6,37 +6,36 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import MpaHome from "./MpaHome.vue";
-    import {Prop} from "vue-property-decorator";
-    import MpaAnalysis from "../analysis/MpaAnalysis.vue";
-    import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
-    import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
-    import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
-    import DatasetManager from "../../logic/data-management/DatasetManager";
-    import { StorageType } from "../../logic/data-management/StorageType";
-    import {GlobalStore} from './../../state';
-    import {AnalysisStore} from './../../state';
+import Vue from "vue";
+import Component from "vue-class-component";
+import MpaHome from "./MpaHome.vue";
+import { Prop } from "vue-property-decorator";
+import MpaAnalysis from "../analysis/MpaAnalysis.vue";
+import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
+import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
+import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
+import DatasetManager from "../../logic/data-management/DatasetManager";
+import { StorageType } from "../../logic/data-management/StorageType";
+import { GlobalStore } from "./../../state";
+import { AnalysisStore } from "./../../state";
 
     @Component({
-        components: {MpaAnalysis, MpaHome}
+        components: { MpaAnalysis, MpaHome }
     })
-    export default class Mpa extends Vue {
-        @Prop({default: ""})
+export default class Mpa extends Vue {
+        @Prop({ default: "" })
         public peptides: string;
-        @Prop({default: true})
+        @Prop({ default: true })
         public il: boolean;
-        @Prop({default: true})
+        @Prop({ default: true })
         public dupes: boolean;
-        @Prop({default: false})
+        @Prop({ default: false })
         public missed: boolean;
-        @Prop({default: ""})
+        @Prop({ default: "" })
         public searchName: string;
 
         mounted() {
-            if (this.peptides != "") 
-            {
+            if (this.peptides != "") {
                 const storageManager: DatasetManager = new DatasetManager();
                 const metaProteomicsAssay: MetaProteomicsAssay = new MetaProteomicsAssay();
                 const storageWriter: StorageWriter = new StorageWriter();
@@ -46,19 +45,19 @@
                 metaProteomicsAssay.setDate(new Date());
                 metaProteomicsAssay.setStorageType(StorageType.SessionStorage);
 
-                this.$store.dispatch('setSearchSettings', {
+                this.$store.dispatch("setSearchSettings", {
                     il: this.il,
                     dupes: this.dupes,
                     missed: this.missed
                 })
 
                 metaProteomicsAssay.visit(storageWriter).then(() => {
-                    this.$store.dispatch('selectDataset', metaProteomicsAssay);
-                    this.$store.dispatch('setAnalysis', true);
+                    this.$store.dispatch("selectDataset", metaProteomicsAssay);
+                    this.$store.dispatch("setAnalysis", true);
                 });
             }
         }
-    };
+}
 </script>
 
 <style>

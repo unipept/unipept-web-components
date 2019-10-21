@@ -1,6 +1,6 @@
-import {NCBITaxonomy} from './taxa/NCBITaxonomy'
-import {GeneOntology} from './go/GeneOntology'
-import {ECOntology} from './ec/ECOntology'
+import { NCBITaxonomy } from "./taxa/NCBITaxonomy"
+import { GeneOntology } from "./go/GeneOntology"
+import { ECOntology } from "./ec/ECOntology"
 
 export namespace Ontologies
 {

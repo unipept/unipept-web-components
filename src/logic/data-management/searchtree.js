@@ -1,4 +1,4 @@
-import {addCopy, highlight, logToGoogle} from "../utils";
+import { addCopy, highlight, logToGoogle } from "../utils";
 /* eslint require-jsdoc: off */
 
 /**
@@ -192,4 +192,4 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
     return that;
 }
 
-export {constructSearchtree};
+export { constructSearchtree };

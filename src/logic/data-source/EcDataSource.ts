@@ -1,39 +1,34 @@
-import EcNumber from '../functional-annotations/EcNumber';
-import { EcNameSpace } from '../functional-annotations/EcNameSpace';
-import FATrust from '../functional-annotations/FATrust';
-import { CachedDataSource } from './CachedDataSource';
-import { ECOntology } from '../data-management/ontology/ec/ECOntology';
-import { ECCountTable } from '../data-management/counts/ECCountTable';
-import { ProcessedPeptideContainer } from '../data-management/ProcessedPeptideContainer';
-import DataRepository from './DataRepository';
-import { PeptideData } from '../api/pept2data/Response';
-import { DataSourceCommon } from './DataSourceCommon';
+import EcNumber from "../functional-annotations/EcNumber";
+import { EcNameSpace } from "../functional-annotations/EcNameSpace";
+import FATrust from "../functional-annotations/FATrust";
+import { CachedDataSource } from "./CachedDataSource";
+import { ECOntology } from "../data-management/ontology/ec/ECOntology";
+import { ECCountTable } from "../data-management/counts/ECCountTable";
+import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
+import DataRepository from "./DataRepository";
+import { PeptideData } from "../api/pept2data/Response";
+import { DataSourceCommon } from "./DataSourceCommon";
 // import TreeViewNode from '../ui/visualizations/TreeViewNode';
 
-export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> 
-{
+export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> {
     private _countTable: ECCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
 
-    constructor(countTable: ECCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository)
-    {
+    constructor(countTable: ECCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository) {
         super(repository)
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
     }
 
-    public getPeptidesByEcNumber(number: EcNumber): string[]
-    {
+    public getPeptidesByEcNumber(number: EcNumber): string[] {
         return Array.from(this._countTable.ontology2peptide.get(number.code) || [])
     }
 
-    public getPeptidesByEcCode(code: string)
-    {
+    public getPeptidesByEcCode(code: string) {
         return Array.from(this._countTable.ontology2peptide.get(code) || [])
     }
 
-    public getECNumberSummary(number: EcNumber): string[][]
-    {
+    public getECNumberSummary(number: EcNumber): string[][] {
         return DataSourceCommon.getFASummary(number, this._processedPeptideContainer)
     }
 
@@ -181,8 +176,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
     // }
 
     // TODO: use percent in calculations
-    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, EcNumber[]>, Map<EcNameSpace, FATrust>]> 
-    {
+    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, EcNumber[]>, Map<EcNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
         var ontology: ECOntology = this._countTable.getOntology()
         await ontology.fetchDefinitions(this._countTable.getOntologyIds())
@@ -191,28 +185,24 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
         var trustOutput: Map<EcNameSpace, FATrust> = new Map()
 
         // calculate terms without peptide information if it is not available
-        if(!this._processedPeptideContainer)
-        {
+        if (!this._processedPeptideContainer) {
             let namespaceCounts = new Map<string, number>()
 
             // first calculated the total counts for each namespace
-            this._countTable.counts.forEach((count, term) => 
-            {
+            this._countTable.counts.forEach((count, term) => {
                 let namespace = ontology.getDefinition(term).namespace
                 namespaceCounts.set(namespace, (namespaceCounts.get(namespace) || 0) + count)
             })
 
             // create FATrusts for each namespace, at the same time init dataOutput arrays
-            for(let namespace of Object.values(EcNameSpace))
-            {
+            for (let namespace of Object.values(EcNameSpace)) {
                 let namespaceCount = namespaceCounts.get(namespace) || 0
                 trustOutput.set(namespace, new FATrust(namespaceCount, namespaceCount, 0));
                 dataOutput.set(namespace, [])
             }
 
             // create EcNumbers
-            this._countTable.counts.forEach((count, term) => 
-            {
+            this._countTable.counts.forEach((count, term) => {
                 let def = ontology.getDefinition(term)
                 let namespaceCount = namespaceCounts.get(def.namespace)
                 let ecNameSpace: EcNameSpace = def.namespace as EcNameSpace
@@ -222,8 +212,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
             })
 
             // sort the EcNumbers for each namespace
-            for(let namespace of Object.values(EcNameSpace))
-            {
+            for (let namespace of Object.values(EcNameSpace)) {
                 dataOutput.set(namespace, dataOutput.get(namespace).sort((a, b) => b.popularity - a.popularity))
             }
 
@@ -232,13 +221,11 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
         var peptideCountTable = this._processedPeptideContainer.countTable
 
-        if(sequences == null)
-        {
+        if (sequences == null) {
             sequences = Array.from(this._processedPeptideContainer.response.keys())
         }
 
-        for(let namespace of Object.values(EcNameSpace))
-        {
+        for (let namespace of Object.values(EcNameSpace)) {
             let totalCount = 0;
             let annotatedCount = 0;            
             let trustCount = 0;
@@ -247,8 +234,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
             // TODO: this shouldn't be calculated here, but only when needed for the heatmap
             let affectedPeptides = new Map<string, string[]>()
 
-            for(const pept of sequences)
-            {
+            for (const pept of sequences) {
                 let peptCount = peptideCountTable.get(pept)
                 let peptideData: PeptideData = this._processedPeptideContainer.response.get(pept);
                 let proteinCount = peptideData.fa.counts.EC;
@@ -256,8 +242,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
                 totalCount += peptCount
 
-                if(!this._countTable.peptide2ontology.has(pept))
-                {
+                if (!this._countTable.peptide2ontology.has(pept)) {
                     continue;
                 }
 
@@ -265,11 +250,9 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
                 let peptArray: string[] = Array(peptCount).fill(pept)
                 let atLeastOne = false;
 
-                for(const term of terms)
-                {
+                for (const term of terms) {
                     let termProteinCount = peptideData.fa.data[term];
-                    if(termProteinCount / proteinCount < percent / 100)
-                    {
+                    if (termProteinCount / proteinCount < percent / 100) {
                         continue;
                     }
 
@@ -278,8 +261,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
                     affectedPeptides.set(term, (affectedPeptides.get(term) || []).concat(peptArray))
                 }
 
-                if(atLeastOne)
-                {
+                if (atLeastOne) {
                     trustCount += peptCount * trust;
                     annotatedCount += peptCount
                 }
@@ -287,14 +269,13 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
             
             // convert calculated data to GoTerms
             let convertedItems: EcNumber[] = [...termCounts].sort((a, b) => b[1] - a[1])
-                .map(term => 
-                    {
-                        let code = term[0]
-                        let count = term[1]
-                        let ontologyData = ontology.getDefinition(code)
-                        let fractionOfPepts = count / totalCount
-                        return new EcNumber(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
-                    })
+                .map(term => {
+                    let code = term[0]
+                    let count = term[1]
+                    let ontologyData = ontology.getDefinition(code)
+                    let fractionOfPepts = count / totalCount
+                    return new EcNumber(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
+                })
 
             dataOutput.set(namespace, convertedItems)
             trustOutput.set(namespace, new FATrust(annotatedCount, totalCount, trustCount))

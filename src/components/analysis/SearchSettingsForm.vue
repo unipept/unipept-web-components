@@ -31,9 +31,9 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
 
     // @Component({
     //     components: {},
@@ -68,11 +68,11 @@
     //     }
     // })
     @Component
-    export default class SearchSetingsForm extends Vue {
-        @Prop({default: false}) disabled!: boolean;
-        @Prop({default: true}) equateIl!: boolean;
-        @Prop({default: true}) filterDuplicates!: boolean;
-        @Prop({default: false}) missingCleavage!: boolean;
+export default class SearchSetingsForm extends Vue {
+        @Prop({ default: false }) disabled!: boolean;
+        @Prop({ default: true }) equateIl!: boolean;
+        @Prop({ default: true }) filterDuplicates!: boolean;
+        @Prop({ default: false }) missingCleavage!: boolean;
 
         equateIlData: boolean = this.equateIl;
         filterDuplicatesData: boolean = this.filterDuplicates;
@@ -82,18 +82,18 @@
         filterDuplicatesModel: boolean = true;
         missingCleavageModel: boolean = false;
 
-        @Watch('equateIl') onEquateIlChanged() {
+        @Watch("equateIl") onEquateIlChanged() {
             this.equateIlData = this.equateIl;
         }
 
-        @Watch('filterDuplicates') onFilterDuplicatesChanged() {
+        @Watch("filterDuplicates") onFilterDuplicatesChanged() {
             this.filterDuplicatesData = this.filterDuplicates;
         }
 
-        @Watch('missingCleavage') onMissingCleavageChanged() {
+        @Watch("missingCleavage") onMissingCleavageChanged() {
             this.missingCleavageData = this.missingCleavage;
         }
-    }
+}
 </script>
 
 <style scoped>

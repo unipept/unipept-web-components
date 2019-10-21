@@ -12,14 +12,14 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import Component from "vue-class-component";
-    import {Prop, Watch} from "vue-property-decorator";
-    import Assay from "../../logic/data-management/assay/Assay";
-    import Tree from "../../logic/data-management/Tree";
-    import {constructSearchtree} from "../../logic/data-management/searchtree";
-    import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-    import DataRepository from '../../logic/data-source/DataRepository';
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop, Watch } from "vue-property-decorator";
+import Assay from "../../logic/data-management/assay/Assay";
+import Tree from "../../logic/data-management/Tree";
+import { constructSearchtree } from "../../logic/data-management/searchtree";
+import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+import DataRepository from "../../logic/data-source/DataRepository";
 
     @Component({
         components: {},
@@ -31,8 +31,8 @@
             }
         }
     })
-    export default class HierarchicalOutlineVisualization extends Vue {
-        @Prop({required: true}) 
+export default class HierarchicalOutlineVisualization extends Vue {
+        @Prop({ required: true }) 
         private dataRepository: DataRepository;
         
         private searchTerm: string = "";
@@ -43,12 +43,12 @@
             this.initSearchTree();
         }
 
-        @Watch('dataRepository') 
+        @Watch("dataRepository") 
         private onDataRepositoryChanged() {
             this.initSearchTree();
         }
 
-        @Watch('searchTerm') 
+        @Watch("searchTerm") 
         private onActiveSearchTermChanged(newSearchTerm: string) {
             if (this.searchTree && newSearchTerm !== "") {
                 this.searchTree.search(newSearchTerm);
@@ -56,7 +56,7 @@
         }
 
 
-        @Watch('watchableSelectedSearchTerm')
+        @Watch("watchableSelectedSearchTerm")
         private onSelectedSearchTermChanged(newSearchTerm: string) {
             this.searchTerm = newSearchTerm;
         }
@@ -68,7 +68,7 @@
                 this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
             }
         }
-    }
+}
 </script>
 
 <style lang="less">

@@ -1,5 +1,5 @@
 import Assay from "../logic/data-management/assay/Assay";
-import {ActionContext, ActionTree, GetterTree, MutationTree} from "vuex";
+import { ActionContext, ActionTree, GetterTree, MutationTree } from "vuex";
 import DatasetManager from "../logic/data-management/DatasetManager";
 import MpaAnalysisManager from "../logic/data-management/MpaAnalysisManager";
 import MPAConfig from "../logic/data-management/MPAConfig";
@@ -24,9 +24,9 @@ const mpaState: GlobalState = {
     storedDatasets: [],
     selectedDatasets: [],
     analysis: false,
-    searchSettings: {il: true, dupes: true, missed: false},
+    searchSettings: { il: true, dupes: true, missed: false },
     activeDataset: null,
-    selectedTerm: 'Organism',
+    selectedTerm: "Organism",
     selectedTaxonId: -1,
     matchedPeptides: 0,
     searchedPeptides: 0,
@@ -79,7 +79,7 @@ const mpaMutations: MutationTree<GlobalState> = {
         if (index === -1) {
             state.selectedDatasets.push(dataset);
         }
-        Vue.set(state, 'selectedDatasets', state.selectedDatasets);
+        Vue.set(state, "selectedDatasets", state.selectedDatasets);
     },
     DESELECT_DATASET(state: GlobalState, dataset: Assay) {
         let index: number = state.selectedDatasets.findIndex((value: Assay, index: number, arr: Assay[]) => {
@@ -95,7 +95,7 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     ADD_STORED_DATASET(state: GlobalState, dataset: Assay) {
         state.storedDatasets.push(dataset);
-        this.$set(state, 'storedDatasets', state.storedDatasets);
+        this.$set(state, "storedDatasets", state.storedDatasets);
     },
     REMOVE_STORED_DATASET(state: GlobalState, dataset: Assay) {
         let index: number = state.storedDatasets.findIndex((value: Assay, index: number) => value.getId() === dataset.getId());
@@ -144,13 +144,13 @@ const mpaActions: ActionTree<GlobalState, any> = {
             return;
         }
 
-        store.commit('SELECT_DATASET', dataset);
+        store.commit("SELECT_DATASET", dataset);
         if (store.getters.isAnalysis) {
-            store.dispatch('processDataset', dataset);
+            store.dispatch("processDataset", dataset);
         }
     },
     deselectDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.commit('DESELECT_DATASET', dataset);
+        store.commit("DESELECT_DATASET", dataset);
 
         if (dataset === store.getters.activeDataset) {
             // Find first processed dataset that could replace the previous active dataset
@@ -162,20 +162,20 @@ const mpaActions: ActionTree<GlobalState, any> = {
                 }
             }
 
-            store.commit('SET_ACTIVE_DATASET', newActiveDataset);
+            store.commit("SET_ACTIVE_DATASET", newActiveDataset);
         }
     },
     deleteDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.dispatch('deselectDataset', dataset);
+        store.dispatch("deselectDataset", dataset);
         let datasetManager: DatasetManager = new DatasetManager();
-        datasetManager.deleteDatasetFromStorage(dataset).then(() => store.commit('REMOVE_STORED_DATASET', dataset));
+        datasetManager.deleteDatasetFromStorage(dataset).then(() => store.commit("REMOVE_STORED_DATASET", dataset));
     },
     clearSelectedDatasets(store: ActionContext<GlobalState, any>) {
-        store.commit('CLEAR_SELECTED_DATASETS');
-        store.commit('SET_ACTIVE_DATASET', null);
+        store.commit("CLEAR_SELECTED_DATASETS");
+        store.commit("SET_ACTIVE_DATASET", null);
     },
     addStoredDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.commit('ADD_STORED_DATASET', dataset);
+        store.commit("ADD_STORED_DATASET", dataset);
     },
     /**
      * Load all datasets stored in the browser's local storage and update the current Vuex's store accordingly.
@@ -185,49 +185,49 @@ const mpaActions: ActionTree<GlobalState, any> = {
 
         datasetManager.listDatasets()
             .then((values) => {
-                store.commit('ADD_STORED_DATASET_BATCH', values);
+                store.commit("ADD_STORED_DATASET_BATCH", values);
             });
     },
     setAnalysis(store: ActionContext<GlobalState, any>, isAnalysing: boolean) {
-        store.commit('SET_ANALYSIS', isAnalysing);
+        store.commit("SET_ANALYSIS", isAnalysing);
     },
     setSearchSettings(store: ActionContext<GlobalState, any>, searchSettings: MPAConfig): void {
-        store.commit('SET_SEARCH_SETTINGS', searchSettings);
+        store.commit("SET_SEARCH_SETTINGS", searchSettings);
     },
     setActiveDataset(store: ActionContext<GlobalState, any>, dataset: Assay | null): void {
-        store.commit('SET_ACTIVE_DATASET', dataset);
+        store.commit("SET_ACTIVE_DATASET", dataset);
         if (dataset !== null) {
-            store.dispatch('setSelectedTerm', 'Organism');
-            store.dispatch('setSelectedTaxonId', -1);
+            store.dispatch("setSelectedTerm", "Organism");
+            store.dispatch("setSelectedTaxonId", -1);
             dataset.dataRepository.createTaxaDataSource().then((taxaDataSource) => {
                 Promise.all([
                     taxaDataSource.getAmountOfMatchedPeptides(),
                     taxaDataSource.getAmountOfSearchedPeptides(),
                     taxaDataSource.getMissedPeptides()
                 ]).then((result) => {
-                    store.commit('SET_MATCHED_PEPTIDES', result[0]);
-                    store.commit('SET_SEARCHED_PEPTIDES', result[1]);
-                    store.commit('SET_MISSED_PEPTIDES', result[2]);
+                    store.commit("SET_MATCHED_PEPTIDES", result[0]);
+                    store.commit("SET_SEARCHED_PEPTIDES", result[1]);
+                    store.commit("SET_MISSED_PEPTIDES", result[2]);
                 })
             });
         }
     },
     processDataset(store: ActionContext<GlobalState, any>, dataset: Assay): void {
         let mpaManager = new MpaAnalysisManager();
-        store.commit('INCREASE_DATASETS_IN_PROGRESS');
+        store.commit("INCREASE_DATASETS_IN_PROGRESS");
         mpaManager.processDataset(dataset, store.getters.searchSettings)
-        .then(() => {
-            if (store.getters.activeDataset === null) {
-                store.dispatch('setActiveDataset', dataset);
-                store.commit('DECREASE_DATASETS_IN_PROGRESS');
-            }
-        });
+            .then(() => {
+                if (store.getters.activeDataset === null) {
+                    store.dispatch("setActiveDataset", dataset);
+                    store.commit("DECREASE_DATASETS_IN_PROGRESS");
+                }
+            });
     },
     setSelectedTerm(store: ActionContext<GlobalState, any>, term: string): void {
-        store.commit('SET_SELECTED_TERM', term);
+        store.commit("SET_SELECTED_TERM", term);
     },
     setSelectedTaxonId(store: ActionContext<GlobalState, any>, taxonId: number): void {
-        store.commit('SET_SELECTED_TAXON_ID', taxonId);
+        store.commit("SET_SELECTED_TAXON_ID", taxonId);
     }
 };
 
