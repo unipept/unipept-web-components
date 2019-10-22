@@ -37,7 +37,7 @@ export default async function process(peptides: string[], config: MPAConfig, set
 
     var missedPeptides = peptideList.filter(p => !response.has(p))
 
-    setProgress(1)
+    setProgress(1);
 
     return {
         countTable: preparedPeptides,

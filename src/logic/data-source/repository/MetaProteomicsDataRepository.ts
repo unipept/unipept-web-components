@@ -38,7 +38,8 @@ export default class MetaProteomicsDataRepository extends DataRepository {
         this._taxaSourceCache = new TaxaDataSource(
             TaxaPeptideProcessor.process(processedPeptideContainer), 
             processedPeptideContainer,
-            this);
+            this
+        );
     }
 
     protected async initGoDataSource(): Promise<void> {

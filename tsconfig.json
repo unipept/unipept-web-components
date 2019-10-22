@@ -20,7 +20,8 @@
       "jest",
       "vuetify",
       "jquery",
-      "d3"
+      "d3",
+      "node"
     ],
     "paths": {
       "@/*": [

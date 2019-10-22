@@ -21,7 +21,14 @@ describe("HierarchicalOutlineVisualization", () => {
         vuetify = new Vuetify();
 
         getters = {
-            selectedTerm: () => "Organism"
+            selectedTerm: () => "Organism",
+            searchSettings: () => {
+                return {
+                    il: true,
+                    dupes: true,
+                    missed: false
+                }
+            }
         }
 
         store = new Vuex.Store({
@@ -29,19 +36,26 @@ describe("HierarchicalOutlineVisualization", () => {
         });
     });
 
-    it("renders simple datasets", () => {
+    it("renders simple datasets", (done) => {
         let mock: Mock = new Mock();
-        let dataRepository: DataRepository = mock.mockDataRepository();
-        
-        const wrapper = mount(HierarchicalOutlineVisualization, {
-            store,
-            localVue,
-            vuetify,
-            propsData: {
-                dataRepository: dataRepository
-            }
-        });
-
-        expect(wrapper.html()).toMatchSnapshot();
+        mock.mockDataRepository().then((dataRepository: DataRepository) => {
+            const wrapper = mount(HierarchicalOutlineVisualization, {
+                store,
+                localVue,
+                vuetify,
+                propsData: {
+                    dataRepository: dataRepository
+                }
+            });
+    
+            // Wait for all async operations to be finished, before expecting anything.
+            const flushPromises = () => new Promise(setImmediate);
+            flushPromises().then(() => {
+                expect(wrapper.html()).toMatchSnapshot();
+                // Call done here in the promise resolve.
+                done();
+                
+            })
+        }).catch(err => console.log(err));
     });
 });

@@ -1,6 +1,7 @@
 import { addCopy, highlight, logToGoogle } from "../utils";
 import d3 from "d3";
 import * as d3Select from "d3-selection";
+import $ from "jquery";
 
 /**
  * Constructs a Searchtree object
@@ -48,6 +49,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
 
         // Add the nested unordered lists to the page based on the data array
         tree = d3Select.select("#searchtree");
+        console.log(tree);
         tree = tree.append("ul").append("li").attr("class", "root not").append("ul");
         // $("li.root").prepend($("#treeSearchDiv"));
         items = tree.selectAll("li").data([data])

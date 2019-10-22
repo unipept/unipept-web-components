@@ -10,8 +10,10 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
     public peptideContainer: PeptideContainer = new PeptideContainer();
 
     async initDataRepository(mpaConfig: MPAConfig) {
-        let dataReader = new StorageDataReader();
-        await this.visit(dataReader);
+        if (!this.peptideContainer.getPeptides() || this.peptideContainer.getPeptides().length === 0) {
+            let dataReader = new StorageDataReader();
+            await this.visit(dataReader);
+        }
         let dataRepo = new MetaProteomicsDataRepository(this, mpaConfig);
         await dataRepo.initProcessedPeptideContainer();
         this._dataRepository = dataRepo;
@@ -24,7 +26,7 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
     getPeptides(): string[] {
         return this.peptideContainer.getPeptides();
     }
-    
+
     setPeptides(peptides: string[]) {
         this.peptideContainer.setPeptides(peptides)
     }
