@@ -5,6 +5,7 @@ import DataRepository from "@/logic/data-source/DataRepository";
 import { PeptideContainer } from '@/logic/data-management';
 import MpaAnalysisManager from '@/logic/data-management/MpaAnalysisManager';
 import MPAConfig from '@/logic/data-management/MPAConfig';
+import Setup from "./Setup";
 
 export default class Mock {
     public mockAssay(): Assay {
@@ -58,6 +59,8 @@ export default class Mock {
     }
 
     public async mockDataRepository(): Promise<DataRepository> {
+        let setup: Setup = new Setup();
+        setup.setupNock();
         let assay: Assay = this.mockAssay();
         let manager: MpaAnalysisManager = new MpaAnalysisManager();
         await manager.processDataset(assay, this.mockMPAConfig());

@@ -7,8 +7,6 @@ import HierarchicalOutlineVisualization from "./../HierarchicalOutlineVisualizat
 import "jsdom-worker-fix";
 import Vuex from "vuex";
 
-import setupNock from "@/test/setupNock";
-
 Vue.use(Vuetify);
 Vue.use(Vuex);
 
@@ -36,8 +34,6 @@ describe("HierarchicalOutlineVisualization", () => {
         store = new Vuex.Store({
             getters
         });
-
-        setupNock();
     });
 
     it("renders simple datasets", (done) => {
