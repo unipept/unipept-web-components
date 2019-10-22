@@ -76,6 +76,7 @@ describe("HierarchicalOutlineVisualization", () => {
             // Wait for all async operations to be finished, before expecting anything.
             const flushPromises = () => new Promise(setImmediate);
             flushPromises().then(() => {
+                
                 expect(wrapper.html()).toMatchSnapshot();
                 // Call done here in the promise resolve.
                 done();

@@ -2,9 +2,9 @@ import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAss
 import { StorageType } from "@/logic/data-management/StorageType";
 import Assay from "@/logic/data-management/assay/Assay";
 import DataRepository from "@/logic/data-source/DataRepository";
-import { PeptideContainer } from '@/logic/data-management';
-import MpaAnalysisManager from '@/logic/data-management/MpaAnalysisManager';
-import MPAConfig from '@/logic/data-management/MPAConfig';
+import { PeptideContainer } from "@/logic/data-management";
+import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
+import MPAConfig from "@/logic/data-management/MPAConfig";
 import Setup from "./Setup";
 
 export default class Mock {
