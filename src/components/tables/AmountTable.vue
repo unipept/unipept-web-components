@@ -1,43 +1,50 @@
 <template>
-    <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
-        <template v-slot:top>
-            <v-tooltip :open-delay=1000 bottom>
-                <template v-slot:activator="{ on }">
-                    <v-icon @click="saveTableAsCSV()" class="table-to-csv-button" v-on="on">mdi-download</v-icon>
-                </template>
-                <span>Download table as CSV</span>
-            </v-tooltip>
-        </template>
-        <template v-slot:expanded-item="{ headers, item }">
-            <td :colspan="headers.length">
-                <div v-if="computeTree(item) && treeAvailable.get(item)">
-                    <treeview
-                        :id="`TreeView-${item.code}`" 
-                        :data="treeAvailable.get(item)" 
-                        :height="320"
-                        :width="800" 
-                        :tooltip="tooltip" 
-                        :colors="highlightColorFunc" 
-                        :enableAutoExpand="0.3" 
-                        :linkStrokeColor="linkStrokeColor" 
-                        :nodeStrokeColor="highlightColorFunc" 
-                        :nodeFillColor="highlightColorFunc">
-                    </treeview>
-                </div>
-            </td>
-        </template>
-        <template v-slot:[`item.${searchSettings.field}`]="{ item }">
-            {{searchSettings.format(item)}}
-        </template>
-        <template v-slot:item.action="{ item }">
-            <v-tooltip :open-delay=1000 bottom>
-                <template v-slot:activator="{ on }">
-                    <v-icon @click="saveSummaryAsCSV(item)" class="row-to-csv-button" v-on="on">mdi-download</v-icon>
-                </template>
-                <span>Download CSV summary of the filtered functional annotation</span>
-            </v-tooltip>
-        </template>
-    </v-data-table>
+    <div>
+        <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
+            <template v-slot:top>
+                <v-tooltip :open-delay=1000 bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-icon @click="saveTableAsCSV()" class="table-to-csv-button" v-on="on">mdi-download</v-icon>
+                    </template>
+                    <span>Download table as CSV</span>
+                </v-tooltip>
+            </template>
+            <template v-slot:expanded-item="{ headers, item }">
+                <td class="item-treeview" :colspan="headers.length">
+                    <div v-if="treeAvailable.get(item) || computeTree(item)">
+                        <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
+                            <v-icon>mdi-download</v-icon>
+                            Save as image
+                        </v-btn>
+                        <treeview
+                            :id="treeViewId(item)" 
+                            :data="treeAvailable.get(item)" 
+                            :height="320"
+                            :width="800" 
+                            :tooltip="tooltip" 
+                            :colors="highlightColorFunc" 
+                            :enableAutoExpand="0.3" 
+                            :linkStrokeColor="linkStrokeColor" 
+                            :nodeStrokeColor="highlightColorFunc" 
+                            :nodeFillColor="highlightColorFunc">
+                        </treeview>
+                    </div>
+                </td>
+            </template>
+            <template v-slot:[`item.${searchSettings.field}`]="{ item }">
+                {{searchSettings.format(item)}}
+            </template>
+            <template v-slot:item.action="{ item }">
+                <v-tooltip :open-delay=1000 bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-icon @click="saveSummaryAsCSV(item)" class="row-to-csv-button" v-on="on">mdi-download</v-icon>
+                    </template>
+                    <span>Download CSV summary of the filtered functional annotation</span>
+                </v-tooltip>
+            </template>
+        </v-data-table>
+        <image-download-modal ref="imageDownloadModal"/>
+    </div>
 </template>
 
 <script lang="ts">

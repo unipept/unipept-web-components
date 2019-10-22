@@ -342,7 +342,8 @@ export async function dom2pngDataURL(selector: string) : Promise<string> {
     const html2canvas = require("html2canvas");
     // Use html2canvas to convert selected element to canvas, 
     // then convert that canvas to a dataURL
-    return html2canvas($(selector).get(0))
+    let element = $(selector).get(0)
+    return html2canvas(element, {windowWidth: element.scrollWidth, windowHeight: element.scrollHeight})
         .then((canvasElement) => canvasElement.toDataURL())
 }
 
