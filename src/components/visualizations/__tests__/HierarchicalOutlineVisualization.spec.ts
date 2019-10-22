@@ -7,6 +7,8 @@ import HierarchicalOutlineVisualization from "./../HierarchicalOutlineVisualizat
 import "jsdom-worker-fix";
 import Vuex from "vuex";
 
+import setupNock from "@/test/SetupNock";
+
 Vue.use(Vuetify);
 Vue.use(Vuex);
 
@@ -34,6 +36,8 @@ describe("HierarchicalOutlineVisualization", () => {
         store = new Vuex.Store({
             getters
         });
+
+        setupNock();
     });
 
     it("renders simple datasets", (done) => {
@@ -56,6 +60,32 @@ describe("HierarchicalOutlineVisualization", () => {
                 done();
                 
             })
-        }).catch(err => console.log(err));
+        });
+    });
+
+    it("listens to changes of the selected term", (done) => {
+        let mock: Mock = new Mock();
+        mock.mockDataRepository().then((dataRepository: DataRepository) => {
+            const wrapper = mount(HierarchicalOutlineVisualization, {
+                store,
+                localVue,
+                vuetify,
+                propsData: {
+                    dataRepository: dataRepository
+                }
+            });
+    
+            getters.selectedTerm = "Bacteria";
+
+            // Wait for all async operations to be finished, before expecting anything.
+            const flushPromises = () => new Promise(setImmediate);
+            flushPromises().then(() => {
+                getters
+                expect(wrapper.html()).toMatchSnapshot();
+                // Call done here in the promise resolve.
+                done();
+                
+            })
+        });
     });
 });

@@ -15,6 +15,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "noImplicitThis": false,
+    "resolveJsonModule": true,
     "types": [
       "webpack-env",
       "jest",
