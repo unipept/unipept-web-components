@@ -5,8 +5,6 @@ import Worker from "worker-loader!./PeptideContainerProcessor.worker";
 import ProgressPublisher from "../../../patterns/progress/ProgressPublisher";
 import MPAConfig from "../../../data-management/MPAConfig";
 
-// import "babel-polyfill"; // for async await support
-
 export class PeptideContainerProcessor extends ProgressPublisher {
     private _worker: Worker;
 
