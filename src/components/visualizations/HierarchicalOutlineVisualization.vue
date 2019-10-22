@@ -44,7 +44,7 @@ export default class HierarchicalOutlineVisualization extends Vue {
     @Prop({ required: true }) 
     private dataRepository: DataRepository;
 
-    private searchTerm: string = "";
+    private searchTerm: string = "Organism";
     private searchTree!: any;
 
     mounted() {

@@ -1,8 +1,8 @@
 import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
 import { StorageType } from "@/logic/data-management/StorageType";
 import Assay from "@/logic/data-management/assay/Assay";
-import { PeptideContainer } from "@/logic";
 import DataRepository from "@/logic/data-source/DataRepository";
+import { PeptideContainer } from '@/logic/data-management';
 
 export default class Mock {
     public mockAssay(): Assay {
