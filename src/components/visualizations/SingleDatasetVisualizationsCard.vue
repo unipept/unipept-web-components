@@ -1,4 +1,4 @@
-<template>
+-<template>
     <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
         <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
             <v-tabs :color="isFullScreen ? 'accent' : 'primary'" :slider-color="isFullScreen ? 'white' : 'secondary'" dark background-color="accent" :fixed-tabs="isFullScreen" v-model="tab">
@@ -253,12 +253,12 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
             if (this.tabs[this.tab] === "Sunburst") {
                 d3.selectAll(".toHide").attr("class", "arc hidden");
-                await imageDownloadModal.download("unipept_sunburst", "#sunburstWrapper > div", "#sunburstWrapper svg")
+                await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
                 d3.selectAll(".hidden").attr("class", "arc toHide");
             } else if (this.tabs[this.tab] === "Treemap") {
-                imageDownloadModal.download("unipept_treemap", "#treemapWrapper > div")
+                imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
             } else {
-                imageDownloadModal.download("unipept_treeview", "#treeviewWrapper > div", "#treeviewWrapper svg")
+                imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
             }
         }
 

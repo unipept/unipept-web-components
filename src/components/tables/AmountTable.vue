@@ -16,14 +16,14 @@
                             <v-icon>mdi-download</v-icon>
                             Save as image
                         </v-btn>
-                        <treeview
-                            :id="treeViewId(item)" 
+                        <treeview 
+                            :id="treeViewId(item)"
                             :data="treeAvailable.get(item)" 
                             :height="320"
                             :width="800" 
                             :tooltip="tooltip" 
                             :colors="highlightColorFunc" 
-                            :enableAutoExpand="0.3" 
+                            :enableAutoExpand="true" 
                             :linkStrokeColor="linkStrokeColor" 
                             :nodeStrokeColor="highlightColorFunc" 
                             :nodeFillColor="highlightColorFunc">
@@ -146,7 +146,7 @@ export default class AmountTable extends Vue {
             // @ts-ignores
             logToGoogle("Multi peptide", "Save Image for FA");
             let downloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-            downloadModal.download("unipept_treeview_" + term.code.replace(":", "_"), "#" + this.treeViewId(term), "#" + this.treeViewId(term) + " > svg")
+            downloadModal.downloadSVG("unipept_treeview_" + term.code.replace(":", "_"), "#" + this.treeViewId(term) + " svg")
         }
 
         private saveTableAsCSV(): void {
