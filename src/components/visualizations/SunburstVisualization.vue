@@ -101,7 +101,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                     rerootCallback: d => this.search(d.id, d.name, 1000),
                 });
 
-                let svgEl = this.sunburst.element.querySelector("svg")
+                let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
                 svgEl.setAttribute("height", "100%")
                 svgEl.setAttribute("width", "100%")
 
