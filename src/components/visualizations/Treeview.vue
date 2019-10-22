@@ -12,9 +12,11 @@ import TreeViewNode from "./TreeViewNode";
 export default class Treeview extends Vue {
         @Prop({ required: true })
         private data: TreeViewNode;
-        @Prop({ required: true })
+        @Prop({ required: false, default: false })
+        private autoResize;
+        @Prop({ required: false, default: 100 })
         private width: number;
-        @Prop({ required: true })
+        @Prop({ required: false, default: 50 })
         private height: number;
         @Prop()
         private tooltip: (d: any) => string; 
@@ -86,9 +88,12 @@ export default class Treeview extends Vue {
                 // @ts-ignore
                 this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
 
-                 let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
-                svgEl.setAttribute("height", "100%")
-                svgEl.setAttribute("width", "100%")
+                if(this.autoResize)
+                {
+                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
+                    svgEl.setAttribute("height", "100%")
+                    svgEl.setAttribute("width", "100%")
+                }
             }
         }
 }

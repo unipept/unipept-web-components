@@ -10,12 +10,13 @@
         </template>
         <template v-slot:expanded-item="{ headers, item }">
             <td :colspan="headers.length">
-                <div v-if="computeTree(item) && treeAvailable.get(item)">
+                <div v-if="treeAvailable.get(item) || computeTree(item)">
                     <treeview
-                        :id="`TreeView-${item.code}`" 
-                        :data="treeAvailable.get(item)" 
-                        :height="310"
-                        :width="800" 
+                        :id="`TreeView-${item.code}`"
+                        :autoResize="true"
+                        :width="650"
+                        :height="230"
+                        :data="treeAvailable.get(item)"
                         :tooltip="tooltip" 
                         :colors="highlightColorFunc" 
                         :enableAutoExpand="0.3" 

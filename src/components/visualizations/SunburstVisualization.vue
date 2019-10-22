@@ -49,8 +49,10 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         private fullScreen: false;
         @Prop({ required: true })
         private dataRepository: DataRepository;
+        @Prop({ required: false, default: false })
+        private autoResize: boolean;
         // The width of the parent container is chosen if no specific width is set by the user.
-        @Prop({ required: false, default: -1 })
+        @Prop({ required: false, default: 740 })
         private width: number;
         @Prop({ required: false, default: 740 })
         private height: number;
@@ -96,16 +98,20 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
                 // @ts-ignore
                 this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
+                    width: this.width,
+                    height: this.height,
+                    radius: this.radius,
                     getTooltip: tooltipContent,
                     getTitleText: d => `${d.name} (${d.rank})`,
                     rerootCallback: d => this.search(d.id, d.name, 1000),
                 });
 
-                let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
-                svgEl.setAttribute("height", "100%")
-                svgEl.setAttribute("width", "100%")
-
-                svgEl.setAttribute("viewBox", "0 -5 600 620")
+                if(this.autoResize)
+                {
+                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
+                    svgEl.setAttribute("height", "100%")
+                    svgEl.setAttribute("width", "100%")
+                }
             }
         }
 }
