@@ -7,7 +7,7 @@ import HierarchicalOutlineVisualization from "./../HierarchicalOutlineVisualizat
 import "jsdom-worker-fix";
 import Vuex from "vuex";
 
-import setupNock from "@/test/SetupNock";
+import setupNock from "@/test/setupNock";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -80,11 +80,9 @@ describe("HierarchicalOutlineVisualization", () => {
             // Wait for all async operations to be finished, before expecting anything.
             const flushPromises = () => new Promise(setImmediate);
             flushPromises().then(() => {
-                getters
                 expect(wrapper.html()).toMatchSnapshot();
                 // Call done here in the promise resolve.
                 done();
-                
             })
         });
     });
