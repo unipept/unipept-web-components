@@ -35,7 +35,16 @@ span.dir {
 
 #treeviewWrapper
 {
-    max-height: 800px;
+    height: 800px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#treeviewWrapper > div
+{
+    height: 100%;
+    width: 100%;
 }
 
 .unipept-sunburst{
@@ -45,11 +54,4 @@ span.dir {
 
     display: flex;
     flex-direction: row;
-}
-
-.unipept-sunburst svg
-{
-    position: absolute;
-    height: 100%;
-    width: 100%;
 }

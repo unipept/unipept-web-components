@@ -100,7 +100,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treeview-visualization ref="treeview" :autoResize="true" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
+                        <treeview-visualization ref="treeview" :autoResize="true" :width="600" :height="350" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
