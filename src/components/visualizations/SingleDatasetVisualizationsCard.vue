@@ -5,6 +5,7 @@
                 <div v-if="isFullScreen" class="unipept-logo">
                     <img src="/images/trans_logo.png" alt="logo" width="40" height="40">
                 </div>
+                <v-spacer v-if="isFullScreen"/>
                 <v-tab>
                     Sunburst
                 </v-tab>
@@ -20,8 +21,7 @@
                 <v-tab v-if="!isFullScreen" @click="openHeatmapWizard()" v-on:click.stop>
                     Heatmap
                 </v-tab>
-                <v-spacer>
-                </v-spacer>
+                <v-spacer/>
                 <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.dataRepository">
                     <template v-slot:activator="{ on }">
                         <v-btn text class="align-self-center mr-4" v-on="on">
@@ -169,6 +169,7 @@ import fullscreen from "vue-fullscreen";
 import { logToGoogle, triggerDownloadModal } from "../../logic/utils";
 import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
 import DataRepository from "../../logic/data-source/DataRepository";
+import Utils from "./../custom/Utils";
 import $ from "jquery";
 
     @Component({
@@ -205,18 +206,18 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
         mounted() {
-            document.addEventListener("fullscreenchange", () => {
+            /*document.addEventListener("fullscreenchange", () => {
                 if (document.fullscreenElement) {
                     this.exitFullScreen();
                 }
-            }, false);
+            }, false);*/
             // @ts-ignore (TODO: migrate to Vuetify)
             // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
         }
         
         private switchToFullScreen() {
             // @ts-ignore
-            if (window.fullScreenApi.supportsFullScreen) {
+            if (Utils.isElectron() || window.fullScreenApi.supportsFullScreen) {
                 this.isFullScreen = true;
                 this.$refs.fullScreenContainer.toggle();
                 // @ts-ignore
@@ -236,10 +237,15 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         }
 
         private reset() {
-            (this.$refs.sunburst as SunburstVisualization).reset();
-            (this.$refs.treeview as TreeviewVisualization).reset();
-            (this.$refs.treemap as TreemapVisualization).reset();
-            (this.$refs.heatmap as HeatmapVisualization).reset();
+            if (this.$refs.sunburst) {
+                (this.$refs.sunburst as SunburstVisualization).reset();
+            }
+            if(this.$refs.treeview) {
+                (this.$refs.treeview as TreeviewVisualization).reset();
+            }
+            if(this.$refs.treemap) {
+                (this.$refs.treemap as TreemapVisualization).reset();
+            }
         }
 
         private saveAsImage() {
