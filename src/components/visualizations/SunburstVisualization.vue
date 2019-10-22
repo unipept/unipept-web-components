@@ -101,13 +101,11 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                     rerootCallback: d => this.search(d.id, d.name, 1000),
                 });
 
-                $("#sunburstWrapper svg").removeAttr("height")
-                $("#sunburstWrapper svg").removeAttr("width")
+                let svgEl = this.sunburst.element.querySelector("svg")
+                svgEl.setAttribute("height", "100%")
+                svgEl.setAttribute("width", "100%")
 
-                // for some reason this dynamic svg doesn't register stylesheet css
-                $("#sunburstWrapper svg").css("position", "absolute")
-                $("#sunburstWrapper svg").css("width", "100%")
-                $("#sunburstWrapper svg").css("height", "100%")
+                svgEl.setAttribute("viewBox", "0 -5 600 620")
             }
         }
 }
