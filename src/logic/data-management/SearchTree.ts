@@ -1,11 +1,6 @@
 import { addCopy, highlight, logToGoogle } from "../utils";
-/* eslint require-jsdoc: off */
-
-/**
- * @typedef Searchtree
- * @type {object}
- * @property {function(string):any} search
- */
+import d3 from "d3";
+import * as d3Select from "d3-selection";
 
 /**
  * Constructs a Searchtree object
@@ -52,7 +47,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         resetinfoPandAndClick();
 
         // Add the nested unordered lists to the page based on the data array
-        tree = d3.select("#searchtree");
+        tree = d3Select.select("#searchtree");
         tree = tree.append("ul").append("li").attr("class", "root not").append("ul");
         // $("li.root").prepend($("#treeSearchDiv"));
         items = tree.selectAll("li").data([data])
@@ -94,12 +89,12 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         // Add click action
         $("#searchtree li span").click(clickAction);
         $("#searchtree li span").dblclick(function() {
-            rerootCallback(Object.assign({}, d3.select(this.parentElement).datum()));
+            rerootCallback(Object.assign({}, d3Select.select(this.parentElement).datum()));
         });
 
         // add search
         $("#tree_search").keyup(function() {
-            let text = $(this).val().toLowerCase();
+            let text = ($(this).val() as string).toLowerCase();
             setTimeout(function() {
                 resetinfoPandAndClick();
                 $("#searchtree li").removeClass("match unmatch");
@@ -126,9 +121,9 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
      * @return {false} prevent default
      */
     function clickAction() {
-        logToGoogle("Multi Peptide", "tree", "Peptides");
+        logToGoogle("Multi Peptide", "tree", "Peptides", null);
 
-        let d = d3.select(this.parentElement).datum(),
+        let d = d3Select.select(this.parentElement).datum(),
             margin = this.offsetTop - 9,
             ownSequences,
             allSequences,
@@ -137,17 +132,21 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
 
         $("span.clicked").removeClass("clicked");
         $(this).addClass("clicked");
+
+        
         infoPane
             .html(`
                 <h3>
-                  <a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${d.id}' target='_blank'>
-                    ${d.name}
-                  </a> (${d.rank})
+                  <a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${(d as any).id}' target='_blank'>
+                    ${(d as any).name}
+                  </a> (${(d as any).rank})
                 </h3>`);
+
         $("#tree_data").css({
             "transform": "translateY(" + margin + "px)",
             "margin-bottom": margin + "px",
         });
+
         ownSequences = dataTree.getOwnSequences(d).sort();
         if (ownSequences && ownSequences.length > 0) {
             stringBuffer = "<h4 class='own'>Peptides specific for this taxon</h4><ul>";
@@ -157,7 +156,8 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
             infoPane.find("h4.own").before("<div id='copy-own' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
-            addCopy("#copy-own span", () => ownSequences.join("\n"));
+            // TODO Fix this
+            // addCopy("#copy-own span", () => ownSequences.join("\n"));
         }
         allSequences = dataTree.getAllSequences(d).sort();
         if (allSequences && allSequences.length > 0 && allSequences.length !== (ownSequences ? ownSequences.length : 0)) {
@@ -168,7 +168,8 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
             infoPane.find("h4.all").before("<div id='copy-all' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
-            addCopy("#copy-all span", () => allSequences.join("\n"));
+            // TODO Fix this
+            // addCopy("#copy-all span", () => allSequences.join("\n"));
         }
         return false;
     }
@@ -180,7 +181,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
      *
      * @param  {string} searchTerm The string to search for
      */
-    that.search = function search(searchTerm) {
+    (that as any).search = function search(searchTerm) {
         $("#tree_search").val(searchTerm);
         highlight("#tree_search");
         $("#tree_search").change();
