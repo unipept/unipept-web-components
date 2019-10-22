@@ -312,13 +312,12 @@ export function numberToPercent(number, digits = 0) {
  * @param {string} svgSelector The DOM selector of the SVG or jQuery object
  * @returns {string} A dataURL containing the resulting PNG
 */
-export async function svg2pngDataURL(svgSelector: string) : Promise<string> 
-{ 
+export async function svg2pngDataURL(svgSelector: string) : Promise<string> { 
     var canvg = require("canvg");
-    var el = $(svgSelector).get(0)
-    var canvas = document.createElement('canvas');
-    canvg(canvas, el.outerHTML)
-    return canvas.toDataURL()
+    var el = $(svgSelector).get(0);
+    var canvas = document.createElement("canvas");
+    canvg(canvas, el.outerHTML);
+    return canvas.toDataURL();
 }
 
 export function svg2svgDataURL(svgSelector: string) {
@@ -340,8 +339,10 @@ export async function dom2pngDataURL(selector: string) : Promise<string> {
     const html2canvas = require("html2canvas");
     // Use html2canvas to convert selected element to canvas, 
     // then convert that canvas to a dataURL
-    let element = $(selector).get(0)
-    return html2canvas(element, {windowWidth: element.scrollWidth, windowHeight: element.scrollHeight, onclone: (doc) =>  {console.log(doc)}})
+    let element = $(selector).get(0);
+    return html2canvas(element, {
+        windowWidth: element.scrollWidth, 
+        windowHeight: element.scrollHeight})
         .then((canvasElement) => canvasElement.toDataURL())
 }
 

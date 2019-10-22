@@ -48,8 +48,7 @@ export default class ImageDownloadModal extends Vue {
         private svgDataURL: string = "";
         private pngDataURL: string = "";
 
-        async downloadSVG(baseFileName, selector)
-        {
+        async downloadSVG(baseFileName, selector) {
             this.svgDownload = true;
             this.baseFileName = baseFileName;
 
@@ -62,8 +61,7 @@ export default class ImageDownloadModal extends Vue {
             this.preparingImage = false;
         }
 
-        async downloadPNG(baseFileName, selector)
-        {
+        async downloadPNG(baseFileName, selector) {
             this.baseFileName = baseFileName;
 
             this.preparingImage = true;
