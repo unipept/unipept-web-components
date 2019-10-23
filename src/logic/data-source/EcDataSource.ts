@@ -8,7 +8,7 @@ import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideCo
 import DataRepository from "./DataRepository";
 import { PeptideData } from "../api/pept2data/Response";
 import { DataSourceCommon } from "./DataSourceCommon";
-import TreeViewNode from '../../components/visualizations/TreeViewNode';
+import TreeViewNode from "../../components/visualizations/TreeViewNode";
 
 // import TreeViewNode from '../ui/visualizations/TreeViewNode';
 
@@ -112,9 +112,9 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
         const codeNodeMap: Map<string, TreeViewNode> = new Map();
 
         // Initialize the root node
-        codeNodeMap.set('-.-.-.-', {
+        codeNodeMap.set("-.-.-.-", {
             id: 0,
-            name: '-.-.-.-',
+            name: "-.-.-.-",
             children: [],
             data: {
                 self_count: 0,
@@ -129,14 +129,14 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
         const getOrNew = (key) => {
             if (!codeNodeMap.has(key)) {
                 codeNodeMap.set(key, {
-                    id: key.split('.').map((x) => ('0000' + x).slice(-4)).join('.'),
-                    name: key.split('.').filter((x) => x !== '-').join('.'),
+                    id: key.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
+                    name: key.split(".").filter((x) => x !== "-").join("."),
                     children: [],
-                    data: {self_count: 0, count: 0, data: {
+                    data: { self_count: 0, count: 0, data: {
                         code: key, value: 0,
                         sequences: Object.create(null),
                         self_sequences: Object.create(null),
-                    }},
+                    } },
                 });
                 const ancestors = EcNumber.computeAncestors(key, true);
                 getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
@@ -149,8 +149,8 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
         for (const data of sortedEC) {
             const toInsert = {
-                id: data.code.split('.').map((x) => ('0000' + x).slice(-4)).join('.'),
-                name: data.code.split('.').filter((x) => x !== '-').join('.'),
+                id: data.code.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
+                name: data.code.split(".").filter((x) => x !== "-").join("."),
                 children: [],
                 data: {
                     self_count: data.popularity,
@@ -173,7 +173,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
             val.children.sort((a, b) => a.id.localeCompare(b.id));
         }
 
-        return codeNodeMap.get('-.-.-.-');
+        return codeNodeMap.get("-.-.-.-");
     }
 
     // TODO: use percent in calculations
