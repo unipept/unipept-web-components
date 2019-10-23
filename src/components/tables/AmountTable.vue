@@ -76,7 +76,7 @@ import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
                 value: this.searchSettings.field,
                 width: "15%"
             }, {
-                text: "GO term",
+                text: this.annotationName,
                 align: "left",
                 value: "code",
                 width: "30%"
