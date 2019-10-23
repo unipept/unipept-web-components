@@ -51,7 +51,6 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         private dataRepository: DataRepository;
         @Prop({ required: false, default: false })
         private autoResize: boolean;
-        // The width of the parent container is chosen if no specific width is set by the user.
         @Prop({ required: false, default: 740 })
         private width: number;
         @Prop({ required: false, default: 740 })
