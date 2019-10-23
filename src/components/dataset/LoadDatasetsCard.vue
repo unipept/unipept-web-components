@@ -52,14 +52,14 @@
                                 </a>
                             </small>
                             <br>
-                            <v-layout wrap align-center>
-                                <v-flex sm8>
+                            <v-row>
+                                <v-col :cols="9">
                                     <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
-                                </v-flex>
-                                <v-flex sm4>
+                                </v-col>
+                                <v-col :cols="3" style="display: flex; align-items: center;">
                                     <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </p>
                     </v-card-text>
                 </v-card>
