@@ -8,6 +8,8 @@ import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideCo
 import DataRepository from "./DataRepository";
 import { PeptideData } from "../api/pept2data/Response";
 import { DataSourceCommon } from "./DataSourceCommon";
+import TreeViewNode from '../../components/visualizations/TreeViewNode';
+
 // import TreeViewNode from '../ui/visualizations/TreeViewNode';
 
 export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> {
@@ -96,84 +98,83 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
         }
     }
 
-    // TODO enable again later (once visualizations have been ported)
-    // /**
-    //  * Query the EC-datasource and directly convert the found results into an EC-tree.
-    //  *
-    //  * @param namespace
-    //  * @param cutoff
-    //  * @param sequences
-    //  * @return A data model that can be used for a treeview.
-    //  */
-    // public async getEcTree(namespace: EcNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<TreeViewNode> {
-    //     const result: EcNumber[] = await this.getEcNumbers(namespace, cutoff, sequences);
-    //     // Maps an EC-code onto a Node.
-    //     const codeNodeMap: Map<string, TreeViewNode> = new Map();
+    /**
+     * Query the EC-datasource and directly convert the found results into an EC-tree.
+     *
+     * @param namespace
+     * @param cutoff
+     * @param sequences
+     * @return A data model that can be used for a treeview.
+     */
+    public async getEcTree(namespace: EcNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<TreeViewNode> {
+        const result: EcNumber[] = await this.getEcNumbers(namespace, cutoff, sequences);
+        // Maps an EC-code onto a Node.
+        const codeNodeMap: Map<string, TreeViewNode> = new Map();
 
-    //     // Initialize the root node
-    //     codeNodeMap.set('-.-.-.-', {
-    //         id: 0,
-    //         name: '-.-.-.-',
-    //         children: [],
-    //         data: {
-    //             self_count: 0,
-    //             count: 0,
-    //             data: {
-    //                 sequences: Object.create(null),
-    //                 self_sequences: Object.create(null),
-    //             },
-    //         },
-    //     });
+        // Initialize the root node
+        codeNodeMap.set('-.-.-.-', {
+            id: 0,
+            name: '-.-.-.-',
+            children: [],
+            data: {
+                self_count: 0,
+                count: 0,
+                data: {
+                    sequences: Object.create(null),
+                    self_sequences: Object.create(null),
+                },
+            },
+        });
 
-    //     const getOrNew = (key) => {
-    //         if (!codeNodeMap.has(key)) {
-    //             codeNodeMap.set(key, {
-    //                 id: key.split('.').map((x) => ('0000' + x).slice(-4)).join('.'),
-    //                 name: key.split('.').filter((x) => x !== '-').join('.'),
-    //                 children: [],
-    //                 data: {self_count: 0, count: 0, data: {
-    //                     code: key, value: 0,
-    //                     sequences: Object.create(null),
-    //                     self_sequences: Object.create(null),
-    //                 }},
-    //             });
-    //             const ancestors = EcNumber.computeAncestors(key, true);
-    //             getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
-    //         }
-    //         return codeNodeMap.get(key);
-    //     };
+        const getOrNew = (key) => {
+            if (!codeNodeMap.has(key)) {
+                codeNodeMap.set(key, {
+                    id: key.split('.').map((x) => ('0000' + x).slice(-4)).join('.'),
+                    name: key.split('.').filter((x) => x !== '-').join('.'),
+                    children: [],
+                    data: {self_count: 0, count: 0, data: {
+                        code: key, value: 0,
+                        sequences: Object.create(null),
+                        self_sequences: Object.create(null),
+                    }},
+                });
+                const ancestors = EcNumber.computeAncestors(key, true);
+                getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
+            }
+            return codeNodeMap.get(key);
+        };
 
-    //     // Sort from generic to specific
-    //     const sortedEC = result.sort((a: EcNumber, b: EcNumber) => a.level - b.level);
+        // Sort from generic to specific
+        const sortedEC = result.sort((a: EcNumber, b: EcNumber) => a.level - b.level);
 
-    //     for (const data of sortedEC) {
-    //         const toInsert = {
-    //             id: data.code.split('.').map((x) => ('0000' + x).slice(-4)).join('.'),
-    //             name: data.code.split('.').filter((x) => x !== '-').join('.'),
-    //             children: [],
-    //             data: {
-    //                 self_count: data.popularity,
-    //                 count: data.popularity,
-    //                 data,
-    //             },
-    //         };
+        for (const data of sortedEC) {
+            const toInsert = {
+                id: data.code.split('.').map((x) => ('0000' + x).slice(-4)).join('.'),
+                name: data.code.split('.').filter((x) => x !== '-').join('.'),
+                children: [],
+                data: {
+                    self_count: data.popularity,
+                    count: data.popularity,
+                    data,
+                },
+            };
 
-    //         codeNodeMap.set(data.code, toInsert);
+            codeNodeMap.set(data.code, toInsert);
 
-    //         const ancestors = EcNumber.computeAncestors(data.code, true);
-    //         getOrNew(ancestors[0]).children.push(toInsert);
-    //         for (const a of ancestors) {
-    //             getOrNew(a).data.count += toInsert.data.count;
-    //         }
-    //     }
+            const ancestors = EcNumber.computeAncestors(data.code, true);
+            getOrNew(ancestors[0]).children.push(toInsert);
+            for (const a of ancestors) {
+                getOrNew(a).data.count += toInsert.data.count;
+            }
+        }
 
-    //     // Order the nodes by their id (order by EC number)
-    //     for (const val of codeNodeMap.values()) {
-    //         val.children.sort((a, b) => a.id.localeCompare(b.id));
-    //     }
+        // Order the nodes by their id (order by EC number)
+        for (const val of codeNodeMap.values()) {
+            val.children.sort((a, b) => a.id.localeCompare(b.id));
+        }
 
-    //     return codeNodeMap.get('-.-.-.-');
-    // }
+        return codeNodeMap.get('-.-.-.-');
+    }
 
     // TODO: use percent in calculations
     protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, EcNumber[]>, Map<EcNameSpace, FATrust>]> {

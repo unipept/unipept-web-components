@@ -144,9 +144,9 @@
                                 <span v-html="ecTrustLine"></span>
                                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
                                 <ec-amount-table :dataRepository="dataRepository" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
-                                <div v-if="ecTreeData">
-                                    <treeview :data="ecTreeData" :height="500" :width="916" :tooltip="ecTreeTooltip" :enableAutoExpand="true" style="position: relative; left: -16px; bottom: -16px;"></treeview>
-                                </div>
+                                <v-card outlined v-if="ecTreeData">
+                                    <treeview :data="ecTreeData" :autoResize="true" :height="300" :width="800" :tooltip="ecTreeTooltip" :enableAutoExpand="true"></treeview>
+                                </v-card>
                             </div>
                         </v-card-text>
                     </v-card>
