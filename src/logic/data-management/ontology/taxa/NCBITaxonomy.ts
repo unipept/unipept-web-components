@@ -20,7 +20,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
     async fetchTaxaInfo(ids: OntologyId[]) {
         ids = ids.filter(id => 
             !this._definitions.has(id) 
-            ||  !this._definitions.get(id).hasOwnProperty("name"))
+            ||  !("name" in this._definitions.get(id)))
 
         // get taxa info
         for (let i = 0; i < ids.length; i += TAXA_BATCH_SIZE) {
@@ -46,7 +46,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
         // first check which ids need to be fetched
         ids = ids.filter(id => 
             !this._definitions.has(id) 
-            || !this._definitions.get(id).hasOwnProperty("lineage"))
+            || !("lineage" in this._definitions.get(id)))
 
         // get lineage info
         for (let i = 0; i < ids.length; i += LINEAGE_BATCH_SIZE) {

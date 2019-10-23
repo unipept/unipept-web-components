@@ -14,5 +14,5 @@ jobs:
     - name: Install ESLint CLI
       run: npm i -g eslint
     - name: Run ESLint
-      run: eslint "src/**" --ext .ts,.js,.vue
+      run: eslint "src/**/*.ts" "src/**/*.vue" "src/**/*.js"
     

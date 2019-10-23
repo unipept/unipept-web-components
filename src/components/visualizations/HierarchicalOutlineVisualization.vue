@@ -17,7 +17,7 @@ import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Assay from "../../logic/data-management/assay/Assay";
 import Tree from "../../logic/data-management/Tree";
-import { constructSearchtree } from "../../logic/data-management/searchtree";
+import { constructSearchtree } from "../../logic/data-management/SearchTree";
 import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 import DataRepository from "../../logic/data-source/DataRepository";
 
