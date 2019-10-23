@@ -342,7 +342,7 @@ export async function dom2pngDataURL(selector: string) : Promise<string> {
     let element = $(selector).get(0);
     return html2canvas(element, {
         windowWidth: element.scrollWidth, 
-        windowHeight: element.scrollHeight})
+        windowHeight: element.scrollHeight })
         .then((canvasElement) => canvasElement.toDataURL())
 }
 
