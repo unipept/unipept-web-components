@@ -1,4 +1,4 @@
-<template>
+-<template>
     <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
         <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
             <v-tabs :color="isFullScreen ? 'accent' : tabsTextColor" :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
@@ -39,7 +39,7 @@
                                 Enter full screen
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item key="save-as-image" @click="saveAsImage()" >
+                        <v-list-item key="save-as-image" @click="prepareImage()">
                             <v-list-item-title>
                                 <v-icon>
                                     mdi-download
@@ -49,6 +49,7 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
+                <image-download-modal ref="imageDownloadModal"/>
                 <div v-if="isFullScreen">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
@@ -85,7 +86,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
+                        <treemap-visualization ref="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -152,7 +153,7 @@
 </template>
 
 <script lang="ts">
-import d3 from "d3";
+import * as d3 from "d3";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
@@ -166,9 +167,10 @@ import CardHeader from "../custom/CardHeader.vue";
 //@ts-ignore
 import fullscreen from "vue-fullscreen";
 
-import { logToGoogle, triggerDownloadModal } from "../../logic/utils";
+import { logToGoogle } from "../../logic/utils";
 import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
 import DataRepository from "../../logic/data-source/DataRepository";
+import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 import $ from "jquery";
 
 @Component({
@@ -179,7 +181,8 @@ import $ from "jquery";
         TreeviewVisualization,
         TreemapVisualization,
         SunburstVisualization,
-        HeatmapWizardSingleSample
+        HeatmapWizardSingleSample,
+        ImageDownloadModal
     }
 })
 export default class SingleDatasetVisualizationsCard extends Vue {
@@ -188,7 +191,8 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         sunburst: SunburstVisualization,
         treeview: TreeviewVisualization,
         treemap: TreemapVisualization,
-        heatmap: HeatmapVisualization
+        heatmap: HeatmapVisualization,
+        imageDownloadModal: ImageDownloadModal
     }
 
     @Prop({ required: true })
@@ -243,25 +247,27 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         this.isFullScreen = state;
     }
 
+    private async prepareImage() {
+        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+
+        // @ts-ignore
+        logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
+        if (this.tabs[this.tab] === "Sunburst") {
+            d3.selectAll(".toHide").attr("class", "arc hidden");
+            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
+            d3.selectAll(".hidden").attr("class", "arc toHide");
+        } else if (this.tabs[this.tab] === "Treemap") {
+            imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
+        } else {
+            imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
+        }
+    }
+
     private reset() {
         (this.$refs.sunburst as SunburstVisualization).reset();
         (this.$refs.treeview as TreeviewVisualization).reset();
         (this.$refs.treemap as TreemapVisualization).reset();
         (this.$refs.heatmap as HeatmapVisualization).reset();
-    }
-
-    private saveAsImage() {
-        // @ts-ignore
-        logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
-        if (this.tabs[this.tab] === "Sunburst") {
-            d3.selectAll(".toHide").attr("class", "arc hidden");
-            triggerDownloadModal("#sunburstWrapper svg", null, "unipept_sunburst");
-            d3.selectAll(".hidden").attr("class", "arc toHide");
-        } else if (this.tabs[this.tab] === "Treemap") {
-            triggerDownloadModal(null, "#treemap", "unipept_treemap");
-        } else {
-            triggerDownloadModal("#treeviewWrapper svg", null, "unipept_treeview");
-        }
     }
 
     private openHeatmapWizard(): void {
