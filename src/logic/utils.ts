@@ -317,10 +317,14 @@ export async function svg2pngDataURL(svgSelector: string) : Promise<string> {
     var el = $(svgSelector).get(0);
 
     var canvas = document.createElement("canvas");
+
+    // automatically size canvas to svg element and render
     canvg(canvas, el.outerHTML);
 
+    // double size of canvas
     canvas.setAttribute("height", canvas.height * 2 + "px")
     canvas.setAttribute("width", canvas.width * 2 + "px")
+    // render svg element to this resized canvas (doubled resolution)
     canvg(canvas, el.outerHTML, {ignoreDimensions: true, scaleWidth: canvas.width, scaleHeight: canvas.height});
 
     return canvas.toDataURL();
