@@ -1,5 +1,5 @@
 <template>
-    <div ref="treeviewWrapper">
+    <div id="treeviewWrapper" ref="treeviewWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <a class="btn btn-xs btn-default btn-animate" @click="reset()" title="reset visualisation">
@@ -8,7 +8,7 @@
             </span>
             <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
         </h2>
-        <treeview ref="treeview" :data="data" :width="this.width" :height="600" :enableAutoExpand="true" :tooltip="tooltip" :colors="colors" :rerootCallback="rerootCallback"></treeview>
+        <treeview ref="treeview" :data="data" :autoResize="this.autoResize" :width="this.width" :height="this.height" :enableAutoExpand="true" :tooltip="tooltip" :colors="colors" :rerootCallback="rerootCallback"></treeview>
     </div>
 </template>
 
@@ -40,6 +40,8 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
         private fullScreen: boolean;
         @Prop({ required: true })
         private dataRepository: DataRepository;
+        @Prop({ required: false, default: false })
+        private autoResize: number;
         @Prop({ required: false, default: -1 })
         private width: number;
         @Prop({ required: false, default: 600 })

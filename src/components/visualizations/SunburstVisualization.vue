@@ -1,5 +1,5 @@
 <template>
-    <div ref="sunburstWrapper">
+    <div id="sunburstWrapper" ref="sunburstWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
@@ -49,8 +49,9 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         private fullScreen: false;
         @Prop({ required: true })
         private dataRepository: DataRepository;
-        // The width of the parent container is chosen if no specific width is set by the user.
-        @Prop({ required: false, default: -1 })
+        @Prop({ required: false, default: false })
+        private autoResize: boolean;
+        @Prop({ required: false, default: 740 })
         private width: number;
         @Prop({ required: false, default: 740 })
         private height: number;
@@ -96,13 +97,19 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
                 // @ts-ignore
                 this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-                    width: this.width === -1 ? (this.$refs.sunburstWrapper as Element).clientWidth : this.width,
+                    width: this.width,
                     height: this.height,
                     radius: this.radius,
                     getTooltip: tooltipContent,
                     getTitleText: d => `${d.name} (${d.rank})`,
                     rerootCallback: d => this.search(d.id, d.name, 1000),
                 });
+
+                if (this.autoResize) {
+                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
+                    svgEl.setAttribute("height", "100%")
+                    svgEl.setAttribute("width", "100%")
+                }
             }
         }
 }
