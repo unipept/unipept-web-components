@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-card>
-            <v-tabs color="primary" dark v-model="currentTab" slider-color="secondary" background-color="accent">
+            <v-tabs :color="tabsTextColor" :dark="isDark" v-model="currentTab" :slider-color="tabsSliderColor" :background-color="tabsColor">
                 <v-tab>
                     GO Terms
                 </v-tab>
@@ -189,246 +189,254 @@ import { NCBITaxon } from "../../../logic/data-management/ontology/taxa/NCBITaxo
 import { NCBITaxonomy } from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
 import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
 
-    @Component({
-        components: {
-            CardHeader,
-            IndeterminateProgressBar,
-            FilterFunctionalAnnotationsDropdown,
-            GoAmountTable,
-            EcAmountTable,
-            Treeview,
-            QuickGoCard
+@Component({
+    components: {
+        CardHeader,
+        IndeterminateProgressBar,
+        FilterFunctionalAnnotationsDropdown,
+        GoAmountTable,
+        EcAmountTable,
+        Treeview,
+        QuickGoCard
+    },
+    computed: {
+        watchableDataset: {
+            get(): PeptideContainer {
+                return this.$store.getters.activeDataset
+            }
         },
-        computed: {
-            watchableDataset: {
-                get(): PeptideContainer {
-                    return this.$store.getters.activeDataset
-                }
-            },
-            watchableSelectedSearchTerm: {
-                get(): string {
-                    return this.$store.getters.selectedTerm
-                }
-            },
-            watchableSelectedTaxonId: {
-                get(): string {
-                    return this.$store.getters.selectedTaxonId;
-                }
+        watchableSelectedSearchTerm: {
+            get(): string {
+                return this.$store.getters.selectedTerm
+            }
+        },
+        watchableSelectedTaxonId: {
+            get(): string {
+                return this.$store.getters.selectedTaxonId;
             }
         }
-    })
+    }
+})
 export default class FunctionalSummaryCard extends Vue {
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
-        @Prop({ required: false, default: true })
-        private analysisInProgress: boolean;
+    @Prop({ required: true })
+    private dataRepository: DataRepository;
+    @Prop({ required: false, default: true })
+    private analysisInProgress: boolean;
+    @Prop({ required: false, default: "primary" })
+    private tabsColor: string;
+    @Prop({ required: false, default: "secondary" })
+    private tabsSliderColor: string;
+    @Prop({ required: false, default: "white" })
+    private tabsTextColor: string;
+    @Prop({ required: false, default: true })
+    private isDark: boolean;
 
-        private totalPeptides: number = 0;
-        private selectedNCBITaxon: NCBITaxon = null; 
-        private showTaxonInfo: boolean = false;
+    private totalPeptides: number = 0;
+    private selectedNCBITaxon: NCBITaxon = null; 
+    private showTaxonInfo: boolean = false;
 
-        // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
-        // directly
-        private goNamespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
-        private goData: {goTerms: GoTerm[], title: string}[] = [];
+    // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
+    // directly
+    private goNamespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
+    private goData: {goTerms: GoTerm[], title: string}[] = [];
 
-        private ecData: EcNumber[] = [];
-        private ecTreeData: TreeViewNode = null;
+    private ecData: EcNumber[] = [];
+    private ecTreeData: TreeViewNode = null;
 
-        private ecTrustLine: string = "";
-        private goTrustLine: string = "";
+    private ecTrustLine: string = "";
+    private goTrustLine: string = "";
 
-        private formatType: string = "int";
+    private formatType: string = "int";
 
-        private currentTab: number = 0;
+    private currentTab: number = 0;
 
-        private dialogOpen: boolean = false;
+    private dialogOpen: boolean = false;
 
-        private ecTreeTooltip: (d: any) => string = (d: any) => {
-            const fullCode = (d.name + ".-.-.-.-").split(".").splice(0, 4).join(".");
-            let tip = "";
-            tip += `<div class="tooltip-fa-text">
-                        <strong>${d.data.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
+    private ecTreeTooltip: (d: any) => string = (d: any) => {
+        const fullCode = (d.name + ".-.-.-.-").split(".").splice(0, 4).join(".");
+        let tip = "";
+        tip += `<div class="tooltip-fa-text">
+                    <strong>${d.data.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
 
-            if (d.data.self_count == 0) {
-                tip += "no specific annotations";
+        if (d.data.self_count == 0) {
+            tip += "no specific annotations";
+        } else {
+            if (d.data.self_count == d.data.count) {
+                tip += " <strong>all specifically</strong> for this number";
             } else {
-                if (d.data.self_count == d.data.count) {
-                    tip += " <strong>all specifically</strong> for this number";
-                } else {
-                    tip += ` <strong>${d.data.self_count} specificly</strong> for this number`;
-                }
-            }
-
-            tip += "</div>";
-            return tip;
-        };
-
-        private readonly formatters = {
-            "int": x => x.toString(),
-            "percent": x => numberToPercent(x),
-            "2pos": x => x.toFixed(2).toString(),
-        };
-
-        private faSortSettings: FaSortSettings = new FaSortSettings(
-            (x: GoTerm) => this.formatters[this.formatType](x["popularity"]),
-            "popularity",
-            "fractionOfPepts",
-            "Peptides",
-            (a, b) => b["popularity"] - a["popularity"]
-        );
-
-        private percentSettings: string = "5";
-
-        private filteredScope: string = "";
-        private numOfFilteredPepts: string = "";
-        private faCalculationsInProgress: boolean = false;
-
-        mounted() {
-            for (let ns of this.goNamespaces) {
-                this.goData.push({
-                    goTerms: [],
-                    title: stringTitleize(ns.toString())
-                });
-            }
-            this.onDataRepositoryChanged();
-        }
-
-        @Watch("dataRepository") onDataRepositoryChange() {
-            this.onDataRepositoryChanged();
-        }
-
-        @Watch("percentSettings") onPercentSettingsChange() {
-            this.onDataRepositoryChanged();
-        }
-        
-        @Watch("watchableSelectedTaxonId") onWatchableSelectedTaxonIdChanged() {
-            this.onDataRepositoryChanged();
-            this.getSelectedTaxonInfo();
-        }
-
-        setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
-            this.formatType = formatType;
-
-            this.faSortSettings.format = (x: GoTerm) => this.formatters[this.formatType](x[fieldType]);
-            this.faSortSettings.field = fieldType;
-            this.faSortSettings.shadeField = shadeFieldType;
-            this.faSortSettings.name = name;
-            this.faSortSettings.sortFunc = (a, b) => b[fieldType] - a[fieldType];
-
-            // Recalculate stuff
-            this.onDataRepositoryChanged();
-        }
-
-        reset() {
-            this.$store.dispatch("setSelectedTerm", "Organism");
-            this.$store.dispatch("setSelectedTaxonId", -1);
-        }
-
-        private async onDataRepositoryChanged() {
-            this.faCalculationsInProgress = true;
-            if (this.dataRepository) {
-                await this.redoFAcalculations();
-            }
-            this.faCalculationsInProgress = false;
-        }
-
-        private async getSelectedTaxonInfo() {
-            if (this.dataRepository) {
-                const taxaSource = await this.dataRepository.createTaxaDataSource();
-                const taxonId = this.$store.getters.selectedTaxonId;
-
-                // get selecton taxon information
-                if (taxonId != -1) {
-                    this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
-                    this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
-                    this.showTaxonInfo = true;
-                }
+                tip += ` <strong>${d.data.self_count} specificly</strong> for this number`;
             }
         }
 
-        private async redoFAcalculations(): Promise<void> {
-            if (this.dataRepository) {
-                let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-                const taxonId = this.$store.getters.selectedTaxonId;
+        tip += "</div>";
+        return tip;
+    };
 
-                // get sequences corresponding to selected taxon id
-                let sequences = null;
-                if (taxonId > 0) {
-                    let tree = await taxaSource.getTree();
-                    sequences = tree.getAllSequences(taxonId);
-                    let taxonData = tree.nodes.get(taxonId);
-                    this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
-                }
+    private readonly formatters = {
+        "int": x => x.toString(),
+        "percent": x => numberToPercent(x),
+        "2pos": x => x.toFixed(2).toString(),
+    };
 
-                this.doFAcalculations(sequences);
+    private faSortSettings: FaSortSettings = new FaSortSettings(
+        (x: GoTerm) => this.formatters[this.formatType](x["popularity"]),
+        "popularity",
+        "fractionOfPepts",
+        "Peptides",
+        (a, b) => b["popularity"] - a["popularity"]
+    );
+
+    private percentSettings: string = "5";
+
+    private filteredScope: string = "";
+    private numOfFilteredPepts: string = "";
+    private faCalculationsInProgress: boolean = false;
+
+    mounted() {
+        for (let ns of this.goNamespaces) {
+            this.goData.push({
+                goTerms: [],
+                title: stringTitleize(ns.toString())
+            });
+        }
+        this.onDataRepositoryChanged();
+    }
+
+    @Watch("dataRepository") onDataRepositoryChange() {
+        this.onDataRepositoryChanged();
+    }
+
+    @Watch("percentSettings") onPercentSettingsChange() {
+        this.onDataRepositoryChanged();
+    }
+    
+    @Watch("watchableSelectedTaxonId") onWatchableSelectedTaxonIdChanged() {
+        this.onDataRepositoryChanged();
+        this.getSelectedTaxonInfo();
+    }
+
+    setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
+        this.formatType = formatType;
+
+        this.faSortSettings.format = (x: GoTerm) => this.formatters[this.formatType](x[fieldType]);
+        this.faSortSettings.field = fieldType;
+        this.faSortSettings.shadeField = shadeFieldType;
+        this.faSortSettings.name = name;
+        this.faSortSettings.sortFunc = (a, b) => b[fieldType] - a[fieldType];
+
+        // Recalculate stuff
+        this.onDataRepositoryChanged();
+    }
+
+    reset() {
+        this.$store.dispatch("setSelectedTerm", "Organism");
+        this.$store.dispatch("setSelectedTaxonId", -1);
+    }
+
+    private async onDataRepositoryChanged() {
+        this.faCalculationsInProgress = true;
+        if (this.dataRepository) {
+            await this.redoFAcalculations();
+        }
+        this.faCalculationsInProgress = false;
+    }
+
+    private async getSelectedTaxonInfo() {
+        if (this.dataRepository) {
+            const taxaSource = await this.dataRepository.createTaxaDataSource();
+            const taxonId = this.$store.getters.selectedTaxonId;
+
+            // get selecton taxon information
+            if (taxonId != -1) {
+                this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
+                this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
+                this.showTaxonInfo = true;
             }
         }
+    }
 
-        private async doFAcalculations(sequences: string[] = null) {
-            if (this.dataRepository) {
-                let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
+    private async redoFAcalculations(): Promise<void> {
+        if (this.dataRepository) {
+            let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
+            const taxonId = this.$store.getters.selectedTaxonId;
 
-                const percent = parseInt(this.percentSettings);
-
-                // recalculate go-data for those sequences
-                for (let i = 0; i < this.goNamespaces.length; i++) {
-                    let namespace: GoNameSpace = this.goNamespaces[i];
-                    this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
-                }
-
-                this.goTrustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
-
-                // recalculate ec-data for those sequences
-                this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
-                this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
-                // @ts-ignore
-                this.ecTreeData = await ecSource.getEcTree();
+            // get sequences corresponding to selected taxon id
+            let sequences = null;
+            if (taxonId > 0) {
+                let tree = await taxaSource.getTree();
+                sequences = tree.getAllSequences(taxonId);
+                let taxonData = tree.nodes.get(taxonId);
+                this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
             }
+
+            this.doFAcalculations(sequences);
         }
+    }
 
-        /**
-         * Generate a tooltip for an EC number
-         * 
-         * @param  ecNumber   The EC number to generate a tooltip for
-         * @return {string}    HTML for the tooltip
-         */
-        private tooltipEC(ecNumber: EcNumber) {
-            // const fmt = x => `<div class="tooltip-ec-ancestor"><span class="tooltip-ec-term">EC ${x}</span><span class="tooltip-ec-name">${ECNumbers.nameOf(x)}</span></div>`;
-            // const fmth = x => `<div class="tooltip-ec-ancestor tooltip-ec-current"><span class="tooltip-ec-term">EC ${x}</span><h4 class="tooltip-fa-title">${ECNumbers.nameOf(x)}</h4></div>`;
+    private async doFAcalculations(sequences: string[] = null) {
+        if (this.dataRepository) {
+            let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+            let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
 
-            // let result = "";
+            const percent = parseInt(this.percentSettings);
 
-            // if (ECNumbers.ancestorsOf(ecNumber).length > 0) {
-            //     result += `${ECNumbers.ancestorsOf(ecNumber).reverse().map(c => fmt(c)).join("\n")}`;
-            // }
-            // result += fmth(ecNumber);
+            // recalculate go-data for those sequences
+            for (let i = 0; i < this.goNamespaces.length; i++) {
+                let namespace: GoNameSpace = this.goNamespaces[i];
+                this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
+            }
 
-            // result += this.tootipResultSet(ecNumber, ecResultSet, oldEcResultSet);
-            // return result;
-            return "";
+            this.goTrustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
+
+            // recalculate ec-data for those sequences
+            this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
+            this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
+            // @ts-ignore
+            this.ecTreeData = await ecSource.getEcTree();
         }
+    }
 
-        /**
-         * Creates a line indicating the trust of the function annotations
-         * 
-         * @param trust The FATrust object that contains all necessary trust information.
-         * @param kind Human readable word that fits in "To have at least one … assigned to it"
-         * @return
-         */
-        private computeTrustLine(trust: FATrust, kind: string): string {
-            if (trust.annotatedCount === 0) {
-                return `<strong>No peptide</strong> has a ${kind} assigned to it. `;
-            }
-            if (trust.annotatedCount === trust.totalCount) {
-                return `<strong>All peptides</strong> ${trust.annotatedCount <= 5 ? `(only ${trust.annotatedCount})` : ""} have at least one ${kind} assigned to them. `;
-            }
-            if (trust.annotatedCount === 1) {
-                return `Only <strong>one peptide</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) has at least one ${kind} assigned to it. `;
-            }
-            return `<strong>${trust.annotatedCount} peptides</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) have at least one ${kind} assigned to them. `;
+    /**
+     * Generate a tooltip for an EC number
+     * 
+     * @param  ecNumber   The EC number to generate a tooltip for
+     * @return {string}    HTML for the tooltip
+     */
+    private tooltipEC(ecNumber: EcNumber) {
+        // const fmt = x => `<div class="tooltip-ec-ancestor"><span class="tooltip-ec-term">EC ${x}</span><span class="tooltip-ec-name">${ECNumbers.nameOf(x)}</span></div>`;
+        // const fmth = x => `<div class="tooltip-ec-ancestor tooltip-ec-current"><span class="tooltip-ec-term">EC ${x}</span><h4 class="tooltip-fa-title">${ECNumbers.nameOf(x)}</h4></div>`;
+
+        // let result = "";
+
+        // if (ECNumbers.ancestorsOf(ecNumber).length > 0) {
+        //     result += `${ECNumbers.ancestorsOf(ecNumber).reverse().map(c => fmt(c)).join("\n")}`;
+        // }
+        // result += fmth(ecNumber);
+
+        // result += this.tootipResultSet(ecNumber, ecResultSet, oldEcResultSet);
+        // return result;
+        return "";
+    }
+
+    /**
+     * Creates a line indicating the trust of the function annotations
+     * 
+     * @param trust The FATrust object that contains all necessary trust information.
+     * @param kind Human readable word that fits in "To have at least one … assigned to it"
+     * @return
+     */
+    private computeTrustLine(trust: FATrust, kind: string): string {
+        if (trust.annotatedCount === 0) {
+            return `<strong>No peptide</strong> has a ${kind} assigned to it. `;
         }
+        if (trust.annotatedCount === trust.totalCount) {
+            return `<strong>All peptides</strong> ${trust.annotatedCount <= 5 ? `(only ${trust.annotatedCount})` : ""} have at least one ${kind} assigned to them. `;
+        }
+        if (trust.annotatedCount === 1) {
+            return `Only <strong>one peptide</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) has at least one ${kind} assigned to it. `;
+        }
+        return `<strong>${trust.annotatedCount} peptides</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) have at least one ${kind} assigned to them. `;
+    }
 }
 </script>
 

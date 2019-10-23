@@ -1,7 +1,7 @@
 -<template>
     <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
         <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
-            <v-tabs :color="isFullScreen ? 'accent' : 'primary'" :slider-color="isFullScreen ? 'white' : 'secondary'" dark background-color="accent" :fixed-tabs="isFullScreen" v-model="tab">
+            <v-tabs :color="isFullScreen ? 'accent' : tabsTextColor" :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
                 <div v-if="isFullScreen" class="unipept-logo">
                     <img src="/images/trans_logo.png" alt="logo" width="40" height="40">
                 </div>
@@ -71,7 +71,7 @@
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <v-card flat>
-                        <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
+                        <sunburst-visualization ref="sunburst" :autoResize="true" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -101,7 +101,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
+                        <treeview-visualization ref="treeview" :autoResize="true" :width="600" :height="350" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -186,85 +186,93 @@ import $ from "jquery";
     }
 })
 export default class SingleDatasetVisualizationsCard extends Vue {
-        $refs!: {
-            fullScreenContainer: fullscreen,
-            sunburst: SunburstVisualization,
-            treeview: TreeviewVisualization,
-            treemap: TreemapVisualization,
-            heatmap: HeatmapVisualization,
-            imageDownloadModal: ImageDownloadModal
-        }
+    $refs!: {
+        fullScreenContainer: fullscreen,
+        sunburst: SunburstVisualization,
+        treeview: TreeviewVisualization,
+        treemap: TreemapVisualization,
+        heatmap: HeatmapVisualization,
+        imageDownloadModal: ImageDownloadModal
+    }
 
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
-        @Prop({ required: false, default: true })
-        private analysisInProgress: boolean;
+    @Prop({ required: true })
+    private dataRepository: DataRepository;
+    @Prop({ required: false, default: true })
+    private analysisInProgress: boolean;
+    @Prop({ required: false, default: "primary" })
+    private tabsColor: string;
+    @Prop({ required: false, default: "secondary" })
+    private tabsSliderColor: string;
+    @Prop({ required: false, default: "white" })
+    private tabsTextColor: string;
+    @Prop({ required: false, default: true })
+    private isDark: boolean;    
 
-        private placeholderText = "Please select at least one dataset for analysis.";
-        private isFullScreen: boolean = false;
-        private dialogOpen: boolean = false;
+    private placeholderText = "Please select at least one dataset for analysis.";
+    private isFullScreen: boolean = false;
+    private dialogOpen: boolean = false;
 
-        private tab = null;
+    private tab = null;
 
-        private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
+    private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
-        mounted() {
-            document.addEventListener("fullscreenchange", () => {
-                if (document.fullscreenElement) {
-                    this.exitFullScreen();
-                }
-            }, false);
-            // @ts-ignore (TODO: migrate to Vuetify)
-            // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
-        }
-        
-        private switchToFullScreen() {
-            // @ts-ignore
-            if (window.fullScreenApi.supportsFullScreen) {
-                this.isFullScreen = true;
-                this.$refs.fullScreenContainer.toggle();
-                // @ts-ignore
-                logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
-                $(".tip").appendTo(".full-screen-container");
+    mounted() {
+        document.addEventListener("fullscreenchange", () => {
+            if (document.fullscreenElement) {
+                this.exitFullScreen();
             }
-        }
-
-        private exitFullScreen() {
-            this.isFullScreen = false;
+        }, false);
+        // @ts-ignore (TODO: migrate to Vuetify)
+        // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
+    }
+    
+    private switchToFullScreen() {
+        // @ts-ignore
+        if (window.fullScreenApi.supportsFullScreen) {
+            this.isFullScreen = true;
             this.$refs.fullScreenContainer.toggle();
-            $(".tip").appendTo("body");
-        }
-
-        private fullScreenChange(state: boolean) {
-            this.isFullScreen = state;
-        }
-
-        private reset() {
-            (this.$refs.sunburst as SunburstVisualization).reset();
-            (this.$refs.treeview as TreeviewVisualization).reset();
-            (this.$refs.treemap as TreemapVisualization).reset();
-            (this.$refs.heatmap as HeatmapVisualization).reset();
-        }
-
-        private async prepareImage() {
-            const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-
             // @ts-ignore
-            logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
-            if (this.tabs[this.tab] === "Sunburst") {
-                d3.selectAll(".toHide").attr("class", "arc hidden");
-                await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
-                d3.selectAll(".hidden").attr("class", "arc toHide");
-            } else if (this.tabs[this.tab] === "Treemap") {
-                imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
-            } else {
-                imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
-            }
+            logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
+            $(".tip").appendTo(".full-screen-container");
         }
+    }
 
-        private openHeatmapWizard(): void {
-            this.dialogOpen = true;
+    private exitFullScreen() {
+        this.isFullScreen = false;
+        this.$refs.fullScreenContainer.toggle();
+        $(".tip").appendTo("body");
+    }
+
+    private fullScreenChange(state: boolean) {
+        this.isFullScreen = state;
+    }
+
+    private async prepareImage() {
+        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+
+        // @ts-ignore
+        logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
+        if (this.tabs[this.tab] === "Sunburst") {
+            d3.selectAll(".toHide").attr("class", "arc hidden");
+            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
+            d3.selectAll(".hidden").attr("class", "arc toHide");
+        } else if (this.tabs[this.tab] === "Treemap") {
+            imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
+        } else {
+            imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
         }
+    }
+
+    private reset() {
+        (this.$refs.sunburst as SunburstVisualization).reset();
+        (this.$refs.treeview as TreeviewVisualization).reset();
+        (this.$refs.treemap as TreemapVisualization).reset();
+        (this.$refs.heatmap as HeatmapVisualization).reset();
+    }
+
+    private openHeatmapWizard(): void {
+        this.dialogOpen = true;
+    }
 }
 </script>
 

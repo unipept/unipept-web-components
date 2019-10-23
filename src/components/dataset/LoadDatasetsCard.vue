@@ -1,6 +1,6 @@
 <template>
     <v-card>
-        <v-tabs color="primary" dark background-color="accent" slider-color="secondary" v-model="currentTab">
+        <v-tabs grow :dark="isDark" :color="tabsTextColor" :background-color="tabsColor" :slider-color="tabsSliderColor" v-model="currentTab">
             <v-tab>
                 Create
             </v-tab>
@@ -52,14 +52,14 @@
                                 </a>
                             </small>
                             <br>
-                            <v-layout wrap align-center>
-                                <v-flex sm8>
+                            <v-row>
+                                <v-col :cols="9">
                                     <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
-                                </v-flex>
-                                <v-flex sm4>
+                                </v-col>
+                                <v-col :cols="3" style="display: flex; align-items: center;">
                                     <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </p>
                     </v-card-text>
                 </v-card>
@@ -153,148 +153,155 @@ import { BASE_URL } from "../../logic/Constants";
 import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
 import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
 
-    @Component({
-        components: {
-            Snackbar,
-            DatasetForm,
-            Tooltip
-        }
-    })
-
+@Component({
+    components: {
+        Snackbar,
+        DatasetForm,
+        Tooltip
+    }
+})
 export default class LoadDatasetsCard extends Vue {
-        $refs!: {
-            createdDatasetForm: DatasetForm,
-            prideDatasetForm: DatasetForm,
-            prideSnackbar: Snackbar,
-            // TODO update typings once Vuetify typings available
-            prideAssayForm: any
-        }
+    $refs!: {
+        createdDatasetForm: DatasetForm,
+        prideDatasetForm: DatasetForm,
+        prideSnackbar: Snackbar,
+        // TODO update typings once Vuetify typings available
+        prideAssayForm: any
+    }
 
-        @Prop({ required: true })
-        private selectedDatasets: Assay[];
-        @Prop({ required: true })
-        private storedDatasets: Assay[];
+    @Prop({ required: true })
+    private selectedDatasets: Assay[];
+    @Prop({ required: true })
+    private storedDatasets: Assay[];
+    @Prop({ required: false, default: "primary" })
+    private tabsColor: string;
+    @Prop({ required: false, default: "secondary" })
+    private tabsSliderColor: string;
+    @Prop({ required: false, default: "white" })
+    private tabsTextColor: string;
+    @Prop({ required: false, default: true })
+    private isDark: boolean;
 
-        private currentTab: number = 0;
+    private currentTab: number = 0;
 
-        private sampleDatasets: SampleDatasetCollection[] = [];
-        private prideAssay: string = "";
+    private sampleDatasets: SampleDatasetCollection[] = [];
+    private prideAssay: string = "";
 
-        private createPeptides: string = "";
-        private createName: string = "";
-        private createSave: boolean = true;
+    private createPeptides: string = "";
+    private createName: string = "";
+    private createSave: boolean = true;
 
-        private pridePeptides: string = "";
-        private prideName: string = "";
-        private prideSave: boolean = true;
-        private prideLoading: boolean = false;
-        private prideProgress: number = 0;
+    private pridePeptides: string = "";
+    private prideName: string = "";
+    private prideSave: boolean = true;
+    private prideLoading: boolean = false;
+    private prideProgress: number = 0;
 
-        private pendingStore: boolean = false;
+    private pendingStore: boolean = false;
 
-        private loadingSampleDatasets: boolean = true;
-        private errorSampleDatasets: boolean = false;
-        private selectedSampleDataset = {};
+    private loadingSampleDatasets: boolean = true;
+    private errorSampleDatasets: boolean = false;
+    private selectedSampleDataset = {};
 
-        mounted() {
-            axios.post(BASE_URL + "/datasets/sampledata")
-                .then(result => {
-                    for (let item of result.data.sample_data) {
-                        let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));
-                        itemDatasets = itemDatasets.sort((a, b) => {
-                            return a.order < b.order;
-                        });
-                        this.sampleDatasets.push(new SampleDatasetCollection(
-                            item.id,
-                            item.environment,
-                            item.project_website,
-                            item.reference,
-                            item.url,
-                            itemDatasets
-                        ));
-                        this.selectedSampleDataset[item.id] = itemDatasets[0].name;
-                    }
-                })
-                .catch((error) => {
-                    this.errorSampleDatasets = true;
-                })
-                .finally(() => this.loadingSampleDatasets = false);
-        }
-
-        storeSampleDataset(datasetId: string) {
-            let name: string = this.selectedSampleDataset[datasetId];
-            if (name && !this.selectedDatasets.some((dataset) => dataset.getName() === name)) {
-                let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find((dataset) => dataset.id == datasetId);
-                let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find((dataset) => dataset.name == this.selectedSampleDataset[datasetId]);
-                this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
-            }
-        }
-
-        fetchPrideAssay(): void {
-            if (this.$refs.prideAssayForm.validate()) {
-                this.prideLoading = true;
-                let datasetManager: DatasetManager = new DatasetManager();
-                let prideNumber: number = parseInt(this.prideAssay);
-
-                this.prideName = "PRIDE assay " + prideNumber.toString();
-
-                // @ts-ignore
-                this.$refs.prideSnackbar.show();
-                datasetManager
-                    .loadPrideDataset(prideNumber, (progress) => this.prideProgress = progress * 100)
-                    .then((peptides) => {
-                        this.pridePeptides = peptides.join("\n");
-                        this.prideLoading = false;
-                        // @ts-ignore
-                        this.$refs.prideSnackbar.destroy();
+    mounted() {
+        axios.post(BASE_URL + "/datasets/sampledata")
+            .then(result => {
+                for (let item of result.data.sample_data) {
+                    let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));
+                    itemDatasets = itemDatasets.sort((a, b) => {
+                        return a.order < b.order;
                     });
-            }
-        }
-
-        storePrideDataset() {
-            //@ts-ignore
-            if (this.$refs.prideDatasetForm.isValid()) {
-                this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
-            }
-        }
-
-        storeCreatedDataset() {
-            // @ts-ignore
-            if (this.$refs.createdDatasetForm.isValid()) {
-                this.storeDataset(this.createPeptides, this.createName, this.createSave);
-            }
-        }
-
-        private selectDataset(dataset: Assay): void {
-            this.$emit("select-dataset", dataset);
-        }
-
-        private deleteDataset(dataset: Assay): void {
-            this.$emit("deselect-dataset", dataset);
-        }
-
-        private storeDataset(peptides: string, name: string, save: boolean): void {
-            this.pendingStore = true;
-
-            let assay: MetaProteomicsAssay = new MetaProteomicsAssay();            
-            let storageType = save ? StorageType.LocalStorage : StorageType.SessionStorage;
-            let storageWriter: StorageWriter = new StorageWriter();
-
-            assay.setPeptides(peptides.split("\n"));
-            assay.setDate(new Date());
-            assay.setStorageType(save ? StorageType.LocalStorage : StorageType.SessionStorage);
-            assay.setName(name);
-
-            assay.visit(storageWriter).then(
-                () => {
-                    this.selectDataset(assay);
-                    if (save) {
-                        this.$emit("store-dataset", assay);
-                    }
-                    this.pendingStore = false;
+                    this.sampleDatasets.push(new SampleDatasetCollection(
+                        item.id,
+                        item.environment,
+                        item.project_website,
+                        item.reference,
+                        item.url,
+                        itemDatasets
+                    ));
+                    this.selectedSampleDataset[item.id] = itemDatasets[0].name;
                 }
-            );
+            })
+            .catch((error) => {
+                this.errorSampleDatasets = true;
+            })
+            .finally(() => this.loadingSampleDatasets = false);
+    }
+
+    storeSampleDataset(datasetId: string) {
+        let name: string = this.selectedSampleDataset[datasetId];
+        if (name && !this.selectedDatasets.some((dataset) => dataset.getName() === name)) {
+            let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find((dataset) => dataset.id == datasetId);
+            let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find((dataset) => dataset.name == this.selectedSampleDataset[datasetId]);
+            this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
         }
+    }
+
+    fetchPrideAssay(): void {
+        if (this.$refs.prideAssayForm.validate()) {
+            this.prideLoading = true;
+            let datasetManager: DatasetManager = new DatasetManager();
+            let prideNumber: number = parseInt(this.prideAssay);
+
+            this.prideName = "PRIDE assay " + prideNumber.toString();
+
+            // @ts-ignore
+            this.$refs.prideSnackbar.show();
+            datasetManager
+                .loadPrideDataset(prideNumber, (progress) => this.prideProgress = progress * 100)
+                .then((peptides) => {
+                    this.pridePeptides = peptides.join("\n");
+                    this.prideLoading = false;
+                    // @ts-ignore
+                    this.$refs.prideSnackbar.destroy();
+                });
+        }
+    }
+
+    storePrideDataset() {
+        //@ts-ignore
+        if (this.$refs.prideDatasetForm.isValid()) {
+            this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
+        }
+    }
+
+    storeCreatedDataset() {
+        // @ts-ignore
+        if (this.$refs.createdDatasetForm.isValid()) {
+            this.storeDataset(this.createPeptides, this.createName, this.createSave);
+        }
+    }
+
+    private selectDataset(dataset: Assay): void {
+        this.$emit("select-dataset", dataset);
+    }
+
+    private deleteDataset(dataset: Assay): void {
+        this.$emit("deselect-dataset", dataset);
+    }
+
+    private storeDataset(peptides: string, name: string, save: boolean): void {
+        this.pendingStore = true;
+
+        let assay: MetaProteomicsAssay = new MetaProteomicsAssay();            
+        let storageType = save ? StorageType.LocalStorage : StorageType.SessionStorage;
+        let storageWriter: StorageWriter = new StorageWriter();
+
+        assay.setPeptides(peptides.split("\n"));
+        assay.setDate(new Date());
+        assay.setStorageType(save ? StorageType.LocalStorage : StorageType.SessionStorage);
+        assay.setName(name);
+
+        assay.visit(storageWriter).then(
+            () => {
+                this.selectDataset(assay);
+                if (save) {
+                    this.$emit("store-dataset", assay);
+                }
+                this.pendingStore = false;
+            }
+        );
+    }
 }
 </script>
 

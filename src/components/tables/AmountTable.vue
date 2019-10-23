@@ -19,8 +19,9 @@
                         <treeview 
                             :id="treeViewId(item)"
                             :data="treeAvailable.get(item)" 
-                            :height="320"
-                            :width="800" 
+                            :autoResize="true"
+                            :width="650" 
+                            :height="230"
                             :tooltip="tooltip" 
                             :colors="highlightColorFunc" 
                             :enableAutoExpand="true" 
