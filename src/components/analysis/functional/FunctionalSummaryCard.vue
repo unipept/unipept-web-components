@@ -144,9 +144,13 @@
                                 <span v-html="ecTrustLine"></span>
                                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
                                 <ec-amount-table :dataRepository="dataRepository" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
-                                <div v-if="ecTreeData">
-                                    <treeview :data="ecTreeData" :height="500" :width="916" :tooltip="ecTreeTooltip" :enableAutoExpand="true" style="position: relative; left: -16px; bottom: -16px;"></treeview>
-                                </div>
+                                <v-card outlined v-if="ecTreeData">
+                                    <v-btn small depressed class="item-treeview-dl-btn" @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
+                                        <v-icon>mdi-download</v-icon>
+                                        Save as image
+                                    </v-btn>
+                                    <treeview id="ec-treeview" :data="ecTreeData" :autoResize="true" :height="300" :width="800" :tooltip="ecTreeTooltip" :enableAutoExpand="true"></treeview>
+                                </v-card>
                             </div>
                         </v-card-text>
                     </v-card>
@@ -154,6 +158,7 @@
             </v-tabs-items>
         </v-card>
         <div id="tooltip" class="tip"></div>
+        <image-download-modal ref="imageDownloadModal"/>
     </div>
 </template>
 
@@ -171,6 +176,7 @@ import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue"
 import CardHeader from "../../custom/CardHeader.vue";
 import QuickGoCard from "./QuickGOCard.vue";
 
+import ImageDownloadModal from "../../utils/ImageDownloadModal.vue";
 import { showInfoModal } from "../../../logic/modal";
 import DataRepository from "../../../logic/data-source/DataRepository";
 import GoDataSource from "../../../logic/data-source/GoDataSource";
@@ -197,7 +203,8 @@ import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
         GoAmountTable,
         EcAmountTable,
         Treeview,
-        QuickGoCard
+        QuickGoCard,
+        ImageDownloadModal
     },
     computed: {
         watchableDataset: {
@@ -218,6 +225,10 @@ import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
     }
 })
 export default class FunctionalSummaryCard extends Vue {
+    $refs!: {
+        imageDownloadModal: ImageDownloadModal
+    }
+    
     @Prop({ required: true })
     private dataRepository: DataRepository;
     @Prop({ required: false, default: true })
@@ -392,7 +403,7 @@ export default class FunctionalSummaryCard extends Vue {
             this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
             this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
             // @ts-ignore
-            this.ecTreeData = await ecSource.getEcTree();
+            this.ecTreeData = await ecSource.getEcTree(null, percent, sequences);
         }
     }
 
