@@ -4,6 +4,7 @@ import DatasetManager from "../logic/data-management/DatasetManager";
 import MpaAnalysisManager from "../logic/data-management/MpaAnalysisManager";
 import MPAConfig from "../logic/data-management/MPAConfig";
 import Vue from "vue";
+import { AssayState } from '../logic/data-management/assay/AssayState';
 
 export interface GlobalState {
     selectedDatasets: Assay[],
@@ -195,8 +196,9 @@ const mpaActions: ActionTree<GlobalState, any> = {
         store.commit("SET_SEARCH_SETTINGS", searchSettings);
     },
     setActiveDataset(store: ActionContext<GlobalState, any>, dataset: Assay | null): void {
-        store.commit("SET_ACTIVE_DATASET", dataset);
-        if (dataset !== null) {
+        if (dataset !== null && dataset.state == AssayState.Initialized) {
+            store.commit("SET_ACTIVE_DATASET", dataset);
+            
             store.dispatch("setSelectedTerm", "Organism");
             store.dispatch("setSelectedTaxonId", -1);
             dataset.dataRepository.createTaxaDataSource().then((taxaDataSource) => {
@@ -221,7 +223,8 @@ const mpaActions: ActionTree<GlobalState, any> = {
                     store.dispatch("setActiveDataset", dataset);
                     store.commit("DECREASE_DATASETS_IN_PROGRESS");
                 }
-            });
+            // do nothing when processing fails, the user is responsible to take action in the UI
+            }).catch(error => {});
     },
     setSelectedTerm(store: ActionContext<GlobalState, any>, term: string): void {
         store.commit("SET_SELECTED_TERM", term);

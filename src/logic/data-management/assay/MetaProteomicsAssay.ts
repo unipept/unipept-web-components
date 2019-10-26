@@ -27,6 +27,9 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
         {
             this._state = AssayState.Rejected;
             this._rejectCause = error;
+
+            // re-throw error so it can be catched by the caller
+            throw error;
         }
     }
 
