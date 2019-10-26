@@ -4,6 +4,7 @@ import { ProcessedPeptideContainer } from "../../../data-management/ProcessedPep
 import Worker from "worker-loader!./PeptideContainerProcessor.worker";
 import ProgressPublisher from "../../../patterns/progress/ProgressPublisher";
 import MPAConfig from "../../../data-management/MPAConfig";
+import { createError } from '../../../utils';
 
 // import "babel-polyfill"; // for async await support
 
@@ -26,6 +27,8 @@ export class PeptideContainerProcessor extends ProgressPublisher {
                     // do this to preserve methods as methods aren't duplicated by the structured cloning algorithm used to pass worker messages
                     resolve(event.data.value as ProcessedPeptideContainer);
                     break;
+                case "error":
+                    throw createError(event.data.value.name, event.data.value.message)
                 }
             };
             this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig });

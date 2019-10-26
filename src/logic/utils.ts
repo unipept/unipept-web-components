@@ -373,4 +373,25 @@ export async function postJSON(url, data) {
     }).then(res => res.json());
 }
 
+export function createError(name, message)
+{
+    switch(name)
+    {
+        case "EvalError":
+            return new EvalError(message)
+        case "RangeError":
+            return new RangeError(message)
+        case "ReferenceError":
+            return new ReferenceError(message)
+        case "SyntaxError":
+            return new SyntaxError(message)
+        case "TypeError":
+            return new TypeError(message)
+        case "URIError":
+            return new URIError(message)
+        default:
+            return new Error(message)
+    }
+} 
+
 export const delay = ms => new Promise(res => setTimeout(res, ms));
