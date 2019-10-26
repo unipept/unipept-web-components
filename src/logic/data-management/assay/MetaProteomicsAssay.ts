@@ -13,7 +13,7 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
         let dataReader = new StorageDataReader();
         await this.visit(dataReader);
         let dataRepo = new MetaProteomicsDataRepository(this, mpaConfig);
-        await dataRepo.initProcessedPeptideContainer();
+        await dataRepo.initProcessedPeptideContainer()
         this._dataRepository = dataRepo;
     }
 

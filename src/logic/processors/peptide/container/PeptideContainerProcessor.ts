@@ -17,7 +17,7 @@ export class PeptideContainerProcessor extends ProgressPublisher {
     }
 
     process(peptides: PeptideContainer, mpaConfig: MPAConfig) : Promise<ProcessedPeptideContainer> {
-        return new Promise<ProcessedPeptideContainer>(resolve => {
+        return new Promise<ProcessedPeptideContainer>((resolve, reject) => {
             this._worker.onmessage = (event) => {
                 switch (event.data.type) {
                 case "progress":
@@ -28,10 +28,11 @@ export class PeptideContainerProcessor extends ProgressPublisher {
                     resolve(event.data.value as ProcessedPeptideContainer);
                     break;
                 case "error":
-                    throw createError(event.data.value.name, event.data.value.message)
+                    reject(createError(event.data.value.name, event.data.value.message))
+                    break;
                 }
             };
             this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig });
-        });
+        }).catch(error => {throw error});
     }
 }

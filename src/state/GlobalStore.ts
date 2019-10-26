@@ -212,10 +212,10 @@ const mpaActions: ActionTree<GlobalState, any> = {
             });
         }
     },
-    processDataset(store: ActionContext<GlobalState, any>, dataset: Assay): void {
+    async processDataset(store: ActionContext<GlobalState, any>, dataset: Assay): Promise<void> {
         let mpaManager = new MpaAnalysisManager();
         store.commit("INCREASE_DATASETS_IN_PROGRESS");
-        mpaManager.processDataset(dataset, store.getters.searchSettings)
+        return mpaManager.processDataset(dataset, store.getters.searchSettings)
             .then(() => {
                 if (store.getters.activeDataset === null) {
                     store.dispatch("setActiveDataset", dataset);
