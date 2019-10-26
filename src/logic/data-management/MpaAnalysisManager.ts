@@ -3,6 +3,6 @@ import MPAConfig from "./MPAConfig";
 
 export default class MpaAnalysisManager {
     async processDataset(dataset: Assay, searchSettings: MPAConfig): Promise<void> {
-        await dataset.initDataRepository(searchSettings)
+        await dataset.initialize(searchSettings)
     }
 }

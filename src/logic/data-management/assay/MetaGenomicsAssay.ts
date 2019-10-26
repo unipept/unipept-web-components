@@ -11,7 +11,7 @@ export default class MetaGenomicsAssay extends Assay {
     private _goCountTable: GOCountTable;
     private _ecCountTable: ECCountTable;
 
-    async initDataRepository(mpaConfig: MPAConfig) {
+    async initialize(mpaConfig: MPAConfig) {
         throw new Error("Method not implemented.");
     }
 
