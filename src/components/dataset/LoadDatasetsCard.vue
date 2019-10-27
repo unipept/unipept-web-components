@@ -149,7 +149,6 @@ import axios from "axios"
 
 import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
-import { BASE_URL } from "../../logic/Constants";
 import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
 import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
 
@@ -204,7 +203,7 @@ export default class LoadDatasetsCard extends Vue {
     private selectedSampleDataset = {};
 
     mounted() {
-        axios.post(BASE_URL + "/datasets/sampledata")
+        axios.post(this.$store.getters.baseUrl + "/datasets/sampledata")
             .then(result => {
                 for (let item of result.data.sample_data) {
                     let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));

@@ -180,7 +180,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
     protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, EcNumber[]>, Map<EcNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
         var ontology: ECOntology = this._countTable.getOntology()
-        await ontology.fetchDefinitions(this._countTable.getOntologyIds())
+        await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._repository._baseUrl);
 
         var dataOutput: Map<EcNameSpace, EcNumber[]> = new Map()
         var trustOutput: Map<EcNameSpace, FATrust> = new Map()

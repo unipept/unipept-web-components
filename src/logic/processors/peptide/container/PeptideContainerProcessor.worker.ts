@@ -5,7 +5,7 @@ const ctx: Worker = self as any;
 ctx.addEventListener("message", handleEvent);
 
 async function handleEvent(event){
-    let result = await process(event.data.peptides, event.data.config, setProgress)
+    let result = await process(event.data.peptides, event.data.config, event.data.baseUrl, setProgress)
     ctx.postMessage({ type: "result", value: result });
 }
 
