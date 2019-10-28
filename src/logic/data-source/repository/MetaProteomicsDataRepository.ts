@@ -41,7 +41,9 @@ export default class MetaProteomicsDataRepository extends DataRepository {
         this._taxaSourceCache = new TaxaDataSource(
             TaxaPeptideProcessor.process(processedPeptideContainer), 
             processedPeptideContainer,
-            this);
+            this,
+            this._baseUrl
+        );
     }
 
     protected async initGoDataSource(): Promise<void> {
@@ -49,7 +51,8 @@ export default class MetaProteomicsDataRepository extends DataRepository {
         this._goSourceCache = new GoDataSource(
             GOPeptideProcessor.process(processedPeptideContainer),
             processedPeptideContainer, 
-            this
+            this,
+            this._baseUrl
         );
     }
 
@@ -58,7 +61,8 @@ export default class MetaProteomicsDataRepository extends DataRepository {
         this._ecSourceCache = new EcDataSource(
             ECPeptideProcessor.process(processedPeptideContainer),
             processedPeptideContainer,
-            this
+            this,
+            this._baseUrl
         );
     }
 
@@ -81,7 +85,7 @@ export default class MetaProteomicsDataRepository extends DataRepository {
         });
 
         // fetch taxa info for these lcas
-        await Ontologies.ncbiTaxonomy.fetchTaxaInfo(lcas);
+        await Ontologies.ncbiTaxonomy.fetchTaxaInfo(lcas, this._baseUrl);
 
         return processedPeptideContainer;
     }

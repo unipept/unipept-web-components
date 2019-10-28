@@ -22,11 +22,13 @@ export default class TaxaDataSource extends DataSource {
     // The amount of peptides that have been looked up in the database. This is the total amount of peptides that were
     // searched.
     private _searchedPeptides: number;
+    private _baseUrl: string;
  
-    constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository) {
+    constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
+        this._baseUrl = baseUrl;
     }
 
     /**
@@ -122,7 +124,7 @@ export default class TaxaDataSource extends DataSource {
 
     private async process(): Promise<void> {
         if (!this._tree || !this._missedPeptides || this._matchedPeptides === undefined || this._searchedPeptides === undefined) {
-            this._tree = await TaxaCountProcessor.process(this._countTable);
+            this._tree = await TaxaCountProcessor.process(this._countTable, this._baseUrl);
 
             // TODO: these values shouldn't be stored here
             this._missedPeptides = this._processedPeptideContainer.missed;

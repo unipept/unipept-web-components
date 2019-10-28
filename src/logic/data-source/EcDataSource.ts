@@ -15,11 +15,13 @@ import TreeViewNode from "../../components/visualizations/TreeViewNode";
 export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> {
     private _countTable: ECCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
+    private _baseUrl: string;
 
-    constructor(countTable: ECCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository) {
+    constructor(countTable: ECCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository)
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
+        this._baseUrl = baseUrl;
     }
 
     public getPeptidesByEcNumber(number: EcNumber): string[] {
@@ -180,7 +182,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
     protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, EcNumber[]>, Map<EcNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
         var ontology: ECOntology = this._countTable.getOntology()
-        await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._repository._baseUrl);
+        await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl);
 
         var dataOutput: Map<EcNameSpace, EcNumber[]> = new Map()
         var trustOutput: Map<EcNameSpace, FATrust> = new Map()

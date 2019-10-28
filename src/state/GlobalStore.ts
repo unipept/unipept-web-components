@@ -18,7 +18,6 @@ export interface GlobalState {
     missedPeptides: string[],
     // How many datasets are currently being analyzed?
     datasetsInProgress: number,
-    baseUrl: string
 }
 
 const mpaState: GlobalState = {
@@ -33,7 +32,6 @@ const mpaState: GlobalState = {
     searchedPeptides: 0,
     missedPeptides: [],
     datasetsInProgress: 0,
-    baseUrl: ""
 };
 
 const mpaGetters: GetterTree<GlobalState, any> = {
@@ -69,9 +67,6 @@ const mpaGetters: GetterTree<GlobalState, any> = {
     },
     datasetsInProgress(state: GlobalState): number {
         return state.datasetsInProgress;
-    },
-    baseUrl(state: GlobalState): string {
-        return state.baseUrl;
     }
 };
 
@@ -140,9 +135,6 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     DECREASE_DATASETS_IN_PROGRESS(state: GlobalState): void {
         state.datasetsInProgress -= 1;
-    },
-    SET_BASE_URL(state: GlobalState, url: string): void {
-        state.baseUrl = url;
     }
 };
 
@@ -236,9 +228,6 @@ const mpaActions: ActionTree<GlobalState, any> = {
     },
     setSelectedTaxonId(store: ActionContext<GlobalState, any>, taxonId: number): void {
         store.commit("SET_SELECTED_TAXON_ID", taxonId);
-    },
-    setBaseUrl(store: ActionContext<GlobalState, any>, baseUrl: string): void {
-        store.commit("SET_BASE_URL", baseUrl);
     }
 };
 

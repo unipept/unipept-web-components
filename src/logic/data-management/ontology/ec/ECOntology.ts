@@ -38,7 +38,7 @@ export class ECOntology extends Ontology<OntologyId, ECDefinition> {
                 ecnumbers: todoList.slice(i, i + EC_BATCH_SIZE)
             });
 
-            const res = await postJSON(EC_URL, data);
+            const res = await postJSON(baseUrl + EC_URL, data);
             
             res.forEach(ecNumber => {
                 let prefixedNumber = "EC:" + ecNumber.code

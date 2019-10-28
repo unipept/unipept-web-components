@@ -3,7 +3,7 @@ export abstract class Ontology<OntologyId, Definition> {
         protected _definitions = new Map<OntologyId, Definition>()
     ){}
     
-    abstract async fetchDefinitions(ids: OntologyId[]) : Promise<void>;
+    abstract async fetchDefinitions(ids: OntologyId[], baseUrl: string) : Promise<void>;
 
     getDefinition(id: OntologyId) : Readonly<Definition> {
         return this._definitions.get(id);
