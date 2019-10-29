@@ -17,7 +17,7 @@
                 <v-tab v-if="!isFullScreen">
                     Hierarchical Outline
                 </v-tab>
-                <v-tab v-if="!isFullScreen" @click="openHeatmapWizard()" v-on:click.stop>
+                <v-tab v-if="!isFullScreen">
                     Heatmap
                 </v-tab>
                 <v-spacer>
@@ -129,25 +129,10 @@
                         </v-card-text>
                     </v-card>
                 </v-tab-item>
+                <v-tab-item>
+                    <heatmap-wizard-single-sample v-if="this.dataRepository" :dataRepository="this.dataRepository"></heatmap-wizard-single-sample>
+                </v-tab-item>
             </v-tabs-items>
-            <template v-for="dataset of $store.getters.selectedDatasets">
-                <v-dialog v-model="dialogOpen" width="1000px" :key="dataset.id" v-if="dataset && $store.getters.activeDataset && dataset.id === $store.getters.activeDataset.id">
-                    <div style="min-height: 600px; background-color: white;">
-                        <div class="modal-header">
-                            <button type="button" class="close" @click="dialogOpen = false"><span aria-hidden="true">×</span></button>
-                            <h4 class="modal-title">Heatmap wizard</h4>
-                        </div>
-                        <div class="single-dataset-wizard">
-                            <heatmap-wizard-single-sample v-if="dataset" :dataset="dataset"></heatmap-wizard-single-sample>
-                            <div v-else>
-                                <div class="text-xs-center" style="margin-top: 25px;">
-                                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </v-dialog>
-            </template>
         </v-card>
     </fullscreen>
 </template>
