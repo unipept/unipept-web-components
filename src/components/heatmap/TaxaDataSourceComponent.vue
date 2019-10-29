@@ -47,27 +47,11 @@ export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
 
     private loading: boolean = true;
 
-    private headers = [
-        {
-            text: "Name",
-            align: "left",
-            value: "name"
-        }, 
-        {
-            text: "Rank",
-            align: "left",
-            value: "rank"
-        },
-        {
-            text: "# peptides",
-            align: "left",
-            value: "popularity"
-        }
-    ];
-
     private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
 
     mounted() {
+        this.headers[1].text = "Rank";
+        this.headers[1].value = "rank";
         this.onSelectedRankChanged();
     }
 

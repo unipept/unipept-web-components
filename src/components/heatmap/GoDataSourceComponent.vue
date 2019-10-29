@@ -43,26 +43,7 @@ export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
     private selectedItems: Element[] = [];
 
     private loading: boolean = true;
-
-    private headers = [
-        {
-            text: "Name",
-            align: "left",
-            value: "name"
-        },
-        {
-            text: "Code",
-            align: "left",
-            value: "code"
-        }, 
-        
-        {
-            text: "# peptides",
-            align: "left",
-            value: "popularity"
-        }
-    ];
-
+    
     private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
 
 

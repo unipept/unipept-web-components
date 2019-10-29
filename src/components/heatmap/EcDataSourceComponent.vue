@@ -46,24 +46,6 @@ export default class EcDataSourceComponent extends mixins(DataSourceMixin) {
 
     private loading: boolean = true;
 
-    private headers = [
-        {
-            text: "Name",
-            align: "left",
-            value: "name"
-        },
-        {
-            text: "Code",
-            align: "left",
-            value: "code"
-        },
-        {
-            text: "# peptides",
-            align: "left",
-            value: "popularity"
-        }
-    ];
-
     mounted() {
         this.onSelectedNameSpaceChanged();
     }
