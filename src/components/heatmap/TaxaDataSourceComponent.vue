@@ -4,9 +4,9 @@
         <v-data-table 
             v-model="selectedItems" 
             :headers="headers" 
-            :items="items" 
+            :items="itemsWithId" 
             show-select
-            item-key="name" 
+            item-key="id" 
             :itemsPerPage="5"
             sort-by="popularity"
             :sort-desc="true"
@@ -37,7 +37,18 @@ import DataSourceMixin from "./DataSourceMixin.vue";
 import { TaxumRank, convertStringToTaxumRank } from "../../logic/data-source/TaxumRank";
 import TaxaElement from "../../logic/data-source/TaxaElement";
 
-@Component
+@Component({
+    computed: {
+        itemsWithId: {
+            get() {
+                return this.items.map((item, index) => ({
+                    id: index,
+                    ...item
+                }))
+            }
+        }
+    }
+})
 export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
     private taxaRanks: string[] = ["all"].concat(Object.values(TaxumRank)).map(el => this.capitalize(el));
     private selectedRank: string = this.taxaRanks[0];
