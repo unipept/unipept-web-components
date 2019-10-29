@@ -1,7 +1,16 @@
 <template>
     <div>
         <v-select :items="goNameSpaces" v-model="selectedNameSpace" label="Namespace"></v-select>
-        <v-data-table v-model="selectedItems" :headers="headers" :items="items" select-all item-key="code" v-bind:pagination.sync="pagination" :loading="loading">
+        <v-data-table 
+            v-model="selectedItems" 
+            :headers="headers" 
+            :items="items" 
+            show-select 
+            item-key="code"
+            :itemsPerPage="5"
+            sort-by="popularity"
+            :sort-desc="true" 
+            :loading="loading">
             <template v-slot:items="props">
                 <tr :active="props.selected" @click="props.selected = !props.selected">
                     <td>
@@ -25,58 +34,39 @@ import GoDataSource from "../../logic/data-source/GoDataSource";
 import GoTerm from "../../logic/functional-annotations/GoTerm";
 import DataSourceMixin from "./DataSourceMixin.vue";
 
-    @Component
+@Component
 export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
-        private goNameSpaces: string[] = ["all"].concat(Object.values(GoNameSpace)).map(el => this.capitalize(el));
-        private selectedNameSpace: string = this.goNameSpaces[0];
+    private goNameSpaces: string[] = ["all"].concat(Object.values(GoNameSpace)).map(el => this.capitalize(el));
+    private selectedNameSpace: string = this.goNameSpaces[0];
 
-        private items: GoTerm[] = [];
-        private selectedItems: Element[] = [];
+    private items: GoTerm[] = [];
+    private selectedItems: Element[] = [];
 
-        private loading: boolean = true;
-
-        private headers = [
-            {
-                text: "Name",
-                align: "left",
-                value: "name"
-            },
-            {
-                text: "Code",
-                align: "left",
-                value: "code"
-            }, 
-            
-            {
-                text: "# peptides",
-                align: "left",
-                value: "popularity"
-            }
-        ];
-
-        private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
+    private loading: boolean = true;
+    
+    private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
 
 
-        mounted() {
-            this.onSelectedNameSpaceChanged();
-        }
+    mounted() {
+        this.onSelectedNameSpaceChanged();
+    }
 
-        @Watch("selectedNameSpace")
-        async onSelectedNameSpaceChanged() {
-            this.loading = true;
-            // Reset lists without changing the list-object reference.
-            this.items.length = 0;
-            this.selectedItems.length = 0;
+    @Watch("selectedNameSpace")
+    async onSelectedNameSpaceChanged() {
+        this.loading = true;
+        // Reset lists without changing the list-object reference.
+        this.items.length = 0;
+        this.selectedItems.length = 0;
 
-            let result: GoTerm[] = await (this.dataSource as GoDataSource).getTopItems(30, convertStringToGoNameSpace(this.selectedNameSpace));
-            this.items.push(...result);
-            this.loading = false;
-        }
+        let result: GoTerm[] = await (this.dataSource as GoDataSource).getTopItems(30, convertStringToGoNameSpace(this.selectedNameSpace));
+        this.items.push(...result);
+        this.loading = false;
+    }
 
-        @Watch("selectedItems")
-        async onSelectedItemsChanged() {
-            this.$emit("selected-items", this.selectedItems);
-        }
+    @Watch("selectedItems")
+    async onSelectedItemsChanged() {
+        this.$emit("selected-items", this.selectedItems);
+    }
 }
 </script>
 
