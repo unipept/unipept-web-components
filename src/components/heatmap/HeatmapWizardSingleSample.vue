@@ -9,23 +9,37 @@ import {NormalizationType} from "./NormalizationType";
             <v-divider></v-divider>
             <v-stepper-step editable :complete="currentStep > 3" step="3">Normalisation</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step editable :complete="currentStep > 4" step="4" @click="computeHeatmapAndProceed()">Heatmap</v-stepper-step>
+            <v-stepper-step editable :complete="currentStep > 4" step="4" @click="computeHeatmapAndProceed()">
+                Heatmap
+            </v-stepper-step>
         </v-stepper-header>
         <v-stepper-items>
             <v-stepper-content step="1">
                 <p>Please select the items that should be visualised on the horizontal axis of the heatmap.</p>
-                <v-select :items="Array.from(dataSources.keys())" v-model="horizontalDataSource" label="Datasource"></v-select>
+                <v-select :items="Array.from(dataSources.keys())" v-model="horizontalDataSource" label="Datasource">
+                </v-select>
                 <div>
-                    <component v-if="!heatmapConfiguration.horizontalLoading && heatmapConfiguration.horizontalDataSource" :is="dataSources.get(horizontalDataSource).dataSourceComponent" :dataSource="heatmapConfiguration.horizontalDataSource" v-on:selected-items="updateHorizontalSelectedItems"></component>
+                    <component 
+                        v-if="!heatmapConfiguration.horizontalLoading && heatmapConfiguration.horizontalDataSource" 
+                        :is="dataSources.get(horizontalDataSource).dataSourceComponent" 
+                        :dataSource="heatmapConfiguration.horizontalDataSource" 
+                        v-on:selected-items="updateHorizontalSelectedItems">
+                    </component>
                     <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
             <v-stepper-content step="2">
                 <p>Please select the items that should be visualised on the vertical axis of the heatmap.</p>
-                <v-select :items="Array.from(dataSources.keys())" v-model="verticalDataSource" label="Datasource"></v-select>
+                <v-select :items="Array.from(dataSources.keys())" v-model="verticalDataSource" label="Datasource">
+                </v-select>
                 <div>
-                    <component v-if="!heatmapConfiguration.verticalLoading && heatmapConfiguration.verticalDataSource" :is="dataSources.get(verticalDataSource).dataSourceComponent" :dataSource="heatmapConfiguration.verticalDataSource" v-on:selected-items="updateVerticalSelectedItems"></component>
+                    <component 
+                        v-if="!heatmapConfiguration.verticalLoading && heatmapConfiguration.verticalDataSource" 
+                        :is="dataSources.get(verticalDataSource).dataSourceComponent" 
+                        :dataSource="heatmapConfiguration.verticalDataSource" 
+                        v-on:selected-items="updateVerticalSelectedItems">
+                    </component>
                     <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
@@ -33,7 +47,10 @@ import {NormalizationType} from "./NormalizationType";
             <v-stepper-content step="3">
                 <p>Please select the type of normalization that should be performed before visualizing data points.</p>
                 <v-radio-group v-model="normalizer">
-                    <div v-for="normalizationType in Array.from(normalizationTypes.keys())" :key="normalizationType" style="margin-bottom: 8px;">
+                    <div 
+                        v-for="normalizationType in Array.from(normalizationTypes.keys())" 
+                        :key="normalizationType" 
+                        style="margin-bottom: 8px;">
                         <v-radio :label="normalizationType" :value="normalizationType"></v-radio>
                         <div style="margin-left: 32px;">{{ normalizationTypes.get(normalizationType).information }}</div>
                     </div>
@@ -238,7 +255,7 @@ export default class HeatmapWizardSingleSample extends Vue {
 }
 </script>
 
-<style scoped>
+<style>
     .v-stepper__wrapper {
         display: flex;
         flex-direction: column;
@@ -246,5 +263,13 @@ export default class HeatmapWizardSingleSample extends Vue {
 
     .continue-button {
         align-self: flex-end;
+    }
+
+    .heatmap {
+        display: flex;
+    }
+
+    .heatmap > svg {
+        margin: auto;
     }
 </style>

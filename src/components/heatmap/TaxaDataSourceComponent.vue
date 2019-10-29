@@ -41,10 +41,10 @@ import TaxaElement from "../../logic/data-source/TaxaElement";
     computed: {
         itemsWithId: {
             get() {
-                return this.items.map((item, index) => ({
-                    id: index,
-                    ...item
-                }))
+                return this.items.map((item, index) => {
+                    item["id"] = index;
+                    return item;
+                })
             }
         }
     }

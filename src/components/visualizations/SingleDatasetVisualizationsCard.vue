@@ -130,7 +130,19 @@
                     </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                    <heatmap-wizard-single-sample v-if="this.dataRepository" :dataRepository="this.dataRepository"></heatmap-wizard-single-sample>
+                    <v-card flat>
+                        <heatmap-wizard-single-sample v-if="this.dataRepository" :dataRepository="this.dataRepository"></heatmap-wizard-single-sample>
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                        </div>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
+                            </v-card-text>
+                        </div>
+                    </v-card>
                 </v-tab-item>
             </v-tabs-items>
         </v-card>
