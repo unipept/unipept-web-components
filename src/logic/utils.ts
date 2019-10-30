@@ -1,7 +1,9 @@
 import Clipboard from "clipboard";
 import $ from "jquery";
-import d3 from "d3";
+import * as d3 from "d3";
 import Utils from "./../components/custom/Utils";
+import canvg from "canvg";
+import html2canvas from "html2canvas";
 
 /**
  * Make clicking on the selector copy to the user clipboard
@@ -313,10 +315,9 @@ export function numberToPercent(number, digits = 0) {
  * @returns {string} A dataURL containing the resulting PNG
 */
 export async function svg2pngDataURL(svgSelector: string) : Promise<string> { 
-    var canvg = require("canvg");
-    var el = $(svgSelector).get(0);
+    let el = $(svgSelector).get(0);
 
-    var canvas = document.createElement("canvas");
+    let canvas = document.createElement("canvas");
 
     // automatically size canvas to svg element and render
     canvg(canvas, el.outerHTML);
@@ -331,11 +332,11 @@ export async function svg2pngDataURL(svgSelector: string) : Promise<string> {
 }
 
 export function svg2svgDataURL(svgSelector: string) {
-    var el = $(svgSelector).get(0)
-    var svgString = new XMLSerializer().serializeToString(el);
-    var decoded = unescape(encodeURIComponent(svgString));
+    let el = $(svgSelector).get(0)
+    let svgString = new XMLSerializer().serializeToString(el);
+    let decoded = unescape(encodeURIComponent(svgString));
     // convert the svg to base64
-    var base64 = btoa(decoded);
+    let base64 = btoa(decoded);
     return `data:image/svg+xml;base64,${base64}`;
 }
 

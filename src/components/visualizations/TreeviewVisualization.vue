@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import d3 from "d3";
+import * as d3 from "d3";
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
