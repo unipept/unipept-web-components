@@ -1,5 +1,5 @@
 import { addCopy, highlight, logToGoogle } from "../utils";
-import d3 from "d3";
+import * as d3 from "d3";
 import * as d3Select from "d3-selection";
 
 /**
