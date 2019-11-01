@@ -2,8 +2,6 @@ import Clipboard from "clipboard";
 import $ from "jquery";
 import * as d3 from "d3";
 import Utils from "./../components/custom/Utils";
-import canvg from "canvg";
-import html2canvas from "html2canvas";
 
 /**
  * Make clicking on the selector copy to the user clipboard
@@ -318,6 +316,7 @@ export async function svg2pngDataURL(svgSelector: string) : Promise<string> {
     let el = $(svgSelector).get(0);
 
     let canvas = document.createElement("canvas");
+    let canvg = require("canvg");
 
     // automatically size canvas to svg element and render
     canvg(canvas, el.outerHTML);
