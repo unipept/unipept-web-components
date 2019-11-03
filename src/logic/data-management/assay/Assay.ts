@@ -62,6 +62,6 @@ export default abstract class Assay implements Visitable {
         return this._date.getFullYear() + "/" + (this._date.getMonth() + 1).toString().padStart(2, "0") + "/" + this._date.getDate().toString().padStart(2, "0");
     }
 
-    abstract async initDataRepository(mpaConfig: MPAConfig);
+    abstract async initDataRepository(mpaConfig: MPAConfig, baseUrl: string);
     abstract async visit(visitor: Visitor): Promise<void>;
 }

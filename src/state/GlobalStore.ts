@@ -17,7 +17,7 @@ export interface GlobalState {
     searchedPeptides: number,
     missedPeptides: string[],
     // How many datasets are currently being analyzed?
-    datasetsInProgress: number
+    datasetsInProgress: number,
 }
 
 const mpaState: GlobalState = {
@@ -31,7 +31,7 @@ const mpaState: GlobalState = {
     matchedPeptides: 0,
     searchedPeptides: 0,
     missedPeptides: [],
-    datasetsInProgress: 0
+    datasetsInProgress: 0,
 };
 
 const mpaGetters: GetterTree<GlobalState, any> = {
@@ -215,7 +215,7 @@ const mpaActions: ActionTree<GlobalState, any> = {
     processDataset(store: ActionContext<GlobalState, any>, dataset: Assay): void {
         let mpaManager = new MpaAnalysisManager();
         store.commit("INCREASE_DATASETS_IN_PROGRESS");
-        mpaManager.processDataset(dataset, store.getters.searchSettings)
+        mpaManager.processDataset(dataset, store.getters.searchSettings, store.getters.baseUrl)
             .then(() => {
                 if (store.getters.activeDataset === null) {
                     store.dispatch("setActiveDataset", dataset);
