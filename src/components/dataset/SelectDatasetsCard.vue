@@ -67,60 +67,65 @@ import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
 import CardTitle from "../custom/CardTitle.vue";
 import CardHeader from "../custom/CardHeader.vue";
 import Tooltip from "../custom/Tooltip.vue";
+import { EventBus } from "../EventBus";
 
-    @Component({
-        components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
-    })
+@Component({
+    components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
+})
 export default class SelectDatasetsCard extends Vue {
-        @Prop({ required: true })
-        private selectedDatasets: Assay[];
+    @Prop({ required: true })
+    private selectedDatasets: Assay[];
 
-        private equateIl: boolean = true;
-        private filterDuplicates: boolean = true;
-        private missingCleavage: boolean = false;
+    private equateIl: boolean = true;
+    private filterDuplicates: boolean = true;
+    private missingCleavage: boolean = false;
 
-        private shaking: boolean = false;
+    private shaking: boolean = false;
 
-        created() {
-            this.updateSearchSettings();
+    created() {
+        this.updateSearchSettings();
+    }
+
+    mounted() {
+        console.log("Select datasets card!");
+        console.log(this.selectedDatasets);
+    }
+
+    public search(): void {
+        if (this.selectedDatasets.length === 0) {
+            this.shaking = true;
+            // Disable the shaking effect after 300ms
+            setTimeout(() => this.shaking = false, 300);
+        } else {
+            this.startAnalysis();
         }
+    }
 
-        mounted() {
-            console.log("Select datasets card!");
-            console.log(this.selectedDatasets);
+    private reset(): void {
+        for (let dataset of this.selectedDatasets) {
+            this.deselectDataset(dataset);
         }
+    }
 
-        public search(): void {
-            if (this.selectedDatasets.length === 0) {
-                this.shaking = true;
-                // Disable the shaking effect after 300ms
-                setTimeout(() => this.shaking = false, 300);
-            } else {
-                this.startAnalysis();
-            }
-        }
+    private startAnalysis() {
+        EventBus.$emit("start-analysis");
+    }
 
-        private reset(): void {
-            for (let dataset of this.selectedDatasets) {
-                this.deselectDataset(dataset);
-            }
-        }
+    private deselectDataset(dataset: Assay) {
+        EventBus.$emit("deselect-dataset", dataset);
+    }
 
-        private startAnalysis() {
-            this.$emit("start-analysis");
-        }
+    private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
+        this.equateIl = equateIl;
+        this.filterDuplicates = filterDuplicates;
+        this.missingCleavage = missingCleavage;
 
-        private deselectDataset(dataset: Assay) {
-            this.$emit("deselect-dataset", dataset);
-        }
-
-        private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
-            this.equateIl = equateIl;
-            this.filterDuplicates = filterDuplicates;
-            this.missingCleavage = missingCleavage;
-
-            this.$emit("update-search-settings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
-        }
+        EventBus.$emit("update-search-settings", {
+            il: this.equateIl,
+            dupes: this.filterDuplicates, 
+            missed: this.missingCleavage
+        });
+    }
 }
 </script>
 
