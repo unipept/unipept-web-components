@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="search-settings-form">
         <h3>Search settings</h3>
         <v-tooltip top>
             <template v-slot:activator="{ on }">
@@ -35,67 +35,69 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 
-    // @Component({
-    //     components: {},
-    //     computed: {
-    //         equateIlModel: {
-    //             get() {
-    //                 return this.equateIl;
-    //             },
-    //             set(val) {
-    //                 this.equateIlData = val;
-    //                 this.$emit('equate-il-change', val);
-    //             }
-    //         },
-    //         filterDuplicatesModel: {
-    //             get(): boolean {
-    //                 return this.filterDuplicates;
-    //             },
-    //             set(val: boolean) {
-    //                 this.filterDuplicatesData = val;
-    //                 this.$emit('filter-duplicates-change', val);
-    //             }
-    //         },
-    //         missingCleavageModel: {
-    //             get() {
-    //                 return this.missingCleavage;
-    //             },
-    //             set(val) {
-    //                 this.missingCleavageData = val;
-    //                 this.$emit('missing-cleavage-change', val);
-    //             }
-    //         }
-    //     }
-    // })
-    @Component
+// @Component({
+//     components: {},
+//     computed: {
+//         equateIlModel: {
+//             get() {
+//                 return this.equateIl;
+//             },
+//             set(val) {
+//                 this.equateIlData = val;
+//                 this.$emit('equate-il-change', val);
+//             }
+//         },
+//         filterDuplicatesModel: {
+//             get(): boolean {
+//                 return this.filterDuplicates;
+//             },
+//             set(val: boolean) {
+//                 this.filterDuplicatesData = val;
+//                 this.$emit('filter-duplicates-change', val);
+//             }
+//         },
+//         missingCleavageModel: {
+//             get() {
+//                 return this.missingCleavage;
+//             },
+//             set(val) {
+//                 this.missingCleavageData = val;
+//                 this.$emit('missing-cleavage-change', val);
+//             }
+//         }
+//     }
+// })
+@Component
 export default class SearchSetingsForm extends Vue {
-        @Prop({ default: false }) disabled!: boolean;
-        @Prop({ default: true }) equateIl!: boolean;
-        @Prop({ default: true }) filterDuplicates!: boolean;
-        @Prop({ default: false }) missingCleavage!: boolean;
+    @Prop({ default: false }) disabled!: boolean;
+    @Prop({ default: true }) equateIl!: boolean;
+    @Prop({ default: true }) filterDuplicates!: boolean;
+    @Prop({ default: false }) missingCleavage!: boolean;
 
-        equateIlData: boolean = this.equateIl;
-        filterDuplicatesData: boolean = this.filterDuplicates;
-        missingCleavageData: boolean = this.missingCleavage;
+    equateIlData: boolean = this.equateIl;
+    filterDuplicatesData: boolean = this.filterDuplicates;
+    missingCleavageData: boolean = this.missingCleavage;
 
-        equateIlModel: boolean = true;
-        filterDuplicatesModel: boolean = true;
-        missingCleavageModel: boolean = false;
+    equateIlModel: boolean = true;
+    filterDuplicatesModel: boolean = true;
+    missingCleavageModel: boolean = false;
 
-        @Watch("equateIl") onEquateIlChanged() {
-            this.equateIlData = this.equateIl;
-        }
+    @Watch("equateIl") onEquateIlChanged() {
+        this.equateIlData = this.equateIl;
+    }
 
-        @Watch("filterDuplicates") onFilterDuplicatesChanged() {
-            this.filterDuplicatesData = this.filterDuplicates;
-        }
+    @Watch("filterDuplicates") onFilterDuplicatesChanged() {
+        this.filterDuplicatesData = this.filterDuplicates;
+    }
 
-        @Watch("missingCleavage") onMissingCleavageChanged() {
-            this.missingCleavageData = this.missingCleavage;
-        }
+    @Watch("missingCleavage") onMissingCleavageChanged() {
+        this.missingCleavageData = this.missingCleavage;
+    }
 }
 </script>
 
 <style scoped>
-
+    .search-settings-form .v-input--selection-controls {
+        margin-top: 0px;
+    }
 </style>

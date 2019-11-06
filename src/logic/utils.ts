@@ -31,7 +31,7 @@ export function addCopy(selector, textFunction, tooltip = "Copy to clipboard", c
             .tooltip("fixTitle");
     });
     clip.on("error", e => {
-        $el.attr("title", "Sorry, something went wrong")
+        $el.attr("title", "So rry, something went wrong")
             .tooltip("fixTitle")
             .tooltip("show")
             .attr("title", tooltip)
@@ -313,10 +313,10 @@ export function numberToPercent(number, digits = 0) {
  * @returns {string} A dataURL containing the resulting PNG
 */
 export async function svg2pngDataURL(svgSelector: string) : Promise<string> { 
-    let el = $(svgSelector).get(0);
+    var canvg = require("canvg");
+    var el = $(svgSelector).get(0);
 
-    let canvas = document.createElement("canvas");
-    let canvg = require("canvg");
+    var canvas = document.createElement("canvas");
 
     // automatically size canvas to svg element and render
     canvg(canvas, el.outerHTML);
@@ -331,11 +331,11 @@ export async function svg2pngDataURL(svgSelector: string) : Promise<string> {
 }
 
 export function svg2svgDataURL(svgSelector: string) {
-    let el = $(svgSelector).get(0)
-    let svgString = new XMLSerializer().serializeToString(el);
-    let decoded = unescape(encodeURIComponent(svgString));
+    var el = $(svgSelector).get(0)
+    var svgString = new XMLSerializer().serializeToString(el);
+    var decoded = unescape(encodeURIComponent(svgString));
     // convert the svg to base64
-    let base64 = btoa(decoded);
+    var base64 = btoa(decoded);
     return `data:image/svg+xml;base64,${base64}`;
 }
 
