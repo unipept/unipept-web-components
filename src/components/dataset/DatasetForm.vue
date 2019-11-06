@@ -25,67 +25,67 @@ import Component from "vue-class-component"
 import { Prop, Watch } from "vue-property-decorator";
 import PeptideContainer from "../../logic/data-management/PeptideContainer";
 
-    @Component({
-        components: {},
-        computed: {
-            peptideModel: {
-                get() {
-                    return this.peptides;
-                },
-                set(val) {
-                    this.peptidesData = val;
-                    this.$emit("peptide-change", val);
-                }
+@Component({
+    components: {},
+    computed: {
+        peptideModel: {
+            get() {
+                return this.peptides;
             },
-            nameModel: {
-                get() {
-                    return this.name;
-                },
-                set(val) {
-                    this.nameData = val;
-                    this.$emit("name-change", val);
-                }
+            set(val) {
+                this.peptidesData = val;
+                this.$emit("peptide-change", val);
+            }
+        },
+        nameModel: {
+            get() {
+                return this.name;
             },
-            saveModel: {
-                get() {
-                    return this.save;
-                },
-                set(val) {
-                    this.saveData = val;
-                    this.$emit("save-change", val);
-                }
+            set(val) {
+                this.nameData = val;
+                this.$emit("name-change", val);
+            }
+        },
+        saveModel: {
+            get() {
+                return this.save;
+            },
+            set(val) {
+                this.saveData = val;
+                this.$emit("save-change", val);
             }
         }
-    })
+    }
+})
 export default class DatasetForm extends Vue {
-        @Prop({ default: "" }) peptides;
-        @Prop({ default: "" }) name;
-        @Prop({ default: true }) save;
-        @Prop({ default: false }) loading;
+    @Prop({ default: "" }) peptides;
+    @Prop({ default: "" }) name;
+    @Prop({ default: true }) save;
+    @Prop({ default: false }) loading;
 
-        private peptidesData: string = this.peptides;
-        private nameData: string = this.name;
-        private saveData: boolean = this.save;
+    private peptidesData: string = this.peptides;
+    private nameData: string = this.name;
+    private saveData: boolean = this.save;
 
-        @Watch("peptides") 
-        private onPeptidesChange(newPeptides: string, oldPeptides: string) {
-            this.peptidesData = newPeptides;
-        }
+    @Watch("peptides") 
+    private onPeptidesChange(newPeptides: string, oldPeptides: string) {
+        this.peptidesData = newPeptides;
+    }
 
-        @Watch("name") 
-        private onNameChange(newName: string, oldName: string) {
-            this.nameData = newName;
-        }
+    @Watch("name") 
+    private onNameChange(newName: string, oldName: string) {
+        this.nameData = newName;
+    }
 
-        @Watch("save") 
-        private onSaveChanged(newSave: boolean, oldSave: boolean) {
-            this.saveData = newSave;
-        }
+    @Watch("save") 
+    private onSaveChanged(newSave: boolean, oldSave: boolean) {
+        this.saveData = newSave;
+    }
 
-        public isValid(): boolean {
-            //@ts-ignore
-            return this.$refs.datasetForm.validate();
-        }
+    public isValid(): boolean {
+        //@ts-ignore
+        return this.$refs.datasetForm.validate();
+    }
 }
 </script>
 

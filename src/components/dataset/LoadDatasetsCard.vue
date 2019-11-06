@@ -151,6 +151,7 @@ import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
 import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
 import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
+import { EventBus } from "../EventBus";
 
 @Component({
     components: {
@@ -288,11 +289,11 @@ export default class LoadDatasetsCard extends Vue {
     }
 
     private selectDataset(dataset: Assay): void {
-        this.$emit("select-dataset", dataset);
+        EventBus.$emit("select-dataset", dataset);
     }
 
     private deleteDataset(dataset: Assay): void {
-        this.$emit("deselect-dataset", dataset);
+        EventBus.$emit("deselect-dataset", dataset);
     }
 
     private storeDataset(peptides: string, name: string, save: boolean): void {
@@ -311,7 +312,7 @@ export default class LoadDatasetsCard extends Vue {
             () => {
                 this.selectDataset(assay);
                 if (save) {
-                    this.$emit("store-dataset", assay);
+                    EventBus.$emit("store-dataset", assay);
                 }
                 this.pendingStore = false;
             }
