@@ -1,15 +1,14 @@
 import { Ontology } from "../Ontology"
 import { GODefinition } from "./GODefinition";
 import { postJSON } from "../../../utils";
-import { BASE_URL } from "../../../Constants";
 
 type OntologyId = string;
 
 const GO_BATCH_SIZE = 100
-const GO_URL = BASE_URL + "/private_api/goterms"
+const GO_URL = "/private_api/goterms"
 
 export class GeneOntology extends Ontology<OntologyId, GODefinition> {
-    async fetchDefinitions(ids: OntologyId[]) {
+    async fetchDefinitions(ids: OntologyId[], baseUrl: string) {
         ids = ids.filter(id => !this._definitions.has(id))
 
         // get GO info
@@ -18,7 +17,7 @@ export class GeneOntology extends Ontology<OntologyId, GODefinition> {
                 goterms: ids.slice(i, i + GO_BATCH_SIZE)
             });
 
-            const res = await postJSON(GO_URL, data);
+            const res = await postJSON(baseUrl + GO_URL, data);
             
             res.forEach(term => {
                 if (!this._definitions.has(term.code)) {

@@ -19,11 +19,13 @@ import { DataSourceCommon } from "./DataSourceCommon";
 export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> {
     private _countTable: GOCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
+    private _baseUrl: string;
 
-    constructor(countTable: GOCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository) {
+    constructor(countTable: GOCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
+        this._baseUrl = baseUrl;
     }
 
     public getPeptidesByGoTerm(term: GoTerm): string[] {
@@ -101,7 +103,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
     protected async computeTerms(percent = 50, sequences = null): Promise<[Map<GoNameSpace, GoTerm[]>, Map<GoNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
         var ontology: GeneOntology = this._countTable.getOntology()
-        await ontology.fetchDefinitions(this._countTable.getOntologyIds())
+        await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl)
 
         var dataOutput: Map<GoNameSpace, GoTerm[]> = new Map()
         var trustOutput: Map<GoNameSpace, FATrust> = new Map()

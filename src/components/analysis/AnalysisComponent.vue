@@ -46,6 +46,7 @@ import Assay from "../../logic/data-management/assay/Assay";
 import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
 import SingleDatasetVisualizationCard from "../visualizations/SingleDatasetVisualizationsCard.vue";
 import FunctionalSummaryCard from "./functional/FunctionalSummaryCard.vue";
+import { EventBus } from "./../EventBus";
 
 @Component({
     components: {
@@ -77,11 +78,14 @@ export default class AnalysisComponent extends Vue {
     private processDataset(dataset: Assay): void {
         let mpaManager = new MpaAnalysisManager();
         // TODO: work with the real search settings here
-        mpaManager.processDataset(dataset, {
-            il: true,
-            dupes: true,
-            missed: false
-        }).then(() => {
+        mpaManager.processDataset(
+            dataset, {
+                il: true,
+                dupes: true,
+                missed: false
+            },
+            this.$store.getters.baseUrl
+        ).then(() => {
             if (!this.activeDataset) {
                 console.log("Set active dataset:");
                 console.log(dataset);
@@ -102,7 +106,7 @@ export default class AnalysisComponent extends Vue {
     private selectDataset(dataset: Assay) {
         this.selectedDatasets.push(dataset);
         this.processDataset(dataset);
-        this.$emit("select-dataset", dataset);
+        EventBus.$emit("select-dataset", dataset);
     }
 
     private deselectDataset(dataset: Assay) {

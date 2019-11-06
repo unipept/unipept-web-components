@@ -67,6 +67,7 @@ import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
 import CardTitle from "../custom/CardTitle.vue";
 import CardHeader from "../custom/CardHeader.vue";
 import Tooltip from "../custom/Tooltip.vue";
+import { EventBus } from "../EventBus";
 
 @Component({
     components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
@@ -107,11 +108,11 @@ export default class SelectDatasetsCard extends Vue {
     }
 
     private startAnalysis() {
-        this.$emit("start-analysis");
+        EventBus.$emit("start-analysis");
     }
 
     private deselectDataset(dataset: Assay) {
-        this.$emit("deselect-dataset", dataset);
+        EventBus.$emit("deselect-dataset", dataset);
     }
 
     private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
@@ -119,7 +120,11 @@ export default class SelectDatasetsCard extends Vue {
         this.filterDuplicates = filterDuplicates;
         this.missingCleavage = missingCleavage;
 
-        this.$emit("update-search-settings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
+        EventBus.$emit("update-search-settings", {
+            il: this.equateIl,
+            dupes: this.filterDuplicates, 
+            missed: this.missingCleavage
+        });
     }
 }
 </script>

@@ -149,15 +149,22 @@ import axios from "axios"
 
 import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
-import { BASE_URL } from "../../logic/Constants";
 import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
 import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
+import { EventBus } from "../EventBus";
 
 @Component({
     components: {
         Snackbar,
         DatasetForm,
         Tooltip
+    },
+    computed: {
+        baseUrl: {
+            get(): string {
+                return this.$store.getters.baseUrl;
+            }
+        }
     }
 })
 export default class LoadDatasetsCard extends Vue {
@@ -204,8 +211,17 @@ export default class LoadDatasetsCard extends Vue {
     private selectedSampleDataset = {};
 
     mounted() {
-        axios.post(BASE_URL + "/datasets/sampledata")
+        this.retrieveSampleDatasets();
+    }
+
+    @Watch("baseUrl")
+    private retrieveSampleDatasets() {
+        this.loadingSampleDatasets = true;
+        this.errorSampleDatasets = false;
+        axios.post(this.$store.getters.baseUrl + "/datasets/sampledata")
             .then(result => {
+                this.sampleDatasets = [];
+                this.selectedSampleDataset = {};
                 for (let item of result.data.sample_data) {
                     let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));
                     itemDatasets = itemDatasets.sort((a, b) => {
@@ -228,7 +244,7 @@ export default class LoadDatasetsCard extends Vue {
             .finally(() => this.loadingSampleDatasets = false);
     }
 
-    storeSampleDataset(datasetId: string) {
+    private storeSampleDataset(datasetId: string) {
         let name: string = this.selectedSampleDataset[datasetId];
         if (name && !this.selectedDatasets.some((dataset) => dataset.getName() === name)) {
             let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find((dataset) => dataset.id == datasetId);
@@ -237,7 +253,7 @@ export default class LoadDatasetsCard extends Vue {
         }
     }
 
-    fetchPrideAssay(): void {
+    private fetchPrideAssay(): void {
         if (this.$refs.prideAssayForm.validate()) {
             this.prideLoading = true;
             let datasetManager: DatasetManager = new DatasetManager();
@@ -258,14 +274,14 @@ export default class LoadDatasetsCard extends Vue {
         }
     }
 
-    storePrideDataset() {
+    private storePrideDataset() {
         //@ts-ignore
         if (this.$refs.prideDatasetForm.isValid()) {
             this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
         }
     }
 
-    storeCreatedDataset() {
+    private storeCreatedDataset() {
         // @ts-ignore
         if (this.$refs.createdDatasetForm.isValid()) {
             this.storeDataset(this.createPeptides, this.createName, this.createSave);
@@ -273,11 +289,11 @@ export default class LoadDatasetsCard extends Vue {
     }
 
     private selectDataset(dataset: Assay): void {
-        this.$emit("select-dataset", dataset);
+        EventBus.$emit("select-dataset", dataset);
     }
 
     private deleteDataset(dataset: Assay): void {
-        this.$emit("deselect-dataset", dataset);
+        EventBus.$emit("deselect-dataset", dataset);
     }
 
     private storeDataset(peptides: string, name: string, save: boolean): void {
@@ -296,7 +312,7 @@ export default class LoadDatasetsCard extends Vue {
             () => {
                 this.selectDataset(assay);
                 if (save) {
-                    this.$emit("store-dataset", assay);
+                    EventBus.$emit("store-dataset", assay);
                 }
                 this.pendingStore = false;
             }

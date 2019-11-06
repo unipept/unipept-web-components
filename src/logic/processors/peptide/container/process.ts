@@ -2,12 +2,11 @@ import { ProcessedPeptideContainer } from "../../../data-management/ProcessedPep
 import { postJSON } from "../../../utils";
 import { PeptideData } from "../../../api/pept2data/Response";
 import MPAConfig from "../../../data-management/MPAConfig";
-import { BASE_URL } from "../../../Constants";
 
 const BATCH_SIZE = 100;
-const API_ENDPOINT = BASE_URL + "/mpa/pept2data";
+const API_ENDPOINT = "/mpa/pept2data";
 
-export default async function process(peptides: string[], config: MPAConfig, setProgress: (number) => void) : Promise<ProcessedPeptideContainer> {
+export default async function process(peptides: string[], config: MPAConfig, baseUrl: string, setProgress: (number) => void) : Promise<ProcessedPeptideContainer> {
     var preparedPeptides = preparePeptides(peptides, config);
     const peptideList = Array.from(preparedPeptides.keys());
 
@@ -25,7 +24,7 @@ export default async function process(peptides: string[], config: MPAConfig, set
             missed: config.missed
         });
 
-        const res = await postJSON(API_ENDPOINT, data);
+        const res = await postJSON(baseUrl + API_ENDPOINT, data);
 
         res.peptides.forEach(p => {
             response.set(p.sequence, { lca: p.lca, lineage: p.lineage, fa: p.fa });

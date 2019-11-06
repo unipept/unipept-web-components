@@ -1,23 +1,22 @@
 import { Ontology } from "../Ontology"
 import { NCBITaxon } from "./NCBITaxon";
 import { postJSON } from "../../../utils";
-import { BASE_URL } from "../../../Constants";
 
 type OntologyId = number;
 
 const TAXA_BATCH_SIZE = 100
 const LINEAGE_BATCH_SIZE = 100
 
-const TAXA_URL = BASE_URL + "/private_api/taxa"
-const LINEAGE_URL = BASE_URL + "/private_api/lineages"
+const TAXA_URL =  "/private_api/taxa"
+const LINEAGE_URL =  "/private_api/lineages"
 
 export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
-    async fetchDefinitions(ids: number[]): Promise<void> {
-        await this.fetchTaxaInfo(ids);
-        await this.fetchLineages(ids);
+    async fetchDefinitions(ids: number[], baseUrl: string): Promise<void> {
+        await this.fetchTaxaInfo(ids, baseUrl);
+        await this.fetchLineages(ids, baseUrl);
     }
 
-    async fetchTaxaInfo(ids: OntologyId[]) {
+    async fetchTaxaInfo(ids: OntologyId[], baseUrl: string) {
         ids = ids.filter(id => 
             !this._definitions.has(id) 
             ||  !("name" in this._definitions.get(id)))
@@ -28,7 +27,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
                 taxids: ids.slice(i, i + TAXA_BATCH_SIZE)
             });
 
-            const res = await postJSON(TAXA_URL, data);
+            const res = await postJSON(baseUrl + TAXA_URL, data);
             
             res.forEach(taxon => {
                 if (!this._definitions.has(taxon.id)) {
@@ -42,7 +41,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
         }
     }
 
-    async fetchLineages(ids: OntologyId[]) {
+    async fetchLineages(ids: OntologyId[], baseUrl) {
         // first check which ids need to be fetched
         ids = ids.filter(id => 
             !this._definitions.has(id) 
@@ -54,7 +53,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
                 taxids: ids.slice(i, i + LINEAGE_BATCH_SIZE)
             });
 
-            const res = await postJSON(LINEAGE_URL, data);
+            const res = await postJSON(baseUrl + LINEAGE_URL, data);
             
             res.forEach(l => {
                 if (!this._definitions.has(l.id)) {

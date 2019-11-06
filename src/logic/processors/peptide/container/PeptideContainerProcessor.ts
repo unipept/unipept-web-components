@@ -15,7 +15,7 @@ export class PeptideContainerProcessor extends ProgressPublisher {
         this._worker = new Worker();
     }
 
-    process(peptides: PeptideContainer, mpaConfig: MPAConfig) : Promise<ProcessedPeptideContainer> {
+    process(peptides: PeptideContainer, mpaConfig: MPAConfig, baseUrl: string) : Promise<ProcessedPeptideContainer> {
         return new Promise<ProcessedPeptideContainer>(resolve => {
             this._worker.onmessage = (event) => {
                 switch (event.data.type) {
@@ -28,7 +28,7 @@ export class PeptideContainerProcessor extends ProgressPublisher {
                     break;
                 }
             };
-            this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig });
+            this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig, baseUrl: baseUrl });
         });
     }
 }
