@@ -53,10 +53,10 @@
                             </small>
                             <br>
                             <v-row>
-                                <v-col :cols="9">
+                                <v-col :cols="8">
                                     <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
                                 </v-col>
-                                <v-col :cols="3" style="display: flex; align-items: center;">
+                                <v-col :cols="4" style="display: flex; align-items: center;">
                                     <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
                                 </v-col>
                             </v-row>
@@ -109,9 +109,9 @@
                                     <v-list-item-title>
                                         {{ dataset.getName() }}
                                     </v-list-item-title>
-                                    <v-list-item-sub-title>
+                                    <v-list-item-subtitle>
                                         {{ dataset.getAmountOfPeptides() }} peptides
-                                    </v-list-item-sub-title>
+                                    </v-list-item-subtitle>
                                 </v-list-item-content>
 
                                 <v-list-item-action>

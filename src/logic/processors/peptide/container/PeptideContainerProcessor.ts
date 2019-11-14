@@ -1,7 +1,7 @@
 import PeptideContainer from "../../../data-management/PeptideContainer";
 import { ProcessedPeptideContainer } from "../../../data-management/ProcessedPeptideContainer";
 
-import Worker from "worker-loader!./PeptideContainerProcessor.worker";
+import Worker from "worker-loader!./PeptideContainerProcessor.worker.js";
 import ProgressPublisher from "../../../patterns/progress/ProgressPublisher";
 import MPAConfig from "../../../data-management/MPAConfig";
 
@@ -28,6 +28,7 @@ export class PeptideContainerProcessor extends ProgressPublisher {
                     break;
                 }
             };
+            console.log(this._worker);
             this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig, baseUrl: baseUrl });
         });
     }

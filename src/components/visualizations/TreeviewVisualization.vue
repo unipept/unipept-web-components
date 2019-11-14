@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import * as d3 from "d3";
+import * as d3Scale from "d3-scale";
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
@@ -25,71 +26,71 @@ import Treeview from "./Treeview.vue";
 import { Node } from "../../logic/data-management/Node";
 import DataRepository from "../../logic/data-source/DataRepository";
 
-    @Component({
-        components: {
-            Treeview
-        }
-    })
+@Component({
+    components: {
+        Treeview
+    }
+})
 export default class TreeviewVisualization extends mixins(VisualizationMixin) {
-        $refs: {
-            treeview: Treeview
-            treeviewWrapper: Element
+    $refs: {
+        treeview: Treeview
+        treeviewWrapper: Element
+    }
+
+    @Prop({ default: false }) 
+    private fullScreen: boolean;
+    @Prop({ required: true })
+    private dataRepository: DataRepository;
+    @Prop({ required: false, default: false })
+    private autoResize: number;
+    @Prop({ required: false, default: -1 })
+    private width: number;
+    @Prop({ required: false, default: 600 })
+    private height: number;
+
+    private colors: (d: any) => string = (d: any) => {
+        if (d.name === "Bacteria") return "#1565C0"; // blue
+        if (d.name === "Archaea") return "#FF8F00"; // orange
+        if (d.name === "Eukaryota") return "#2E7D32"; // green
+        if (d.name === "Viruses") return "#C62828"; // red
+        // @ts-ignore
+        return d3Scale.scaleOrdinal(d3.schemeCategory10).call(this, d);
+    };
+
+    private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);
+    private data: Node = null;
+    private tooltip: (d: any) => string = tooltipContent; 
+
+    mounted() {
+        this.initTreeview();
+    }
+
+    @Watch("dataset") onDatasetChanged() {
+        this.initTreeview();
+    }
+
+    @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
+        if (this.watchableTaxonId === -1) {
+            this.reset();
         }
+    }
 
-        @Prop({ default: false }) 
-        private fullScreen: boolean;
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
-        @Prop({ required: false, default: false })
-        private autoResize: number;
-        @Prop({ required: false, default: -1 })
-        private width: number;
-        @Prop({ required: false, default: 600 })
-        private height: number;
+    @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
+        this.$refs.treeview.setFullScreen(newFullScreen)
+    }
 
-        private colors: (d: any) => string = (d: any) => {
-            if (d.name === "Bacteria") return "#1565C0"; // blue
-            if (d.name === "Archaea") return "#FF8F00"; // orange
-            if (d.name === "Eukaryota") return "#2E7D32"; // green
-            if (d.name === "Viruses") return "#C62828"; // red
-            // @ts-ignore
-            return d3.scale.category10().call(this, d);
-        };
+    reset() {
+        this.$refs.treeview.reset();
+    }
 
-        private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);
-        private data: Node = null;
-        private tooltip: (d: any) => string = tooltipContent; 
-
-        mounted() {
-            this.initTreeview();
+    private async initTreeview() {
+        this.width = this.width === -1 ? this.$refs.treeviewWrapper.clientWidth : this.width;
+        if (this.dataRepository != null) {
+            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
+            let tree: Tree = await taxaDataSource.getTree();
+            this.data = tree.getRoot();
         }
-
-        @Watch("dataset") onDatasetChanged() {
-            this.initTreeview();
-        }
-
-        @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
-            if (this.watchableTaxonId === -1) {
-                this.reset();
-            }
-        }
-
-        @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
-            this.$refs.treeview.setFullScreen(newFullScreen)
-        }
-
-        reset() {
-            this.$refs.treeview.reset();
-        }
-
-        private async initTreeview() {
-            this.width = this.width === -1 ? this.$refs.treeviewWrapper.clientWidth : this.width;
-            if (this.dataRepository != null) {
-                let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-                let tree: Tree = await taxaDataSource.getTree();
-                this.data = tree.getRoot();
-            }
-        }
+    }
 }
 </script>
 
