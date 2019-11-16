@@ -74,7 +74,7 @@ import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
                 text: this.searchSettings.name,
                 align: "left",
                 value: this.searchSettings.field,
-                width: "15%"
+                width: "20%"
             }, {
                 text: this.annotationName,
                 align: "left",
@@ -84,7 +84,7 @@ import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
                 text: "Name",
                 align: "left",
                 value: "name",
-                width: "45%"
+                width: "40%"
             }, {
                 text: "Actions",
                 align: "center",

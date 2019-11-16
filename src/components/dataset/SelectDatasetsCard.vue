@@ -5,9 +5,11 @@
                 Metaproteomics Analysis
             </card-title>
         </card-header>
-        <v-card-text style="display: flex; flex-direction: column; flex-grow: 1;">
-            <h3>Selected datasets</h3>
-            <span v-if="selectedDatasets.length === 0" :class="{'shaking': shaking, 'selected-placeholder': true}">Please select one or more datasets from the right hand panel to continue the analysis..</span>
+        <v-card-text style="display: flex; flex-direction: column; flex-grow: 1; padding: 0;">
+            <div style="padding-top: 16px; padding-left: 16px; padding-right: 16px;">
+                <h3>Selected datasets</h3>
+                <span v-if="selectedDatasets.length === 0" :class="{'shaking': shaking, 'selected-placeholder': true}">Please select one or more datasets from the right hand panel to continue the analysis..</span>
+            </div>
             <v-list two-line class="switch-datasets-list" style="flex-grow: 1;">
                 <v-list-item v-for="dataset of selectedDatasets" two-line :key="dataset.id" >
                     <v-list-item-content>
@@ -31,28 +33,30 @@
                     </v-list-item-action>
                 </v-list-item>
             </v-list>
-            <search-settings-form
-                :equate-il="equateIl"
-                v-on:equate-il-change="equateIl = $event"
-                :filter-duplicates="filterDuplicates"
-                v-on:filter-duplicates-change="filterDuplicates = $event"
-                :missing-cleavage="missingCleavage"
-                v-on:missing-cleavage="missingCleavage = $event"
-                class="selected-dataset-settings">
-            </search-settings-form>            
-            <div class="card-actions">
-                <v-btn @click="search()" color="primary">
-                    <v-icon left>
-                        mdi-magnify
-                    </v-icon>
-                    Search
-                </v-btn>
-                <v-btn @click="reset()">
-                    <v-icon left>
-                        mdi-restore
-                    </v-icon>
-                    Start over
-                </v-btn>
+            <div style="padding-bottom: 16px; padding-left: 16px; padding-right: 16px;">
+                <search-settings-form
+                    :equate-il="equateIl"
+                    v-on:equate-il-change="equateIl = $event"
+                    :filter-duplicates="filterDuplicates"
+                    v-on:filter-duplicates-change="filterDuplicates = $event"
+                    :missing-cleavage="missingCleavage"
+                    v-on:missing-cleavage="missingCleavage = $event"
+                    class="selected-dataset-settings">
+                </search-settings-form>            
+                <div class="card-actions">
+                    <v-btn @click="search()" color="primary">
+                        <v-icon left>
+                            mdi-magnify
+                        </v-icon>
+                        Search
+                    </v-btn>
+                    <v-btn @click="reset()">
+                        <v-icon left>
+                            mdi-restore
+                        </v-icon>
+                        Start over
+                    </v-btn>
+                </div>
             </div>
         </v-card-text>
     </v-card>
