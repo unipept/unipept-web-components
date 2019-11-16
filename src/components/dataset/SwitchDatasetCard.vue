@@ -72,14 +72,14 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import PeptideContainer from "../../logic/data-management/PeptideContainer";
+import PeptideContainer from "./../../logic/data-management/PeptideContainer";
 
-import CardHeader from "../custom/CardHeader.vue";
-import CardTitle from "../custom/CardTitle.vue";
+import CardHeader from "./../custom/CardHeader.vue";
+import CardTitle from "./../custom/CardTitle.vue";
 
-import HeatmapWizardMultiSample from "../heatmap/HeatmapWizardMultiSample.vue";
-import Tooltip from "../custom/Tooltip.vue";
-import { EventBus } from "../EventBus";
+import HeatmapWizardMultiSample from "./../heatmap/HeatmapWizardMultiSample.vue";
+import Tooltip from "./../custom/Tooltip.vue";
+import { EventBus } from "./../EventBus";
 
 @Component({
     components: { CardTitle, CardHeader, HeatmapWizardMultiSample, Tooltip },

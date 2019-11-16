@@ -66,12 +66,12 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import Assay from "../../logic/data-management/assay/Assay";
-import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
-import CardTitle from "../custom/CardTitle.vue";
-import CardHeader from "../custom/CardHeader.vue";
-import Tooltip from "../custom/Tooltip.vue";
-import { EventBus } from "../EventBus";
+import Assay from "./../../logic/data-management/assay/Assay";
+import SearchSettingsForm from "./../analysis/SearchSettingsForm.vue";
+import CardTitle from "./../custom/CardTitle.vue";
+import CardHeader from "./../custom/CardHeader.vue";
+import Tooltip from "./../custom/Tooltip.vue";
+import { EventBus } from "./../EventBus";
 
 @Component({
     components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
