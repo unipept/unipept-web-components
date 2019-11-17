@@ -2,9 +2,7 @@
     <div id="treeviewWrapper" ref="treeviewWrapper">
         <h2 class="ghead">
             <span class="dir">
-                <a class="btn btn-xs btn-default btn-animate" @click="reset()" title="reset visualisation">
-                    <span class="glyphicon glyphicon-repeat spin"></span>
-                </a>
+                <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
             <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
         </h2>

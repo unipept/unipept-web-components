@@ -40,78 +40,78 @@ import VisualizationMixin from "./VisualizationMixin.vue";
 import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 import DataRepository from "../../logic/data-source/DataRepository";
 
-    @Component
+@Component
 export default class SunburstVisualization extends mixins(VisualizationMixin) {
-        // Make field non-reactive by not setting it here, but only after created has been called for the first time.
-        sunburst!: any;
+    // Make field non-reactive by not setting it here, but only after created has been called for the first time.
+    sunburst!: any;
 
-        @Prop({ default: false }) 
-        private fullScreen: false;
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
-        @Prop({ required: false, default: false })
-        private autoResize: boolean;
-        @Prop({ required: false, default: 740 })
-        private width: number;
-        @Prop({ required: false, default: 740 })
-        private height: number;
-        @Prop({ required: false, default: 740 / 2 })
-        private radius: number;
+    @Prop({ default: false }) 
+    private fullScreen: false;
+    @Prop({ required: true })
+    private dataRepository: DataRepository;
+    @Prop({ required: false, default: false })
+    private autoResize: boolean;
+    @Prop({ required: false, default: 740 })
+    private width: number;
+    @Prop({ required: false, default: 740 })
+    private height: number;
+    @Prop({ required: false, default: 740 / 2 })
+    private radius: number;
 
-        private isFixedColors: boolean = false;
+    private isFixedColors: boolean = false;
 
-        mounted() {
-            this.initTree();
+    mounted() {
+        this.initTree();
+    }
+
+    @Watch("dataRepository") onDataRepositoryChanged() {
+        this.initTree();
+    }
+
+    @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
+        if (this.watchableTaxonId === -1) {
+            this.reset();
         }
+    }
 
-        @Watch("dataRepository") onDataRepositoryChanged() {
-            this.initTree();
+    @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
+        this.sunburst.setFullScreen(newFullScreen)
+    }
+
+    @Watch("isFixedColors") onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
+        this.sunburst.settings.useFixedColors = newFixedColors;
+        this.sunburst.redrawColors();
+    }
+
+    reset() {
+        if (this.sunburst) {
+            this.sunburst.reset();
         }
+    }
 
-        @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
-            if (this.watchableTaxonId === -1) {
-                this.reset();
+    private async initTree() {
+        if (this.dataRepository != null) {
+            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
+            let tree: Tree = await taxaDataSource.getTree();
+            const data = JSON.stringify(tree.getRoot());
+
+            // @ts-ignore
+            this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
+                width: this.width,
+                height: this.height,
+                radius: this.radius,
+                getTooltip: tooltipContent,
+                getTitleText: d => `${d.name} (${d.rank})`,
+                rerootCallback: d => this.search(d.id, d.name, 1000),
+            });
+
+            if (this.autoResize) {
+                let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
+                svgEl.setAttribute("height", "100%")
+                svgEl.setAttribute("width", "100%")
             }
         }
-
-        @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
-            this.sunburst.setFullScreen(newFullScreen)
-        }
-
-        @Watch("isFixedColors") onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
-            this.sunburst.settings.useFixedColors = newFixedColors;
-            this.sunburst.redrawColors();
-        }
-
-        reset() {
-            if (this.sunburst) {
-                this.sunburst.reset();
-            }
-        }
-
-        private async initTree() {
-            if (this.dataRepository != null) {
-                let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-                let tree: Tree = await taxaDataSource.getTree();
-                const data = JSON.stringify(tree.getRoot());
-
-                // @ts-ignore
-                this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-                    width: this.width,
-                    height: this.height,
-                    radius: this.radius,
-                    getTooltip: tooltipContent,
-                    getTitleText: d => `${d.name} (${d.rank})`,
-                    rerootCallback: d => this.search(d.id, d.name, 1000),
-                });
-
-                if (this.autoResize) {
-                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
-                    svgEl.setAttribute("height", "100%")
-                    svgEl.setAttribute("width", "100%")
-                }
-            }
-        }
+    }
 }
 </script>
 
