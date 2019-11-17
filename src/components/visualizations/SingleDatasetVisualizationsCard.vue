@@ -1,7 +1,7 @@
 -<template>
     <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
         <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
-            <v-tabs :color="isFullScreen ? 'accent' : tabsTextColor" :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
+            <v-tabs :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
                 <div v-if="isFullScreen" class="unipept-logo">
                     <img src="/images/trans_logo.png" alt="logo" width="40" height="40">
                 </div>
@@ -50,7 +50,7 @@
                     </v-list>
                 </v-menu>
                 <image-download-modal ref="imageDownloadModal"/>
-                <div v-if="isFullScreen">
+                <div v-if="isFullScreen" class="fullscreen-buttons-container">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
                             mdi-restore
@@ -277,6 +277,11 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         position: relative;
         left: 50%;
         transform: translate(-35px);
+    }
+
+    .fullscreen-buttons-container {
+        display: flex;
+        align-items: center;
     }
     
     /* .fullscreen-nav {
