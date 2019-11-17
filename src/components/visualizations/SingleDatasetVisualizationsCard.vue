@@ -214,11 +214,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
     mounted() {
-        document.addEventListener("fullscreenchange", () => {
-            if (document.fullscreenElement) {
-                this.exitFullScreen();
-            }
-        }, false);
         // @ts-ignore (TODO: migrate to Vuetify)
         // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
     }
