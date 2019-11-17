@@ -17,7 +17,11 @@
             <v-list two-line>
                 <v-list-item v-for="dataset of this.selectedDatasets" :key="dataset.id" ripple @click="activateDataset(dataset)" :class="activeDataset === dataset ? 'selected-list-item' : ''">
                     <v-list-item-action>
-                        <v-radio-group v-if="dataset.progress === 1" v-model="activeDatasetModel"><v-radio :value="dataset"></v-radio></v-radio-group>
+                        <div class="select-dataset-radio" v-if="dataset.progress === 1">
+                            <v-radio-group v-model="activeDatasetModel">
+                                <v-radio :value="dataset"></v-radio>
+                            </v-radio-group>
+                        </div>
                         <v-progress-circular v-else :rotate="-90" :size="24" :value="dataset.progress * 100" color="primary"></v-progress-circular>
                     </v-list-item-action>
                     <v-list-item-content>
@@ -165,5 +169,9 @@ export default class SwitchDatasetCard extends Vue {
     .v-divider {
         margin-top: 15px;
         margin-bottom: 15px;
+    }
+
+    .select-dataset-radio .v-input--radio-group__input {
+        margin-right: -16px;
     }
 </style>
