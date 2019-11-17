@@ -55,9 +55,8 @@
                     <h4 class="modal-title">Heatmap wizard</h4>
                 </div>
                 <div class="single-dataset-wizard">
-                    <!-- TODO fix -->
-                    <!-- <heatmap-wizard-multi-sample v-if="$store.getters.activeDataset" :dataset="$store.getters.activeDataset"></heatmap-wizard-multi-sample> -->
-                    <div>
+                    <heatmap-wizard-multi-sample v-if="$store.getters.activeDataset" :dataset="$store.getters.activeDataset"></heatmap-wizard-multi-sample>
+                    <div v-else>
                         <div class="text-xs-center" style="margin-top: 25px;">
                             <v-progress-circular indeterminate color="primary"></v-progress-circular>
                         </div>
