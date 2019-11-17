@@ -185,6 +185,8 @@ export default class HeatmapWizardSingleSample extends Vue {
 
     @Watch("dataRepository")
     private async onDataRepositoryChanged() {
+        // Switch back to the first step of the configuration
+        this.currentStep = 1;
         // Update all DataSources.
         await this.onHorizontalSelection();
         await this.onVerticalSelection();
