@@ -40,6 +40,11 @@
                     {{searchSettings.format(item)}}
                 </div>
             </template>
+            <template v-slot:Name="{ item }">
+                <span style="text-overflow: ellipsis;">
+                     {{ item.name }}
+                </span>
+            </template>
             <template v-slot:item.action="{ item }">
                 <v-tooltip :open-delay=1000 bottom>
                     <template v-slot:activator="{ on }">

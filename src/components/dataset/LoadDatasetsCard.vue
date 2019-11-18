@@ -38,7 +38,7 @@
                                 Unable to retrieve list of sample datasets.
                             </v-alert>
                         </div>
-                        <p v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
+                        <div v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
                             <b>Environment:</b> {{ dataset.environment }}
                             <br>
                             <b>Reference:</b>
@@ -52,15 +52,17 @@
                                 </a>
                             </small>
                             <br>
-                            <v-row>
-                                <v-col :cols="8">
-                                    <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
-                                </v-col>
-                                <v-col :cols="4" style="display: flex; align-items: center;">
-                                    <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
-                                </v-col>
-                            </v-row>
-                        </p>
+                            <div class="load-sample-container">
+                                <v-row>
+                                    <v-col :cols="7">
+                                        <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
+                                    </v-col>
+                                    <v-col :cols="5" style="display: flex; align-items: center;">
+                                        <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
+                                    </v-col>
+                                </v-row>
+                            </div>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-tab-item>
@@ -331,5 +333,9 @@ export default class LoadDatasetsCard extends Vue {
         display: flex !important;
         flex-direction: row;
         justify-content: space-between;
+    }
+
+    .load-sample-container .row {
+        flex-wrap: nowrap;
     }
 </style>
