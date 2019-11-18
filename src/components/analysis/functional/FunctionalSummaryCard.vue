@@ -112,7 +112,7 @@
                                 <span>This panel shows the Gene Ontology annotations that were matched to your peptides. </span>
                                 <span v-html="goTrustLine"></span>
                                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                                <div v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace" style="margin-top: 16px;">
+                                <div v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace" style="margin-top: 16px;" class="go-table-container">
                                     <h2>{{ goData[idx].title }}</h2>
                                     <v-row>
                                         <v-col :cols="9">
@@ -485,5 +485,9 @@ export default class FunctionalSummaryCard extends Vue {
     #filtered-taxon-information
     {
         background-color: #ffe57f;
+    }
+
+    .go-table-container .row {
+        flex-wrap: nowrap;
     }
 </style>
