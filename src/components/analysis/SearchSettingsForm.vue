@@ -35,39 +35,38 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 
-// @Component({
-//     components: {},
-//     computed: {
-//         equateIlModel: {
-//             get() {
-//                 return this.equateIl;
-//             },
-//             set(val) {
-//                 this.equateIlData = val;
-//                 this.$emit('equate-il-change', val);
-//             }
-//         },
-//         filterDuplicatesModel: {
-//             get(): boolean {
-//                 return this.filterDuplicates;
-//             },
-//             set(val: boolean) {
-//                 this.filterDuplicatesData = val;
-//                 this.$emit('filter-duplicates-change', val);
-//             }
-//         },
-//         missingCleavageModel: {
-//             get() {
-//                 return this.missingCleavage;
-//             },
-//             set(val) {
-//                 this.missingCleavageData = val;
-//                 this.$emit('missing-cleavage-change', val);
-//             }
-//         }
-//     }
-// })
-@Component
+@Component({
+    components: {},
+    computed: {
+        equateIlModel: {
+            get() {
+                return this.equateIl;
+            },
+            set(val) {
+                this.equateIlData = val;
+                this.$emit("update:equate-il", val);
+            }
+        },
+        filterDuplicatesModel: {
+            get(): boolean {
+                return this.filterDuplicates;
+            },
+            set(val: boolean) {
+                this.filterDuplicatesData = val;
+                this.$emit("update:filter-duplicates", val);
+            }
+        },
+        missingCleavageModel: {
+            get() {
+                return this.missingCleavage;
+            },
+            set(val) {
+                this.missingCleavageData = val;
+                this.$emit("update:missing-cleavage", val);
+            }
+        }
+    }
+})
 export default class SearchSetingsForm extends Vue {
     @Prop({ default: false }) disabled!: boolean;
     @Prop({ default: true }) equateIl!: boolean;
@@ -77,10 +76,6 @@ export default class SearchSetingsForm extends Vue {
     equateIlData: boolean = this.equateIl;
     filterDuplicatesData: boolean = this.filterDuplicates;
     missingCleavageData: boolean = this.missingCleavage;
-
-    equateIlModel: boolean = true;
-    filterDuplicatesModel: boolean = true;
-    missingCleavageModel: boolean = false;
 
     @Watch("equateIl") onEquateIlChanged() {
         this.equateIlData = this.equateIl;
