@@ -293,7 +293,8 @@ export default class LoadDatasetsCard extends Vue {
     }
 
     private deleteDataset(dataset: Assay): void {
-        EventBus.$emit("deselect-dataset", dataset);
+        this.$store.dispatch("deleteDataset", dataset);
+        EventBus.$emit("delete-dataset", dataset);
     }
 
     private storeDataset(peptides: string, name: string, save: boolean): void {

@@ -166,7 +166,6 @@ const mpaActions: ActionTree<GlobalState, any> = {
         }
     },
     deleteDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.dispatch("deselectDataset", dataset);
         let datasetManager: DatasetManager = new DatasetManager();
         datasetManager.deleteDatasetFromStorage(dataset).then(() => store.commit("REMOVE_STORED_DATASET", dataset));
     },
