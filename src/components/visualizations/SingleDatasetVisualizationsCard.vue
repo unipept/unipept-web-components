@@ -82,7 +82,7 @@
                             </v-card-text>
                         </div>
                     </v-card>
-                    <image-download-modal ref="imageDownloadModal"/>
+                    <image-download-modal ref="imageDownloadModal" />
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
@@ -213,6 +213,10 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
+    private mounted() {
+        
+    }
+
     private switchToFullScreen() {
         // @ts-ignore
         if (!this.isFullScreen && window.fullScreenApi.supportsFullScreen) {
@@ -225,14 +229,12 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     private exitFullScreen() {
-        console.log("EXIT FULLSCREEN!");
         this.isFullScreen = false;
         this.$refs.fullScreenContainer.exit();
         $(".tip").appendTo("body");
     }
 
     private fullScreenChange(state: boolean) {
-        console.log("CHANGE!!");
         if (!state) {
             this.exitFullScreen();
         } else {
@@ -241,6 +243,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     private async prepareImage() {
+        this.exitFullScreen();
         const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
         // @ts-ignore
