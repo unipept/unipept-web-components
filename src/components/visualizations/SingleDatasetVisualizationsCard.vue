@@ -56,7 +56,7 @@
                             mdi-restore
                         </v-icon>
                     </v-btn>
-                    <v-btn icon text @click="saveAsImage()">
+                    <v-btn icon text @click="prepareImage()">
                         <v-icon color="white">
                             mdi-download
                         </v-icon>
@@ -213,11 +213,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
-    mounted() {
-        // @ts-ignore (TODO: migrate to Vuetify)
-        // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
-    }
-    
     private switchToFullScreen() {
         // @ts-ignore
         if (window.fullScreenApi.supportsFullScreen) {
@@ -246,7 +241,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
         if (this.tabs[this.tab] === "Sunburst") {
             d3.selectAll(".toHide").attr("class", "arc hidden");
-            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
+            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
             d3.selectAll(".hidden").attr("class", "arc toHide");
         } else if (this.tabs[this.tab] === "Treemap") {
             imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")

@@ -331,7 +331,7 @@ export async function svg2pngDataURL(svgSelector: string) : Promise<string> {
 }
 
 export function svg2svgDataURL(svgSelector: string) {
-    var el = $(svgSelector).get(0)
+    var el = $(svgSelector).get(0);
     var svgString = new XMLSerializer().serializeToString(el);
     var decoded = unescape(encodeURIComponent(svgString));
     // convert the svg to base64
