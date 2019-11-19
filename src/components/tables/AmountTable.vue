@@ -35,7 +35,7 @@
             <template v-slot:[`item.${searchSettings.field}`]="{ item }">
                 <div :style="{
                         padding: '12px', 
-                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.fractionOfPepts * 100 + '%, rgba(255,255,255,1) ' + item.fractionOfPepts * 100 + '%)',
+                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.fractionOfPepts * 100 + '%, rgba(255,255,255,0) ' + item.fractionOfPepts * 100 + '%)',
                 }">
                     {{searchSettings.format(item)}}
                 </div>
