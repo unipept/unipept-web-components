@@ -3,8 +3,6 @@ import process from "./process.js";
 self.addEventListener("message", handleEvent);
 
 async function handleEvent(event){
-    console.log("Handling event!");
-    console.log(event);
     let result = await process(event.data.peptides, event.data.config, event.data.baseUrl, setProgress)
     self.postMessage({ type: "result", value: result });
 }

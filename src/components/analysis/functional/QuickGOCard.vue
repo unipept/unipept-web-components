@@ -9,7 +9,7 @@
                     {{ top5Sentence }}.
                     <br/>
                     <a @click="openInBrowser(quickGOChartURL(top5.map(x => x.code), true))">
-                        <img style="max-width: 80%; position: relative; left: 50%; transform: translateX(-50%); margin-top: 32px; margin-bottom: 32px;" :src="quickGOChartURL(top5.map(x => x.code), true)" :alt="'QuickGO chart of ' + top5Sentence"/>
+                        <img style="max-width: 80%; max-height: 600px; position: relative; left: 50%; transform: translateX(-50%); margin-top: 32px; margin-bottom: 32px;" :src="quickGOChartURL(top5.map(x => x.code), true)" :alt="'QuickGO chart of ' + top5Sentence"/>
                     </a>
                     <div>
                         Provided by <a @click="openInBrowser('https://www.ebi.ac.uk/QuickGO/annotations?goId=' + top5.map(x => x.code).join(','))" target="_blank">QuickGO</a>.

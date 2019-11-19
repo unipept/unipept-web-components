@@ -31,7 +31,7 @@ export function addCopy(selector, textFunction, tooltip = "Copy to clipboard", c
             .tooltip("fixTitle");
     });
     clip.on("error", e => {
-        $el.attr("title", "So rry, something went wrong")
+        $el.attr("title", "Sorry, something went wrong")
             .tooltip("fixTitle")
             .tooltip("show")
             .attr("title", tooltip)

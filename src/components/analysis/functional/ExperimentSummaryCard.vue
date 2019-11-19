@@ -25,6 +25,40 @@
                 Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ $store.getters.missedPeptides.length }}</a> peptides couldn't be found.
             </span>
         </v-card-text>
+        <v-dialog v-model="showNotFoundModal" :width="600">
+            <v-card>
+                <v-card-title>
+                    {{ $store.getters.missedPeptides.length }} missed peptides
+                </v-card-title>
+                <v-card-text>
+                    <v-row>
+                        <v-col :cols="7">
+                            <span>
+                                Sorry, we didn't manage to find {{ $store.getters.missedPeptides.length }} of your 
+                                peptides. You can BLAST them by clicking the links or copy them by using the button on 
+                                the right.
+                            </span>
+                        </v-col>
+                        <v-col :cols="5">
+                            <v-btn class="copy-button">
+                                <v-icon left>
+                                    mdi-clipboard-text-outline
+                                </v-icon>
+                                Copy to clipboard
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    
+                    <ul>
+                        <li v-for="missed of $store.getters.missedPeptides" :key="missed">
+                            <a :href="getBlastUrl(missed)" target="_blank">
+                                {{ missed }}
+                            </a>
+                        </li>
+                    </ul>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -37,8 +71,7 @@ import SearchSettingsForm from "../SearchSettingsForm.vue";
 import CardHeader from "../../custom/CardHeader.vue";
 import CardTitle from "../../custom/CardTitle.vue";
 
-import { addCopy } from "../../../logic/utils";
-import { showInfoModal } from "../../../logic/modal";
+import Clipboard from "clipboard";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import Tooltip from "../../custom/Tooltip.vue";
@@ -50,11 +83,18 @@ export default class ExperimentSummaryCard extends Vue {
     private equateIl: boolean = true;
     private filterDuplicates: boolean = true;
     private missingCleavage: boolean = false;
+    private showNotFoundModal: boolean = false;
 
     created() {
         this.equateIl = this.$store.getters.searchSettings.il;
         this.filterDuplicates = this.$store.getters.searchSettings.dupes;
         this.missingCleavage = this.$store.getters.searchSettings.missed;
+    }
+
+    mounted() {
+        const clip = new Clipboard(".copy-button", {
+            text: () => this.$store.getters.missedPeptides.join("\n")
+        });
     }
 
     reprocess(): void {
@@ -67,31 +107,18 @@ export default class ExperimentSummaryCard extends Vue {
         }
     }
 
-    showNotFoundPeptidesModal() {
-        let missedPeptidesHTML = "";
-        for (let missedPeptide of this.$store.getters.missedPeptides) {
-            missedPeptidesHTML += `
-                <li>
-                    <a target="_blank" href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&SET_SAVED_SEARCH=on&USER_FORMAT_DEFAULTS=on&PAGE=Proteins&PROGRAM=blastp&QUERY=${missedPeptide}&GAPCOSTS=11%201&EQ_MENU=Enter%20organism%20name%20or%20id--completions%20will%20be%20suggested&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=10&WORD_SIZE=3&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&OLD_BLAST=false">${missedPeptide}</a>
-                    <span class="glyphicon glyphicon-share-alt"></span>
-                </li>
-            `;
-        }
+    private showNotFoundPeptidesModal() {
+        this.showNotFoundModal = true;
+    }
 
-        let missedPeptidesCount = this.$store.getters.searchedPeptides - this.$store.getters.matchedPeptides;
-
-        let modalContent = `
-            <div class="card-supporting-text">
-                <button class="btn btn-default pull-right copy-button"><span class="glyphicon glyphicon-copy"></span></button>
-                Sorry, we didn't manage to find ${missedPeptidesCount} of your peptides. You can BLAST them by clicking the links or copy them by using the button on the right.
-            </div>
-            <ul>
-                ${missedPeptidesHTML}
-            </ul>
-        `;
-
-        let modal = showInfoModal(missedPeptidesCount + " missed peptides", modalContent);
-        addCopy($(".copy-button")[0], () => this.$store.getters.missedPeptides.join("\n"), "Copy list to clipboard", modal[0]);
+    private getBlastUrl(peptide: string) {
+        return "http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&SET_SAVED_SEARCH=on" +
+            "&USER_FORMAT_DEFAULTS=on&PAGE=Proteins&PROGRAM=blastp&QUERY=" + peptide + "&GAPCOSTS=11%201" + 
+            "&EQ_MENU=Enter%20organism%20name%20or%20id--completions%20will%20be%20suggested&DATABASE=nr" +
+            "&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=10&WORD_SIZE=3" + 
+            "&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&SHOW_OVERVIEW=on&SHOW_LINKOUT=on" + 
+            "&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100" + 
+            "&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&OLD_BLAST=false"
     }
 }
 </script>

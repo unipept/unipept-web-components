@@ -28,7 +28,6 @@ export class PeptideContainerProcessor extends ProgressPublisher {
                     break;
                 }
             };
-            console.log(this._worker);
             this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig, baseUrl: baseUrl });
         });
     }
