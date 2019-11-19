@@ -35,12 +35,9 @@
             </v-list>
             <div style="padding-bottom: 16px; padding-left: 16px; padding-right: 16px;">
                 <search-settings-form
-                    :equate-il="equateIl"
-                    v-on:equate-il-change="equateIl = $event"
-                    :filter-duplicates="filterDuplicates"
-                    v-on:filter-duplicates-change="filterDuplicates = $event"
-                    :missing-cleavage="missingCleavage"
-                    v-on:missing-cleavage="missingCleavage = $event"
+                    :equate-il.sync="equateIl"
+                    :filter-duplicates.sync="filterDuplicates"
+                    :missing-cleavage.sync="missingCleavage"
                     class="selected-dataset-settings">
                 </search-settings-form>            
                 <div class="card-actions">
@@ -72,6 +69,7 @@ import CardTitle from "./../custom/CardTitle.vue";
 import CardHeader from "./../custom/CardHeader.vue";
 import Tooltip from "./../custom/Tooltip.vue";
 import { EventBus } from "./../EventBus";
+import MPAConfig from "../../logic/data-management/MPAConfig";
 
 @Component({
     components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
@@ -86,13 +84,11 @@ export default class SelectDatasetsCard extends Vue {
 
     private shaking: boolean = false;
 
-    created() {
-        this.updateSearchSettings();
-    }
-
-    mounted() {
-        console.log("Select datasets card!");
-        console.log(this.selectedDatasets);
+    private mounted() {
+        const settings: MPAConfig = this.$store.getters.searchSettings;
+        this.equateIl = settings.il;
+        this.filterDuplicates = settings.dupes;
+        this.missingCleavage = settings.missed;
     }
 
     public search(): void {
@@ -119,16 +115,17 @@ export default class SelectDatasetsCard extends Vue {
         EventBus.$emit("deselect-dataset", dataset);
     }
 
-    private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
-        this.equateIl = equateIl;
-        this.filterDuplicates = filterDuplicates;
-        this.missingCleavage = missingCleavage;
-
-        EventBus.$emit("update-search-settings", {
+    @Watch("equateIl")
+    @Watch("filterDuplicates")
+    @Watch("missingCleavage")
+    private updateSearchSettings() {
+        const settings: MPAConfig = {
             il: this.equateIl,
-            dupes: this.filterDuplicates, 
+            dupes: this.filterDuplicates,
             missed: this.missingCleavage
-        });
+        }
+
+        this.$store.dispatch("setSearchSettings", settings);
     }
 }
 </script>
