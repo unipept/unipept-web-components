@@ -49,7 +49,6 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <image-download-modal ref="imageDownloadModal"/>
                 <div v-if="isFullScreen" class="fullscreen-buttons-container">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
@@ -83,6 +82,7 @@
                             </v-card-text>
                         </div>
                     </v-card>
+                    <image-download-modal ref="imageDownloadModal"/>
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
@@ -215,9 +215,9 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private switchToFullScreen() {
         // @ts-ignore
-        if (window.fullScreenApi.supportsFullScreen) {
+        if (!this.isFullScreen && window.fullScreenApi.supportsFullScreen) {
             this.isFullScreen = true;
-            this.$refs.fullScreenContainer.toggle();
+            this.$refs.fullScreenContainer.enter();
             // @ts-ignore
             logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
             $(".tip").appendTo(".full-screen-container");
@@ -225,13 +225,19 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     private exitFullScreen() {
+        console.log("EXIT FULLSCREEN!");
         this.isFullScreen = false;
-        this.$refs.fullScreenContainer.toggle();
+        this.$refs.fullScreenContainer.exit();
         $(".tip").appendTo("body");
     }
 
     private fullScreenChange(state: boolean) {
-        this.isFullScreen = state;
+        console.log("CHANGE!!");
+        if (!state) {
+            this.exitFullScreen();
+        } else {
+            this.switchToFullScreen();
+        }
     }
 
     private async prepareImage() {
@@ -278,25 +284,9 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         display: flex;
         align-items: center;
     }
-    
-    /* .fullscreen-nav {
-        position: absolute;
-        z-index: 1;
-        right: 16px;
-        top: 16px;
-    }
 
-    .unipept-logo {
-        z-index: 100;
-        position: absolute;
-        top: 10px;
-        left: 10px;
+    .full-screen-container .tip {
+        position: relative;
+        top: -300px;
     }
-
-    .fullScreenButtons {
-        position: absolute;
-        z-index: 10;
-        right: 16px;
-        top: 5px;
-    } */
 </style>
