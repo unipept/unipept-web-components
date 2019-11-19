@@ -1,5 +1,5 @@
 <template>
-    <div id="treeviewWrapper" ref="treeviewWrapper">
+    <div id="treeviewWrapper" ref="treeviewWrapper" style="height: 100%;">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>

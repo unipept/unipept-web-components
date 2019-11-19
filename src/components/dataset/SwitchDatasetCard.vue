@@ -47,7 +47,7 @@
                 <v-divider></v-divider>
                 <div class="card-actions">
                     <tooltip message="Compare samples above using a heatmap.">
-                        <v-btn @click="compareDatasets()">Compare samples</v-btn>
+                        <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="compareDatasets()">Compare samples</v-btn>
                     </tooltip>
                 </div>
             </v-card-text>
@@ -83,6 +83,7 @@ import CardTitle from "./../custom/CardTitle.vue";
 import HeatmapWizardMultiSample from "./../heatmap/HeatmapWizardMultiSample.vue";
 import Tooltip from "./../custom/Tooltip.vue";
 import { EventBus } from "./../EventBus";
+import Assay from "../../logic/data-management/assay/Assay";
 
 @Component({
     components: { CardTitle, CardHeader, HeatmapWizardMultiSample, Tooltip },
@@ -135,8 +136,10 @@ export default class SwitchDatasetCard extends Vue {
      * 
      * @param container The dataset that's currently activated by the user.
      */
-    private activateDataset(container: PeptideContainer) {
-        EventBus.$emit("activate-dataset", container);
+    private activateDataset(container: Assay) {
+        if (container.progress === 1) {
+            EventBus.$emit("activate-dataset", container); 
+        }
     }
 }
 </script>
