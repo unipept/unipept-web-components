@@ -216,11 +216,9 @@ const mpaActions: ActionTree<GlobalState, any> = {
         store.commit("INCREASE_DATASETS_IN_PROGRESS");
         mpaManager.processDataset(dataset, store.getters.searchSettings, store.getters.baseUrl)
             .then(() => {
-                console.log("Processed: ");
-                console.log(dataset);
+                store.commit("DECREASE_DATASETS_IN_PROGRESS");
                 if (store.getters.activeDataset === null) {
                     store.dispatch("setActiveDataset", dataset);
-                    store.commit("DECREASE_DATASETS_IN_PROGRESS");
                 }
             });
     },

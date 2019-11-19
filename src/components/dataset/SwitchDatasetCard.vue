@@ -111,6 +111,7 @@ export default class SwitchDatasetCard extends Vue {
         let idx: number = this.selectedDatasets.indexOf(dataset);
         this.selectedDatasets.splice(idx, 1);
         this.updateSelectedDatasets();
+        EventBus.$emit("deselect-dataset", dataset);
     }
 
     private toggleDatasetSelection(): void {
