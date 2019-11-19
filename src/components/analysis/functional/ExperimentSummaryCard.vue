@@ -1,32 +1,31 @@
 <template>
-    <div style="height: 100%;">
-        <v-card>
-            <card-header>
-                <card-title>
-                    Experiment Summary
-                </card-title>
-            </card-header>
-            <v-card-text>
-                <search-settings-form
-                    :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)"
-                    :equate-il.sync="equateIl"
-                    :filter-duplicates.sync="filterDuplicates"
-                    :missing-cleavage.sync="missingCleavage">
-                </search-settings-form>
-                <div class="card-actions">
-                    <tooltip message="Restart search with selected samples using the settings chosen above.">
-                        <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary"><v-icon left>mdi-restore</v-icon>Update</v-btn>
-                    </tooltip>
-                </div>
-                <v-divider></v-divider>
-                <span v-if="!$store.getters.activeDataset">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
-                <span v-else>
-                    We managed to match {{ $store.getters.matchedPeptides }} of your {{ $store.getters.searchedPeptides }} peptides.
-                    Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ $store.getters.missedPeptides.length }}</a> peptides couldn't be found.
-                </span>
-            </v-card-text>
-        </v-card>
-    </div>
+    <v-card style="min-height: 100%; display: flex; flex-direction: column;">
+        <card-header>
+            <card-title>
+                Experiment Summary
+            </card-title>
+        </card-header>
+        <v-card-text style="flex-grow: 1; display: flex; flex-direction: column;">
+            <search-settings-form
+                :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)"
+                :equate-il.sync="equateIl"
+                :filter-duplicates.sync="filterDuplicates"
+                :missing-cleavage.sync="missingCleavage"
+                style="flex-grow: 1;">
+            </search-settings-form>
+            <div class="card-actions" >
+                <tooltip message="Restart search with selected samples using the settings chosen above.">
+                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary"><v-icon left>mdi-restore</v-icon>Update</v-btn>
+                </tooltip>
+            </div>
+            <v-divider></v-divider>
+            <span v-if="!$store.getters.activeDataset">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
+            <span v-else>
+                We managed to match {{ $store.getters.matchedPeptides }} of your {{ $store.getters.searchedPeptides }} peptides.
+                Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ $store.getters.missedPeptides.length }}</a> peptides couldn't be found.
+            </span>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script lang="ts">

@@ -95,7 +95,6 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     ADD_STORED_DATASET(state: GlobalState, dataset: Assay) {
         state.storedDatasets.push(dataset);
-        this.$set(state, "storedDatasets", state.storedDatasets);
     },
     REMOVE_STORED_DATASET(state: GlobalState, dataset: Assay) {
         let index: number = state.storedDatasets.findIndex((value: Assay, index: number) => value.getId() === dataset.getId());
@@ -166,6 +165,7 @@ const mpaActions: ActionTree<GlobalState, any> = {
         }
     },
     deleteDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
+        store.dispatch("deselectDataset", dataset);
         let datasetManager: DatasetManager = new DatasetManager();
         datasetManager.deleteDatasetFromStorage(dataset).then(() => store.commit("REMOVE_STORED_DATASET", dataset));
     },
