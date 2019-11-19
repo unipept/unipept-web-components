@@ -1,5 +1,5 @@
 <template>
-    <div id="sunburstWrapper" ref="sunburstWrapper" style="height: 100%;">
+    <div id="sunburstWrapper" ref="sunburstWrapper">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
@@ -115,6 +115,19 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
     @import './../../assets/style/visualizations.css.less';
+
+    .full-screen #sunburstWrapper > .unipept-sunburst > svg {
+        position: relative;
+        left: -245px;
+    }
+
+    #sunburstWrapper {
+        height: 100%;
+    }
+
+    .full-screen #sunburstWrapper {
+        height: calc(100% - 48px);
+    }
 </style>
