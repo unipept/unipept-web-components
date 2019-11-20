@@ -40,7 +40,7 @@
                             </span>
                         </v-col>
                         <v-col :cols="5">
-                            <v-btn class="copy-button">
+                            <v-btn @click="copyToClipboard">
                                 <v-icon left>
                                     mdi-clipboard-text-outline
                                 </v-icon>
@@ -75,6 +75,7 @@ import Clipboard from "clipboard";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import Tooltip from "../../custom/Tooltip.vue";
+import * as clipboard from "clipboard-polyfill";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip }
@@ -91,12 +92,6 @@ export default class ExperimentSummaryCard extends Vue {
         this.missingCleavage = this.$store.getters.searchSettings.missed;
     }
 
-    mounted() {
-        const clip = new Clipboard(".copy-button", {
-            text: () => this.$store.getters.missedPeptides.join("\n")
-        });
-    }
-
     reprocess(): void {
         this.$store.dispatch("setSearchSettings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
 
@@ -105,6 +100,10 @@ export default class ExperimentSummaryCard extends Vue {
         for (let dataset of this.$store.getters.selectedDatasets) {
             promises.push(this.$store.dispatch("processDataset", dataset));
         }
+    }
+
+    private copyToClipboard() {
+        clipboard.writeText(this.$store.getters.missedPeptides.join("\n"));
     }
 
     private showNotFoundPeptidesModal() {
