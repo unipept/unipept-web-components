@@ -1,12 +1,10 @@
-import process from "./process";
+import process from "./process.js";
 
-const ctx: Worker = self as any;
-
-ctx.addEventListener("message", handleEvent);
+self.addEventListener("message", handleEvent);
 
 async function handleEvent(event){
     let result = await process(event.data.peptides, event.data.config, event.data.baseUrl, setProgress)
-    ctx.postMessage({ type: "result", value: result });
+    self.postMessage({ type: "result", value: result });
 }
 
 /**

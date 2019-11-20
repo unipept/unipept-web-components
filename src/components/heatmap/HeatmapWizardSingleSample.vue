@@ -178,38 +178,51 @@ export default class HeatmapWizardSingleSample extends Vue {
     }
 
     mounted() {
-        this.onHorizontalSelection(this.horizontalDataSource);
-        this.onVerticalSelection(this.verticalDataSource);
+        this.onHorizontalSelection();
+        this.onVerticalSelection();
         this.onNormalizerChange(this.normalizer);
     }
 
+    @Watch("dataRepository")
+    private async onDataRepositoryChanged() {
+        // Switch back to the first step of the configuration.
+        this.currentStep = 1;
+        // Update all DataSources.
+        await this.onHorizontalSelection();
+        await this.onVerticalSelection();
+    }
+
     @Watch("horizontalDataSource") 
-    async onHorizontalSelection(newValue: string){
+    private async onHorizontalSelection(){
         this.heatmapConfiguration.horizontalLoading = true;
-        this.heatmapConfiguration.horizontalDataSource = await this.dataSources.get(newValue).factory();
+        this.heatmapConfiguration.horizontalDataSource = await this.dataSources.get(this.horizontalDataSource).factory();
         this.heatmapConfiguration.horizontalLoading = false;
     }
 
     @Watch("verticalDataSource") 
-    async onVerticalSelection(newValue: string) {
+    private async onVerticalSelection() {
         this.heatmapConfiguration.verticalLoading = true;
-        this.heatmapConfiguration.verticalDataSource = await this.dataSources.get(newValue).factory();
+        this.heatmapConfiguration.verticalDataSource = await this.dataSources.get(this.verticalDataSource).factory();
         this.heatmapConfiguration.verticalLoading = false;
     }
 
     @Watch("normalizer") 
-    async onNormalizerChange(newValue: string) {
+    private async onNormalizerChange(newValue: string) {
         this.heatmapConfiguration.normalizer = await this.normalizationTypes.get(newValue).factory();
     }
 
-    updateHorizontalSelectedItems(newItems: Element[]) {
+    private updateHorizontalSelectedItems(newItems: Element[]) {
         this.heatmapConfiguration.horizontalSelectedItems = newItems;
     }
 
-    updateVerticalSelectedItems(newItems: Element[]) {
+    private updateVerticalSelectedItems(newItems: Element[]) {
         this.heatmapConfiguration.verticalSelectedItems = newItems;
     }
 
+    /**
+     * Compute a new heatmap when required. This means that the selected items, normalization or data source did change.
+     * If none of these items were updated, the previously computed heatmap is used.
+     */
     private async computeHeatmapAndProceed() {
         let newHash = sha256(this.normalizer + this.horizontalDataSource + this.verticalDataSource + this.heatmapConfiguration.horizontalSelectedItems.toString() + this.heatmapConfiguration.verticalSelectedItems.toString()).toString();
 
@@ -256,20 +269,20 @@ export default class HeatmapWizardSingleSample extends Vue {
 </script>
 
 <style>
-    .v-stepper__wrapper {
-        display: flex;
-        flex-direction: column;
-    }
+.v-stepper__wrapper {
+    display: flex;
+    flex-direction: column;
+}
 
-    .continue-button {
-        align-self: flex-end;
-    }
+.continue-button {
+    align-self: flex-end;
+}
 
-    .heatmap {
-        display: flex;
-    }
+.heatmap {
+    display: flex;
+}
 
-    .heatmap > svg {
-        margin: auto;
-    }
+.heatmap > svg {
+    margin: auto;
+}
 </style>

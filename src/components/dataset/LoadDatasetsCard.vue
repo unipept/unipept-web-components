@@ -38,7 +38,7 @@
                                 Unable to retrieve list of sample datasets.
                             </v-alert>
                         </div>
-                        <p v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
+                        <div v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
                             <b>Environment:</b> {{ dataset.environment }}
                             <br>
                             <b>Reference:</b>
@@ -52,15 +52,17 @@
                                 </a>
                             </small>
                             <br>
-                            <v-row>
-                                <v-col :cols="9">
-                                    <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
-                                </v-col>
-                                <v-col :cols="3" style="display: flex; align-items: center;">
-                                    <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
-                                </v-col>
-                            </v-row>
-                        </p>
+                            <div class="load-sample-container">
+                                <v-row>
+                                    <v-col :cols="7">
+                                        <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
+                                    </v-col>
+                                    <v-col :cols="5" style="display: flex; align-items: center;">
+                                        <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
+                                    </v-col>
+                                </v-row>
+                            </div>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-tab-item>
@@ -99,32 +101,32 @@
                     </v-card-text>
                     <v-list two-line>
                         <template v-for="dataset of storedDatasets">
-                            <v-list-tile :key="dataset.id" ripple @click="selectDataset(dataset)">
-                                <v-list-tile-action>
+                            <v-list-item :key="dataset.id" ripple @click="selectDataset(dataset)">
+                                <v-list-item-action>
                                     <tooltip message="Select this dataset for analysis.">
                                         <v-icon>mdi-plus</v-icon>
                                     </tooltip>
-                                </v-list-tile-action>
-                                <v-list-tile-content>
-                                    <v-list-tile-title>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>
                                         {{ dataset.getName() }}
-                                    </v-list-tile-title>
-                                    <v-list-tile-sub-title>
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle>
                                         {{ dataset.getAmountOfPeptides() }} peptides
-                                    </v-list-tile-sub-title>
-                                </v-list-tile-content>
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
 
-                                <v-list-tile-action>
-                                    <v-list-tile-action-text>
+                                <v-list-item-action>
+                                    <v-list-item-action-text>
                                         {{ dataset.getDateFormatted() }}
-                                    </v-list-tile-action-text>
+                                    </v-list-item-action-text>
                                     <tooltip message="Delete this sample from local storage.">
                                         <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
                                             <v-icon color="grey darken-1">mdi-close</v-icon>
                                         </v-btn>
                                     </tooltip>
-                                </v-list-tile-action>
-                            </v-list-tile>
+                                </v-list-item-action>
+                            </v-list-item>
                         </template>
                     </v-list>
                 </v-card>
@@ -293,7 +295,8 @@ export default class LoadDatasetsCard extends Vue {
     }
 
     private deleteDataset(dataset: Assay): void {
-        EventBus.$emit("deselect-dataset", dataset);
+        this.$store.dispatch("deleteDataset", dataset);
+        EventBus.$emit("delete-dataset", dataset);
     }
 
     private storeDataset(peptides: string, name: string, save: boolean): void {
@@ -330,5 +333,9 @@ export default class LoadDatasetsCard extends Vue {
         display: flex !important;
         flex-direction: row;
         justify-content: space-between;
+    }
+
+    .load-sample-container .row {
+        flex-wrap: nowrap;
     }
 </style>

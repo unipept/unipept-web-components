@@ -19,37 +19,37 @@ import FaSortSettings from "./FaSortSettings";
 import { Node } from "../../logic/data-management/Node";
 import FAElement from "../../logic/functional-annotations/FAElement";
 
-    @Component({
-        components: {
-            AmountTable
-        }
-    })
+@Component({
+    components: {
+        AmountTable
+    }
+})
 export default class GoAmountTable extends Vue {
-        @Prop({ required: true })
-        private items: GoTerm[]
-        @Prop({ required: true })
-        private searchSettings: FaSortSettings;
-        @Prop({ required: true })
-        private namespace: GoNameSpace;
-        // The Sample that should be summarized in this AmountTable
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
+    @Prop({ required: true })
+    private items: GoTerm[]
+    @Prop({ required: true })
+    private searchSettings: FaSortSettings;
+    @Prop({ required: true })
+    private namespace: GoNameSpace;
+    // The Sample that should be summarized in this AmountTable
+    @Prop({ required: true })
+    private dataRepository: DataRepository;
 
-        private async taxaRetriever(term: GoTerm): Promise<Node> {
-            if (this.dataRepository) {
-                let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
-                let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
-            }
+    private async taxaRetriever(term: GoTerm): Promise<Node> {
+        if (this.dataRepository) {
+            let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
+            let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
+            return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
         }
+    }
 
-        private async summaryRetriever(term: GoTerm): Promise<string[][]> {
-            if (this.dataRepository) {
-                let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                return goDataSource.getGoTermSummary(term);
-            }
-            return []
+    private async summaryRetriever(term: GoTerm): Promise<string[][]> {
+        if (this.dataRepository) {
+            let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
+            return goDataSource.getGoTermSummary(term);
         }
+        return []
+    }
 }
 </script>
 

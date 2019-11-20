@@ -5,9 +5,11 @@
                 Metaproteomics Analysis
             </card-title>
         </card-header>
-        <v-card-text style="display: flex; flex-direction: column; flex-grow: 1;">
-            <h3>Selected datasets</h3>
-            <span v-if="selectedDatasets.length === 0" :class="{'shaking': shaking, 'selected-placeholder': true}">Please select one or more datasets from the right hand panel to continue the analysis..</span>
+        <v-card-text style="display: flex; flex-direction: column; flex-grow: 1; padding: 0;">
+            <div style="padding-top: 16px; padding-left: 16px; padding-right: 16px;">
+                <h3>Selected datasets</h3>
+                <span v-if="selectedDatasets.length === 0" :class="{'shaking': shaking, 'selected-placeholder': true}">Please select one or more datasets from the right hand panel to continue the analysis..</span>
+            </div>
             <v-list two-line class="switch-datasets-list" style="flex-grow: 1;">
                 <v-list-item v-for="dataset of selectedDatasets" two-line :key="dataset.id" >
                     <v-list-item-content>
@@ -31,28 +33,27 @@
                     </v-list-item-action>
                 </v-list-item>
             </v-list>
-            <search-settings-form
-                :equate-il="equateIl"
-                v-on:equate-il-change="equateIl = $event"
-                :filter-duplicates="filterDuplicates"
-                v-on:filter-duplicates-change="filterDuplicates = $event"
-                :missing-cleavage="missingCleavage"
-                v-on:missing-cleavage="missingCleavage = $event"
-                class="selected-dataset-settings">
-            </search-settings-form>            
-            <div class="card-actions">
-                <v-btn @click="search()" color="primary">
-                    <v-icon left>
-                        mdi-magnify
-                    </v-icon>
-                    Search
-                </v-btn>
-                <v-btn @click="reset()">
-                    <v-icon left>
-                        mdi-restore
-                    </v-icon>
-                    Start over
-                </v-btn>
+            <div style="padding-bottom: 16px; padding-left: 16px; padding-right: 16px;">
+                <search-settings-form
+                    :equate-il.sync="equateIl"
+                    :filter-duplicates.sync="filterDuplicates"
+                    :missing-cleavage.sync="missingCleavage"
+                    class="selected-dataset-settings">
+                </search-settings-form>            
+                <div class="card-actions">
+                    <v-btn @click="search()" color="primary">
+                        <v-icon left>
+                            mdi-magnify
+                        </v-icon>
+                        Search
+                    </v-btn>
+                    <v-btn @click="reset()">
+                        <v-icon left>
+                            mdi-restore
+                        </v-icon>
+                        Start over
+                    </v-btn>
+                </div>
             </div>
         </v-card-text>
     </v-card>
@@ -62,12 +63,13 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import Assay from "../../logic/data-management/assay/Assay";
-import SearchSettingsForm from "../analysis/SearchSettingsForm.vue";
-import CardTitle from "../custom/CardTitle.vue";
-import CardHeader from "../custom/CardHeader.vue";
-import Tooltip from "../custom/Tooltip.vue";
-import { EventBus } from "../EventBus";
+import Assay from "./../../logic/data-management/assay/Assay";
+import SearchSettingsForm from "./../analysis/SearchSettingsForm.vue";
+import CardTitle from "./../custom/CardTitle.vue";
+import CardHeader from "./../custom/CardHeader.vue";
+import Tooltip from "./../custom/Tooltip.vue";
+import { EventBus } from "./../EventBus";
+import MPAConfig from "../../logic/data-management/MPAConfig";
 
 @Component({
     components: { CardHeader, CardTitle, SearchSettingsForm, Tooltip }
@@ -82,13 +84,11 @@ export default class SelectDatasetsCard extends Vue {
 
     private shaking: boolean = false;
 
-    created() {
-        this.updateSearchSettings();
-    }
-
-    mounted() {
-        console.log("Select datasets card!");
-        console.log(this.selectedDatasets);
+    private mounted() {
+        const settings: MPAConfig = this.$store.getters.searchSettings;
+        this.equateIl = settings.il;
+        this.filterDuplicates = settings.dupes;
+        this.missingCleavage = settings.missed;
     }
 
     public search(): void {
@@ -115,16 +115,17 @@ export default class SelectDatasetsCard extends Vue {
         EventBus.$emit("deselect-dataset", dataset);
     }
 
-    private updateSearchSettings(equateIl: boolean = true, filterDuplicates: boolean = true, missingCleavage: boolean = true) {
-        this.equateIl = equateIl;
-        this.filterDuplicates = filterDuplicates;
-        this.missingCleavage = missingCleavage;
-
-        EventBus.$emit("update-search-settings", {
+    @Watch("equateIl")
+    @Watch("filterDuplicates")
+    @Watch("missingCleavage")
+    private updateSearchSettings() {
+        const settings: MPAConfig = {
             il: this.equateIl,
-            dupes: this.filterDuplicates, 
+            dupes: this.filterDuplicates,
             missed: this.missingCleavage
-        });
+        }
+
+        this.$store.dispatch("setSearchSettings", settings);
     }
 }
 </script>

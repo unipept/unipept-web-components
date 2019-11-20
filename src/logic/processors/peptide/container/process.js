@@ -1,19 +1,15 @@
-import { ProcessedPeptideContainer } from "../../../data-management/ProcessedPeptideContainer";
-import { postJSON } from "../../../utils";
-import { PeptideData } from "../../../api/pept2data/Response";
-import MPAConfig from "../../../data-management/MPAConfig";
-
+import { postJSON } from "unipept-web-components/src/logic/utils";
 const BATCH_SIZE = 100;
 const API_ENDPOINT = "/mpa/pept2data";
 
-export default async function process(peptides: string[], config: MPAConfig, baseUrl: string, setProgress: (number) => void) : Promise<ProcessedPeptideContainer> {
+export default async function process(peptides, config, baseUrl, setProgress) {
     var preparedPeptides = preparePeptides(peptides, config);
     const peptideList = Array.from(preparedPeptides.keys());
 
     var numSearched = [...preparedPeptides.values()].reduce((a, b) => a + b, 0);
     var numMatched = 0;
 
-    var response = new Map<string, PeptideData>();
+    var response = new Map();
 
     setProgress(0.1);
 
@@ -51,7 +47,7 @@ export default async function process(peptides: string[], config: MPAConfig, bas
  * Prepares the list of originalPeptides for use in the application by
  * cleaving, filtering, equating IL and finally generating a frequency table
  */
-function preparePeptides(originalPeptides : string[], config: MPAConfig) {
+function preparePeptides(originalPeptides, config) {
     let peptides = cleavePeptides(originalPeptides, config.missed);
     peptides = filterShortPeptides(peptides);
     peptides = equateIL(peptides, config.il);
@@ -62,7 +58,7 @@ function preparePeptides(originalPeptides : string[], config: MPAConfig) {
  * Split all peptides after every K or R if not followed by P if
  * advancedMissedCleavageHandling isn't set
  */
-function cleavePeptides(peptides: string[], advancedMissedCleavageHandling: boolean) {
+function cleavePeptides(peptides, advancedMissedCleavageHandling) {
     if (!advancedMissedCleavageHandling) {
         return peptides.join("+")
             .replace(/([KR])([^P])/g, "$1+$2")
@@ -75,14 +71,14 @@ function cleavePeptides(peptides: string[], advancedMissedCleavageHandling: bool
 /**
  * Filters out all peptides with a length lower than 5
  */
-function filterShortPeptides(peptides: string[]) {
+function filterShortPeptides(peptides) {
     return peptides.filter(p => p.length >= 5);
 }
 
 /**
  * Replaces every I with an L if equateIL is set to true
  */
-function equateIL(peptides: string[], equateIL: boolean) {
+function equateIL(peptides, equateIL) {
     if (equateIL) {
         return peptides.map(p => p.replace(/I/g, "L"));
     }
@@ -92,8 +88,8 @@ function equateIL(peptides: string[], equateIL: boolean) {
 /**
  * Creates a frequency table for a list of peptides
  */
-function indexPeptides(peptides: string[], dupes: boolean) {
-    const peptideMap = new Map<string, number>();
+function indexPeptides(peptides, dupes) {
+    const peptideMap = new Map();
     for (const peptide of peptides) {
         const count = peptideMap.get(peptide) || 0;
         if (dupes) {

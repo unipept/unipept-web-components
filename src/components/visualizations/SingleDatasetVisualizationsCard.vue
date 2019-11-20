@@ -1,7 +1,7 @@
 -<template>
     <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
         <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
-            <v-tabs :color="isFullScreen ? 'accent' : tabsTextColor" :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
+            <v-tabs :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
                 <div v-if="isFullScreen" class="unipept-logo">
                     <img src="/images/trans_logo.png" alt="logo" width="40" height="40">
                 </div>
@@ -49,14 +49,13 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <image-download-modal ref="imageDownloadModal"/>
-                <div v-if="isFullScreen">
+                <div v-if="isFullScreen" class="fullscreen-buttons-container">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
                             mdi-restore
                         </v-icon>
                     </v-btn>
-                    <v-btn icon text @click="saveAsImage()">
+                    <v-btn icon text @click="prepareImage()">
                         <v-icon color="white">
                             mdi-download
                         </v-icon>
@@ -83,6 +82,7 @@
                             </v-card-text>
                         </div>
                     </v-card>
+                    <image-download-modal ref="imageDownloadModal" />
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
@@ -213,21 +213,15 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
-    mounted() {
-        document.addEventListener("fullscreenchange", () => {
-            if (document.fullscreenElement) {
-                this.exitFullScreen();
-            }
-        }, false);
-        // @ts-ignore (TODO: migrate to Vuetify)
-        // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
+    private mounted() {
+        
     }
-    
+
     private switchToFullScreen() {
         // @ts-ignore
-        if (window.fullScreenApi.supportsFullScreen) {
+        if (!this.isFullScreen && window.fullScreenApi.supportsFullScreen) {
             this.isFullScreen = true;
-            this.$refs.fullScreenContainer.toggle();
+            this.$refs.fullScreenContainer.enter();
             // @ts-ignore
             logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
             $(".tip").appendTo(".full-screen-container");
@@ -236,22 +230,27 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private exitFullScreen() {
         this.isFullScreen = false;
-        this.$refs.fullScreenContainer.toggle();
+        this.$refs.fullScreenContainer.exit();
         $(".tip").appendTo("body");
     }
 
     private fullScreenChange(state: boolean) {
-        this.isFullScreen = state;
+        if (!state) {
+            this.exitFullScreen();
+        } else {
+            this.switchToFullScreen();
+        }
     }
 
     private async prepareImage() {
+        this.exitFullScreen();
         const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
         // @ts-ignore
         logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
         if (this.tabs[this.tab] === "Sunburst") {
             d3.selectAll(".toHide").attr("class", "arc hidden");
-            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper svg")
+            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
             d3.selectAll(".hidden").attr("class", "arc toHide");
         } else if (this.tabs[this.tab] === "Treemap") {
             imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
@@ -283,25 +282,14 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         left: 50%;
         transform: translate(-35px);
     }
-    
-    /* .fullscreen-nav {
-        position: absolute;
-        z-index: 1;
-        right: 16px;
-        top: 16px;
+
+    .fullscreen-buttons-container {
+        display: flex;
+        align-items: center;
     }
 
-    .unipept-logo {
-        z-index: 100;
-        position: absolute;
-        top: 10px;
-        left: 10px;
+    .full-screen-container .tip {
+        position: relative;
+        top: -300px;
     }
-
-    .fullScreenButtons {
-        position: absolute;
-        z-index: 10;
-        right: 16px;
-        top: 5px;
-    } */
 </style>

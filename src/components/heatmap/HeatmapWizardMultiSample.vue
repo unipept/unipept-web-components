@@ -34,14 +34,6 @@ import {NormalizationType} from "./NormalizationType";
                     Please select at least one item for both axis of the heatmap.
                 </div>
                 <div v-else class="reorder-heatmap-buttons">
-                    <v-layout wrap>
-                        <v-flex xs12 sm6 md6>
-                            <v-checkbox v-model="clusterRows" label="Reorder rows?" :disabled="heatmapLoading"></v-checkbox>
-                        </v-flex>
-                        <v-flex xs12 sm6 md6>
-                            <v-checkbox v-model="clusterColumns" label="Reorder columns?" :disabled="heatmapLoading"></v-checkbox>
-                        </v-flex>
-                    </v-layout>
                     <v-progress-circular v-if="!heatmapData && selectedItems.length !== 0" indeterminate color="primary"></v-progress-circular>
                     <heatmap-visualization v-if="heatmapData && selectedItems.length !== 0" :data="heatmapData" :clusterRows="clusterRows" :clusterColumns="clusterColumns"></heatmap-visualization>
                 </div>
@@ -73,174 +65,174 @@ import Element from "../../logic/data-source/Element";
 import sha256 from "crypto-js/sha256";
 import MPAConfig from "../../logic/data-management/MPAConfig";
 
-    @Component({
-        components: { GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization }
-    })
+@Component({
+    components: { GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization }
+})
 export default class HeatmapWizardMultiSample extends Vue {
-        @Prop()
-        private dataset: Assay;
-        @Prop()
-        private searchSettings: MPAConfig;
+    @Prop()
+    private dataset: Assay;
+    @Prop()
+    private searchSettings: MPAConfig;
 
-        private clusterRows: boolean = true;
-        private clusterColumns: boolean = true;
+    private clusterRows: boolean = true;
+    private clusterColumns: boolean = true;
 
-        private heatmapLoading: boolean = false;
+    private heatmapLoading: boolean = false;
 
-        private currentStep: number = 1;
-        private heatmapConfiguration: HeatmapConfiguration = new HeatmapConfiguration();
+    private currentStep: number = 1;
+    private heatmapConfiguration: HeatmapConfiguration = new HeatmapConfiguration();
 
-        private heatmapData: HeatmapData = null;
-        // Keeps track of a hash of the previously computed data for the heatmap
-        private previouslyComputed: string = "";
+    private heatmapData: HeatmapData = null;
+    // Keeps track of a hash of the previously computed data for the heatmap
+    private previouslyComputed: string = "";
 
-        private dataSources: Map<string, {dataSourceComponent: string, factory: () => Promise<DataSource>}> = new Map([
-            [
-                "Taxa",
-                {
-                    dataSourceComponent: "taxa-data-source-component",
-                    factory: () => {
-                        let dataRepository = this.dataset.dataRepository;
-                        return dataRepository.createTaxaDataSource();
-                    }
+    private dataSources: Map<string, {dataSourceComponent: string, factory: () => Promise<DataSource>}> = new Map([
+        [
+            "Taxa",
+            {
+                dataSourceComponent: "taxa-data-source-component",
+                factory: () => {
+                    let dataRepository = this.dataset.dataRepository;
+                    return dataRepository.createTaxaDataSource();
                 }
-                
-            ],
-            [
-                "EC-Numbers", 
-                {
-                    dataSourceComponent: "ec-data-source-component",
-                    factory: () => {
-                        let dataRepository = this.dataset.dataRepository;
-                        return dataRepository.createEcDataSource();
-                    }
-                }
-                
-            ],
-            [
-                "GO-Terms", 
-                {
-                    dataSourceComponent: "go-data-source-component",
-                    factory: () => {
-                        let dataRepository = this.dataset.dataRepository;
-                        return dataRepository.createGoDataSource();
-                    }
-                }
-            ]
-        ]);
-
-        private normalizationTypes: Map<string, {information: string, factory: () => Normalizer}> = new Map([
-            [
-                "All",
-                {
-                    information: "Normalize over all data points of the input.",
-                    factory: () => new AllNormalizer()
-                }
-            ],
-            [
-                "Rows",
-                {
-                    information: "Normalize values on a row-per-row basis.",
-                    factory: () => new RowNormalizer()
-                }
-            ],
-            [
-                "Columns",
-                {
-                    information: "Normalize values on a column-per-column basis.",
-                    factory: () => new ColumnNormalizer()
-                }
-            ]
-        ]);
-
-        private dataSource: string = "";
-        private dataSourceItem: DataSource = null;
-        private dataSourceLoading: boolean = false;
-        private selectedItems: Element[] = [];
-        private normalizer: string = "";
-
-        created() {
-            this.dataSource = this.dataSources.keys().next().value;
-            this.normalizer = this.normalizationTypes.keys().next().value;
-        }
-
-        mounted() {
-            this.onHorizontalSelection(this.dataSource);
-            this.onNormalizerChange(this.normalizer);
-        }
-
-        @Watch("dataSource") 
-        async onHorizontalSelection(newValue: string){
-            this.dataSourceLoading = true;
-            this.dataSourceItem = await this.dataSources.get(newValue).factory();
-            this.dataSourceLoading = false;
-        }
-
-        @Watch("normalizer") 
-        async onNormalizerChange(newValue: string) {
-            this.heatmapConfiguration.normalizer = await this.normalizationTypes.get(newValue).factory();
-        }
-
-        updateSelectedItems(newItems: Element[]) {
-            this.selectedItems = newItems;
-        }
-
-        @Watch("clusterRows")
-        async onClusterRows() {
-            this.heatmapLoading = true;
-            await this.computeHeatmapAndProceed();
-            this.heatmapLoading = false;
-        }
-
-        @Watch("clusterColumns")
-        async onClusterColumns() {
-            this.heatmapLoading = true;
-            await this.computeHeatmapAndProceed();
-            this.heatmapLoading = false;
-        }
-
-        private async computeHeatmapAndProceed() {
-            let newHash = sha256(this.normalizer + this.dataSource + this.selectedItems.toString()).toString();
-
-            if (newHash === this.previouslyComputed) {
-                return;
             }
-
-            this.previouslyComputed = newHash;
-
-            // Go the next step in the wizard.
-            this.currentStep = 3;
-
-            let rows: HeatmapElement[] = [];
-            let cols: HeatmapElement[] = [];
-
-            let grid: number[][] = [];
             
-            for (let i = 0; i < this.selectedItems.length; i++) {
-                let item: Element = this.selectedItems[i];
-                rows.push({ id: i.toString(), name: item.name });
-            }
-
-            for (let i = 0; i < this.$store.getters.selectedDatasets.length; i++) {
-                let item: Assay = this.$store.getters.selectedDatasets[i];
-                cols.push({ id: i.toString(), name: item.getName() });
-            }
-
-            for (let item of this.selectedItems) {
-                let gridRow: number[] = [];
-                for (let container of this.$store.getters.selectedDatasets) {
-                    let value: number = (await item.getAffectedPeptides(container.dataRepository)).length;
-                    gridRow.push(value);
+        ],
+        [
+            "EC-Numbers", 
+            {
+                dataSourceComponent: "ec-data-source-component",
+                factory: () => {
+                    let dataRepository = this.dataset.dataRepository;
+                    return dataRepository.createEcDataSource();
                 }
-                grid.push(gridRow);
             }
+            
+        ],
+        [
+            "GO-Terms", 
+            {
+                dataSourceComponent: "go-data-source-component",
+                factory: () => {
+                    let dataRepository = this.dataset.dataRepository;
+                    return dataRepository.createGoDataSource();
+                }
+            }
+        ]
+    ]);
 
-            this.heatmapData = {
-                rows: rows,
-                columns: cols,
-                values: this.heatmapConfiguration.normalizer.normalize(grid)
-            };
+    private normalizationTypes: Map<string, {information: string, factory: () => Normalizer}> = new Map([
+        [
+            "All",
+            {
+                information: "Normalize over all data points of the input.",
+                factory: () => new AllNormalizer()
+            }
+        ],
+        [
+            "Rows",
+            {
+                information: "Normalize values on a row-per-row basis.",
+                factory: () => new RowNormalizer()
+            }
+        ],
+        [
+            "Columns",
+            {
+                information: "Normalize values on a column-per-column basis.",
+                factory: () => new ColumnNormalizer()
+            }
+        ]
+    ]);
+
+    private dataSource: string = "";
+    private dataSourceItem: DataSource = null;
+    private dataSourceLoading: boolean = false;
+    private selectedItems: Element[] = [];
+    private normalizer: string = "";
+
+    created() {
+        this.dataSource = this.dataSources.keys().next().value;
+        this.normalizer = this.normalizationTypes.keys().next().value;
+    }
+
+    mounted() {
+        this.onHorizontalSelection(this.dataSource);
+        this.onNormalizerChange(this.normalizer);
+    }
+
+    @Watch("dataSource") 
+    async onHorizontalSelection(newValue: string){
+        this.dataSourceLoading = true;
+        this.dataSourceItem = await this.dataSources.get(newValue).factory();
+        this.dataSourceLoading = false;
+    }
+
+    @Watch("normalizer") 
+    async onNormalizerChange(newValue: string) {
+        this.heatmapConfiguration.normalizer = await this.normalizationTypes.get(newValue).factory();
+    }
+
+    updateSelectedItems(newItems: Element[]) {
+        this.selectedItems = newItems;
+    }
+
+    @Watch("clusterRows")
+    async onClusterRows() {
+        this.heatmapLoading = true;
+        await this.computeHeatmapAndProceed();
+        this.heatmapLoading = false;
+    }
+
+    @Watch("clusterColumns")
+    async onClusterColumns() {
+        this.heatmapLoading = true;
+        await this.computeHeatmapAndProceed();
+        this.heatmapLoading = false;
+    }
+
+    private async computeHeatmapAndProceed() {
+        let newHash = sha256(this.normalizer + this.dataSource + this.selectedItems.toString()).toString();
+
+        if (newHash === this.previouslyComputed) {
+            return;
         }
+
+        this.previouslyComputed = newHash;
+
+        // Go the next step in the wizard.
+        this.currentStep = 3;
+
+        let rows: HeatmapElement[] = [];
+        let cols: HeatmapElement[] = [];
+
+        let grid: number[][] = [];
+        
+        for (let i = 0; i < this.selectedItems.length; i++) {
+            let item: Element = this.selectedItems[i];
+            rows.push({ id: i.toString(), name: item.name });
+        }
+
+        for (let i = 0; i < this.$store.getters.selectedDatasets.length; i++) {
+            let item: Assay = this.$store.getters.selectedDatasets[i];
+            cols.push({ id: i.toString(), name: item.getName() });
+        }
+
+        for (let item of this.selectedItems) {
+            let gridRow: number[] = [];
+            for (let container of this.$store.getters.selectedDatasets) {
+                let value: number = (await item.getAffectedPeptides(container.dataRepository)).length;
+                gridRow.push(value);
+            }
+            grid.push(gridRow);
+        }
+
+        this.heatmapData = {
+            rows: rows,
+            columns: cols,
+            values: this.heatmapConfiguration.normalizer.normalize(grid)
+        };
+    }
 }
 </script>
 

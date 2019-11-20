@@ -33,7 +33,17 @@
                 </td>
             </template>
             <template v-slot:[`item.${searchSettings.field}`]="{ item }">
-                {{searchSettings.format(item)}}
+                <div :style="{
+                        padding: '12px', 
+                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.fractionOfPepts * 100 + '%, rgba(255,255,255,0) ' + item.fractionOfPepts * 100 + '%)',
+                }">
+                    {{searchSettings.format(item)}}
+                </div>
+            </template>
+            <template v-slot:Name="{ item }">
+                <span style="text-overflow: ellipsis;">
+                     {{ item.name }}
+                </span>
             </template>
             <template v-slot:item.action="{ item }">
                 <v-tooltip :open-delay=1000 bottom>
@@ -74,7 +84,7 @@ import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
                 text: this.searchSettings.name,
                 align: "left",
                 value: this.searchSettings.field,
-                width: "15%"
+                width: "20%"
             }, {
                 text: this.annotationName,
                 align: "left",
@@ -84,7 +94,7 @@ import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
                 text: "Name",
                 align: "left",
                 value: "name",
-                width: "45%"
+                width: "40%"
             }, {
                 text: "Actions",
                 align: "center",

@@ -14,8 +14,7 @@
                 class="white--text align-end"
                 max-height="600px"
                 min-height="200px"
-                :src="pngDataURL"
-            />
+                :src="pngDataURL" />
             <v-card-actions class="justify-center">
                 <v-btn v-if="svgDownload" @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
                 <v-btn @click="savePNG()" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
@@ -36,49 +35,49 @@ import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { dom2pngDataURL, svg2svgDataURL, svg2pngDataURL, downloadDataByLink } from "../../logic/utils";
 
-    @Component
+@Component
 export default class ImageDownloadModal extends Vue {
-        private downloadDialogOpen: boolean = false;
-        private preparingImage: boolean = false;
+    private downloadDialogOpen: boolean = false;
+    private preparingImage: boolean = false;
 
-        private svgDownload: boolean = false;
+    private svgDownload: boolean = false;
 
-        private baseFileName: string = "";
+    private baseFileName: string = "";
 
-        private svgDataURL: string = "";
-        private pngDataURL: string = "";
+    private svgDataURL: string = "";
+    private pngDataURL: string = "";
 
-        async downloadSVG(baseFileName, selector) {
-            this.svgDownload = true;
-            this.baseFileName = baseFileName;
+    async downloadSVG(baseFileName, selector) {
+        this.svgDownload = true;
+        this.baseFileName = baseFileName;
 
-            this.preparingImage = true;
-            this.downloadDialogOpen = true;
+        this.preparingImage = true;
+        this.downloadDialogOpen = true;
 
-            this.svgDataURL = await svg2svgDataURL(selector);
-            this.pngDataURL = await svg2pngDataURL(selector);
+        this.svgDataURL = await svg2svgDataURL(selector);
+        this.pngDataURL = await svg2pngDataURL(selector);
 
-            this.preparingImage = false;
-        }
+        this.preparingImage = false;
+    }
 
-        async downloadPNG(baseFileName, selector) {
-            this.baseFileName = baseFileName;
+    async downloadPNG(baseFileName, selector) {
+        this.baseFileName = baseFileName;
 
-            this.preparingImage = true;
-            this.downloadDialogOpen = true;
+        this.preparingImage = true;
+        this.downloadDialogOpen = true;
 
-            this.pngDataURL = await dom2pngDataURL(selector);
+        this.pngDataURL = await dom2pngDataURL(selector);
 
-            this.preparingImage = false;
-        }
+        this.preparingImage = false;
+    }
 
-        private async savePNG() {
-            downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
-        }
+    private async savePNG() {
+        downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
+    }
 
-        private async saveSVG() {
-            downloadDataByLink(this.svgDataURL, this.baseFileName + ".svg")
-        }
+    private async saveSVG() {
+        downloadDataByLink(this.svgDataURL, this.baseFileName + ".svg")
+    }
 }
 </script>
 
