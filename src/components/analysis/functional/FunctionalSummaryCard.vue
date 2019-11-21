@@ -116,7 +116,7 @@
                                     <h2>{{ goData[idx].title }}</h2>
                                     <v-row>
                                         <v-col :cols="9">
-                                            <go-amount-table :dataRepository="dataRepository" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
+                                            <go-amount-table :loading="faCalculationsInProgress" :dataRepository="dataRepository" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
                                         </v-col>
                                         <v-col :cols="3">
                                             <quick-go-card :sort-settings="faSortSettings" :items="goData[idx].goTerms"></quick-go-card>
@@ -143,7 +143,7 @@
                                 <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
                                 <span v-html="ecTrustLine"></span>
                                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                                <ec-amount-table :dataRepository="dataRepository" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
+                                <ec-amount-table :loading="faCalculationsInProgress" :dataRepository="dataRepository" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
                                 <v-card outlined v-if="ecTreeData">
                                     <v-btn small depressed class="item-treeview-dl-btn" @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
                                         <v-icon>mdi-download</v-icon>
@@ -380,7 +380,7 @@ export default class FunctionalSummaryCard extends Vue {
                 this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
             }
 
-            this.doFAcalculations(sequences);
+            await this.doFAcalculations(sequences);
         }
     }
 
