@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-data-table :headers="tableHeaders" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
+        <v-data-table :headers="tableHeaders" :loading="loading" :items="items" :items-per-page="5" item-key="code" show-expand :expanded.sync="expandedItemsList">
             <template v-slot:top>
                 <v-tooltip :open-delay=1000 bottom>
                     <template v-slot:activator="{ on }">
@@ -122,6 +122,8 @@ export default class AmountTable extends Vue {
         protected annotationName: string;
         @Prop({ required: false })
         protected namespace: string;
+        @Prop({ required: false, default: false })
+        protected loading: boolean;
 
         // Keeps track of the functional annotations for which a Tree has already been calculated.
         private treeAvailable: Map<FAElement, Node> = new Map();

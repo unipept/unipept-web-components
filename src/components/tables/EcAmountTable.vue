@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" annotation-name="EC number" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
+    <amount-table :items="items" :loading="loading" annotation-name="EC number" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -29,6 +29,8 @@ export default class EcAmountTable extends Vue {
     // The Sample that should be summarized in this AmountTable.
     @Prop({ required: true })
     private dataRepository: DataRepository;
+    @Prop({ required: false, default: false })
+    private loading: boolean;
 
     private async taxaRetriever(number: EcNumber): Promise<Node> {
         if (this.dataRepository) {

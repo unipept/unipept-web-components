@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
+    <amount-table :items="items" :loading="loading" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -31,8 +31,11 @@ export default class GoAmountTable extends Vue {
     private searchSettings: FaSortSettings;
     @Prop({ required: true })
     private namespace: GoNameSpace;
-    // The Sample that should be summarized in this AmountTable
+    // The sample that should be summarized in this AmountTable
     @Prop({ required: true })
+    @Prop({ required: false, default: false })
+    private loading: boolean;
+
     private dataRepository: DataRepository;
 
     private async taxaRetriever(term: GoTerm): Promise<Node> {
