@@ -1,6 +1,7 @@
 import { addCopy, highlight, logToGoogle } from "../utils";
 import * as d3 from "d3";
 import * as d3Select from "d3-selection";
+import * as clipboard from "clipboard-polyfill"
 
 /**
  * Constructs a Searchtree object
@@ -156,8 +157,10 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
             infoPane.find("h4.own").before("<div id='copy-own' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
-            // TODO Fix this
-            // addCopy("#copy-own span", () => ownSequences.join("\n"));
+            
+            $("#copy-own span").click(() => {
+                clipboard.writeText(ownSequences.join("\n"));
+            })
         }
         allSequences = dataTree.getAllSequences(d).sort();
         if (allSequences && allSequences.length > 0 && allSequences.length !== (ownSequences ? ownSequences.length : 0)) {
@@ -168,8 +171,10 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
             infoPane.find("h4.all").before("<div id='copy-all' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
-            // TODO Fix this
-            // addCopy("#copy-all span", () => allSequences.join("\n"));
+            
+            $("#copy-all span").click(() => {
+                clipboard.writeText(ownSequences.join("\n"));
+            })
         }
         return false;
     }
