@@ -1,6 +1,7 @@
 import { addCopy, highlight, logToGoogle } from "../utils";
 import * as d3 from "d3";
 import * as d3Select from "d3-selection";
+import * as clipboard from "clipboard-polyfill"
 
 /**
  * Constructs a Searchtree object
@@ -149,27 +150,31 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
 
         ownSequences = dataTree.getOwnSequences(d).sort();
         if (ownSequences && ownSequences.length > 0) {
-            stringBuffer = "<h4 class='own'>Peptides specific for this taxon</h4><ul>";
+            stringBuffer = "<h4 class='own' style='font-size:16px;'>Peptides specific for this taxon</h4><ul style='max-height: 200px; overflow-y: auto; margin-top: 16px;'>";
             for (i = 0; i < ownSequences.length; i++) {
                 stringBuffer += `<li><a href='/sequences/${ownSequences[i]}/${equateIL}' title='Tryptic Peptide Analysis of ${ownSequences[i]}' target='_blank'>${ownSequences[i]}</a></li>`;
             }
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
             infoPane.find("h4.own").before("<div id='copy-own' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
-            // TODO Fix this
-            // addCopy("#copy-own span", () => ownSequences.join("\n"));
+            
+            $("#copy-own span").click(() => {
+                clipboard.writeText(ownSequences.join("\n"));
+            })
         }
         allSequences = dataTree.getAllSequences(d).sort();
         if (allSequences && allSequences.length > 0 && allSequences.length !== (ownSequences ? ownSequences.length : 0)) {
-            stringBuffer = "<h4 class='all'>Peptides specific to this taxon or its subtaxa</h4><ul>";
+            stringBuffer = "<h4 class='all' style='font-size: 16px;'>Peptides specific to this taxon or its subtaxa</h4><ul style='max-height: 200px; overflow-y: auto; margin-top: 16px;'>";
             for (i = 0; i < allSequences.length; i++) {
                 stringBuffer += `<li><a href='/sequences/${allSequences[i]}/${equateIL}' title='Tryptic Peptide Analysis of ${allSequences[i]}' target='_blank'>${allSequences[i]}</a></li>`;
             }
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
             infoPane.find("h4.all").before("<div id='copy-all' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
-            // TODO Fix this
-            // addCopy("#copy-all span", () => allSequences.join("\n"));
+            
+            $("#copy-all span").click(() => {
+                clipboard.writeText(ownSequences.join("\n"));
+            })
         }
         return false;
     }
