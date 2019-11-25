@@ -150,7 +150,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
 
         ownSequences = dataTree.getOwnSequences(d).sort();
         if (ownSequences && ownSequences.length > 0) {
-            stringBuffer = "<h4 class='own'>Peptides specific for this taxon</h4><ul>";
+            stringBuffer = "<h4 class='own' style='font-size:16px;'>Peptides specific for this taxon</h4><ul style='max-height: 200px; overflow-y: auto; margin-top: 16px;'>";
             for (i = 0; i < ownSequences.length; i++) {
                 stringBuffer += `<li><a href='/sequences/${ownSequences[i]}/${equateIL}' title='Tryptic Peptide Analysis of ${ownSequences[i]}' target='_blank'>${ownSequences[i]}</a></li>`;
             }
@@ -164,7 +164,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         }
         allSequences = dataTree.getAllSequences(d).sort();
         if (allSequences && allSequences.length > 0 && allSequences.length !== (ownSequences ? ownSequences.length : 0)) {
-            stringBuffer = "<h4 class='all'>Peptides specific to this taxon or its subtaxa</h4><ul>";
+            stringBuffer = "<h4 class='all' style='font-size: 16px;'>Peptides specific to this taxon or its subtaxa</h4><ul style='max-height: 200px; overflow-y: auto; margin-top: 16px;'>";
             for (i = 0; i < allSequences.length; i++) {
                 stringBuffer += `<li><a href='/sequences/${allSequences[i]}/${equateIL}' title='Tryptic Peptide Analysis of ${allSequences[i]}' target='_blank'>${allSequences[i]}</a></li>`;
             }
