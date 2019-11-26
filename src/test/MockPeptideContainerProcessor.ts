@@ -1,4 +1,4 @@
-import process from "./../logic/processors/peptide/container/process";
+import process from "../logic/processors/peptide/container/process";
 import MPAConfig from "../logic/data-management/MPAConfig";
 
 /**
@@ -7,7 +7,7 @@ import MPAConfig from "../logic/data-management/MPAConfig";
  */
 export default class Worker {
     public async postMessage(event: { peptides: string[], config: MPAConfig }) {
-        let result = await process( event.peptides, event.config, (val) => this.setProgress(val) );
+        let result = await process( event.peptides, event.config, "http://localhost:3000", (val) => this.setProgress(val) );
         this.onmessage({
             data: {
                 type: "result",

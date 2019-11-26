@@ -26,7 +26,7 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
-      "^worker-loader!./PeptideContainerProcessor.worker$": "<rootDir>/src/test/MockPeptideContainerProcessor"
+      "^worker-loader!./PeptideContainerProcessor.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
     }
   },
   "files": [

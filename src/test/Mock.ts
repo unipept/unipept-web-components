@@ -63,7 +63,14 @@ export default class Mock {
         setup.setupNock();
         let assay: Assay = this.mockAssay();
         let manager: MpaAnalysisManager = new MpaAnalysisManager();
-        await manager.processDataset(assay, this.mockMPAConfig());
+        try {
+            await manager.processDataset(assay, this.mockMPAConfig(), "http://localhost:3000");
+        } catch (err) {
+            // This error should be ignored.
+            if (!err.includes("are not available")) {
+                throw err;
+            }
+        }
         return assay.dataRepository;
     }
 }
