@@ -94,7 +94,7 @@ export default class MissingPeptidesList extends Vue {
     }
 
     private copyToClipboard() {
-        clipboard.writeText(this.$store.getters.missedPeptides.join("\n"));
+        clipboard.writeText(this.missedPeptides.map(item => item.value).join("\n"));
     }
 }
 </script>
