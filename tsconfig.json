@@ -15,12 +15,14 @@
     "sourceMap": true,
     "baseUrl": ".",
     "noImplicitThis": false,
+    "resolveJsonModule": true,
     "types": [
       "webpack-env",
       "jest",
       "vuetify",
       "jquery",
-      "d3"
+      "d3",
+      "node"
     ],
     "paths": {
       "@/*": [

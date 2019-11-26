@@ -1,6 +1,15 @@
 <template>
-    <div class="hierarchical-outline-container">
-        <v-text-field style="margin-bottom: -26px;" name="tree_search" id="tree_search" outlined single-line label="Search for an organism" append-icon="mdi-magnify" v-model="searchTerm"></v-text-field>
+    <div>
+        <v-text-field 
+            style="margin-bottom: -26px;" 
+            name="tree_search" 
+            id="tree_search" 
+            outlined 
+            single-line 
+            label="Search for an organism" 
+            append-icon="mdi-magnify" 
+            v-model="searchTerm">
+        </v-text-field>
         <div id="searchtree" class="treeView multi"></div>
         <div id="tree_data">
             <p>
@@ -54,7 +63,6 @@ export default class HierarchicalOutlineVisualization extends Vue {
             this.searchTree.search(newSearchTerm);
         }
     }
-
 
     @Watch("watchableSelectedSearchTerm")
     private onSelectedSearchTermChanged(newSearchTerm: string) {

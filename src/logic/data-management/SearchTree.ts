@@ -1,6 +1,7 @@
 import { addCopy, highlight, logToGoogle } from "../utils";
 import * as d3 from "d3";
 import * as d3Select from "d3-selection";
+import $ from "jquery";
 import * as clipboard from "clipboard-polyfill"
 
 /**
