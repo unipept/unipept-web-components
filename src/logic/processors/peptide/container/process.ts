@@ -1,5 +1,4 @@
-// TODO REMOVE THIS FILE once Webpack is properly configured.
-import { postJSON } from "./../../../../logic/utils";
+import { postJSON } from "../../../utils";
 const BATCH_SIZE = 100;
 const API_ENDPOINT = "/mpa/pept2data";
 

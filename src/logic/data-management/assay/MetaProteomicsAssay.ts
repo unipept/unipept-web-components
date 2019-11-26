@@ -24,7 +24,7 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
     getPeptides(): string[] {
         return this.peptideContainer.getPeptides();
     }
-    
+
     setPeptides(peptides: string[]) {
         this.peptideContainer.setPeptides(peptides)
     }
