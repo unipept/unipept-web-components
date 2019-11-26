@@ -19,11 +19,7 @@
                 </tooltip>
             </div>
             <v-divider></v-divider>
-            <span v-if="!$store.getters.activeDataset">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
-            <span v-else>
-                We managed to match {{ $store.getters.matchedPeptides }} of your {{ $store.getters.searchedPeptides }} peptides.
-                Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ $store.getters.missedPeptides.length }}</a> peptides couldn't be found.
-            </span>
+            <experiment-summary-content :dataset="$store.getters.activeDataset"></experiment-summary-content>
         </v-card-text>
         <v-dialog v-model="showNotFoundModal" :width="600">
             <v-card>
@@ -50,11 +46,11 @@
                     </v-row>
                     
                     <ul>
-                        <li v-for="missed of $store.getters.missedPeptides" :key="missed">
+                        <!-- <li v-for="missed of $store.getters.missedPeptides" :key="missed">
                             <a :href="getBlastUrl(missed)" target="_blank">
                                 {{ missed }}
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </v-card-text>
             </v-card>

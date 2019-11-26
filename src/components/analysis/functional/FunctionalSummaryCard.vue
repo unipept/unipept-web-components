@@ -91,17 +91,17 @@
                             <div v-if="!this.dataRepository" class="mpa-unavailable go">
                                 <div v-if="this.analysisInProgress">
                                     <h2>Biological Process</h2>
-                                    <div class="go-waiting">
+                                    <span class="go-waiting">
                                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                    </div>
+                                    </span>
                                     <h2>Cellular Component</h2>
-                                    <div class="go-waiting">
+                                    <span class="go-waiting">
                                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                    </div>
+                                    </span>
                                     <h2>Molecular Function</h2>
-                                    <div class="go-waiting">
+                                    <span class="go-waiting">
                                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                    </div>
+                                    </span>
                                 </div>
                                 <div v-else class="placeholder-text">
                                     Please select at least one dataset for analysis.
@@ -131,12 +131,12 @@
                     <v-card flat>
                         <v-card-text>
                             <div v-if="!this.dataRepository">
-                                <div class="ec-waiting" v-if="this.analysisInProgress">
+                                <span class="ec-waiting" v-if="this.analysisInProgress">
                                     <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                                </div>
-                                <div v-else class="placeholder-text">
+                                </span>
+                                <span v-else class="placeholder-text">
                                     Please select at least one dataset for analysis.
-                                </div>
+                                </span>
                             </div>
                             <div v-else>
                                 <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
@@ -472,6 +472,7 @@ export default class FunctionalSummaryCard extends Vue {
         margin-bottom: 16px;
         position: relative;
         left: 50%;
+        transform: translateX(-50%);
     }
 
     .go-waiting {

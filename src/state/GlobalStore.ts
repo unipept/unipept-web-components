@@ -13,9 +13,6 @@ export interface GlobalState {
     activeDataset: Assay | null,
     selectedTerm: string,
     selectedTaxonId: number,
-    matchedPeptides: number,
-    searchedPeptides: number,
-    missedPeptides: string[],
     // How many datasets are currently being analyzed?
     datasetsInProgress: number,
 }
@@ -28,9 +25,6 @@ const mpaState: GlobalState = {
     activeDataset: null,
     selectedTerm: "Organism",
     selectedTaxonId: -1,
-    matchedPeptides: 0,
-    searchedPeptides: 0,
-    missedPeptides: [],
     datasetsInProgress: 0,
 };
 
@@ -55,15 +49,6 @@ const mpaGetters: GetterTree<GlobalState, any> = {
     },
     selectedTaxonId(state: GlobalState): number {
         return state.selectedTaxonId;
-    },
-    searchedPeptides(state: GlobalState): number {
-        return state.searchedPeptides;
-    },
-    matchedPeptides(state: GlobalState): number {
-        return state.matchedPeptides;
-    },
-    missedPeptides(state: GlobalState): string[] {
-        return state.missedPeptides;
     },
     datasetsInProgress(state: GlobalState): number {
         return state.datasetsInProgress;
@@ -119,15 +104,6 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     SET_SELECTED_TAXON_ID(state: GlobalState, value: number): void {
         state.selectedTaxonId = value;
-    },
-    SET_SEARCHED_PEPTIDES(state: GlobalState, value: number): void {
-        state.searchedPeptides = value;
-    },
-    SET_MATCHED_PEPTIDES(state: GlobalState, value: number): void {
-        state.matchedPeptides = value;
-    },
-    SET_MISSED_PEPTIDES(state: GlobalState, value: string[]): void {
-        state.missedPeptides = value;
     },
     INCREASE_DATASETS_IN_PROGRESS(state: GlobalState): void {
         state.datasetsInProgress += 1;
@@ -198,17 +174,6 @@ const mpaActions: ActionTree<GlobalState, any> = {
         if (dataset !== null) {
             store.dispatch("setSelectedTerm", "Organism");
             store.dispatch("setSelectedTaxonId", -1);
-            dataset.dataRepository.createTaxaDataSource().then((taxaDataSource) => {
-                Promise.all([
-                    taxaDataSource.getAmountOfMatchedPeptides(),
-                    taxaDataSource.getAmountOfSearchedPeptides(),
-                    taxaDataSource.getMissedPeptides()
-                ]).then((result) => {
-                    store.commit("SET_MATCHED_PEPTIDES", result[0]);
-                    store.commit("SET_SEARCHED_PEPTIDES", result[1]);
-                    store.commit("SET_MISSED_PEPTIDES", result[2]);
-                })
-            });
         }
     },
     processDataset(store: ActionContext<GlobalState, any>, dataset: Assay): void {
