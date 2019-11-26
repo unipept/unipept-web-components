@@ -43,8 +43,8 @@ import DataRepository from "../../logic/data-source/DataRepository";
 export default class HierarchicalOutlineVisualization extends Vue {
     @Prop({ required: true }) 
     private dataRepository: DataRepository;
-
-    private searchTerm: string = "Organism";
+    
+    private searchTerm: string = "";
     private searchTree!: any;
 
     mounted() {
@@ -63,7 +63,6 @@ export default class HierarchicalOutlineVisualization extends Vue {
             this.searchTree.search(newSearchTerm);
         }
     }
-
 
     @Watch("watchableSelectedSearchTerm")
     private onSelectedSearchTermChanged(newSearchTerm: string) {
@@ -176,5 +175,9 @@ export default class HierarchicalOutlineVisualization extends Vue {
 
     #searchtree {
         margin-bottom: 16px;
+    }
+
+    .hierarchical-outline-container legend {
+        display: none;
     }
 </style>

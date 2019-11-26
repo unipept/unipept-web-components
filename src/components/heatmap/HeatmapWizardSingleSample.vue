@@ -9,23 +9,37 @@ import {NormalizationType} from "./NormalizationType";
             <v-divider></v-divider>
             <v-stepper-step editable :complete="currentStep > 3" step="3">Normalisation</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step editable :complete="currentStep > 4" step="4" @click="computeHeatmapAndProceed()">Heatmap</v-stepper-step>
+            <v-stepper-step editable :complete="currentStep > 4" step="4" @click="computeHeatmapAndProceed()">
+                Heatmap
+            </v-stepper-step>
         </v-stepper-header>
         <v-stepper-items>
             <v-stepper-content step="1">
                 <p>Please select the items that should be visualised on the horizontal axis of the heatmap.</p>
-                <v-select :items="Array.from(dataSources.keys())" v-model="horizontalDataSource" label="Datasource"></v-select>
+                <v-select :items="Array.from(dataSources.keys())" v-model="horizontalDataSource" label="Datasource">
+                </v-select>
                 <div>
-                    <component v-if="!heatmapConfiguration.horizontalLoading && heatmapConfiguration.horizontalDataSource" :is="dataSources.get(horizontalDataSource).dataSourceComponent" :dataSource="heatmapConfiguration.horizontalDataSource" v-on:selected-items="updateHorizontalSelectedItems"></component>
+                    <component 
+                        v-if="!heatmapConfiguration.horizontalLoading && heatmapConfiguration.horizontalDataSource" 
+                        :is="dataSources.get(horizontalDataSource).dataSourceComponent" 
+                        :dataSource="heatmapConfiguration.horizontalDataSource" 
+                        v-on:selected-items="updateHorizontalSelectedItems">
+                    </component>
                     <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
             <v-stepper-content step="2">
                 <p>Please select the items that should be visualised on the vertical axis of the heatmap.</p>
-                <v-select :items="Array.from(dataSources.keys())" v-model="verticalDataSource" label="Datasource"></v-select>
+                <v-select :items="Array.from(dataSources.keys())" v-model="verticalDataSource" label="Datasource">
+                </v-select>
                 <div>
-                    <component v-if="!heatmapConfiguration.verticalLoading && heatmapConfiguration.verticalDataSource" :is="dataSources.get(verticalDataSource).dataSourceComponent" :dataSource="heatmapConfiguration.verticalDataSource" v-on:selected-items="updateVerticalSelectedItems"></component>
+                    <component 
+                        v-if="!heatmapConfiguration.verticalLoading && heatmapConfiguration.verticalDataSource" 
+                        :is="dataSources.get(verticalDataSource).dataSourceComponent" 
+                        :dataSource="heatmapConfiguration.verticalDataSource" 
+                        v-on:selected-items="updateVerticalSelectedItems">
+                    </component>
                     <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
@@ -33,7 +47,10 @@ import {NormalizationType} from "./NormalizationType";
             <v-stepper-content step="3">
                 <p>Please select the type of normalization that should be performed before visualizing data points.</p>
                 <v-radio-group v-model="normalizer">
-                    <div v-for="normalizationType in Array.from(normalizationTypes.keys())" :key="normalizationType" style="margin-bottom: 8px;">
+                    <div 
+                        v-for="normalizationType in Array.from(normalizationTypes.keys())" 
+                        :key="normalizationType" 
+                        style="margin-bottom: 8px;">
                         <v-radio :label="normalizationType" :value="normalizationType"></v-radio>
                         <div style="margin-left: 32px;">{{ normalizationTypes.get(normalizationType).information }}</div>
                     </div>
@@ -73,177 +90,199 @@ import HeatmapVisualization from "./HeatmapVisualization.vue";
 import Element from "../../logic/data-source/Element";
 import sha256 from "crypto-js/sha256";
 import MPAConfig from "../../logic/data-management/MPAConfig";
+import DataRepository from "./../../logic/data-source/DataRepository";
 
-    @Component({
-        components: { GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization }
-    })
+@Component({
+    components: { GoDataSourceComponent, EcDataSourceComponent, TaxaDataSourceComponent, HeatmapVisualization }
+})
 export default class HeatmapWizardSingleSample extends Vue {
-        @Prop()
-        private dataset: Assay;
-        @Prop()
-        private searchSettings: MPAConfig;
+    @Prop()
+    private dataRepository: DataRepository;
+    @Prop()
+    private searchSettings: MPAConfig;
 
-        private currentStep: number = 1;
-        private heatmapConfiguration: HeatmapConfiguration = new HeatmapConfiguration();
+    private currentStep: number = 1;
+    private heatmapConfiguration: HeatmapConfiguration = new HeatmapConfiguration();
 
-        private heatmapData: HeatmapData = null;
-        // Keeps track of a hash of the previously computed data for the heatmap
-        private previouslyComputed: string = "";
+    private heatmapData: HeatmapData = null;
+    // Keeps track of a hash of the previously computed data for the heatmap
+    private previouslyComputed: string = "";
 
-        private dataSources: Map<string, {dataSourceComponent: string, factory: () => Promise<DataSource>}> = new Map([
-            [
-                "Taxa",
-                {
-                    dataSourceComponent: "taxa-data-source-component",
-                    factory: () => {
-                        let dataRepository = this.dataset.dataRepository;
-                        return dataRepository.createTaxaDataSource();
-                    }
+    private dataSources: Map<string, {dataSourceComponent: string, factory: () => Promise<DataSource>}> = new Map([
+        [
+            "Taxa",
+            {
+                dataSourceComponent: "taxa-data-source-component",
+                factory: () => {
+                    let dataRepository = this.dataRepository;
+                    return dataRepository.createTaxaDataSource();
                 }
-                
-            ],
-            [
-                "EC-Numbers", 
-                {
-                    dataSourceComponent: "ec-data-source-component",
-                    factory: () => {
-                        let dataRepository = this.dataset.dataRepository;
-                        return dataRepository.createEcDataSource();
-                    }
-                }
-                
-            ],
-            [
-                "GO-Terms", 
-                {
-                    dataSourceComponent: "go-data-source-component",
-                    factory: () => {
-                        let dataRepository = this.dataset.dataRepository;
-                        return dataRepository.createGoDataSource();
-                    }
-                }
-            ]
-        ]);
-
-        private normalizationTypes: Map<string, {information: string, factory: () => Normalizer}> = new Map([
-            [
-                "All",
-                {
-                    information: "Normalize over all data points of the input.",
-                    factory: () => new AllNormalizer()
-                }
-            ],
-            [
-                "Rows",
-                {
-                    information: "Normalize values on a row-per-row basis.",
-                    factory: () => new RowNormalizer()
-                }
-            ],
-            [
-                "Columns",
-                {
-                    information: "Normalize values on a column-per-column basis.",
-                    factory: () => new ColumnNormalizer()
-                }
-            ]
-        ]);
-
-        private horizontalDataSource: string = "";
-        private verticalDataSource: string = "";
-        private normalizer: string = "";
-
-        created() {
-            this.horizontalDataSource = this.dataSources.keys().next().value;
-            this.verticalDataSource = this.dataSources.keys().next().value;
-            this.normalizer = this.normalizationTypes.keys().next().value;
-        }
-
-        mounted() {
-            this.onHorizontalSelection(this.horizontalDataSource);
-            this.onVerticalSelection(this.verticalDataSource);
-            this.onNormalizerChange(this.normalizer);
-        }
-
-        @Watch("horizontalDataSource") 
-        async onHorizontalSelection(newValue: string){
-            this.heatmapConfiguration.horizontalLoading = true;
-            this.heatmapConfiguration.horizontalDataSource = await this.dataSources.get(newValue).factory();
-            this.heatmapConfiguration.horizontalLoading = false;
-        }
-
-        @Watch("verticalDataSource") 
-        async onVerticalSelection(newValue: string) {
-            this.heatmapConfiguration.verticalLoading = true;
-            this.heatmapConfiguration.verticalDataSource = await this.dataSources.get(newValue).factory();
-            this.heatmapConfiguration.verticalLoading = false;
-        }
-
-        @Watch("normalizer") 
-        async onNormalizerChange(newValue: string) {
-            this.heatmapConfiguration.normalizer = await this.normalizationTypes.get(newValue).factory();
-        }
-
-        updateHorizontalSelectedItems(newItems: Element[]) {
-            this.heatmapConfiguration.horizontalSelectedItems = newItems;
-        }
-
-        updateVerticalSelectedItems(newItems: Element[]) {
-            this.heatmapConfiguration.verticalSelectedItems = newItems;
-        }
-
-        private async computeHeatmapAndProceed() {
-            let newHash = sha256(this.normalizer + this.horizontalDataSource + this.verticalDataSource + this.heatmapConfiguration.horizontalSelectedItems.toString() + this.heatmapConfiguration.verticalSelectedItems.toString()).toString();
-
-            if (newHash === this.previouslyComputed) {
-                return;
             }
-
-            this.previouslyComputed = newHash;
-
-            // Go the next step in the wizard.
-            this.currentStep = 4;
-
-            let rows: HeatmapElement[] = [];
-            let cols: HeatmapElement[] = [];
-
-            let grid: number[][] = [];
-
-            for (let i = 0; i < this.heatmapConfiguration.verticalSelectedItems.length; i++) {
-                let vertical: Element = this.heatmapConfiguration.verticalSelectedItems[i];
-                rows.push({ id: i.toString(), name: vertical.name });
-            }
-
-            for (let i = 0; i < this.heatmapConfiguration.horizontalSelectedItems.length; i++) {
-                let horizontal: Element = this.heatmapConfiguration.horizontalSelectedItems[i];
-                cols.push({ id: i.toString(), name: horizontal.name });
-            }
-
-            for (let vertical of this.heatmapConfiguration.verticalSelectedItems) {
-                let gridRow: number[] = [];
-                for (let horizontal of this.heatmapConfiguration.horizontalSelectedItems) {
-                    let value: number = await vertical.computeCrossPopularity(horizontal, this.dataset.dataRepository);
-                    gridRow.push(value);
+            
+        ],
+        [
+            "EC-Numbers", 
+            {
+                dataSourceComponent: "ec-data-source-component",
+                factory: () => {
+                    let dataRepository = this.dataRepository;
+                    return dataRepository.createEcDataSource();
                 }
-                grid.push(gridRow);
             }
+            
+        ],
+        [
+            "GO-Terms", 
+            {
+                dataSourceComponent: "go-data-source-component",
+                factory: () => {
+                    let dataRepository = this.dataRepository;
+                    return dataRepository.createGoDataSource();
+                }
+            }
+        ]
+    ]);
 
-            this.heatmapData = {
-                rows: rows,
-                columns: cols,
-                values: this.heatmapConfiguration.normalizer.normalize(grid)
-            };
+    private normalizationTypes: Map<string, {information: string, factory: () => Normalizer}> = new Map([
+        [
+            "All",
+            {
+                information: "Normalize over all data points of the input.",
+                factory: () => new AllNormalizer()
+            }
+        ],
+        [
+            "Rows",
+            {
+                information: "Normalize values on a row-per-row basis.",
+                factory: () => new RowNormalizer()
+            }
+        ],
+        [
+            "Columns",
+            {
+                information: "Normalize values on a column-per-column basis.",
+                factory: () => new ColumnNormalizer()
+            }
+        ]
+    ]);
+
+    private horizontalDataSource: string = "";
+    private verticalDataSource: string = "";
+    private normalizer: string = "";
+
+    created() {
+        this.horizontalDataSource = this.dataSources.keys().next().value;
+        this.verticalDataSource = this.dataSources.keys().next().value;
+        this.normalizer = this.normalizationTypes.keys().next().value;
+    }
+
+    mounted() {
+        this.onHorizontalSelection();
+        this.onVerticalSelection();
+        this.onNormalizerChange(this.normalizer);
+    }
+
+    @Watch("dataRepository")
+    private async onDataRepositoryChanged() {
+        // Switch back to the first step of the configuration.
+        this.currentStep = 1;
+        // Update all DataSources.
+        await this.onHorizontalSelection();
+        await this.onVerticalSelection();
+    }
+
+    @Watch("horizontalDataSource") 
+    private async onHorizontalSelection(){
+        this.heatmapConfiguration.horizontalLoading = true;
+        this.heatmapConfiguration.horizontalDataSource = await this.dataSources.get(this.horizontalDataSource).factory();
+        this.heatmapConfiguration.horizontalLoading = false;
+    }
+
+    @Watch("verticalDataSource") 
+    private async onVerticalSelection() {
+        this.heatmapConfiguration.verticalLoading = true;
+        this.heatmapConfiguration.verticalDataSource = await this.dataSources.get(this.verticalDataSource).factory();
+        this.heatmapConfiguration.verticalLoading = false;
+    }
+
+    @Watch("normalizer") 
+    private async onNormalizerChange(newValue: string) {
+        this.heatmapConfiguration.normalizer = await this.normalizationTypes.get(newValue).factory();
+    }
+
+    private updateHorizontalSelectedItems(newItems: Element[]) {
+        this.heatmapConfiguration.horizontalSelectedItems = newItems;
+    }
+
+    private updateVerticalSelectedItems(newItems: Element[]) {
+        this.heatmapConfiguration.verticalSelectedItems = newItems;
+    }
+
+    /**
+     * Compute a new heatmap when required. This means that the selected items, normalization or data source did change.
+     * If none of these items were updated, the previously computed heatmap is used.
+     */
+    private async computeHeatmapAndProceed() {
+        let newHash = sha256(this.normalizer + this.horizontalDataSource + this.verticalDataSource + this.heatmapConfiguration.horizontalSelectedItems.toString() + this.heatmapConfiguration.verticalSelectedItems.toString()).toString();
+
+        if (newHash === this.previouslyComputed) {
+            return;
         }
+
+        this.previouslyComputed = newHash;
+
+        // Go the next step in the wizard.
+        this.currentStep = 4;
+
+        let rows: HeatmapElement[] = [];
+        let cols: HeatmapElement[] = [];
+
+        let grid: number[][] = [];
+
+        for (let i = 0; i < this.heatmapConfiguration.verticalSelectedItems.length; i++) {
+            let vertical: Element = this.heatmapConfiguration.verticalSelectedItems[i];
+            rows.push({ id: i.toString(), name: vertical.name });
+        }
+
+        for (let i = 0; i < this.heatmapConfiguration.horizontalSelectedItems.length; i++) {
+            let horizontal: Element = this.heatmapConfiguration.horizontalSelectedItems[i];
+            cols.push({ id: i.toString(), name: horizontal.name });
+        }
+
+        for (let vertical of this.heatmapConfiguration.verticalSelectedItems) {
+            let gridRow: number[] = [];
+            for (let horizontal of this.heatmapConfiguration.horizontalSelectedItems) {
+                let value: number = await vertical.computeCrossPopularity(horizontal, this.dataRepository);
+                gridRow.push(value);
+            }
+            grid.push(gridRow);
+        }
+
+        this.heatmapData = {
+            rows: rows,
+            columns: cols,
+            values: this.heatmapConfiguration.normalizer.normalize(grid)
+        };
+    }
 }
 </script>
 
-<style scoped>
-    .v-stepper__wrapper {
-        display: flex;
-        flex-direction: column;
-    }
+<style>
+.v-stepper__wrapper {
+    display: flex;
+    flex-direction: column;
+}
 
-    .continue-button {
-        align-self: flex-end;
-    }
+.continue-button {
+    align-self: flex-end;
+}
+
+.heatmap {
+    display: flex;
+}
+
+.heatmap > svg {
+    margin: auto;
+}
 </style>

@@ -1,8 +1,7 @@
 import Clipboard from "clipboard";
 import $ from "jquery";
-import d3 from "d3";
-
-export const runningInElectron = navigator.userAgent.toLowerCase().indexOf(" electron/") > -1;
+import * as d3 from "d3";
+import Utils from "./../components/custom/Utils";
 
 /**
  * Make clicking on the selector copy to the user clipboard
@@ -64,7 +63,7 @@ export function brightness(rgb) {
  * @return {Promise.<string>}
  */
 export function downloadDataByForm(data, fileName, fileType = null) {
-    if (runningInElectron) {
+    if (Utils.isElectron()) {
         const fs = require("fs");
         const { dialog } = require("electron").remote;
         dialog.showSaveDialog(null, { title: "save to CSV", defaultPath: fileName }).then((saveDialogReturnValue) => {
@@ -82,15 +81,6 @@ export function downloadDataByForm(data, fileName, fileType = null) {
             if (fileType !== null) {
                 $downloadForm.append(`<input type='hidden' name='filetype' value='${fileType}'/>`);
             }
-            $downloadForm.append("<input type='hidden' name='nonce' value='" + nonce + "'/>");
-            // The x-www-form-urlencoded spec replaces newlines with \n\r
-            $downloadForm.find(".data").val(data.replace(/\n\r/g, "\n"));
-            let downloadTimer = setInterval(() => {
-                if (document.cookie.indexOf(nonce.toString()) !== -1) {
-                    clearInterval(downloadTimer);
-                    resolve(fileName);
-                }
-            }, 100);
             $downloadForm.submit();
         });
     }
@@ -318,73 +308,50 @@ export function numberToPercent(number, digits = 0) {
 }
 
 /**
- * Triggers the image export modal.
- *
- * If an svgSelector is present, sends the SVG-code to the server to convert
- * it to a PNG. The server return a data URL containing the PNG data.
- * In an canvasSelector is present, uses html2canvas to convert it to a PNG.
- * A modal dialog is shown containing the image and buttons
- * to download the image as PNG and SVG if present.
- *
+ * Use canvg to convert an inline svg element to a PNG DataURL
  * @param {string} svgSelector The DOM selector of the SVG or jQuery object
- * @param {string} canvasSelector The DOM selector of the canvas
- * @param {string} baseFileName The requested file name
- */
-export function triggerDownloadModal(svgSelector, canvasSelector, baseFileName) {
-    let $buttons = $("#save-as-modal .buttons"),
-        $image = $("#save-as-modal .image"),
-        $element,
-        svg;
+ * @returns {string} A dataURL containing the resulting PNG
+*/
+export async function svg2pngDataURL(svgSelector: string) : Promise<string> { 
+    var canvg = require("canvg");
+    var el = $(svgSelector).get(0);
 
-    // Reset the modal and show it
-    $buttons.html("<h3>Please wait while we create your image</h3>");
-    $image.html("<h3>Loading preview...</h3>" +
-        "<div class='progress progress-striped active'>" +
-        "<div class='progress-bar'  style='width: 65%'></div></div>");
-    //@ts-ignore
-    $("#save-as-modal").modal();
+    var canvas = document.createElement("canvas");
 
-    // Generate the image
-    if (svgSelector) {
-        // Send the SVG code to the server for png conversion
-        $element = $(svgSelector);
-        svg = $element.wrap("<div></div>").parent().html();
-        $element.unwrap();
-        $.post("/convert", { image: svg }, showImage);
-    }
-    if (canvasSelector) {
-        // Use html2canvas to convert canvas to dataURL
-        this.html2canvas($(canvasSelector), {
-            onrendered: function(canvas) {
-                showImage(canvas.toDataURL());
-            },
-        });
-    }
+    // automatically size canvas to svg element and render
+    canvg(canvas, el.outerHTML);
 
-    //@ts-ignore
-    if (window.fullScreenApi.isFullScreen()) {
-        //@ts-ignore
-        window.fullScreenApi.cancelFullScreen();
-    }
+    // double size of canvas
+    canvas.setAttribute("height", canvas.height * 2 + "px")
+    canvas.setAttribute("width", canvas.width * 2 + "px")
+    // render svg element to this resized canvas (doubled resolution)
+    canvg(canvas, el.outerHTML, { ignoreDimensions: true, scaleWidth: canvas.width, scaleHeight: canvas.height });
 
-    /**
-     *  Show the image and add buttons
-     * @param {string} dataURL
-     */
-    function showImage(dataURL) {
-        $image.html("<img src='" + dataURL + "' />");
-        $buttons.empty();
-        if (svgSelector) {
-            $buttons.append("<button id='download-svg' class='btn btn-primary btn-animate'><span class='glyphicon glyphicon-download down'></span> Download as SVG</button>");
-            $("#download-svg").click(function() {
-                downloadDataByForm(svg, baseFileName + ".svg", "image/svg+xml");
-            });
-        }
-        $buttons.append("<button id='download-png' class='btn btn-primary btn-animate'><span class='glyphicon glyphicon-download down'></span> Download as PNG</button>");
-        $("#download-png").click(function() {
-            downloadDataByLink($("#save-as-modal .image img").attr("src"), baseFileName + ".png");
-        });
-    }
+    return canvas.toDataURL();
+}
+
+export function svg2svgDataURL(svgSelector: string) {
+    var el = $(svgSelector).get(0);
+    var svgString = new XMLSerializer().serializeToString(el);
+    var decoded = unescape(encodeURIComponent(svgString));
+    // convert the svg to base64
+    var base64 = btoa(decoded);
+    return `data:image/svg+xml;base64,${base64}`;
+}
+
+/**
+ * Uses html2canvas to convert canvas to a PNG.
+ *
+ * @param {string} selector The DOM selector
+ * @returns {string} A dataURL containing the resulting PNG
+*/
+export async function dom2pngDataURL(selector: string) : Promise<string> {
+    const html2canvas = require("html2canvas");
+    // Use html2canvas to convert selected element to canvas, 
+    // then convert that canvas to a dataURL
+    let element = $(selector).get(0);
+    return html2canvas(element, { scale: 2 })
+        .then((canvasElement) => canvasElement.toDataURL())
 }
 
 /**

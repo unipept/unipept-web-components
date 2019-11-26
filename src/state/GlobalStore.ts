@@ -17,7 +17,7 @@ export interface GlobalState {
     searchedPeptides: number,
     missedPeptides: string[],
     // How many datasets are currently being analyzed?
-    datasetsInProgress: number
+    datasetsInProgress: number,
 }
 
 const mpaState: GlobalState = {
@@ -31,7 +31,7 @@ const mpaState: GlobalState = {
     matchedPeptides: 0,
     searchedPeptides: 0,
     missedPeptides: [],
-    datasetsInProgress: 0
+    datasetsInProgress: 0,
 };
 
 const mpaGetters: GetterTree<GlobalState, any> = {
@@ -95,7 +95,6 @@ const mpaMutations: MutationTree<GlobalState> = {
     },
     ADD_STORED_DATASET(state: GlobalState, dataset: Assay) {
         state.storedDatasets.push(dataset);
-        this.$set(state, "storedDatasets", state.storedDatasets);
     },
     REMOVE_STORED_DATASET(state: GlobalState, dataset: Assay) {
         let index: number = state.storedDatasets.findIndex((value: Assay, index: number) => value.getId() === dataset.getId());
@@ -215,11 +214,11 @@ const mpaActions: ActionTree<GlobalState, any> = {
     processDataset(store: ActionContext<GlobalState, any>, dataset: Assay): void {
         let mpaManager = new MpaAnalysisManager();
         store.commit("INCREASE_DATASETS_IN_PROGRESS");
-        mpaManager.processDataset(dataset, store.getters.searchSettings)
+        mpaManager.processDataset(dataset, store.getters.searchSettings, store.getters.baseUrl)
             .then(() => {
+                store.commit("DECREASE_DATASETS_IN_PROGRESS");
                 if (store.getters.activeDataset === null) {
                     store.dispatch("setActiveDataset", dataset);
-                    store.commit("DECREASE_DATASETS_IN_PROGRESS");
                 }
             });
     },

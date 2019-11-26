@@ -1,7 +1,7 @@
-<template>
+-<template>
     <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
         <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
-            <v-tabs :color="isFullScreen ? 'accent' : 'primary'" :slider-color="isFullScreen ? 'white' : 'secondary'" dark background-color="accent" :fixed-tabs="isFullScreen" v-model="tab">
+            <v-tabs :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
                 <div v-if="isFullScreen" class="unipept-logo">
                     <img src="/images/trans_logo.png" alt="logo" width="40" height="40">
                 </div>
@@ -17,7 +17,7 @@
                 <v-tab v-if="!isFullScreen">
                     Hierarchical Outline
                 </v-tab>
-                <v-tab v-if="!isFullScreen" @click="openHeatmapWizard()" v-on:click.stop>
+                <v-tab v-if="!isFullScreen">
                     Heatmap
                 </v-tab>
                 <v-spacer>
@@ -39,7 +39,7 @@
                                 Enter full screen
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item key="save-as-image" @click="saveAsImage()" >
+                        <v-list-item key="save-as-image" @click="prepareImage()">
                             <v-list-item-title>
                                 <v-icon>
                                     mdi-download
@@ -49,13 +49,13 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <div v-if="isFullScreen">
+                <div v-if="isFullScreen" class="fullscreen-buttons-container">
                     <v-btn icon text @click="reset()">
                         <v-icon color="white">
                             mdi-restore
                         </v-icon>
                     </v-btn>
-                    <v-btn icon text @click="saveAsImage()">
+                    <v-btn icon text @click="prepareImage()">
                         <v-icon color="white">
                             mdi-download
                         </v-icon>
@@ -70,7 +70,23 @@
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <v-card flat>
-                        <sunburst-visualization ref="sunburst" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
+                        <sunburst-visualization ref="sunburst" :autoResize="true" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                        </div>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
+                            </v-card-text>
+                        </div>
+                    </v-card>
+                    <image-download-modal ref="imageDownloadModal" />
+                </v-tab-item>
+                <v-tab-item>
+                    <v-card flat>
+                        <treemap-visualization ref="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -85,22 +101,7 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treemap-visualization ref="treemap" id="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
-                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                        </div>
-                        <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
-                        </div>
-                    </v-card>
-                </v-tab-item>
-                <v-tab-item>
-                    <v-card flat>
-                        <treeview-visualization ref="treeview" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
+                        <treeview-visualization ref="treeview" :autoResize="true" :width="600" :height="350" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -128,31 +129,28 @@
                         </v-card-text>
                     </v-card>
                 </v-tab-item>
-            </v-tabs-items>
-            <template v-for="dataset of $store.getters.selectedDatasets">
-                <v-dialog v-model="dialogOpen" width="1000px" :key="dataset.id" v-if="dataset && $store.getters.activeDataset && dataset.id === $store.getters.activeDataset.id">
-                    <div style="min-height: 600px; background-color: white;">
-                        <div class="modal-header">
-                            <button type="button" class="close" @click="dialogOpen = false"><span aria-hidden="true">×</span></button>
-                            <h4 class="modal-title">Heatmap wizard</h4>
+                <v-tab-item>
+                    <v-card flat>
+                        <heatmap-wizard-single-sample v-if="this.dataRepository" :dataRepository="this.dataRepository"></heatmap-wizard-single-sample>
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
-                        <div class="single-dataset-wizard">
-                            <heatmap-wizard-single-sample v-if="dataset" :dataset="dataset"></heatmap-wizard-single-sample>
-                            <div v-else>
-                                <div class="text-xs-center" style="margin-top: 25px;">
-                                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
                                 </div>
-                            </div>
+                            </v-card-text>
                         </div>
-                    </div>
-                </v-dialog>
-            </template>
+                    </v-card>
+                </v-tab-item>
+            </v-tabs-items>
         </v-card>
     </fullscreen>
 </template>
 
 <script lang="ts">
-import d3 from "d3";
+import * as d3 from "d3";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
@@ -166,99 +164,111 @@ import CardHeader from "../custom/CardHeader.vue";
 //@ts-ignore
 import fullscreen from "vue-fullscreen";
 
-import { logToGoogle, triggerDownloadModal } from "../../logic/utils";
+import { logToGoogle } from "../../logic/utils";
 import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
 import DataRepository from "../../logic/data-source/DataRepository";
+import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 import $ from "jquery";
 
-    @Component({
-        components: {
-            HeatmapVisualization,
-            CardHeader,
-            HierarchicalOutlineVisualization,
-            TreeviewVisualization,
-            TreemapVisualization,
-            SunburstVisualization,
-            HeatmapWizardSingleSample
-        }
-    })
+@Component({
+    components: {
+        HeatmapVisualization,
+        CardHeader,
+        HierarchicalOutlineVisualization,
+        TreeviewVisualization,
+        TreemapVisualization,
+        SunburstVisualization,
+        HeatmapWizardSingleSample,
+        ImageDownloadModal
+    }
+})
 export default class SingleDatasetVisualizationsCard extends Vue {
-        $refs!: {
-            fullScreenContainer: fullscreen,
-            sunburst: SunburstVisualization,
-            treeview: TreeviewVisualization,
-            treemap: TreemapVisualization,
-            heatmap: HeatmapVisualization
-        }
+    $refs!: {
+        fullScreenContainer: fullscreen,
+        sunburst: SunburstVisualization,
+        treeview: TreeviewVisualization,
+        treemap: TreemapVisualization,
+        heatmap: HeatmapVisualization,
+        imageDownloadModal: ImageDownloadModal
+    }
 
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
-        @Prop({ required: false, default: true })
-        private analysisInProgress: boolean;
+    @Prop({ required: true })
+    private dataRepository: DataRepository;
+    @Prop({ required: false, default: true })
+    private analysisInProgress: boolean;
+    @Prop({ required: false, default: "primary" })
+    private tabsColor: string;
+    @Prop({ required: false, default: "secondary" })
+    private tabsSliderColor: string;
+    @Prop({ required: false, default: "white" })
+    private tabsTextColor: string;
+    @Prop({ required: false, default: true })
+    private isDark: boolean;    
 
-        private placeholderText = "Please select at least one dataset for analysis.";
-        private isFullScreen: boolean = false;
-        private dialogOpen: boolean = false;
+    private placeholderText = "Please select at least one dataset for analysis.";
+    private isFullScreen: boolean = false;
+    private dialogOpen: boolean = false;
 
-        private tab = null;
+    private tab = null;
 
-        private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
+    private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
-        mounted() {
-            document.addEventListener("fullscreenchange", () => {
-                if (document.fullscreenElement) {
-                    this.exitFullScreen();
-                }
-            }, false);
-            // @ts-ignore (TODO: migrate to Vuetify)
-            // $(".fullScreenActions a").tooltip({placement: "bottom", delay: {"show": 300, "hide": 300}});
-        }
+    private mounted() {
         
-        private switchToFullScreen() {
+    }
+
+    private switchToFullScreen() {
+        // @ts-ignore
+        if (!this.isFullScreen && window.fullScreenApi.supportsFullScreen) {
+            this.isFullScreen = true;
+            this.$refs.fullScreenContainer.enter();
             // @ts-ignore
-            if (window.fullScreenApi.supportsFullScreen) {
-                this.isFullScreen = true;
-                this.$refs.fullScreenContainer.toggle();
-                // @ts-ignore
-                logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
-                $(".tip").appendTo(".full-screen-container");
-            }
+            logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
+            $(".tip").appendTo(".full-screen-container");
         }
+    }
 
-        private exitFullScreen() {
-            this.isFullScreen = false;
-            this.$refs.fullScreenContainer.toggle();
-            $(".tip").appendTo("body");
-        }
+    private exitFullScreen() {
+        this.isFullScreen = false;
+        this.$refs.fullScreenContainer.exit();
+        $(".tip").appendTo("body");
+    }
 
-        private fullScreenChange(state: boolean) {
-            this.isFullScreen = state;
+    private fullScreenChange(state: boolean) {
+        if (!state) {
+            this.exitFullScreen();
+        } else {
+            this.switchToFullScreen();
         }
+    }
 
-        private reset() {
-            (this.$refs.sunburst as SunburstVisualization).reset();
-            (this.$refs.treeview as TreeviewVisualization).reset();
-            (this.$refs.treemap as TreemapVisualization).reset();
-            (this.$refs.heatmap as HeatmapVisualization).reset();
-        }
+    private async prepareImage() {
+        this.exitFullScreen();
+        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
-        private saveAsImage() {
-            // @ts-ignore
-            logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
-            if (this.tabs[this.tab] === "Sunburst") {
-                d3.selectAll(".toHide").attr("class", "arc hidden");
-                triggerDownloadModal("#sunburstWrapper svg", null, "unipept_sunburst");
-                d3.selectAll(".hidden").attr("class", "arc toHide");
-            } else if (this.tabs[this.tab] === "Treemap") {
-                triggerDownloadModal(null, "#treemap", "unipept_treemap");
-            } else {
-                triggerDownloadModal("#treeviewWrapper svg", null, "unipept_treeview");
-            }
+        // @ts-ignore
+        logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
+        if (this.tabs[this.tab] === "Sunburst") {
+            d3.selectAll(".toHide").attr("class", "arc hidden");
+            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
+            d3.selectAll(".hidden").attr("class", "arc toHide");
+        } else if (this.tabs[this.tab] === "Treemap") {
+            imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
+        } else {
+            imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
         }
+    }
 
-        private openHeatmapWizard(): void {
-            this.dialogOpen = true;
-        }
+    private reset() {
+        (this.$refs.sunburst as SunburstVisualization).reset();
+        (this.$refs.treeview as TreeviewVisualization).reset();
+        (this.$refs.treemap as TreemapVisualization).reset();
+        (this.$refs.heatmap as HeatmapVisualization).reset();
+    }
+
+    private openHeatmapWizard(): void {
+        this.dialogOpen = true;
+    }
 }
 </script>
 
@@ -272,25 +282,14 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         left: 50%;
         transform: translate(-35px);
     }
-    
-    /* .fullscreen-nav {
-        position: absolute;
-        z-index: 1;
-        right: 16px;
-        top: 16px;
+
+    .fullscreen-buttons-container {
+        display: flex;
+        align-items: center;
     }
 
-    .unipept-logo {
-        z-index: 100;
-        position: absolute;
-        top: 10px;
-        left: 10px;
+    .full-screen-container .tip {
+        position: relative;
+        top: -300px;
     }
-
-    .fullScreenButtons {
-        position: absolute;
-        z-index: 10;
-        right: 16px;
-        top: 5px;
-    } */
 </style>

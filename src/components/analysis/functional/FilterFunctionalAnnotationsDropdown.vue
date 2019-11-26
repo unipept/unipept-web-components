@@ -6,7 +6,7 @@
                     <v-icon>mdi-settings</v-icon>
                 </v-btn>
             </template>
-            <v-card max-width="310px">
+            <v-card max-width="310px" height="100px">
                 <v-card-text>
                     <span>Filtering</span>
                     <div class="input-group">

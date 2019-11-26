@@ -1,7 +1,7 @@
 import PeptideContainer from "../../../data-management/PeptideContainer";
 import { ProcessedPeptideContainer } from "../../../data-management/ProcessedPeptideContainer";
 
-import Worker from "worker-loader!./PeptideContainerProcessor.worker";
+import Worker from "worker-loader!./PeptideContainerProcessor.worker.js";
 import ProgressPublisher from "../../../patterns/progress/ProgressPublisher";
 import MPAConfig from "../../../data-management/MPAConfig";
 
@@ -13,7 +13,7 @@ export class PeptideContainerProcessor extends ProgressPublisher {
         this._worker = new Worker();
     }
 
-    process(peptides: PeptideContainer, mpaConfig: MPAConfig) : Promise<ProcessedPeptideContainer> {
+    process(peptides: PeptideContainer, mpaConfig: MPAConfig, baseUrl: string) : Promise<ProcessedPeptideContainer> {
         return new Promise<ProcessedPeptideContainer>(resolve => {
             this._worker.onmessage = (event) => {
                 switch (event.data.type) {
@@ -26,7 +26,7 @@ export class PeptideContainerProcessor extends ProgressPublisher {
                     break;
                 }
             };
-            this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig });
+            this._worker.postMessage({ peptides: peptides.getPeptides(), config: mpaConfig, baseUrl: baseUrl });
         });
     }
 }

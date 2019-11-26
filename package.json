@@ -1,6 +1,6 @@
 {
   "name": "unipept-web-components",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -35,10 +35,13 @@
   "dependencies": {
     "axios": "^0.19.0",
     "babel-polyfill": "^6.26.0",
-    "clipboard": "^2.0.4",
+    "canvg": "^2.0.0",
+    "clipboard-polyfill": "^2.8.6",
+    "convert-svg-to-png": "^0.5.0",
     "crypto-js": "^3.1.9-1",
     "d3": "^5.11.0",
     "d3-selection": "^1.4.0",
+    "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.4.1",
     "less": "^3.10.3",
     "schema-utils": "^2.2.0",

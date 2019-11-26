@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports["QuickGOSummaryCard renders a placeholder when no GO-terms are found 1"] = `
+exports[`QuickGOSummaryCard renders a placeholder when no GO-terms are found 1`] = `
 "<v-card-text-stub>
                 No GO terms for this domain were found.
             </v-card-text-stub>"
 `;
 
-exports["QuickGOSummaryCard renders valid GO-terms correctly 1"] = `
+exports[`QuickGOSummaryCard renders valid GO-terms correctly 1`] = `
 "<v-card-text-stub>
                 This chart shows the relationship between the 3 most occurring GO terms: 
                 translation ([object Object]), neutrophil degranulation ([object Object]) and protein refolding ([object Object]).
-                <br> <a><img src=\\"https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/GO:0006412,GO:0042026,GO:0043312/chart?showKey=true\\" alt=\\"QuickGO chart of translation ([object Object]), neutrophil degranulation ([object Object]) and protein refolding ([object Object])\\" style=\\"max-width: 100%; position: relative; left: 50%; transform: translateX(-50%);\\"></a> <div>
+                <br> <a><img src=\\"https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/GO:0006412,GO:0042026,GO:0043312/chart?showKey=true\\" alt=\\"QuickGO chart of translation ([object Object]), neutrophil degranulation ([object Object]) and protein refolding ([object Object])\\" style=\\"max-width: 80%; max-height: 600px; position: relative; left: 50%; transform: translateX(-50%); margin-top: 32px; margin-bottom: 32px;\\"></a> <div>
                     Provided by <a target=\\"_blank\\">QuickGO</a>.
                 </div></v-card-text-stub>"
 `;

@@ -1,5 +1,5 @@
 <template>
-    <amount-table :items="items" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
+    <amount-table :items="items" :loading="loading" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
 </template>
 
 <script lang="ts">
@@ -13,43 +13,46 @@ import GoDataSource from "../../logic/data-source/GoDataSource";
 import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 import Treeview from "../visualizations/treeview.vue";
 import AmountTable from "./AmountTable.vue";
-import { downloadDataByForm, logToGoogle, triggerDownloadModal } from "../../logic/utils";
+import { downloadDataByForm, logToGoogle } from "../../logic/utils";
 import { GoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
 import FaSortSettings from "./FaSortSettings";
 import { Node } from "../../logic/data-management/Node";
 import FAElement from "../../logic/functional-annotations/FAElement";
 
-    @Component({
-        components: {
-            AmountTable
-        }
-    })
+@Component({
+    components: {
+        AmountTable
+    }
+})
 export default class GoAmountTable extends Vue {
-        @Prop({ required: true })
-        private items: GoTerm[]
-        @Prop({ required: true })
-        private searchSettings: FaSortSettings;
-        @Prop({ required: true })
-        private namespace: GoNameSpace;
-        // The Sample that should be summarized in this AmountTable
-        @Prop({ required: true })
-        private dataRepository: DataRepository;
+    @Prop({ required: true })
+    private items: GoTerm[]
+    @Prop({ required: true })
+    private searchSettings: FaSortSettings;
+    @Prop({ required: true })
+    private namespace: GoNameSpace;
+    // The sample that should be summarized in this AmountTable
+    @Prop({ required: true })
+    @Prop({ required: false, default: false })
+    private loading: boolean;
 
-        private async taxaRetriever(term: GoTerm): Promise<Node> {
-            if (this.dataRepository) {
-                let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
-                let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
-            }
-        }
+    private dataRepository: DataRepository;
 
-        private async summaryRetriever(term: GoTerm): Promise<string[][]> {
-            if (this.dataRepository) {
-                let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
-                return goDataSource.getGoTermSummary(term);
-            }
-            return []
+    private async taxaRetriever(term: GoTerm): Promise<Node> {
+        if (this.dataRepository) {
+            let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
+            let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
+            return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
         }
+    }
+
+    private async summaryRetriever(term: GoTerm): Promise<string[][]> {
+        if (this.dataRepository) {
+            let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
+            return goDataSource.getGoTermSummary(term);
+        }
+        return []
+    }
 }
 </script>
 

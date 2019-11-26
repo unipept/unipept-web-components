@@ -9,12 +9,10 @@ import StorageDataReader from "../visitors/storage/StorageDataReader";
 export default class MetaProteomicsAssay extends Assay implements ProgressListener {
     public peptideContainer: PeptideContainer = new PeptideContainer();
 
-    async initDataRepository(mpaConfig: MPAConfig) {
-        if (!this.peptideContainer.getPeptides() || this.peptideContainer.getPeptides().length === 0) {
-            let dataReader = new StorageDataReader();
-            await this.visit(dataReader);
-        }
-        let dataRepo = new MetaProteomicsDataRepository(this, mpaConfig);
+    async initDataRepository(mpaConfig: MPAConfig, baseUrl: string) {
+        let dataReader = new StorageDataReader();
+        await this.visit(dataReader);
+        let dataRepo = new MetaProteomicsDataRepository(this, mpaConfig, baseUrl);
         await dataRepo.initProcessedPeptideContainer();
         this._dataRepository = dataRepo;
     }
