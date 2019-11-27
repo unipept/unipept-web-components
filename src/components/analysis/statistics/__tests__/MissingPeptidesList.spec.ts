@@ -4,7 +4,6 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
 import Mock from "@/test/Mock";
-import DataRepository from "@/logic/data-source/DataRepository";
 import Assay from "@/logic/data-management/assay/Assay";
 
 Vue.use(Vuetify);
@@ -39,8 +38,6 @@ describe("MissingPeptidesList", () => {
     it("correctly renders all peptides ", (done) => {
         let mock: Mock = new Mock();
         mock.mockInitializedAssay().then((assay: Assay) => {
-            console.log(assay.dataRepository);
-
             const wrapper = mount(MissingPeptidesList, {
                 store,
                 localVue,

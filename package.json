@@ -28,7 +28,8 @@
       "^@/(.*)$": "<rootDir>/src/$1",
       "^worker-loader!./PeptideContainerProcessor.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
     },
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["./src/test/init.js"]
   },
   "files": [
     "src/**"
