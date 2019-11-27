@@ -27,7 +27,8 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
       "^worker-loader!./PeptideContainerProcessor.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
-    }
+    },
+    "testEnvironment": "jsdom"
   },
   "files": [
     "src/**"

@@ -5,10 +5,27 @@ import taxa2 from "./resources/taxa2.json";
 import goterms1 from "./resources/goterms1.json";
 import goterms2 from "./resources/goterms2.json";
 import ecnumbers from "./resources/ecnumbers.json";
+import LocalStorageMock from "./LocalStorageMock";
+const fetchPolifill = require("whatwg-fetch")
 
 export default class Setup {
+    public setupAll() {
+        this.setUpLocalStorage();
+        this.setUpFetch();
+        this.setupNock();
+    }
+
+    public setUpLocalStorage() {
+        globalThis.localStorage = new LocalStorageMock();
+    }
+
+    public setUpFetch() {
+        globalThis.fetch = fetchPolifill.fetch;
+    }
+
     public setupNock() {
-        const pept2dataScope = nock("http://localhost:3000")
+        const pept2dataScope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/mpa/pept2data", {
                 "peptides": [
@@ -43,7 +60,8 @@ export default class Setup {
             })
             .reply(200, pept2data);
     
-        const taxa1Scope = nock("http://localhost:3000")
+        const taxa1Scope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/taxa", {
                 "taxids": [
@@ -66,7 +84,8 @@ export default class Setup {
             })
             .reply(200, taxa1);
     
-        const taxa2Scope = nock("http://localhost:3000")
+        const taxa2Scope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/taxa", {
                 "taxids": [
@@ -93,7 +112,8 @@ export default class Setup {
             })
             .reply(200, taxa2);
         
-        const goterms1Scope = nock("http://localhost:3000")
+        const goterms1Scope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/goterms", {
                 "goterms": [
@@ -201,7 +221,8 @@ export default class Setup {
             })
             .reply(200, goterms1);
         
-        const goterms2Scope = nock("http://localhost:3000")
+        const goterms2Scope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/goterms", {
                 "goterms": [
@@ -309,7 +330,8 @@ export default class Setup {
             })
             .reply(200, goterms2);
     
-        const ecnumbersScope = nock("http://localhost:3000")
+        const ecnumbersScope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/ecnumbers", {
                 "ecnumbers": [
