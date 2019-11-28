@@ -7,7 +7,7 @@ import MPAConfig from "../logic/data-management/MPAConfig";
  */
 export default class Worker {
     public async postMessage(event: { peptides: string[], config: MPAConfig }) {
-        let result = await process( event.peptides, event.config, "http://localhost:3000", (val) => this.setProgress(val) );
+        let result = await process( event.peptides, event.config, "http://unipept.ugent.be", (val) => this.setProgress(val) );
         this.onmessage({
             data: {
                 type: "result",

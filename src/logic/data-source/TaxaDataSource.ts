@@ -126,7 +126,6 @@ export default class TaxaDataSource extends DataSource {
         if (!this._tree || !this._missedPeptides || this._matchedPeptides === undefined || this._searchedPeptides === undefined) {
             this._tree = await TaxaCountProcessor.process(this._countTable, this._baseUrl);
 
-            // TODO: these values shouldn't be stored here
             this._missedPeptides = this._processedPeptideContainer.missed;
             this._matchedPeptides = this._processedPeptideContainer.numMatched;
             this._searchedPeptides = this._processedPeptideContainer.numSearched;

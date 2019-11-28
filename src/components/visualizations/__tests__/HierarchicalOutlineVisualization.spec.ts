@@ -6,6 +6,7 @@ import DataRepository from "../../../logic/data-source/DataRepository";
 import HierarchicalOutlineVisualization from "./../HierarchicalOutlineVisualization.vue";
 import "jsdom-worker-fix";
 import Vuex from "vuex";
+import flushPromises from "flush-promises"
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -38,7 +39,7 @@ describe("HierarchicalOutlineVisualization", () => {
 
     it("renders simple datasets", (done) => {
         let mock: Mock = new Mock();
-        mock.mockDataRepository().then((dataRepository: DataRepository) => {
+        mock.mockDataRepository().then(async(dataRepository: DataRepository) => {
             const wrapper = mount(HierarchicalOutlineVisualization, {
                 store,
                 localVue,
@@ -49,13 +50,11 @@ describe("HierarchicalOutlineVisualization", () => {
             });
     
             // Wait for all async operations to be finished, before expecting anything.
-            const flushPromises = () => new Promise(setImmediate);
-            flushPromises().then(() => {
-                expect(wrapper.html()).toMatchSnapshot();
-                // Call done here in the promise resolve.
-                done();
-                
-            })
+            await sleep(2000);
+            await flushPromises();
+            expect(wrapper.html()).toMatchSnapshot();
+            // Call done here in the promise resolve.
+            done();
         });
     });
 
@@ -89,3 +88,7 @@ describe("HierarchicalOutlineVisualization", () => {
     //     });
     // });
 });
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

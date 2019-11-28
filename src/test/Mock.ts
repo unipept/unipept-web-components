@@ -6,6 +6,7 @@ import { PeptideContainer } from "@/logic/data-management";
 import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
 import MPAConfig from "@/logic/data-management/MPAConfig";
 import Setup from "./Setup";
+import StorageWriter from "@/logic/data-management/visitors/storage/StorageWriter";
 
 export default class Mock {
     public mockAssay(): Assay {
@@ -46,6 +47,9 @@ export default class Mock {
 
         let peptideContainer: PeptideContainer = new PeptideContainer(sequences);
         output.peptideContainer = peptideContainer;
+
+        let storageWriter: StorageWriter = new StorageWriter();
+        storageWriter.visitMetaProteomicsAssay(output);
         
         return output;
     }
@@ -60,17 +64,19 @@ export default class Mock {
 
     public async mockDataRepository(): Promise<DataRepository> {
         let setup: Setup = new Setup();
-        setup.setupNock();
+        setup.setupAll();
         let assay: Assay = this.mockAssay();
         let manager: MpaAnalysisManager = new MpaAnalysisManager();
-        try {
-            await manager.processDataset(assay, this.mockMPAConfig(), "http://localhost:3000");
-        } catch (err) {
-            // This error should be ignored.
-            if (!err.includes("are not available")) {
-                throw err;
-            }
-        }
+        await manager.processDataset(assay, this.mockMPAConfig(), "http://unipept.ugent.be");
         return assay.dataRepository;
+    }
+
+    public async mockInitializedAssay(): Promise<Assay> {
+        let setup: Setup = new Setup();
+        setup.setupAll();
+        let assay: Assay = this.mockAssay();
+        let manager: MpaAnalysisManager = new MpaAnalysisManager();
+        await manager.processDataset(assay, this.mockMPAConfig(), "http://unipept.ugent.be");
+        return assay;
     }
 }
