@@ -113,6 +113,21 @@ describe("ExperimentSummaryCard", () => {
 
         done();
     });
+
+    it("opens a dialog when clicking the missed peptides text", async(done) => {
+        // Fix for Vuetify warn in combination with Jest and Dialogs
+        const app = document.createElement("div");
+        app.setAttribute("data-app", "");
+        document.body.append(app);
+
+        const wrapper = await mountWithValidDatasets(vuetify);
+    
+        expect(wrapper.find(".v-dialog--active").exists()).toBeFalsy();
+        wrapper.find(".peptide-match-text a").trigger("click");
+        expect(wrapper.find(".v-dialog--active").exists()).toBeTruthy();
+
+        done();
+    });
 });
 
 const getValidStore = async function(): Promise<Store<unknown>> {
