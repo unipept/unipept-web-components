@@ -6,21 +6,30 @@ import goterms1 from "./resources/goterms1.json";
 import goterms2 from "./resources/goterms2.json";
 import ecnumbers from "./resources/ecnumbers.json";
 import LocalStorageMock from "./LocalStorageMock";
+import ClipboardMock from "./ClipboardMock";
 const fetchPolifill = require("whatwg-fetch")
 
 export default class Setup {
     public setupAll() {
-        this.setUpLocalStorage();
-        this.setUpFetch();
+        this.setupLocalStorage();
+        this.setupFetch();
         this.setupNock();
+        this.setupClipboard();
     }
 
-    public setUpLocalStorage() {
+    public setupLocalStorage() {
         globalThis.localStorage = new LocalStorageMock();
     }
 
-    public setUpFetch() {
+    public setupFetch() {
         globalThis.fetch = fetchPolifill.fetch;
+    }
+
+    public setupClipboard() {
+        // Required to override the clipboard property of the navigator
+        type Writable<T> = { -readonly [P in keyof T]: T[P] };
+        let writableNavigator: Writable<Navigator> = navigator;
+        writableNavigator.clipboard = new ClipboardMock();
     }
 
     public setupNock() {

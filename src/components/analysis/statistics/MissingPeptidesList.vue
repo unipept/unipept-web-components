@@ -13,7 +13,7 @@
             </template>
         </v-data-table>
 
-        <div style="margin-top: 8px; margin-bottom: 8px; display: flex; justify-content: center;">
+        <div style="margin-top: 8px; margin-bottom: 8px; display: flex; justify-content: center;" class="copy-button-container">
             <v-btn @click="copyToClipboard" color="primary">
                 <v-icon left>
                     mdi-clipboard-text-outline

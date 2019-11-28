@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`MissingPeptidesList correctly copies items to clipboard 1`] = `
+"SGLAPFYSDK
+AAANESFGYNEDELVSSDLVGMR
+LAEEVLR
+YEVGTMLELPR
+TNTLLQSAFFK
+ANFEGECSEVGMYLAMAR
+MEVAVGDK
+LLDLGVLVGSGYHVNPK
+VYFLNFKPESSDEWK
+LGLVAVSR"
+`;
+
 exports[`MissingPeptidesList correctly renders all peptides 1`] = `
 "<div>
         Sorry, we didn't manage to find 10 of your 
