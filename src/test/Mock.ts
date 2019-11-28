@@ -9,8 +9,8 @@ import Setup from "./Setup";
 import StorageWriter from "@/logic/data-management/visitors/storage/StorageWriter";
 
 export default class Mock {
-    public mockAssay(): Assay {
-        let sequences: string[] = [
+    public mockSequences(): string[] {
+        return [
             "YVVIQPGVK",
             "SGIAPFYSDKYAK",
             "FLGFEQIFK",
@@ -36,19 +36,23 @@ export default class Mock {
             "VYFLNFKPESSDEWKK",
             "IGIVAVSR",
             "AVGFGGDFDGVPR"
-        ]
+        ];
+    }
 
-        let output: MetaProteomicsAssay = new MetaProteomicsAssay(
+    public mockAssay(): Assay {
+        const sequences: string[] = this.mockSequences();
+
+        const output: MetaProteomicsAssay = new MetaProteomicsAssay(
             "1", 
             StorageType.LocalStorage, 
             "Sample X", 
             new Date("2019-10-21")
         );
 
-        let peptideContainer: PeptideContainer = new PeptideContainer(sequences);
+        const peptideContainer: PeptideContainer = new PeptideContainer(sequences);
         output.peptideContainer = peptideContainer;
 
-        let storageWriter: StorageWriter = new StorageWriter();
+        const storageWriter: StorageWriter = new StorageWriter();
         storageWriter.visitMetaProteomicsAssay(output);
         
         return output;

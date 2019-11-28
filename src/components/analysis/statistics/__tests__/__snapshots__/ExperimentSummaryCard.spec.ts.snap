@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExperimentSummaryCard correctly renders a placeholder when no dataset is selected 1`] = `"<span class=\\"dataset-placeholder-text\\">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>"`;
+
+exports[`ExperimentSummaryCard correctly renders all items that are currently present 1`] = `
+"<span class=\\"peptide-match-text\\">
+            We managed to match 15 of your 25 peptides.
+            Unfortunately, <a style=\\"cursor: pointer;\\">10</a> peptides couldn't be found.
+        </span>"
+`;

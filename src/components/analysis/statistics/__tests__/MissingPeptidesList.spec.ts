@@ -7,7 +7,7 @@ import Mock from "@/test/Mock";
 import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import Utils from "./../../../custom/Utils";
-import { contourDensity } from "d3";
+import TestUtils from "@/test/TestUtils";
 
 jest.mock("./../../../custom/Utils");
 
@@ -66,7 +66,7 @@ describe("MissingPeptidesList", () => {
                 }
             });
     
-            await sleep(1000);
+            await TestUtils.sleep(1000);
             await flushPromises();
 
             // Test whether the calculated amount of missing peptides is correct.
@@ -98,7 +98,7 @@ describe("MissingPeptidesList", () => {
                 }
             });
     
-            await sleep(1000);
+            await TestUtils.sleep(1000);
             await flushPromises();
 
             wrapper.find(".copy-button-container button").trigger("click");
@@ -122,7 +122,7 @@ describe("MissingPeptidesList", () => {
                 }
             });
     
-            await sleep(1000);
+            await TestUtils.sleep(1000);
             await flushPromises();
 
             wrapper.find("td.text-center i").trigger("click");
@@ -141,8 +141,3 @@ describe("MissingPeptidesList", () => {
         })
     });
 })
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-

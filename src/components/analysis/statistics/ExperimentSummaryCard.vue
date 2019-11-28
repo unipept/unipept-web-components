@@ -19,8 +19,8 @@
                 </tooltip>
             </div>
             <v-divider></v-divider>
-            <span v-if="!$store.getters.activeDataset">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
-            <span v-else>
+            <span v-if="!$store.getters.activeDataset" class="dataset-placeholder-text">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
+            <span v-else class="peptide-match-text">
                 We managed to match {{ matchedPeptides }} of your {{ searchedPeptides }} peptides.
                 Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ missedPeptides.length }}</a> peptides couldn't be found.
             </span>
@@ -80,6 +80,10 @@ export default class ExperimentSummaryCard extends Vue {
         this.missingCleavage = this.$store.getters.searchSettings.missed;
     }
 
+    mounted() {
+        this.onActiveDatasetChanged();
+    }
+
     reprocess(): void {
         this.$store.dispatch("setSearchSettings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
 
@@ -102,6 +106,8 @@ export default class ExperimentSummaryCard extends Vue {
             this.searchedPeptides = await taxaSource.getAmountOfSearchedPeptides();
             this.matchedPeptides = await taxaSource.getAmountOfMatchedPeptides();
             this.missedPeptides = await taxaSource.getMissedPeptides();
+            console.log(this.searchedPeptides);
+            console.log(this.matchedPeptides);
             this.loading = false;
         }
     }
