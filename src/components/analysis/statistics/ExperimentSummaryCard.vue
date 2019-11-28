@@ -106,8 +106,6 @@ export default class ExperimentSummaryCard extends Vue {
             this.searchedPeptides = await taxaSource.getAmountOfSearchedPeptides();
             this.matchedPeptides = await taxaSource.getAmountOfMatchedPeptides();
             this.missedPeptides = await taxaSource.getMissedPeptides();
-            console.log(this.searchedPeptides);
-            console.log(this.matchedPeptides);
             this.loading = false;
         }
     }

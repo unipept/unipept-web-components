@@ -1,12 +1,14 @@
-import { shallowMount, createLocalVue, mount } from "@vue/test-utils";
+import { shallowMount, createLocalVue, mount, Wrapper } from "@vue/test-utils";
 import ExperimentSummaryCard from "./../ExperimentSummaryCard.vue";
 import Vue from "vue";
 import Vuetify from "vuetify";
-import Vuex from "vuex";
+import Vuex, { Store } from "vuex";
 import Mock from "@/test/Mock";
 import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import TestUtils from "@/test/TestUtils";
+import { CombinedVueInstance } from "vue/types/vue";
+import MPAConfig from "@/logic/data-management/MPAConfig";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -37,41 +39,32 @@ describe("ExperimentSummaryCard", () => {
     });
 
     it("correctly renders all items that are currently present", async(done) => {
-        let mock: Mock = new Mock();
-        mock.mockInitializedAssay().then(async(assay: Assay) => {
-            getters = {
-                selectedTerm: () => "Organism",
-                searchSettings: () => {
-                    return {
-                        il: true,
-                        dupes: true,
-                        missed: false
-                    }
-                },
-                selectedDatasets: () => [assay],
-                activeDataset: () => assay,
-            };
-    
-            store = new Vuex.Store({
-                getters
-            });
+        const wrapper = await mountWithValidDatasets(vuetify);
 
-            const wrapper = mount(ExperimentSummaryCard, {
-                store,
-                localVue,
-                vuetify
-            });
+        await TestUtils.sleep(1000);
+        await flushPromises();
 
-            await TestUtils.sleep(1000);
-            await flushPromises();
-
-            expect(wrapper.find(".peptide-match-text").html()).toMatchSnapshot();
-            done();
-        });
+        expect(wrapper.find(".peptide-match-text").html()).toMatchSnapshot();
+        done();
     });
 
     it("correctly renders a placeholder when no dataset is selected", async(done) => {
-        getters = {
+        const wrapper = await mountWithoutDatasets(vuetify);
+        expect(wrapper.find(".dataset-placeholder-text").html()).toMatchSnapshot();
+        done();
+    });
+
+    it("correctly updates search settings when clicking update", async(done) => {
+        const mock: Mock = new Mock();
+        const assay: Assay = await mock.mockInitializedAssay();
+
+        const actions = {
+            setSearchSettings: jest.fn(),
+            setActiveDataset: jest.fn(),
+            processDataset: jest.fn(),
+        }
+
+        const getters = {
             selectedTerm: () => "Organism",
             searchSettings: () => {
                 return {
@@ -80,25 +73,113 @@ describe("ExperimentSummaryCard", () => {
                     missed: false
                 }
             },
-            selectedDatasets: () => [],
-            activeDataset: () => null,
+            selectedDatasets: () => [assay],
+            activeDataset: () => assay,
         };
 
-        store = new Vuex.Store({
+        const store = new Vuex.Store({
+            actions,
             getters
         });
 
-        const wrapper = mount(ExperimentSummaryCard, {
+        const wrapper = await mount(ExperimentSummaryCard, {
             store,
             localVue,
             vuetify
         });
 
-        expect(wrapper.find(".dataset-placeholder-text").html()).toMatchSnapshot();
+        wrapper.find(".card-actions button").trigger("click");
+        // Check that the function did inform the store of the current values
+        expect(actions.setSearchSettings).toBeCalled();
+        expect(actions.setSearchSettings.mock.calls[0][1]).toEqual({
+            il: true,
+            dupes: true,
+            missed: false
+        });
+
+        actions.setSearchSettings.mockReset();
+
+        // Now we change the search settings-values
+        wrapper.find(".search-settings-form input").trigger("click");
+        wrapper.find(".card-actions button").trigger("click");
+
+        // Check that different search settings are now being used in the store.
+        expect(actions.setSearchSettings).toBeCalled();
+        expect(actions.setSearchSettings.mock.calls[0][1]).toEqual({
+            il: false,
+            dupes: true,
+            missed: false
+        });
+
         done();
+    });
+});
+
+const getValidStore = async function(): Promise<Store<unknown>> {
+    const mock: Mock = new Mock();
+    const assay: Assay = await mock.mockInitializedAssay();
+    const getters = {
+        selectedTerm: () => "Organism",
+        searchSettings: () => {
+            return {
+                il: true,
+                dupes: true,
+                missed: false
+            }
+        },
+        selectedDatasets: () => [assay],
+        activeDataset: () => assay,
+    };
+
+    const store = new Vuex.Store({
+        getters
     });
 
-    it("correctly updates search settings when clicking update", async(done) => {
-        done();
+    return store;
+}
+
+/**
+ * Mount the ExperimentSummaryCard-component with a valid lists of assays in the store and a valid activeDataset
+ * entry in the Vuex store.
+ * 
+ * @param vuetify A valid Vuetify instance that should be used during the tests.
+ */
+const mountWithValidDatasets = async function(vuetify): Promise<Wrapper<CombinedVueInstance<ExperimentSummaryCard, object, object, object, Record<never, any>>>> {
+    const store = await getValidStore();
+
+    return mount(ExperimentSummaryCard, {
+        store,
+        localVue,
+        vuetify
     });
-})
+}
+
+/**
+ * Mount the ExperimentSummaryCard-component without valid assay.
+ * 
+ * @param vuetify A valid Vuetify instance that should be used during the tests.
+ */
+const mountWithoutDatasets = async function(vuetify): Promise<Wrapper<CombinedVueInstance<ExperimentSummaryCard, object, object, object, Record<never, any>>>> {
+    const getters = {
+        selectedTerm: () => "Organism",
+        searchSettings: () => {
+            return {
+                il: true,
+                dupes: true,
+                missed: false
+            }
+        },
+        selectedDatasets: () => [],
+        activeDataset: () => null,
+    };
+
+    const store = new Vuex.Store({
+        getters
+    });
+
+    return mount(ExperimentSummaryCard, {
+        store,
+        localVue,
+        vuetify
+    });
+}
