@@ -8,7 +8,6 @@ import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import TestUtils from "@/test/TestUtils";
 import { CombinedVueInstance } from "vue/types/vue";
-import MPAConfig from "@/logic/data-management/MPAConfig";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -115,15 +114,17 @@ describe("ExperimentSummaryCard", () => {
     });
 
     it("opens a dialog when clicking the missed peptides text", async(done) => {
-        // Fix for Vuetify warn in combination with Jest and Dialogs
+        // Fix for Vuetify warn in combination with Jest and Dialogs 
         const app = document.createElement("div");
         app.setAttribute("data-app", "");
         document.body.append(app);
 
         const wrapper = await mountWithValidDatasets(vuetify);
     
+        // The dialog should not be open when first loading the component.
         expect(wrapper.find(".v-dialog--active").exists()).toBeFalsy();
         wrapper.find(".peptide-match-text a").trigger("click");
+        // After clicking the peptide-match-text, the dialog should open.
         expect(wrapper.find(".v-dialog--active").exists()).toBeTruthy();
 
         done();
