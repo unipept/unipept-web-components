@@ -1,7 +1,7 @@
 {
   "name": "unipept-web-components",
-  "version": "0.1.1",
-  "private": true,
+  "version": "0.1.2",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "webpack && dts-bundle --configJson dts-bundle.config.json --emitOnIncludedFileNotFound",
