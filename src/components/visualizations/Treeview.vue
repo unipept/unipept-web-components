@@ -1,5 +1,5 @@
 <template>
-    <div v-once ref="visualization"></div>
+    <div class="treeview-container" v-once ref="visualization"></div>
 </template>
 
 <script lang="ts">
@@ -101,5 +101,9 @@ export default class Treeview extends Vue {
 }
 </script>
 
-<style scoped>
+<style>
+   .treeview-container svg {
+        width: 100% !important;
+        max-height: 600px !important;
+    }
 </style>
