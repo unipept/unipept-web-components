@@ -1,6 +1,6 @@
 {
   "name": "unipept-web-components",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -34,7 +34,8 @@
     ]
   },
   "files": [
-    "src/**"
+    "src/**",
+    "tsconfig.json"
   ],
   "dependencies": {
     "axios": "^0.19.0",
