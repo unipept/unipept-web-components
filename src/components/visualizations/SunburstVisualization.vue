@@ -103,6 +103,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                 getTooltip: tooltipContent,
                 getTitleText: d => `${d.name} (${d.rank})`,
                 rerootCallback: d => this.search(d.id, d.name, 1000),
+                useFixedColors: this.isFixedColors
             });
 
             if (this.autoResize) {
