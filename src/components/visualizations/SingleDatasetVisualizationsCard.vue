@@ -278,9 +278,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     .mpa-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
-        position: relative;
-        left: 50%;
-        transform: translate(-35px);
     }
 
     .fullscreen-buttons-container {
