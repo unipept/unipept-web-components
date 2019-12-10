@@ -16,17 +16,7 @@
         </v-tabs>
         <v-tabs-items v-model="currentTab">
             <v-tab-item>
-                <v-card flat>
-                    <v-card-text>
-                        <dataset-form ref="createdDatasetForm" v-on:peptide-change="createPeptides = $event" :peptides="createPeptides" v-on:name-change="createName = $event" :name="createName" v-on:save-change="createSave = $event" :save="createSave" :loading="pendingStore"></dataset-form>
-                        <div class="card-actions">
-                            <v-btn :disabled="pendingStore" @click="storeCreatedDataset()">
-                                <v-icon left>mdi-plus</v-icon>
-                                Add to selected datasets
-                            </v-btn>
-                        </div>
-                    </v-card-text>
-                </v-card>
+                <create-dataset-card></create-dataset-card>
             </v-tab-item>
             
             <v-tab-item>
@@ -148,6 +138,7 @@ import { StorageType } from "../../logic/data-management/StorageType";
 // TODO can be migrated to Vuetify snackbar!
 import Snackbar from "../custom/Snackbar.vue";
 import axios from "axios"
+import CreateDatasetCard from "./CreateDatasetCard.vue";
 
 import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
