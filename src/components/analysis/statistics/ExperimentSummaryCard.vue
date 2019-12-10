@@ -7,15 +7,15 @@
         </card-header>
         <v-card-text style="flex-grow: 1; display: flex; flex-direction: column;">
             <search-settings-form
-                :disabled="disabled"
+                :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)"
                 :equate-il.sync="equateIl"
                 :filter-duplicates.sync="filterDuplicates"
                 :missing-cleavage.sync="missingCleavage"
                 style="flex-grow: 1;">
             </search-settings-form>
-            <div class="card-actions">
+            <div class="card-actions" >
                 <tooltip message="Restart search with selected samples using the settings chosen above.">
-                    <v-btn :disabled="disabled" @click="reprocess()" color="primary"><v-icon left>mdi-restore</v-icon>Update</v-btn>
+                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary"><v-icon left>mdi-restore</v-icon>Update</v-btn>
                 </tooltip>
             </div>
             <v-divider></v-divider>
@@ -63,9 +63,6 @@ import Tooltip from "../../custom/Tooltip.vue";
     }
 })
 export default class ExperimentSummaryCard extends Vue {
-    @Prop({ required: false, default: false })
-    private disabled: boolean;
-
     private equateIl: boolean = true;
     private filterDuplicates: boolean = true;
     private missingCleavage: boolean = false;
