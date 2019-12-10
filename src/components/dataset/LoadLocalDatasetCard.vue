@@ -38,17 +38,18 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component"
+import Component, { mixins } from "vue-class-component"
 import Assay from "../../logic/data-management/assay/Assay";
 import { Prop } from "vue-property-decorator";
 import Tooltip from "../custom/Tooltip.vue";
+import DatasetMixin from "./DatasetMixin.vue";
 
 @Component({
     components: {
         Tooltip
     }
 })
-export default class LoadLocalDatasetCard extends Vue {
+export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
     @Prop({ required: true })
     private storedDatasets: Assay[];
 }

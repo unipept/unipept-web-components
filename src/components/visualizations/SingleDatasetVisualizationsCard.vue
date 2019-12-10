@@ -278,6 +278,11 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     .mpa-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
+        display: flex;
+    }
+
+    .unipept-web-app .mpa-waiting {
+        justify-content: center;
     }
 
     .fullscreen-buttons-container {
