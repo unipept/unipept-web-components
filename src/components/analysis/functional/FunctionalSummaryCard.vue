@@ -470,15 +470,16 @@ export default class FunctionalSummaryCard extends Vue {
     .go-waiting, .ec-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
-        display: flex;
+        position: relative;
+        transform: translateX(-50%);
     }
 
-    .unipept-web-app .go-waiting {
-        justify-content: center;
+    .go-waiting {
+        transform: translate(-25px);
     }
 
-    .unipept-web-app .ec-waiting {
-        justify-content: center;
+    .ec-waiting {
+        transform: translate(-35px);
     }
 
     #filtered-taxon-information
