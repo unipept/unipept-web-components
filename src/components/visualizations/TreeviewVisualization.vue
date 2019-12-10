@@ -95,8 +95,8 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
 <style lang="less">
     @import './../../assets/style/visualizations.css.less';
 
-    #treeviewWrapper svg {
+    .treeviewWrapper svg {
         width: 100% !important;
-        height: 600px !important;
+        max-height: 600px !important;
     }
 </style>
