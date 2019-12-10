@@ -1,11 +1,11 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
-import { StorageType } from "@/logic/data-management/StorageType";
-import StorageWriter from "@/logic/data-management/visitors/storage/StorageWriter";
+import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
+import { StorageType } from "../../logic/data-management/StorageType";
+import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
 import { EventBus } from "../EventBus";
-import Assay from "@/logic/data-management/assay/Assay";
+import Assay from "../../logic/data-management/assay/Assay";
 
 @Component
 export default class DatasetMixin extends Vue {

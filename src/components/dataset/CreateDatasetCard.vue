@@ -11,7 +11,7 @@
                 :loading="pendingStore">
             </dataset-form>
             <div class="card-actions">
-                <v-btn :disabled="pendingStore" @click="storeCreatedDataset()">
+                <v-btn :disabled="pendingStore" @click="selectCreateDataset()">
                     <v-icon left>mdi-plus</v-icon>
                     Add to selected datasets
                 </v-btn>
@@ -24,14 +24,19 @@
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
+import DatasetForm from "./DatasetForm.vue";
 
-@Component
+@Component({
+    components: {
+        DatasetForm
+    }
+})
 export default class CreateDatasetCard extends mixins(DatasetMixin) {
     protected createPeptides: string = "";
     protected createName: string = "";
     private createSave: boolean = true;
 
-    private storeCreatedDataset() {
+    private selectCreateDataset() {
         // @ts-ignore
         if (this.$refs.createdDatasetForm.isValid()) {
             this.storeDataset(this.createPeptides, this.createName, this.createSave);

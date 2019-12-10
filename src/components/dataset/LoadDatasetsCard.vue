@@ -20,41 +20,7 @@
             </v-tab-item>
             
             <v-tab-item>
-                <v-card flat>
-                    <v-card-text>
-                        <v-progress-circular v-if="loadingSampleDatasets"></v-progress-circular>
-                        <div v-else-if="errorSampleDatasets">
-                            <v-alert type="error">
-                                Unable to retrieve list of sample datasets.
-                            </v-alert>
-                        </div>
-                        <div v-else v-for="dataset of sampleDatasets" v-bind:key="dataset.id">
-                            <b>Environment:</b> {{ dataset.environment }}
-                            <br>
-                            <b>Reference:</b>
-                            <small>
-                                {{ dataset.reference }}
-                                <a target="_blank" title="Article website" :href="dataset.url">
-                                    <span class="glyphicon glyphicon-link"></span>
-                                </a>
-                                <a target="_blank" title="Project website" :href="dataset.projectWebsite">
-                                    <span class="glyphicon glyphicon-share-alt"></span>
-                                </a>
-                            </small>
-                            <br>
-                            <div class="load-sample-container">
-                                <v-row>
-                                    <v-col :cols="7">
-                                        <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
-                                    </v-col>
-                                    <v-col :cols="5" style="display: flex; align-items: center;">
-                                        <v-btn @click="storeSampleDataset(dataset.id)">Load dataset</v-btn>
-                                    </v-col>
-                                </v-row>
-                            </div>
-                        </div>
-                    </v-card-text>
-                </v-card>
+                <load-sample-dataset-card :selected-datasets="selectedDatasets"></load-sample-dataset-card>
             </v-tab-item>
             
             <v-tab-item>
@@ -139,6 +105,7 @@ import { StorageType } from "../../logic/data-management/StorageType";
 import Snackbar from "../custom/Snackbar.vue";
 import axios from "axios"
 import CreateDatasetCard from "./CreateDatasetCard.vue";
+import LoadSampleDatasetCard from "./LoadSampleDatasetCard.vue";
 
 import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
@@ -150,7 +117,9 @@ import { EventBus } from "../EventBus";
     components: {
         Snackbar,
         DatasetForm,
-        Tooltip
+        Tooltip,
+        CreateDatasetCard,
+        LoadSampleDatasetCard
     },
     computed: {
         baseUrl: {
@@ -202,49 +171,6 @@ export default class LoadDatasetsCard extends Vue {
     private loadingSampleDatasets: boolean = true;
     private errorSampleDatasets: boolean = false;
     private selectedSampleDataset = {};
-
-    mounted() {
-        this.retrieveSampleDatasets();
-    }
-
-    @Watch("baseUrl")
-    private retrieveSampleDatasets() {
-        this.loadingSampleDatasets = true;
-        this.errorSampleDatasets = false;
-        axios.post(this.$store.getters.baseUrl + "/datasets/sampledata")
-            .then(result => {
-                this.sampleDatasets = [];
-                this.selectedSampleDataset = {};
-                for (let item of result.data.sample_data) {
-                    let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));
-                    itemDatasets = itemDatasets.sort((a, b) => {
-                        return a.order < b.order;
-                    });
-                    this.sampleDatasets.push(new SampleDatasetCollection(
-                        item.id,
-                        item.environment,
-                        item.project_website,
-                        item.reference,
-                        item.url,
-                        itemDatasets
-                    ));
-                    this.selectedSampleDataset[item.id] = itemDatasets[0].name;
-                }
-            })
-            .catch((error) => {
-                this.errorSampleDatasets = true;
-            })
-            .finally(() => this.loadingSampleDatasets = false);
-    }
-
-    private storeSampleDataset(datasetId: string) {
-        let name: string = this.selectedSampleDataset[datasetId];
-        if (name && !this.selectedDatasets.some((dataset) => dataset.getName() === name)) {
-            let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find((dataset) => dataset.id == datasetId);
-            let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find((dataset) => dataset.name == this.selectedSampleDataset[datasetId]);
-            this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
-        }
-    }
 
     private fetchPrideAssay(): void {
         if (this.$refs.prideAssayForm.validate()) {
