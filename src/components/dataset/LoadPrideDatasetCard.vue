@@ -33,7 +33,12 @@ import DatasetManager from "../../logic/data-management/DatasetManager";
 import DatasetForm from "./DatasetForm.vue";
 import Snackbar from "../custom/Snackbar.vue";
 
-@Component
+@Component({
+    components: {
+        Snackbar,
+        DatasetForm
+    }
+})
 export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
     $refs!: {
         prideAssayForm: any,

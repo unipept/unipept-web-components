@@ -28,41 +28,7 @@
             </v-tab-item>
             
             <v-tab-item>
-                <v-card flat>
-                    <v-card-text v-if="storedDatasets.length === 0">
-                        <span>There are currently no datasets present in your browser's local storage.</span>
-                    </v-card-text>
-                    <v-list two-line>
-                        <template v-for="dataset of storedDatasets">
-                            <v-list-item :key="dataset.id" ripple @click="selectDataset(dataset)">
-                                <v-list-item-action>
-                                    <tooltip message="Select this dataset for analysis.">
-                                        <v-icon>mdi-plus</v-icon>
-                                    </tooltip>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        {{ dataset.getName() }}
-                                    </v-list-item-title>
-                                    <v-list-item-subtitle>
-                                        {{ dataset.getAmountOfPeptides() }} peptides
-                                    </v-list-item-subtitle>
-                                </v-list-item-content>
-
-                                <v-list-item-action>
-                                    <v-list-item-action-text>
-                                        {{ dataset.getDateFormatted() }}
-                                    </v-list-item-action-text>
-                                    <tooltip message="Delete this sample from local storage.">
-                                        <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
-                                            <v-icon color="grey darken-1">mdi-close</v-icon>
-                                        </v-btn>
-                                    </tooltip>
-                                </v-list-item-action>
-                            </v-list-item>
-                        </template>
-                    </v-list>
-                </v-card>
+                <load-local-dataset-card :stored-datasets="storedDatasets"></load-local-dataset-card>
             </v-tab-item>
         </v-tabs-items>
     </v-card>
@@ -73,17 +39,11 @@ import Vue from "vue";
 
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import DatasetForm from "./DatasetForm.vue";
 import Assay from "../../logic/data-management/assay/Assay";
-import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
-import DatasetManager from "../../logic/data-management/DatasetManager";
-import { StorageType } from "../../logic/data-management/StorageType";
-// TODO can be migrated to Vuetify snackbar!
-import Snackbar from "../custom/Snackbar.vue";
-import axios from "axios"
 import CreateDatasetCard from "./CreateDatasetCard.vue";
 import LoadSampleDatasetCard from "./LoadSampleDatasetCard.vue";
 import LoadPrideDatasetCard from "./LoadPrideDatasetCard.vue";
+import LoadLocalDatasetCard from "./LoadLocalDatasetCard.vue";
 
 import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
@@ -93,12 +53,10 @@ import { EventBus } from "../EventBus";
 
 @Component({
     components: {
-        Snackbar,
-        DatasetForm,
-        Tooltip,
         CreateDatasetCard,
         LoadSampleDatasetCard,
-        LoadPrideDatasetCard
+        LoadPrideDatasetCard,
+        LoadLocalDatasetCard
     },
     computed: {
         baseUrl: {
@@ -123,23 +81,6 @@ export default class LoadDatasetsCard extends Vue {
     private isDark: boolean;
 
     private currentTab: number = 0;
-
-    private sampleDatasets: SampleDatasetCollection[] = [];
-
-    private pendingStore: boolean = false;
-
-    private loadingSampleDatasets: boolean = true;
-    private errorSampleDatasets: boolean = false;
-    private selectedSampleDataset = {};
-
-    private selectDataset(dataset: Assay): void {
-        EventBus.$emit("select-dataset", dataset);
-    }
-
-    private deleteDataset(dataset: Assay): void {
-        this.$store.dispatch("deleteDataset", dataset);
-        EventBus.$emit("delete-dataset", dataset);
-    }
 }
 </script>
 
