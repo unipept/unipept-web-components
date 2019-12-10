@@ -32,12 +32,15 @@ import DatasetForm from "./DatasetForm.vue";
     }
 })
 export default class CreateDatasetCard extends mixins(DatasetMixin) {
+    $refs!: {
+        createdDatasetForm: DatasetForm
+    }
+
     protected createPeptides: string = "";
     protected createName: string = "";
     private createSave: boolean = true;
 
     private selectCreateDataset() {
-        // @ts-ignore
         if (this.$refs.createdDatasetForm.isValid()) {
             this.storeDataset(this.createPeptides, this.createName, this.createSave);
         }
