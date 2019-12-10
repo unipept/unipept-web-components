@@ -73,8 +73,6 @@ export default class HeatmapWizardMultiSample extends Vue {
     private dataset: Assay;
     @Prop()
     private searchSettings: MPAConfig;
-    @Prop({ required: true })
-    private selectedDatasets: Assay[];
 
     private clusterRows: boolean = true;
     private clusterColumns: boolean = true;
@@ -194,12 +192,7 @@ export default class HeatmapWizardMultiSample extends Vue {
     }
 
     private async computeHeatmapAndProceed() {
-        let newHash = sha256(
-            this.normalizer +
-            this.dataSource +
-            this.selectedItems.toString() + 
-            this.selectedDatasets.map(el => el.getName()).toString()
-        ).toString();
+        let newHash = sha256(this.normalizer + this.dataSource + this.selectedItems.toString()).toString();
 
         if (newHash === this.previouslyComputed) {
             return;
@@ -220,14 +213,14 @@ export default class HeatmapWizardMultiSample extends Vue {
             rows.push({ id: i.toString(), name: item.name });
         }
 
-        for (let i = 0; i < this.selectedDatasets.length; i++) {
-            let item: Assay = this.selectedDatasets[i];
+        for (let i = 0; i < this.$store.getters.selectedDatasets.length; i++) {
+            let item: Assay = this.$store.getters.selectedDatasets[i];
             cols.push({ id: i.toString(), name: item.getName() });
         }
 
         for (let item of this.selectedItems) {
             let gridRow: number[] = [];
-            for (let container of this.selectedDatasets) {
+            for (let container of this.$store.getters.selectedDatasets) {
                 let value: number = (await item.getAffectedPeptides(container.dataRepository)).length;
                 gridRow.push(value);
             }
