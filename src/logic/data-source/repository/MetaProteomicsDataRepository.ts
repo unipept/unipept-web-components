@@ -89,9 +89,6 @@ export default class MetaProteomicsDataRepository extends DataRepository {
             lcas.push(data.lca)
         });
 
-        // fetch taxa info for these lcas
-        await Ontologies.ncbiTaxonomy.fetchTaxaInfo(lcas, this._baseUrl);
-
         return processedPeptideContainer;
     }
 }
