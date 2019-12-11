@@ -7,31 +7,10 @@
     "build": "webpack && dts-bundle --configJson dts-bundle.config.json --emitOnIncludedFileNotFound",
     "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "docs:build": "vuepress build docs",
-    "docs:dev": "vuepress dev docs"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "vue"
-    ],
-    "transform": {
-      ".*\\.(vue)$": "vue-jest",
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testURL": "http://localhost/",
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1",
-      "^worker-loader!./PeptideContainerProcessor.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
-    },
-    "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": [
-      "./src/test/init.js"
-    ]
+    "docs": "vue-styleguidist server",
+    "docs:build": "vue-styleguidist build",
+    "styleguide": "vue-cli-service styleguidist",
+    "styleguide:build": "vue-cli-service styleguidist:build"
   },
   "files": [
     "src/**",
@@ -46,6 +25,7 @@
     "crypto-js": "^3.1.9-1",
     "d3": "^5.11.0",
     "d3-selection": "^1.4.0",
+    "electron": "^7.1.4",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.4.1",
     "less": "^3.10.3",
@@ -96,14 +76,39 @@
     "svg-inline-loader": "^0.8.0",
     "ts-jest": "^23.10.5",
     "typescript": "^3.5.1",
+    "vue-cli-plugin-styleguidist": "^4.2.0",
     "vue-cli-plugin-vuetify": "^0.6.3",
     "vue-jest": "^3.0.5",
     "vue-style-loader": "^4.1.2",
+    "vue-styleguidist": "^4.2.0",
     "vue-template-compiler": "^2.6.10",
     "vuepress": "^1.0.2",
     "vuetify-loader": "^1.2.2",
     "webpack-cli": "^3.3.7",
     "worker-loader": "^2.0.0",
     "workerize-loader": "^1.1.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "vue"
+    ],
+    "transform": {
+      ".*\\.(vue)$": "vue-jest",
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testURL": "http://localhost/",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^worker-loader!./PeptideContainerProcessor.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
+    },
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "./src/test/init.js"
+    ]
   }
 }
