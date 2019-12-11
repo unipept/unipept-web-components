@@ -8,9 +8,7 @@
     "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "docs": "vue-styleguidist server",
-    "docs:build": "vue-styleguidist build",
-    "styleguide": "vue-cli-service styleguidist",
-    "styleguide:build": "vue-cli-service styleguidist:build"
+    "docs:build": "vue-styleguidist build"
   },
   "files": [
     "src/**",
