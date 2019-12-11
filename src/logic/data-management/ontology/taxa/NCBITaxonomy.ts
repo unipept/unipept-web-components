@@ -11,15 +11,21 @@ const TAXA_URL =  "/private_api/taxa"
 const LINEAGE_URL =  "/private_api/lineages"
 
 export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
-    async fetchDefinitions(ids: number[], baseUrl: string): Promise<void> {
-        await this.fetchTaxaInfo(ids, baseUrl);
-        await this.fetchLineages(ids, baseUrl);
+    async fetchDefinitions(ids: number[], baseUrl: string): Promise<Set<OntologyId>> {
+        let missedIds = new Set<number>();
+
+        (await this.fetchTaxaInfo(ids, baseUrl)).forEach(id => missedIds.add(id));
+        (await this.fetchLineages(ids, baseUrl)).forEach(id => missedIds.add(id));
+
+        return missedIds;
     }
 
-    async fetchTaxaInfo(ids: OntologyId[], baseUrl: string) {
+    async fetchTaxaInfo(ids: OntologyId[], baseUrl: string): Promise<Set<OntologyId>> {
         ids = ids.filter(id => 
             !this._definitions.has(id) 
             ||  !("name" in this._definitions.get(id)))
+
+        let missedIds = new Set<number>(ids)
 
         // get taxa info
         for (let i = 0; i < ids.length; i += TAXA_BATCH_SIZE) {
@@ -37,15 +43,21 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
                     ncbiTaxon.name = taxon.name;
                     ncbiTaxon.rank = taxon.rank;
                 }
+
+                missedIds.delete(taxon.id);
             })
         }
+
+        return missedIds;
     }
 
-    async fetchLineages(ids: OntologyId[], baseUrl) {
+    async fetchLineages(ids: OntologyId[], baseUrl): Promise<Set<OntologyId>> {
         // first check which ids need to be fetched
         ids = ids.filter(id => 
             !this._definitions.has(id) 
             || !("lineage" in this._definitions.get(id)))
+
+        let missedIds = new Set<number>(ids)
 
         // get lineage info
         for (let i = 0; i < ids.length; i += LINEAGE_BATCH_SIZE) {
@@ -61,8 +73,12 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
                 } else {
                     this._definitions.get(l.id).lineage = l.lineage;
                 }
+
+                missedIds.delete(l.id);
             })
         }
+
+        return missedIds;
     }
 
     setLineage(id: OntologyId, lineage: number[]) {

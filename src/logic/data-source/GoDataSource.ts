@@ -112,7 +112,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
         if (!this._processedPeptideContainer) {
             let namespaceCounts = new Map<string, number>()
 
-            // first calculated the total counts for each namespace
+            // first calculate the total counts for each namespace
             this._countTable.counts.forEach((count, term) => {
                 let namespace = ontology.getDefinition(term).namespace
                 namespaceCounts.set(namespace, (namespaceCounts.get(namespace) || 0) + count)

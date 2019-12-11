@@ -1,10 +1,11 @@
 import { ProcessedPeptideContainer } from "../../data-management/ProcessedPeptideContainer";
 import { TaxaCountTable } from "../../data-management/counts/TaxaCountTable";
 import { Count } from "../../data-management/counts/CountTable";
+import { Ontologies } from "../../data-management/ontology/Ontologies";
 
 export namespace TaxaPeptideProcessor
 {
-    export function process(processedPeptides: ProcessedPeptideContainer): TaxaCountTable {
+    export function process(processedPeptides: ProcessedPeptideContainer, baseURL: string): TaxaCountTable {
         var peptideCounts = processedPeptides.countTable;
 
         var lcaCounts = new Map<number, Count>();

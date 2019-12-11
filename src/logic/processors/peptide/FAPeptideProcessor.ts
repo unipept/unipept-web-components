@@ -3,7 +3,7 @@ import { Count } from "../../data-management/counts/CountTable";
 
 export namespace FAPeptideProcessor
 {
-    export function process(processedPeptides: ProcessedPeptideContainer, faPrefix: string, createFACountTable: (ontologyCounts, ontology2peptide, peptide2ontology) => any): any {
+    export async function process(processedPeptides: ProcessedPeptideContainer, faPrefix: string, ontology: any, baseURL: string, createFACountTable: (ontologyCounts, ontology2peptide, peptide2ontology) => any): Promise<any> {
         var peptideCounts = processedPeptides.countTable;
         var pept2dataResponse = processedPeptides.response;
 
@@ -19,10 +19,28 @@ export namespace FAPeptideProcessor
                 .filter(term => term.startsWith(faPrefix))
                 .forEach(term => {
                     ontologyCounts.set(term, (ontologyCounts.get(term) || 0) + peptideCount)
-                        
-                    if (!peptide2ontology.has(peptide)) {
-                        peptide2ontology.set(peptide, [])
-                    }
+                });
+        })
+
+        // fetch ontology definitions
+        let missingIds: Set<string> = await ontology.fetchDefinitions(Array.from(ontologyCounts.keys()), baseURL);
+
+        // remove missingIds from ontologyCounts
+        missingIds.forEach((id) => {
+            ontologyCounts.delete(id);
+        })
+
+        // create peptide links
+        pept2dataResponse.forEach((data, peptide, _) => {
+            let fas = data.fa.data || [];
+
+            if (!peptide2ontology.has(peptide)) {
+                peptide2ontology.set(peptide, [])
+            }
+
+            Object.keys(fas)
+                .filter(term => term.startsWith(faPrefix) && !missingIds.has(term))
+                .forEach(term => {
                     peptide2ontology.get(peptide).push(term)
 
                     if (!ontology2peptide.has(term)) {
@@ -32,6 +50,7 @@ export namespace FAPeptideProcessor
                 });
         })
 
-        return createFACountTable(ontologyCounts, ontology2peptide, peptide2ontology);
+        let countTable = createFACountTable(ontologyCounts, ontology2peptide, peptide2ontology)
+        return countTable;
     }
 }
