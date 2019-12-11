@@ -13,7 +13,7 @@ import { Heatmap, HeatmapSettings } from "unipept-heatmap";
 import VisualizationMixin from "../visualizations/VisualizationMixin.vue";
 import Tree from "../../logic/data-management/Tree";
 import { Node } from "../../logic/data-management/Node";
-import { HeatmapData, HeatmapElement, HeatmapValue } from "unipept-heatmap/heatmap/input";
+import { HeatmapData, HeatmapElement, HeatmapValue } from "unipept-heatmap/src/heatmap/input";
 
 @Component
 export default class HeatmapVisualization extends mixins(VisualizationMixin) {
@@ -62,6 +62,7 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
             this.heatmap = new Heatmap(heatmapElement, this.data);
 
             let clusterType: "all" | "columns" | "rows" | "none" = "all";
+
 
             if (this.clusterRows && !this.clusterColumns) {
                 clusterType = "rows";

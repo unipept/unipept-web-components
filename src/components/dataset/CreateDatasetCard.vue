@@ -36,8 +36,8 @@ export default class CreateDatasetCard extends mixins(DatasetMixin) {
         createdDatasetForm: DatasetForm
     }
 
-    protected createPeptides: string = "";
-    protected createName: string = "";
+    private createPeptides: string = "";
+    private createName: string = "";
     private createSave: boolean = true;
 
     private selectCreateDataset() {
