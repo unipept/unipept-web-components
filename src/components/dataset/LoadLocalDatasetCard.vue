@@ -1,3 +1,8 @@
+<docs>
+The `LoadLocalDatasetCard` displays a list of all assays that are persistently stored on the user's local computer. The 
+component provides him with the option to select one of these assays for analysis.
+</docs>
+
 <template>
     <v-card flat>
         <v-card-text v-if="storedDatasets.length === 0">
@@ -50,6 +55,10 @@ import DatasetMixin from "./DatasetMixin.vue";
     }
 })
 export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
+    /**
+     * All datasets that are stored in persistent storage (and have already been loaded into memory). The user is able 
+     * to chose each any one of these items and start an analysis.
+     */
     @Prop({ required: true })
     private storedDatasets: Assay[];
 }

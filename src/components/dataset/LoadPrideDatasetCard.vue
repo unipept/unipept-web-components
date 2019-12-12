@@ -1,3 +1,8 @@
+<docs>
+The `LoadPrideDatasetCard` allows the user to load any dataset from the PRIDE-archive. The user enters a valid PRIDE id 
+after which the required information is downloaded and transformed into an Assay.
+</docs>
+
 <template>
     <v-card flat>
         <v-card-text>

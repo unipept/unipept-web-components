@@ -1,3 +1,8 @@
+<docs>
+The `LoadSampleDatasetCard` asynchronously downloads all sample datasets that are present in the Unipept database and 
+provides the user with the option to select any one of these.
+</docs>
+
 <template>
     <v-card flat>
         <v-card-text>
@@ -26,7 +31,11 @@
                 <div class="load-sample-container">
                     <v-row>
                         <v-col :cols="7">
-                            <v-select :items="dataset.datasets" item-text="name" v-model="selectedSampleDataset[dataset.id]"></v-select>
+                            <v-select 
+                                :items="dataset.datasets" 
+                                item-text="name" 
+                                v-model="selectedSampleDataset[dataset.id]">
+                            </v-select>
                         </v-col>
                         <v-col :cols="5" style="display: flex; align-items: center;">
                             <v-btn @click="selectSampleDataset(dataset.id)">Load dataset</v-btn>
@@ -48,11 +57,16 @@ import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCo
 import Assay from "../../logic/data-management/assay/Assay";
 import SampleDataset from "../../logic/data-management/SampleDataset";
 
-@Component
+@Component({
+    computed: {
+        baseUrl: {
+            get(): string {
+                return this.$store.getters.baseUrl;
+            }
+        }
+    }
+})
 export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
-    @Prop({ required: true })
-    private selectedDatasets: Assay[];
-
     private loadingSampleDatasets: boolean = true;
     private errorSampleDatasets: boolean = false;
     private selectedSampleDataset = {};
@@ -95,10 +109,14 @@ export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
 
     private selectSampleDataset(datasetId: string) {
         let name: string = this.selectedSampleDataset[datasetId];
-        // Only datasets with a valid name, that haven't been selected before can be selected
-        if (name && !this.selectedDatasets.some((dataset) => dataset.getName() === name)) {
-            let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find((dataset) => dataset.id == datasetId);
-            let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find((dataset) => dataset.name == this.selectedSampleDataset[datasetId]);
+        // Only datasets with a valid name can be selected.
+        if (name) {
+            let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find(
+                (dataset) => dataset.id == datasetId
+            );
+            let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find(
+                (dataset) => dataset.name == this.selectedSampleDataset[datasetId]
+            );
             this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
         }
     }

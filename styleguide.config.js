@@ -28,5 +28,11 @@ module.exports = {
             components: 'src/components/visualizations/**/[A-Z]*.vue'
         }
     ],
-	exampleMode: 'expand'
+    exampleMode: 'expand',
+    theme: {
+        sidebarWidth: 350,
+        color: {
+            sidebarColor: ""
+        }
+    }
 }
