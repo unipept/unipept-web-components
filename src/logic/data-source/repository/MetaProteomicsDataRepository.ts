@@ -80,13 +80,11 @@ export default class MetaProteomicsDataRepository extends DataRepository {
     }
 
     private async processPeptideContainer() {
-        let processedPeptideContainer = await this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig, this._baseUrl)
-        let lcas = [];
+        let processedPeptideContainer = await this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig, this._baseUrl);
 
         // set lineages in ncbiTaxonomy
         processedPeptideContainer.response.forEach((data: PeptideData) => {
             Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
-            lcas.push(data.lca)
         });
 
         return processedPeptideContainer;
