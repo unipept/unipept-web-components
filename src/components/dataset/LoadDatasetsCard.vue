@@ -57,13 +57,6 @@ import { EventBus } from "../EventBus";
         LoadSampleDatasetCard,
         LoadPrideDatasetCard,
         LoadLocalDatasetCard
-    },
-    computed: {
-        baseUrl: {
-            get(): string {
-                return this.$store.getters.baseUrl;
-            }
-        }
     }
 })
 export default class LoadDatasetsCard extends Vue {
