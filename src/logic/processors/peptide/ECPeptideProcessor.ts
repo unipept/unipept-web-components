@@ -1,10 +1,11 @@
 import { ProcessedPeptideContainer } from "../../data-management/ProcessedPeptideContainer";
 import { ECCountTable } from "../../data-management/counts/ECCountTable";
 import { FAPeptideProcessor } from "./FAPeptideProcessor";
+import { Ontologies } from "../../data-management/ontology/Ontologies";
 
 export namespace ECPeptideProcessor
 {
-    export function process(processedPeptides: ProcessedPeptideContainer): ECCountTable {
-        return FAPeptideProcessor.process(processedPeptides, "EC:", (a, b, c) => new ECCountTable(a, b, c));
+    export async function process(processedPeptides: ProcessedPeptideContainer, baseURL: string): Promise<ECCountTable> {
+        return FAPeptideProcessor.process(processedPeptides, "EC:", Ontologies.ecOntology, baseURL, (a, b, c) => new ECCountTable(a, b, c));
     }
 }
