@@ -9,8 +9,6 @@ import Assay from "../../logic/data-management/assay/Assay";
 
 @Component
 export default class DatasetMixin extends Vue {
-    protected pendingStore: boolean = false;
-
     protected selectDataset(assay: Assay): void {
         /**
          * Fired after creation of a new assay by the user. This assay is not automatically processed or added to the
@@ -33,11 +31,19 @@ export default class DatasetMixin extends Vue {
         this.$emit("destroy-assay", dataset);
     }
 
-    protected storeDataset(peptides: string, name: string, save: boolean): void {
-        this.pendingStore = true;
-
+    /**
+     * Store a new dataset with all the given properties. This function does not store the dataset itself, it only
+     * creates a new assay-object and emits the corresponding event.
+     * 
+     * @param peptides One big string containing all peptides for this dataset. The peptides inside this string should
+     * be seperated by "\n" and will automatically be split by this function.
+     * @param name The name of the new assay that should be stored.
+     * @param save Whether the new assay should be stored in persistent storage or not. Pass true if it should be
+     * stored.
+     * @return The assay that was created and stored by this function.
+     */
+    protected storeDataset(peptides: string, name: string, save: boolean): Assay {
         let assay: MetaProteomicsAssay = new MetaProteomicsAssay();            
-        let storageType = save ? StorageType.LocalStorage : StorageType.SessionStorage;
         let storageWriter: StorageWriter = new StorageWriter();
 
         assay.setPeptides(peptides.split("\n"));
@@ -45,23 +51,16 @@ export default class DatasetMixin extends Vue {
         assay.setStorageType(save ? StorageType.LocalStorage : StorageType.SessionStorage);
         assay.setName(name);
 
-        assay.visit(storageWriter).then(
-            () => {
-                this.selectDataset(assay);
-                if (save) {
-                    /**
-                     * Fired after creation of a new assay by the user, in the event that he also chose to 
-                     * persistently store the assay.
-                     * 
-                     * @event store-assay
-                     * @property {Assay} assay The assay that was created by the user and that should be persistently 
-                     * stored.
-                     */
-                    this.$emit("store-assay", assay);
-                }
-                this.pendingStore = false;
-            }
-        );
+        /**
+         * Fired after creation of a new assay by the user, in the event that he also chose to 
+         * persistently store the assay.
+         * 
+         * @event store-assay
+         * @property {Assay} assay The assay that was created by the user and that should be persistently 
+         * stored.
+         */
+        this.$emit("store-assay", assay);
+        return assay;
     }
 }
 </script>

@@ -13,11 +13,10 @@ select assays by itself, it only emits an event with it's intended action.
                 v-on:name-change="createName = $event" 
                 :name="createName" 
                 v-on:save-change="createSave = $event" 
-                :save="createSave" 
-                :loading="pendingStore">
+                :save="createSave">
             </dataset-form>
             <div class="card-actions">
-                <v-btn :disabled="pendingStore" @click="selectCreateDataset()">
+                <v-btn @click="selectCreateDataset()">
                     <v-icon left>mdi-plus</v-icon>
                     Add to selected datasets
                 </v-btn>
@@ -31,6 +30,8 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
 import DatasetForm from "./DatasetForm.vue";
+import Assay from "../../logic/data-management/assay/Assay";
+
 
 @Component({
     components: {
@@ -48,7 +49,8 @@ export default class CreateDatasetCard extends mixins(DatasetMixin) {
 
     private selectCreateDataset() {
         if (this.$refs.createdDatasetForm.isValid()) {
-            this.storeDataset(this.createPeptides, this.createName, this.createSave);
+            const createdAssay: Assay = this.storeDataset(this.createPeptides, this.createName, this.createSave);
+            this.$emit("create-assay", createdAssay);
         }
     }
 }

@@ -5,11 +5,11 @@ component provides him with the option to select one of these assays for analysi
 
 <template>
     <v-card flat>
-        <v-card-text v-if="storedDatasets.length === 0">
+        <v-card-text v-if="storedAssays.length === 0">
             <span>There are currently no datasets present in your browser's local storage.</span>
         </v-card-text>
         <v-list two-line>
-            <template v-for="dataset of storedDatasets">
+            <template v-for="dataset of storedAssays">
                 <v-list-item :key="dataset.id" ripple @click="selectDataset(dataset)">
                     <v-list-item-action>
                         <tooltip message="Select this dataset for analysis.">
@@ -60,7 +60,7 @@ export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
      * to chose each any one of these items and start an analysis.
      */
     @Prop({ required: true })
-    private storedDatasets: Assay[];
+    private storedAssays: Assay[];
 }
 </script>
 
