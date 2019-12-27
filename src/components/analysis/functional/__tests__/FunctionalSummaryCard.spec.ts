@@ -24,7 +24,9 @@ describe("FunctionalSummaryCard", () => {
         store = new Vuex.Store(GlobalStore);
     });
 
-    // it("correctly shows progress bars when data is selected and still loading");
+    it("correctly shows progress bars when data is selected and still loding", (done) => {
+        
+    });
 
     // it("correctly shows placeholders when no data has been selected");
 });
