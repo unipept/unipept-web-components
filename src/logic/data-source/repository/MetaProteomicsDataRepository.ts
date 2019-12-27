@@ -37,9 +37,10 @@ export default class MetaProteomicsDataRepository extends DataRepository {
 
     protected async initTaxaDataSource(): Promise<void> {
         let processedPeptideContainer = await this._processedPeptideContainer;
+        let countTable = await TaxaPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
 
         this._taxaSourceCache = new TaxaDataSource(
-            TaxaPeptideProcessor.process(processedPeptideContainer), 
+            countTable, 
             processedPeptideContainer,
             this,
             this._baseUrl
@@ -48,8 +49,10 @@ export default class MetaProteomicsDataRepository extends DataRepository {
 
     protected async initGoDataSource(): Promise<void> {
         let processedPeptideContainer = await this._processedPeptideContainer;
+        let countTable = await GOPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
+
         this._goSourceCache = new GoDataSource(
-            GOPeptideProcessor.process(processedPeptideContainer),
+            countTable,
             processedPeptideContainer, 
             this,
             this._baseUrl
@@ -58,8 +61,10 @@ export default class MetaProteomicsDataRepository extends DataRepository {
 
     protected async initEcDataSource(): Promise<void> {
         let processedPeptideContainer = await this._processedPeptideContainer;
+        let countTable = await ECPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
+
         this._ecSourceCache = new EcDataSource(
-            ECPeptideProcessor.process(processedPeptideContainer),
+            countTable,
             processedPeptideContainer,
             this,
             this._baseUrl
@@ -75,17 +80,12 @@ export default class MetaProteomicsDataRepository extends DataRepository {
     }
 
     private async processPeptideContainer() {
-        let processedPeptideContainer = await this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig, this._baseUrl)
-        let lcas = [];
+        let processedPeptideContainer = await this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig, this._baseUrl);
 
         // set lineages in ncbiTaxonomy
         processedPeptideContainer.response.forEach((data: PeptideData) => {
             Ontologies.ncbiTaxonomy.setLineage(data.lca, data.lineage);
-            lcas.push(data.lca)
         });
-
-        // fetch taxa info for these lcas
-        await Ontologies.ncbiTaxonomy.fetchTaxaInfo(lcas, this._baseUrl);
 
         return processedPeptideContainer;
     }

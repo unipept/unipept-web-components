@@ -32,10 +32,9 @@ export default class GoAmountTable extends Vue {
     @Prop({ required: true })
     private namespace: GoNameSpace;
     // The sample that should be summarized in this AmountTable
-    @Prop({ required: true })
     @Prop({ required: false, default: false })
     private loading: boolean;
-
+    @Prop({ required: true })
     private dataRepository: DataRepository;
 
     private async taxaRetriever(term: GoTerm): Promise<Node> {

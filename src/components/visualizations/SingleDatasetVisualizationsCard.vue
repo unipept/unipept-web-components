@@ -70,7 +70,7 @@
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <v-card flat>
-                        <sunburst-visualization ref="sunburst" :autoResize="true" :full-screen="isFullScreen" class="unipept-sunburst" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
+                        <sunburst-visualization ref="sunburst" :autoResize="true" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                         </div>
@@ -278,9 +278,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     .mpa-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
-        position: relative;
-        left: 50%;
-        transform: translate(-35px);
     }
 
     .fullscreen-buttons-container {

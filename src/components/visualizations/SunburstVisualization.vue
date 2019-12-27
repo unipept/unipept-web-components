@@ -103,6 +103,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                 getTooltip: tooltipContent,
                 getTitleText: d => `${d.name} (${d.rank})`,
                 rerootCallback: d => this.search(d.id, d.name, 1000),
+                useFixedColors: this.isFixedColors
             });
 
             if (this.autoResize) {
@@ -130,4 +131,12 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
     .full-screen #sunburstWrapper {
         height: calc(100% - 48px);
     }
+
+    .unipept-sunburst {
+        width: 100% !important;
+    }
+
+    #sunburstWrapper > .unipept-sunburst > svg {
+        max-height: 800px;
+    } 
 </style>

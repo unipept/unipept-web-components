@@ -471,7 +471,6 @@ export default class FunctionalSummaryCard extends Vue {
         margin-top: 16px;
         margin-bottom: 16px;
         position: relative;
-        left: 50%;
         transform: translateX(-50%);
     }
 
