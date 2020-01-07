@@ -49,7 +49,6 @@ import SampleDataset from "../../logic/data-management/SampleDataset";
 import Tooltip from "../custom/Tooltip.vue";
 import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
 import StorageWriter from "../../logic/data-management/visitors/storage/StorageWriter";
-import { EventBus } from "../EventBus";
 
 @Component({
     components: {
