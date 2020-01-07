@@ -9,10 +9,10 @@ const EC_BATCH_SIZE = 100
 const EC_URL = "/private_api/ecnumbers"
 
 export class ECOntology extends Ontology<OntologyId, ECDefinition> {
-    async fetchDefinitions(ids: OntologyId[], baseUrl: string) {
+    async fetchDefinitions(ids: OntologyId[], baseUrl: string): Promise<Set<OntologyId>> {
         // TODO: check if this is still needed
         // calculate ids to fetch
-        const todo = new Set();
+        const todo = new Set<string>();
         for (const id of ids.map(id => id.substr(3))) {
             if (!this._definitions.has("EC:" + id)) {
                 todo.add(id);
@@ -50,7 +50,11 @@ export class ECOntology extends Ontology<OntologyId, ECDefinition> {
                             namespace: convertEcNumberToEcNameSpace(ecNumber.code)
                         })
                 }
+
+                todo.delete(ecNumber.code);
             })
         }
+
+        return new Set<string>(Array.from(todo.keys()).map(id => "EC:" + id));
     }
 }
