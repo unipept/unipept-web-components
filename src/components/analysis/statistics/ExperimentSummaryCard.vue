@@ -70,6 +70,10 @@ export default class ExperimentSummaryCard extends Vue {
      */
     @Prop({ required: false, default: false })
     private disabled: boolean;
+    /**
+     * Denotes the assay that's currently been selected by the user (this is the assay for which the visualizations
+     * are visible at this moment).
+     */
     @Prop({ required: true })
     private activeAssay: Assay;
 
@@ -91,6 +95,9 @@ export default class ExperimentSummaryCard extends Vue {
     }
 
     reprocess(): void {
+        /**
+         * Fired after the user chose new settings and decided to rerun the analysis on all selected assays.
+         */
         this.$emit("update-search-settings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
     }
 
