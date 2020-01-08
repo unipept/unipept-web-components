@@ -9,9 +9,9 @@ after which the required information is downloaded and transformed into an Assay
             <h3>Load data from the PRIDE archive</h3>
             <p>You can easily load data from the <a href="http://www.ebi.ac.uk/pride/" target="_blank">PRIDE</a> data repository. Simply enter an assay id (e.g. 8500) in the field below and click the 'Load PRIDE Dataset' button. The corresponding dataset will then be fetched using the PRIDE API and loaded into the search form on the left.</p>
             <v-form ref="prideAssayForm" @submit.prevent>
-                <v-text-field label="Assay id" placeholder="e.g. 8500" :disabled="prideLoading" v-model="prideAssay" :rules="[value => !!value || 'Please enter a valid PRIDE assay number']" clearable></v-text-field>
+                <v-text-field class="assay-id-input" label="Assay id" placeholder="e.g. 8500" :disabled="prideLoading" v-model="prideAssay" :rules="[value => !!value || 'Please enter a valid PRIDE assay number']" clearable></v-text-field>
             </v-form>
-            <div class="card-actions">
+            <div class="card-actions fetch-pride-button">
                 <v-btn v-if="!prideLoading" @click="fetchPrideAssay()">
                     <v-icon left>mdi-cloud-download</v-icon>
                     Fetch PRIDE dataset

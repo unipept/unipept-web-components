@@ -7,7 +7,6 @@ import Mock from "@/test/Mock";
 import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import Utils from "./../../../custom/Utils";
-import { contourDensity } from "d3";
 
 jest.mock("./../../../custom/Utils");
 
