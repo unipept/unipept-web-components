@@ -117,7 +117,8 @@ export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
             let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find(
                 (dataset) => dataset.name == this.selectedSampleDataset[datasetId]
             );
-            this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
+            let assay = this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);
+            this.selectDataset(assay);
         }
     }
 }
