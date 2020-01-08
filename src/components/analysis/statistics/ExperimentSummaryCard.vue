@@ -1,3 +1,9 @@
+<docs>
+The ExperimentSummaryCard summarizes an experiment into statistics: mainly the amount of peptides that were found, the 
+peptides that were not found (including the ability to show these as a list). This component also allows the user to
+change the currently active search settings and redo the analysis of all selected assays.
+</docs>
+
 <template>
     <v-card style="min-height: 100%; display: flex; flex-direction: column;">
         <card-header>
@@ -19,7 +25,7 @@
                 </tooltip>
             </div>
             <v-divider></v-divider>
-            <span v-if="!$store.getters.activeDataset">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
+            <span v-if="!activeAssay">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
             <span v-else>
                 We managed to match {{ matchedPeptides }} of your {{ searchedPeptides }} peptides.
                 Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ missedPeptides.length }}</a> peptides couldn't be found.
@@ -31,7 +37,7 @@
                     {{ missedPeptides.length }} missed peptides
                 </v-card-title>
                 <v-card-text>
-                    <missing-peptides-list :dataset="$store.getters.activeDataset">
+                    <missing-peptides-list :dataset="activeAssay">
                     </missing-peptides-list>
                 </v-card-text>
             </v-card>
@@ -53,16 +59,24 @@ import Clipboard from "clipboard";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import Tooltip from "../../custom/Tooltip.vue";
+import Assay from "../../../logic/data-management/assay/Assay";
 
 @Component({
-    components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
-    computed: {
-        activeDataset() {
-            return this.$store.getters.activeDataset;
-        }
-    }
+    components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList }
 })
 export default class ExperimentSummaryCard extends Vue {
+    /**
+     * Is the user able to interact with this component? (True if he can interact, false otherwise).
+     */
+    @Prop({ required: false, default: false })
+    private disabled: boolean;
+    /**
+     * Denotes the assay that's currently been selected by the user (this is the assay for which the visualizations
+     * are visible at this moment).
+     */
+    @Prop({ required: true })
+    private activeAssay: Assay;
+
     private equateIl: boolean = true;
     private filterDuplicates: boolean = true;
     private missingCleavage: boolean = false;
@@ -81,24 +95,21 @@ export default class ExperimentSummaryCard extends Vue {
     }
 
     reprocess(): void {
-        this.$store.dispatch("setSearchSettings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
-
-        this.$store.dispatch("setActiveDataset", null);
-        let promises: Promise<any>[] = [];
-        for (let dataset of this.$store.getters.selectedDatasets) {
-            promises.push(this.$store.dispatch("processDataset", dataset));
-        }
+        /**
+         * Fired after the user chose new settings and decided to rerun the analysis on all selected assays.
+         */
+        this.$emit("update-search-settings", { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage });
     }
 
     private showNotFoundPeptidesModal() {
         this.showNotFoundModal = true;
     }
 
-    @Watch("activeDataset")
+    @Watch("activeAssay")
     private async onActiveDatasetChanged(): Promise<void> {
-        if (this.$store.getters.activeDataset) {
+        if (this.activeAssay) {
             this.loading = true;
-            let taxaSource: TaxaDataSource = await this.$store.getters.activeDataset.dataRepository.createTaxaDataSource();
+            let taxaSource: TaxaDataSource = await this.activeAssay.dataRepository.createTaxaDataSource();
             this.searchedPeptides = await taxaSource.getAmountOfSearchedPeptides();
             this.matchedPeptides = await taxaSource.getAmountOfMatchedPeptides();
             this.missedPeptides = await taxaSource.getMissedPeptides();

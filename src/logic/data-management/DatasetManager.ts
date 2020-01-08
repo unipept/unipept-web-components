@@ -11,7 +11,7 @@ export default class DatasetManager {
      * List all datasets that are stored in local storage memory.
      *
      * @return A list containing all datasets stored in this manager's corresponding storage type and sorted
-     *         alphabetically by name.
+     * alphabetically by name.
      */
     async listDatasets(): Promise<Assay[]> {
         let output: MetaProteomicsAssay[] = [];
