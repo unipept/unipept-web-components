@@ -9,6 +9,7 @@ import { TaxumRank, convertStringToTaxumRank } from "./TaxumRank";
 import { TaxaCountTable } from "../data-management/counts/TaxaCountTable";
 import { TaxaCountProcessor } from "../processors/count/TaxaCountProcessor";
 import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
+import { GoNameSpace } from "../functional-annotations/GoNameSpace";
 
 export default class TaxaDataSource extends DataSource {
     private _countTable: TaxaCountTable;
@@ -51,7 +52,6 @@ export default class TaxaDataSource extends DataSource {
             }
 
             for (let node of nodes) {
-                // TODO: should we use count or self_count here?
                 output.push(new TaxaElement(node.name, level, node.data.count));
             }
             return output;
@@ -64,7 +64,6 @@ export default class TaxaDataSource extends DataSource {
             }
 
             for (let node of nodes) {
-                // TODO: should we use count or self_count here?
                 output.push(new TaxaElement(node.name, convertStringToTaxumRank(node.rank), node.data.count));
             }
             return output;
@@ -120,6 +119,50 @@ export default class TaxaDataSource extends DataSource {
     public async getAmountOfSearchedPeptides(): Promise<number> {
         await this.process();
         return this._searchedPeptides;
+    }
+
+    /**
+     * @return a string representing a CSV file that contains a summary of all LCA-related information.
+     */
+    public async toCSV(): Promise<string> {
+        await this.process();
+        let result = 
+            "peptide,lca," + Object.values(TaxumRank).join(",") + "," + "EC," + 
+            Object.values(GoNameSpace).map(ns => `GO (${ns})`).join(",") + "\n";
+
+        const tree: Tree = await this.getTree();
+
+        for (const peptide of tree.getAllSequences(tree.getRoot().id)) {
+            let row = peptide + ",";
+    
+            // row += taxonMap.get(peptide.lca).name + ",";
+            // row += peptide.lineage.map(e => {
+            //     if (e === null) return "";
+            //     return taxonMap.get(e).name;
+            // }).join(",");
+    
+    
+            // row += ",";
+            // row += peptide.faGrouped.EC.sort((a, b) => b.value - a.value)
+            //     .slice(0, 3)
+            //     .map(a => `${a.code} (${numberToPercent(a.value / peptide.fa.counts.EC)})`)
+            //     .join(";");
+            // row += ",";
+    
+            // row += GOTerms.NAMESPACES.map(ns =>
+            //     (peptide.faGrouped.GO[ns] || [])
+            //         .sort((a, b) => b.value - a.value)
+            //         .slice(0, 3)
+            //         .map(a => `${a.code} (${numberToPercent(a.value / peptide.fa.counts.GO)})`)
+            //         .join(";"))
+            //     .join(",");
+    
+            row += "\n";
+            result += row;
+            // result += row.repeat(peptide.count);
+        }
+        console.log(result);
+        return result;
     }
 
     private async process(): Promise<void> {

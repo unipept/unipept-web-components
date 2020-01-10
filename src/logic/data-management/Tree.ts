@@ -44,6 +44,7 @@ export default class Tree {
             currentNode.data.self_count = count;
         })
 
+        this.nodes.set(id, this.root);
         this.root.getCounts();
     }
 
