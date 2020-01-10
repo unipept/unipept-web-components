@@ -8,6 +8,7 @@ import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import Utils from "./../../custom/Utils";
 import LoadPrideDatasetCard from "./../LoadPrideDatasetCard.vue";
+import Setup from "@/test/Setup";
 
 
 Vue.use(Vuetify);
@@ -30,16 +31,20 @@ describe("LoadPrideDatasetCard", () => {
         const wrapper = mount(LoadPrideDatasetCard, {
             store,
             localVue,
-            vuetify
+            vuetify,
+            data: function() {
+                return {
+                    prideAssay: 2600
+                }
+            }
         });
 
-        let assayIdInput = wrapper.find(".assay-id-input");
-        assayIdInput.setValue("8500");
-
+        let setup: Setup = new Setup();
+        setup.setUpPrideNock();
         let fetchPrideButton = wrapper.find(".fetch-pride-button");
         fetchPrideButton.trigger("click");
 
-        expect(wrapper.find(".assay-id-input")).toMatchSnapshot();
+        expect(wrapper.emitted().createAssay).toBe
 
         done();
     });
