@@ -169,6 +169,16 @@ export default class Tree {
         return s;
     }
 
+    getAllSequencesAndNodes(nodeId): [Node, string[]][] {
+        let node: Node = this.nodes.get(nodeId);
+        let sequences: string[] = this.getOwnSequences(node.id);
+        let s: [Node, string[]][]= [[node, sequences]];
+        for (let i = 0; i < node.children.length; i++) {
+            s = s.concat(this.getAllSequencesAndNodes(node.children[i].id));
+        }
+        return s;
+    }
+
     /**
      * Completes the name and rank information present in the tree, from a list of TaxonInfos
      *

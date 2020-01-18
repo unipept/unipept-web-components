@@ -47,14 +47,6 @@
                                 Save as image
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item key="save-as-csv" @click="saveAsCsv()">
-                            <v-list-item-title>
-                                <v-icon>
-                                    mdi-file-download
-                                </v-icon>
-                                Save as CSV
-                            </v-list-item-title>
-                        </v-list-item>
                     </v-list>
                 </v-menu>
                 <div v-if="isFullScreen" class="fullscreen-buttons-container">
@@ -266,11 +258,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         } else {
             imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
         }
-    }
-
-    private async saveAsCsv() {
-        const taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-        await taxaDataSource.toCSV();
     }
 
     private reset() {

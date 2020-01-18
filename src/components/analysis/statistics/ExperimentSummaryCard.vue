@@ -21,7 +21,20 @@ change the currently active search settings and redo the analysis of all selecte
             </search-settings-form>
             <div class="card-actions" >
                 <tooltip message="Restart search with selected samples using the settings chosen above.">
-                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary"><v-icon left>mdi-restore</v-icon>Update</v-btn>
+                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary">
+                        <v-icon left>
+                            mdi-restore
+                        </v-icon>
+                        Update
+                    </v-btn>
+                </tooltip>
+                <tooltip message="Download a CSV-file with the results of this analysis.">
+                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progres !== 1)" @click="downloadCsv()" color="default">
+                        <v-icon>
+                            mdi-download
+                        </v-icon>
+                        Download results
+                    </v-btn>
                 </tooltip>
             </div>
             <v-divider></v-divider>
@@ -114,6 +127,13 @@ export default class ExperimentSummaryCard extends Vue {
             this.matchedPeptides = await taxaSource.getAmountOfMatchedPeptides();
             this.missedPeptides = await taxaSource.getMissedPeptides();
             this.loading = false;
+        }
+    }
+
+    private async downloadCsv(): Promise<void> {
+        if (this.activeAssay) {
+            const taxaDataSource: TaxaDataSource = await this.activeAssay.dataRepository.createTaxaDataSource();
+            await taxaDataSource.toCSV();
         }
     }
 }

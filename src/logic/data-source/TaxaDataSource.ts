@@ -10,6 +10,10 @@ import { TaxaCountTable } from "../data-management/counts/TaxaCountTable";
 import { TaxaCountProcessor } from "../processors/count/TaxaCountProcessor";
 import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
 import { GoNameSpace } from "../functional-annotations/GoNameSpace";
+import TaxonInfo from "../data-management/TaxonInfo";
+import { postJSON } from "../utils";
+import { NCBITaxonomy } from "../data-management/ontology/taxa/NCBITaxonomy";
+import { NCBITaxon } from "../data-management/ontology/taxa/NCBITaxon";
 
 export default class TaxaDataSource extends DataSource {
     private _countTable: TaxaCountTable;
@@ -27,6 +31,8 @@ export default class TaxaDataSource extends DataSource {
  
     constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository);
+        console.log("Set counttable:");
+        console.log(countTable);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
         this._baseUrl = baseUrl;
@@ -131,15 +137,40 @@ export default class TaxaDataSource extends DataSource {
             Object.values(GoNameSpace).map(ns => `GO (${ns})`).join(",") + "\n";
 
         const tree: Tree = await this.getTree();
+        const ontology: NCBITaxonomy = this._countTable.getOntology();
 
         for (const peptide of tree.getAllSequences(tree.getRoot().id)) {
+            await this.process();
             let row = peptide + ",";
-    
-            // row += taxonMap.get(peptide.lca).name + ",";
-            // row += peptide.lineage.map(e => {
-            //     if (e === null) return "";
-            //     return taxonMap.get(e).name;
-            // }).join(",");
+            const ids = this._countTable.peptide2ontology.get(peptide);
+
+            // TODO should we only take the first id here?
+            const definition: Readonly<NCBITaxon> = ontology.getDefinition(ids[0]);
+
+            // console.log(definition);
+
+            // TODO fix LCA (take the farthest number in the list?)
+            let lcaIdx: number = -1;
+            for (const [idx, item ] of definition.lineage.entries()) {
+                if (item !== null) {
+                    lcaIdx = idx;
+                }
+            }
+
+            if (lcaIdx !== -1) {
+                row += ontology.getDefinition(definition.lineage[lcaIdx]).name + ",";
+            } else {
+                row += "root,"
+            }
+            
+            row += definition.lineage.map(e => {
+                if (e === null){
+                    return "";
+                } else {
+                    console.log(ontology.getDefinition(e));
+                    return ontology.getDefinition(e).name;
+                }
+            }).join(",");
     
     
             // row += ",";
