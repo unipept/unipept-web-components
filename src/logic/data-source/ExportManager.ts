@@ -61,6 +61,9 @@ export default class ExportManager {
                 row += ",";
             }
 
+            // Remove redundant last comma
+            row = row.substring(0, row.length - 1);
+
             row += "\n";
             // Duplicate row in the case the peptide was more present more than once.
             result += row.repeat(processedContainer.countTable.get(tax.sequence));

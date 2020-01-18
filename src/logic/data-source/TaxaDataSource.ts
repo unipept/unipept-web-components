@@ -150,7 +150,7 @@ export default class TaxaDataSource extends DataSource {
 
             let lcaName: string = "root";
             if (lcaIdx !== -1) {
-                lcaName = ontology.getDefinition(definition.lineage[lcaIdx]).name + ",";
+                lcaName = ontology.getDefinition(definition.lineage[lcaIdx]).name;
             }
 
             const lineages: string[] = definition.lineage.map(e => {
