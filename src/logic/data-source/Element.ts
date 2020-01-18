@@ -5,6 +5,8 @@ export default abstract class Element {
     public name: string;
     // Determines the amount of peptides to which this element is assigned.
     public popularity: number;
+    // How many proteins in the database are annotated with this Element?
+    public proteinCount: number;
 
     constructor(name: string, popularity: number) {
         this.name = name;

@@ -4,8 +4,11 @@ import { TaxumRank } from "./TaxumRank";
 import { GoNameSpace } from "../functional-annotations/GoNameSpace";
 import MetaProteomicsDataRepository from "./repository/MetaProteomicsDataRepository";
 import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
+import { scaleQuantile } from "d3";
+import { PeptideData } from "../api/pept2data/Response";
 
 export default class ExportManager {
+    // TODO this code should be cleaned up, once all the proteincounts are part of the data sources.
     public async exportResultsAsCsv(repo: MetaProteomicsDataRepository): Promise<string> {
         const taxaSource = await repo.createTaxaDataSource();
         const taxos: TaxonomicsSummary[] = await taxaSource.getTaxonomicSummaries();
@@ -29,37 +32,40 @@ export default class ExportManager {
                 }
             }).join(",");
 
-            const ecNumbers = await ecSource.getEcNumbers(undefined, 0, [tax.sequence]);
+
+            const peptData: PeptideData = processedContainer.response.get(tax.sequence);
+            const dataList: {code: string, count: number}[] = [];
+
+            for (const [key, value] of Object.entries(peptData.fa.data)) {
+                dataList.push({
+                    code: key,
+                    count: parseInt(value as string)
+                })
+            }
+
+            const ecNumbers = dataList.filter(x => x.code.startsWith("EC:")).sort((a, b) => b.count - a.count);
 
             row += ",";
-            row += ecNumbers.slice(0, 3).map(a => `${a.code}`).join(";");
+            row += ecNumbers
+                .slice(0, 3)
+                .map(a => `${a.code.substr(3)} (${this.numberToPercent(a.count / peptData.fa.counts.EC)})`)
+                .join(";");
             row += ",";
-            // row += peptide.faGrouped.EC.sort((a, b) => b.value - a.value)
-            //     .slice(0, 3)
-            //     .map(a => `${a.code} (${numberToPercent(a.value / peptide.fa.counts.EC)})`)
-            //     .join(";");
-            // row += ",";
 
             for (const ns of [GoNameSpace.BiologicalProcess, GoNameSpace.CellularComponent, GoNameSpace.MolecularFunction]) {
-                const goTerms = await goSource.getGoTerms(ns, 0, [tax.sequence]);
-                row += goTerms.slice(0, 3).map(a => `${a.code}`).join(";");
+                const goTerms = (await goSource.getGoTerms(ns, 0, [tax.sequence])).map(x => {
+                    return dataList.find(y => y.code === x.code);
+                }).sort((a, b) => b.count - a.count);
+
+                row += goTerms.slice(0, 3).map(a => `${a.code} (${this.numberToPercent(a.count / peptData.fa.counts.GO)})`).join(";");
                 row += ",";
             }
-    
-            // row += GOTerms.NAMESPACES.map(ns =>
-            //     (peptide.faGrouped.GO[ns] || [])
-            //         .sort((a, b) => b.value - a.value)
-            //         .slice(0, 3)
-            //         .map(a => `${a.code} (${numberToPercent(a.value / peptide.fa.counts.GO)})`)
-            //         .join(";"))
-            //     .join(",");
 
             row += "\n";
             // Duplicate row in the case the peptide was more present more than once.
             result += row.repeat(processedContainer.countTable.get(tax.sequence));
         }
 
-        console.log(result);
         return result;
     }
 
