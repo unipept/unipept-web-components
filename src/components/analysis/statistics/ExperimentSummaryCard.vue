@@ -73,6 +73,7 @@ import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import Tooltip from "../../custom/Tooltip.vue";
 import Assay from "../../../logic/data-management/assay/Assay";
+import ExportManager from "../../../logic/data-source/ExportManager";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList }
@@ -132,8 +133,8 @@ export default class ExperimentSummaryCard extends Vue {
 
     private async downloadCsv(): Promise<void> {
         if (this.activeAssay) {
-            const taxaDataSource: TaxaDataSource = await this.activeAssay.dataRepository.createTaxaDataSource();
-            await taxaDataSource.toCSV();
+            const exportMng: ExportManager = new ExportManager();
+            await exportMng.exportResultsAsCsv(this.activeAssay.dataRepository);
         }
     }
 }

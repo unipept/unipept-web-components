@@ -14,6 +14,7 @@ import TaxonInfo from "../data-management/TaxonInfo";
 import { postJSON } from "../utils";
 import { NCBITaxonomy } from "../data-management/ontology/taxa/NCBITaxonomy";
 import { NCBITaxon } from "../data-management/ontology/taxa/NCBITaxon";
+import TaxonomicSummary from "./TaxonomicSummary";
 
 export default class TaxaDataSource extends DataSource {
     private _countTable: TaxaCountTable;
@@ -127,6 +128,43 @@ export default class TaxaDataSource extends DataSource {
         return this._searchedPeptides;
     }
 
+    public async getTaxonomicSummaries(): Promise<TaxonomicSummary[]> {
+        await this.process();
+        const tree: Tree = await this.getTree();
+        const ontology: NCBITaxonomy = this._countTable.getOntology();
+
+        const output: TaxonomicSummary[] = [];
+
+        for (const peptide of tree.getAllSequences(tree.getRoot().id)) {
+            const ids = this._countTable.peptide2ontology.get(peptide);
+
+            // TODO there seems to be only one ID per definition here?
+            const definition: Readonly<NCBITaxon> = ontology.getDefinition(ids[0]);
+
+            let lcaIdx: number = -1;
+            for (const [idx, item ] of definition.lineage.entries()) {
+                if (item !== null) {
+                    lcaIdx = idx;
+                }
+            }
+
+            let lcaName: string = "root";
+            if (lcaIdx !== -1) {
+                lcaName = ontology.getDefinition(definition.lineage[lcaIdx]).name + ",";
+            }
+
+            const lineages: string[] = definition.lineage.map(e => {
+                if (e !== null) {
+                    return ontology.getDefinition(e).name;
+                }
+                return null;
+            });
+
+            output.push(new TaxonomicSummary(peptide, lcaName, lineages));
+        }
+        return output;
+    }
+
     /**
      * @return a string representing a CSV file that contains a summary of all LCA-related information.
      */
@@ -144,12 +182,9 @@ export default class TaxaDataSource extends DataSource {
             let row = peptide + ",";
             const ids = this._countTable.peptide2ontology.get(peptide);
 
-            // TODO should we only take the first id here?
+            // TODO there seems to be only one ID per definition here?
             const definition: Readonly<NCBITaxon> = ontology.getDefinition(ids[0]);
 
-            // console.log(definition);
-
-            // TODO fix LCA (take the farthest number in the list?)
             let lcaIdx: number = -1;
             for (const [idx, item ] of definition.lineage.entries()) {
                 if (item !== null) {
@@ -162,7 +197,7 @@ export default class TaxaDataSource extends DataSource {
             } else {
                 row += "root,"
             }
-            
+
             row += definition.lineage.map(e => {
                 if (e === null){
                     return "";
@@ -192,7 +227,6 @@ export default class TaxaDataSource extends DataSource {
             result += row;
             // result += row.repeat(peptide.count);
         }
-        console.log(result);
         return result;
     }
 
