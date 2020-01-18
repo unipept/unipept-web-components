@@ -16,9 +16,16 @@ export default class ExportManager {
         const ecSource = await repo.createEcDataSource();
         const goSource = await repo.createGoDataSource();
 
+        // These need to be manually specified here to retain a specific order!
+        const goNameSpaces: GoNameSpace[] = [
+            GoNameSpace.BiologicalProcess,
+            GoNameSpace.CellularComponent, 
+            GoNameSpace.MolecularFunction
+        ];
+
         let result: string = 
             "peptide,lca," + Object.values(TaxumRank).join(",") + "," + "EC," + 
-            Object.values(GoNameSpace).map(ns => `GO (${ns})`).join(",") + "\n";
+            goNameSpaces.map(ns => `GO (${ns})`).join(",") + "\n";
 
         const processedContainer: ProcessedPeptideContainer = await repo.initProcessedPeptideContainer();
 
@@ -52,17 +59,13 @@ export default class ExportManager {
                 .join(";");
             row += ",";
 
-            for (const ns of [GoNameSpace.BiologicalProcess, GoNameSpace.CellularComponent, GoNameSpace.MolecularFunction]) {
+            row += (await Promise.all(goNameSpaces.map(async ns => {
                 const goTerms = (await goSource.getGoTerms(ns, 0, [tax.sequence])).map(x => {
                     return dataList.find(y => y.code === x.code);
                 }).sort((a, b) => b.count - a.count);
 
-                row += goTerms.slice(0, 3).map(a => `${a.code} (${this.numberToPercent(a.count / peptData.fa.counts.GO)})`).join(";");
-                row += ",";
-            }
-
-            // Remove redundant last comma
-            row = row.substring(0, row.length - 1);
+                return goTerms.slice(0, 3).map(a => `${a.code} (${this.numberToPercent(a.count / peptData.fa.counts.GO)})`).join(";");
+            }))).join(",");
 
             row += "\n";
             // Duplicate row in the case the peptide was more present more than once.
