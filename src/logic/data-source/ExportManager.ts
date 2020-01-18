@@ -9,6 +9,7 @@ export default class ExportManager {
         const taxos: TaxonomicsSummary[] = await taxaSource.getTaxonomicSummaries();
 
         const ecSource = await repo.createEcDataSource();
+        const goSource = await repo.createGoDataSource();
 
         let result: string = 
             "peptide,lca," + Object.values(TaxumRank).join(",") + "," + "EC," + 
@@ -35,6 +36,11 @@ export default class ExportManager {
             //     .join(";");
             // row += ",";
 
+            for (const ns of [GoNameSpace.CellularComponent, GoNameSpace.MolecularFunction, GoNameSpace.BiologicalProcess]) {
+                const goTerms = await goSource.getGoTerms(ns, 0, [tax.sequence]);
+                row += goTerms.slice(0, 3).map(a => `${a.code}`).join(";");
+                row += ",";
+            }
     
             // row += GOTerms.NAMESPACES.map(ns =>
             //     (peptide.faGrouped.GO[ns] || [])
