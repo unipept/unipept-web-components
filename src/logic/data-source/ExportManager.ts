@@ -2,9 +2,11 @@ import DataRepository from "./DataRepository";
 import TaxonomicsSummary from "./../data-source/TaxonomicSummary";
 import { TaxumRank } from "./TaxumRank";
 import { GoNameSpace } from "../functional-annotations/GoNameSpace";
+import MetaProteomicsDataRepository from "./repository/MetaProteomicsDataRepository";
+import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
 
 export default class ExportManager {
-    public async exportResultsAsCsv(repo: DataRepository): Promise<string> {
+    public async exportResultsAsCsv(repo: MetaProteomicsDataRepository): Promise<string> {
         const taxaSource = await repo.createTaxaDataSource();
         const taxos: TaxonomicsSummary[] = await taxaSource.getTaxonomicSummaries();
 
@@ -14,6 +16,8 @@ export default class ExportManager {
         let result: string = 
             "peptide,lca," + Object.values(TaxumRank).join(",") + "," + "EC," + 
             Object.values(GoNameSpace).map(ns => `GO (${ns})`).join(",") + "\n";
+
+        const processedContainer: ProcessedPeptideContainer = await repo.initProcessedPeptideContainer();
 
         for (const tax of taxos) {
             // Process taxonomic information
@@ -36,7 +40,7 @@ export default class ExportManager {
             //     .join(";");
             // row += ",";
 
-            for (const ns of [GoNameSpace.CellularComponent, GoNameSpace.MolecularFunction, GoNameSpace.BiologicalProcess]) {
+            for (const ns of [GoNameSpace.BiologicalProcess, GoNameSpace.CellularComponent, GoNameSpace.MolecularFunction]) {
                 const goTerms = await goSource.getGoTerms(ns, 0, [tax.sequence]);
                 row += goTerms.slice(0, 3).map(a => `${a.code}`).join(";");
                 row += ",";
@@ -50,10 +54,16 @@ export default class ExportManager {
             //         .join(";"))
             //     .join(",");
 
-            result += row + "\n";
+            row += "\n";
+            // Duplicate row in the case the peptide was more present more than once.
+            result += row.repeat(processedContainer.countTable.get(tax.sequence));
         }
 
         console.log(result);
         return result;
+    }
+
+    private numberToPercent(n: number): string {
+        return Math.round(n * 100) + "%";
     }
 }

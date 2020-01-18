@@ -74,6 +74,8 @@ import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import Tooltip from "../../custom/Tooltip.vue";
 import Assay from "../../../logic/data-management/assay/Assay";
 import ExportManager from "../../../logic/data-source/ExportManager";
+import MetaProteomicsDataRepository from "../../../logic/data-source/repository/MetaProteomicsDataRepository";
+import { downloadDataByForm } from "../../../logic/utils";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList }
@@ -134,7 +136,11 @@ export default class ExperimentSummaryCard extends Vue {
     private async downloadCsv(): Promise<void> {
         if (this.activeAssay) {
             const exportMng: ExportManager = new ExportManager();
-            await exportMng.exportResultsAsCsv(this.activeAssay.dataRepository);
+            const csv: string = await exportMng.exportResultsAsCsv(
+                this.activeAssay.dataRepository as MetaProteomicsDataRepository
+            );
+
+            downloadDataByForm(csv, "mpa_result.csv", "text/csv");
         }
     }
 }
