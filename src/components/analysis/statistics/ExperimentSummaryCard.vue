@@ -29,11 +29,15 @@ change the currently active search settings and redo the analysis of all selecte
                     </v-btn>
                 </tooltip>
                 <tooltip message="Download a CSV-file with the results of this analysis.">
-                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progres !== 1)" @click="downloadCsv()" color="default">
-                        <v-icon>
-                            mdi-download
-                        </v-icon>
-                        Download results
+                    <v-btn min-width="187" :disabled="$store.getters.selectedDatasets.some(el => el.progres !== 1) || exportLoading" @click="downloadCsv()" color="default">
+                        <div v-if="!exportLoading">
+                            <v-icon>
+                                mdi-download
+                            </v-icon>
+                            Download results
+                        </div>
+                        <v-progress-circular v-else indeterminate color="black" :size="20">
+                        </v-progress-circular>
                     </v-btn>
                 </tooltip>
             </div>
@@ -93,6 +97,9 @@ export default class ExperimentSummaryCard extends Vue {
     @Prop({ required: true })
     private activeAssay: Assay;
 
+    // Is the export system loading?
+    private exportLoading: boolean = false;
+
     private equateIl: boolean = true;
     private filterDuplicates: boolean = true;
     private missingCleavage: boolean = false;
@@ -135,12 +142,14 @@ export default class ExperimentSummaryCard extends Vue {
 
     private async downloadCsv(): Promise<void> {
         if (this.activeAssay) {
+            this.exportLoading = true;
             const exportMng: ExportManager = new ExportManager();
             const csv: string = await exportMng.exportResultsAsCsv(
                 this.activeAssay.dataRepository as MetaProteomicsDataRepository
             );
 
-            downloadDataByForm(csv, "mpa_result.csv", "text/csv");
+            await downloadDataByForm(csv, "mpa_result.csv", "text/csv");
+            this.exportLoading = false;
         }
     }
 }
