@@ -69,7 +69,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
      * @param namespace The EC-Namespace to which all returned EC-Numbers should belong. If this is null, EC-Numbers
      * from all namespaces will be returned.
      * @param cutoff
-     * @param sequences
+     * @param sequences Restrict the search to this given list of peptides.
      */
     public async getEcNumbers(namespace: EcNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<EcNumber[]> {
         if (namespace) {

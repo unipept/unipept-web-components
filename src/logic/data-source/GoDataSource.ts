@@ -74,7 +74,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
      */
     public async getGoTerms(namespace: GoNameSpace, cutoff: number = 50, sequences: string[] = null): Promise<GoTerm[]> {
         const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
-        return result[0];
+        return result[0].sort((a: GoTerm, b: GoTerm) => b.popularity - a.popularity);
     }
 
     /**
