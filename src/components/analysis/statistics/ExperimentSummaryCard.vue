@@ -8,7 +8,7 @@ change the currently active search settings and redo the analysis of all selecte
     <v-card style="min-height: 100%; display: flex; flex-direction: column;">
         <card-header>
             <card-title>
-                Experiment Summary
+                {{ assayName }}
             </card-title>
         </card-header>
         <v-card-text style="flex-grow: 1; display: flex; flex-direction: column;">
@@ -97,6 +97,15 @@ import MetaProteomicsAssay from "../../../logic/data-management/assay/MetaProteo
             },
             set() {
                 // Do nothing (should never be triggered as textarea is readonly)
+            }
+        },
+        assayName: {
+            get() {
+                if (this.activeAssay) {
+                    return this.activeAssay.getName();
+                } else {
+                    return "Experiment Summary";
+                }
             }
         }
     }
