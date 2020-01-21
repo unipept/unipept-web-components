@@ -37,6 +37,7 @@ import DatasetMixin from "./DatasetMixin.vue";
 import DatasetManager from "../../logic/data-management/DatasetManager";
 import DatasetForm from "./DatasetForm.vue";
 import Snackbar from "../custom/Snackbar.vue";
+import Assay from "../../logic/data-management/assay/Assay";
 
 @Component({
     components: {
@@ -79,7 +80,8 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
 
     private selectPrideAssay() {
         if (this.$refs.prideDatasetForm.isValid()) {
-            this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
+            const createdAssay: Assay = this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
+            this.$emit("create-assay", createdAssay);
         }
     }
 }
