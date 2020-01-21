@@ -30,7 +30,7 @@ component provides him with the option to select one of these assays for analysi
                             {{ dataset.getDateFormatted() }}
                         </v-list-item-action-text>
                         <tooltip message="Delete this sample from local storage.">
-                            <v-btn icon text @click="deleteDataset(dataset)" v-on:click.stop>
+                            <v-btn icon text @click="removeAssay(dataset)" v-on:click.stop>
                                 <v-icon color="grey darken-1">mdi-close</v-icon>
                             </v-btn>
                         </tooltip>
@@ -38,6 +38,29 @@ component provides him with the option to select one of these assays for analysi
                 </v-list-item>
             </template>
         </v-list>
+
+        <v-dialog v-model="confirmationDialog" max-width="400">
+            <v-card>
+                <v-card-title class="headline">Confirm sample deletion?</v-card-title>
+
+                <v-card-text>
+                    Are you sure you want to permanently delete "{{ deletionName }}" from your browser?
+                    This operation cannot be undone.
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn color="black" text @click="confirmationDialog = false">
+                    Cancel
+                </v-btn>
+
+                <v-btn color="primary" text @click="confirmAssayDeletion(markedForDeletion)">
+                    OK
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -45,13 +68,24 @@ component provides him with the option to select one of these assays for analysi
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
 import Assay from "../../logic/data-management/assay/Assay";
-import { Prop } from "vue-property-decorator";
+import { Prop, Watch } from "vue-property-decorator";
 import Tooltip from "../custom/Tooltip.vue";
 import DatasetMixin from "./DatasetMixin.vue";
 
 @Component({
     components: {
         Tooltip
+    },
+    computed: {
+        deletionName: {
+            get() {
+                if (this.markedForDeletion != null) {
+                    return this.markedForDeletion.getName();
+                } else {
+                    return "";
+                }
+            }
+        }
     }
 })
 export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
@@ -61,6 +95,26 @@ export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
      */
     @Prop({ required: true })
     private storedAssays: Assay[];
+
+    private confirmationDialog: boolean = false;
+    private markedForDeletion: Assay = null;
+
+    private removeAssay(assay: Assay) {
+        this.markedForDeletion = assay;
+        this.confirmationDialog = true;
+    }
+
+    private confirmAssayDeletion(assay: Assay) {
+        this.deleteDataset(assay);
+        this.confirmationDialog = false;
+    }
+
+    @Watch("confirmationDialog")
+    private onConfirmationClosed() {
+        if (!this.confirmationDialog) {
+            this.markedForDeletion = null;
+        }
+    }
 }
 </script>
 
