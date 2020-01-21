@@ -32,8 +32,6 @@ export default class TaxaDataSource extends DataSource {
  
     constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository);
-        console.log("Set counttable:");
-        console.log(countTable);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
         this._baseUrl = baseUrl;
