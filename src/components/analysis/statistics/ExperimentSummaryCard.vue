@@ -8,10 +8,12 @@ change the currently active search settings and redo the analysis of all selecte
     <v-card style="min-height: 100%; display: flex; flex-direction: column;">
         <card-header>
             <card-title>
-                Experiment Summary
+                {{ assayName }}
             </card-title>
         </card-header>
         <v-card-text style="flex-grow: 1; display: flex; flex-direction: column;">
+            <h3>Peptide list</h3>
+            <v-textarea :readonly="true" v-model="peptideList"></v-textarea>
             <search-settings-form
                 :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)"
                 :equate-il.sync="equateIl"
@@ -80,9 +82,33 @@ import Assay from "../../../logic/data-management/assay/Assay";
 import ExportManager from "../../../logic/data-source/ExportManager";
 import MetaProteomicsDataRepository from "../../../logic/data-source/repository/MetaProteomicsDataRepository";
 import { downloadDataByForm } from "../../../logic/utils";
+import MetaProteomicsAssay from "../../../logic/data-management/assay/MetaProteomicsAssay";
 
 @Component({
-    components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList }
+    components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
+    computed: {
+        peptideList: {
+            get() {
+                if (this.activeAssay) {
+                    return this.activeAssay.peptideContainer.getPeptides().join("\n");
+                } else {
+                    return "";
+                }
+            },
+            set() {
+                // Do nothing (should never be triggered as textarea is readonly)
+            }
+        },
+        assayName: {
+            get() {
+                if (this.activeAssay) {
+                    return this.activeAssay.getName();
+                } else {
+                    return "Experiment Summary";
+                }
+            }
+        }
+    }
 })
 export default class ExperimentSummaryCard extends Vue {
     /**
@@ -95,7 +121,7 @@ export default class ExperimentSummaryCard extends Vue {
      * are visible at this moment).
      */
     @Prop({ required: true })
-    private activeAssay: Assay;
+    private activeAssay: MetaProteomicsAssay;
 
     // Is the export system loading?
     private exportLoading: boolean = false;
