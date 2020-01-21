@@ -6,7 +6,7 @@ provides the user with the option to select any one of these.
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="loadingSampleDatasets" style="display: flex;">
+            <div v-if="loadingSampleDatasets" style="display: flex; justify-content: center;">
                 <v-progress-circular indeterminate color="primary"></v-progress-circular>
             </div>
             <div v-else-if="errorSampleDatasets">
