@@ -24,6 +24,12 @@ describe("CreateDatasetCard", () => {
         store = new Vuex.Store({});
     });
 
+    /**
+     * Check if this card correctly creates a new Assay with the required properties filled in. By doing this, we can
+     * test whether the correct events, emitted by the DatasetForm, are handled.
+     * 
+     * Both the store-assay and create-assay events should be emitted by this card.
+     */
     it("correctly creates a new assay", async(done) => {
         const peptides: string = "AALTER\nAAAAA\n";
         const name: string = "Test";

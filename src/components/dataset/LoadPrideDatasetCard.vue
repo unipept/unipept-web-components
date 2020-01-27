@@ -79,7 +79,6 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
     }
 
     private selectPrideAssay() {
-        console.log("Select assay");
         if (this.$refs.prideDatasetForm.isValid()) {
             const createdAssay: Assay = this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
             this.selectDataset(createdAssay);

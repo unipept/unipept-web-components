@@ -51,15 +51,14 @@ describe("LoadPrideDatasetCard", () => {
         });
     });
 
-    it("correctly fires the create-assay event", async(done) => {
+    it("correctly fires the create-assay and store-assay events", async(done) => {
         const wrapper = mount(LoadPrideDatasetCard, {
             store,
             localVue,
             vuetify,
             data: function() {
                 return {
-                    prideAssay: 2600,
-                    prideSave: false
+                    prideAssay: 2600
                 }
             }
         });

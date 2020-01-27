@@ -1,15 +1,34 @@
 <template>
     <v-form ref="datasetForm">
-        <v-textarea name="qs" label="Peptide list" :rows="7" v-model="peptideModel" :disabled="loading" :rules="[value => !!value || 'At least one peptide is required']" spellcheck="false"></v-textarea>
+        <v-textarea 
+            name="qs" 
+            id="qs-textarea"
+            label="Peptide list" 
+            :rows="7" 
+            v-model="peptideModel" 
+            :disabled="loading" 
+            :rules="[value => !!value || 'At least one peptide is required']" 
+            spellcheck="false">
+        </v-textarea>
         <v-tooltip top>
             <template v-slot:activator="{ on }">
-                <v-text-field v-on="on" name="search_name" label="Name this dataset"  :disabled="loading" placeholder="e.g. Sample B5" v-model="nameModel" :rules="[value => !!value || 'Name is required when the dataset is set to be saved']" clearable></v-text-field>
+                <v-text-field 
+                    v-on="on"
+                    id="name-input"
+                    name="search_name" 
+                    label="Name this dataset"  
+                    :disabled="loading" 
+                    placeholder="e.g. Sample B5" 
+                    v-model="nameModel" 
+                    :rules="[value => !!value || 'Name is required when the dataset is set to be saved']" 
+                    clearable>
+                </v-text-field>
             </template>
             <span>This name will be shown on the results page. Handy if you have many open tabs.</span>
         </v-tooltip>
         <v-tooltip top>
             <template v-slot:activator="{ on }">
-                <v-checkbox v-on="on" :disabled="loading" v-model="saveModel" hide-details>
+                <v-checkbox v-on="on" id="save-checkbox" :disabled="loading" v-model="saveModel" hide-details>
                     <span slot="label" v-on="on">Store dataset in browser's local storage</span>
                 </v-checkbox>
             </template>
