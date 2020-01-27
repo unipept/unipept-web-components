@@ -7,6 +7,7 @@ import Mock from "@/test/Mock";
 import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import Utils from "./../../../custom/Utils";
+import { sleep } from "./../../../../test/Utils";
 
 jest.mock("./../../../custom/Utils");
 
@@ -140,8 +141,4 @@ describe("MissingPeptidesList", () => {
         })
     });
 })
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 

@@ -16,6 +16,7 @@ export default class DatasetMixin extends Vue {
          * @event create-assay
          * @property {Assay} assay The new assay that was created by the user.
          */
+        console.log("Emit create-assay.");
         this.$emit("create-assay", assay);
     }
 

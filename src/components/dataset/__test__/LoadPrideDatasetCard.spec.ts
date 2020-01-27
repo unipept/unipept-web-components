@@ -9,6 +9,8 @@ import flushPromises from "flush-promises";
 import Utils from "./../../custom/Utils";
 import LoadPrideDatasetCard from "./../LoadPrideDatasetCard.vue";
 import Setup from "@/test/Setup";
+import { sleep } from "@/test/Utils";
+import { VMenu } from "vuetify/lib";
 
 
 Vue.use(Vuetify);
@@ -23,11 +25,10 @@ describe("LoadPrideDatasetCard", () => {
 
     beforeEach(() => {
         vuetify = new Vuetify();
-
         store = new Vuex.Store({});
     });
 
-    it("correctly fires create-assay event", (done) => {
+    it("correctly fires create-assay event", async(done) => {
         const wrapper = mount(LoadPrideDatasetCard, {
             store,
             localVue,
@@ -41,11 +42,20 @@ describe("LoadPrideDatasetCard", () => {
 
         let setup: Setup = new Setup();
         setup.setUpPrideNock();
-        let fetchPrideButton = wrapper.find(".fetch-pride-button");
+
+        await sleep(1000);
+        await flushPromises();
+
+        let fetchPrideButton = wrapper.find(".fetch-pride-button button");
         fetchPrideButton.trigger("click");
 
-        expect(wrapper.emitted().createAssay).toBe
+        // Now check if the required peptides are loaded into the textfield
+        await sleep(500);
+        await flushPromises();
 
-        done();
+        wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.$data.pridePeptides).toMatchSnapshot();
+            done();
+        });
     });
 })

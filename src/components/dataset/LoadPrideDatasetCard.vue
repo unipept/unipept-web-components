@@ -71,6 +71,7 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
                 .loadPrideDataset(prideNumber, (progress) => this.prideProgress = progress * 100)
                 .then((peptides) => {
                     this.pridePeptides = peptides.join("\n");
+                    console.log(this.pridePeptides);
                     this.prideLoading = false;
                     this.$refs.prideSnackbar.destroy();
                 });
