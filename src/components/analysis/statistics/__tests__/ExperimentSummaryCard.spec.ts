@@ -29,8 +29,6 @@ const foundPeptides: string[] = [
 
 describe("ExperimentSummaryCard", () => {
     let vuetify;
-    let getters;
-    let store;
 
     beforeEach(() => {
         vuetify = new Vuetify();

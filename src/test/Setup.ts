@@ -6,6 +6,7 @@ import goterms1 from "./resources/goterms1.json";
 import goterms2 from "./resources/goterms2.json";
 import ecnumbers from "./resources/ecnumbers.json";
 import pridedata from "./resources/pridedata.json";
+import sampledata from "./resources/sampledata.json";
 import LocalStorageMock from "./LocalStorageMock";
 import ClipboardMock from "./ClipboardMock";
 const fetchPolifill = require("whatwg-fetch")
@@ -49,6 +50,12 @@ export default class Setup {
     }
 
     public setupUnipeptNock() {
+        const sampleScope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
+            .persist()
+            .post("/datasets/sampledata")
+            .reply(200, sampledata);
+
         const pept2dataScope = nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()

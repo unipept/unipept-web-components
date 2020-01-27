@@ -9,7 +9,7 @@ provides the user with the option to select any one of these.
             <div v-if="loadingSampleDatasets" style="display: flex; justify-content: center;">
                 <v-progress-circular indeterminate color="primary"></v-progress-circular>
             </div>
-            <div v-else-if="errorSampleDatasets">
+            <div v-else-if="errorSampleDatasets" class="connection-error">
                 <v-alert type="error">
                     Unable to retrieve list of sample datasets.
                 </v-alert>
