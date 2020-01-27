@@ -1,19 +1,10 @@
 import { shallowMount, createLocalVue, mount } from "@vue/test-utils";
-import MissingPeptidesList from "./../MissingPeptidesList.vue";
 import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
-import Mock from "@/test/Mock";
-import Assay from "@/logic/data-management/assay/Assay";
-import flushPromises from "flush-promises";
-import Utils from "./../../custom/Utils";
 import LoadPrideDatasetCard from "./../LoadPrideDatasetCard.vue";
 import Setup from "@/test/Setup";
 import { sleep, waitForPromises } from "@/test/Utils";
-import { VMenu } from "vuetify/lib";
-import { select } from "d3";
-import MetaGenomicsAssay from "@/logic/data-management/assay/MetaGenomicsAssay";
-import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
 
 
 Vue.use(Vuetify);
@@ -90,5 +81,5 @@ describe("LoadPrideDatasetCard", () => {
         expect(wrapper.emitted("store-assay")).toBeTruthy();
 
         done();
-    })
+    });
 })
