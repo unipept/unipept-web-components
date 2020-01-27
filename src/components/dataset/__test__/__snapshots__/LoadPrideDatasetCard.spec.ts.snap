@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LoadPrideDatasetCard correctly fires create-assay event 1`] = `
+exports[`LoadPrideDatasetCard correctly loads a set of PRIDE peptides 1`] = `
 "AALSALESFLK
 AALSALESFLK
 AANILVGENLVCK

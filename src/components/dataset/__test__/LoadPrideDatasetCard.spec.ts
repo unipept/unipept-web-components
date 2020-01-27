@@ -9,8 +9,11 @@ import flushPromises from "flush-promises";
 import Utils from "./../../custom/Utils";
 import LoadPrideDatasetCard from "./../LoadPrideDatasetCard.vue";
 import Setup from "@/test/Setup";
-import { sleep } from "@/test/Utils";
+import { sleep, waitForPromises } from "@/test/Utils";
 import { VMenu } from "vuetify/lib";
+import { select } from "d3";
+import MetaGenomicsAssay from "@/logic/data-management/assay/MetaGenomicsAssay";
+import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
 
 
 Vue.use(Vuetify);
@@ -28,7 +31,7 @@ describe("LoadPrideDatasetCard", () => {
         store = new Vuex.Store({});
     });
 
-    it("correctly fires create-assay event", async(done) => {
+    it("correctly loads a set of PRIDE peptides", async(done) => {
         const wrapper = mount(LoadPrideDatasetCard, {
             store,
             localVue,
@@ -40,22 +43,52 @@ describe("LoadPrideDatasetCard", () => {
             }
         });
 
-        let setup: Setup = new Setup();
+        const setup: Setup = new Setup();
         setup.setUpPrideNock();
 
-        await sleep(1000);
-        await flushPromises();
+        await waitForPromises(1000);
 
-        let fetchPrideButton = wrapper.find(".fetch-pride-button button");
+        const fetchPrideButton = wrapper.find(".fetch-pride-button button");
         fetchPrideButton.trigger("click");
 
         // Now check if the required peptides are loaded into the textfield
-        await sleep(500);
-        await flushPromises();
+        await waitForPromises(500);
 
         wrapper.vm.$nextTick(() => {
             expect(wrapper.vm.$data.pridePeptides).toMatchSnapshot();
             done();
         });
     });
+
+    it("correctly fires the create-assay event", async(done) => {
+        const wrapper = mount(LoadPrideDatasetCard, {
+            store,
+            localVue,
+            vuetify,
+            data: function() {
+                return {
+                    prideAssay: 2600,
+                    prideSave: false
+                }
+            }
+        });
+
+        const setup: Setup = new Setup();
+        setup.setUpPrideNock();
+
+        await waitForPromises(500);
+
+        const fetchPrideButton = wrapper.find(".fetch-pride-button button");
+        fetchPrideButton.trigger("click");
+
+        await waitForPromises(500);
+
+        const selectPrideButton = wrapper.find("#select-pride-assay-button button");
+        selectPrideButton.trigger("click");
+
+        expect(wrapper.emitted("create-assay")).toBeTruthy();
+        expect(wrapper.emitted("store-assay")).toBeTruthy();
+
+        done();
+    })
 })

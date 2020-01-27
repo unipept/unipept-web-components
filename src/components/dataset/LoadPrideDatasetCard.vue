@@ -19,7 +19,7 @@ after which the required information is downloaded and transformed into an Assay
                 <v-progress-linear v-if="prideLoading" v-model="prideProgress"></v-progress-linear>
             </div>
             <dataset-form ref="prideDatasetForm" v-on:peptide-change="pridePeptides = $event" :peptides="pridePeptides" v-on:name-change="prideName = $event" :name="prideName" v-on:save-change="prideSave = $event" :save="prideSave" :loading="prideLoading"></dataset-form>
-            <div class="card-actions">
+            <div class="card-actions" id="select-pride-assay-button">
                 <v-btn :disabled="prideLoading" @click="selectPrideAssay()">
                     <v-icon left>mdi-plus</v-icon>
                     Add to selected datasets
@@ -72,7 +72,6 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
                 .loadPrideDataset(prideNumber, (progress) => this.prideProgress = progress * 100)
                 .then((peptides) => {
                     this.pridePeptides = peptides.join("\n");
-                    console.log(this.pridePeptides);
                     this.prideLoading = false;
                     this.$refs.prideSnackbar.destroy();
                 });
@@ -80,9 +79,10 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
     }
 
     private selectPrideAssay() {
+        console.log("Select assay");
         if (this.$refs.prideDatasetForm.isValid()) {
             const createdAssay: Assay = this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
-            this.$emit("create-assay", createdAssay);
+            this.selectDataset(createdAssay);
         }
     }
 }
