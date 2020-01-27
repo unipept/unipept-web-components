@@ -15,7 +15,9 @@ import {NormalizationType} from "./NormalizationType";
                 <v-select :items="Array.from(dataSources.keys())" v-model="dataSource" label="Datasource"></v-select>
                 <div>
                     <component v-if="!dataSourceLoading && dataSourceItem" :is="dataSources.get(dataSource).dataSourceComponent" :dataSource="dataSourceItem" v-on:selected-items="updateSelectedItems"></component>
-                    <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
+                    <div v-else style="display: flex; justify-content: center;">
+                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                    </div>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
@@ -34,7 +36,9 @@ import {NormalizationType} from "./NormalizationType";
                     Please select at least one item for both axis of the heatmap.
                 </div>
                 <div v-else class="reorder-heatmap-buttons">
-                    <v-progress-circular v-if="!heatmapData && selectedItems.length !== 0" indeterminate color="primary"></v-progress-circular>
+                    <div v-if="!heatmapData && selectedItems.length !== 0" style="display: flex; justify-content: center;">
+                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                    </div>
                     <heatmap-visualization v-if="heatmapData && selectedItems.length !== 0" :data="heatmapData" :clusterRows="clusterRows" :clusterColumns="clusterColumns"></heatmap-visualization>
                 </div>
             </v-stepper-content>
@@ -213,14 +217,14 @@ export default class HeatmapWizardMultiSample extends Vue {
             rows.push({ id: i.toString(), name: item.name });
         }
 
-        for (let i = 0; i < this.$store.getters.selectedDatasets.length; i++) {
-            let item: Assay = this.$store.getters.selectedDatasets[i];
+        for (let i = 0; i < this.$store.getters.getSelectedAssays.length; i++) {
+            let item: Assay = this.$store.getters.getSelectedAssays[i];
             cols.push({ id: i.toString(), name: item.getName() });
         }
 
         for (let item of this.selectedItems) {
             let gridRow: number[] = [];
-            for (let container of this.$store.getters.selectedDatasets) {
+            for (let container of this.$store.getters.getSelectedAssays) {
                 let value: number = (await item.getAffectedPeptides(container.dataRepository)).length;
                 gridRow.push(value);
             }

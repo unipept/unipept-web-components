@@ -11,15 +11,15 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 
-    @Component
+@Component
 export default class IndeterminateProgressBar extends Vue {
-        @Prop({ default: false }) active;
+    @Prop({ default: false }) active;
 
-        content: boolean = this.active;
+    content: boolean = this.active;
 
-        @Watch("active") onActiveChanged() {
-            this.content = this.active;
-        }
+    @Watch("active") onActiveChanged() {
+        this.content = this.active;
+    }
 }
 </script>
 

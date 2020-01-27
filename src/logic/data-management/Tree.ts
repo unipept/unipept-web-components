@@ -44,6 +44,7 @@ export default class Tree {
             currentNode.data.self_count = count;
         })
 
+        this.nodes.set(id, this.root);
         this.root.getCounts();
     }
 
@@ -164,6 +165,16 @@ export default class Tree {
         let s = this.getOwnSequences(node);
         for (let i = 0; i < node.children.length; i++) {
             s = s.concat(this.getAllSequences(node.children[i].id));
+        }
+        return s;
+    }
+
+    getAllSequencesAndNodes(nodeId): [Node, string[]][] {
+        let node: Node = this.nodes.get(nodeId);
+        let sequences: string[] = this.getOwnSequences(node.id);
+        let s: [Node, string[]][]= [[node, sequences]];
+        for (let i = 0; i < node.children.length; i++) {
+            s = s.concat(this.getAllSequencesAndNodes(node.children[i].id));
         }
         return s;
     }

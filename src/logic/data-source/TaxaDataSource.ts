@@ -9,6 +9,12 @@ import { TaxumRank, convertStringToTaxumRank } from "./TaxumRank";
 import { TaxaCountTable } from "../data-management/counts/TaxaCountTable";
 import { TaxaCountProcessor } from "../processors/count/TaxaCountProcessor";
 import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
+import { GoNameSpace } from "../functional-annotations/GoNameSpace";
+import TaxonInfo from "../data-management/TaxonInfo";
+import { postJSON } from "../utils";
+import { NCBITaxonomy } from "../data-management/ontology/taxa/NCBITaxonomy";
+import { NCBITaxon } from "../data-management/ontology/taxa/NCBITaxon";
+import TaxonomicSummary from "./TaxonomicSummary";
 
 export default class TaxaDataSource extends DataSource {
     private _countTable: TaxaCountTable;
@@ -51,7 +57,6 @@ export default class TaxaDataSource extends DataSource {
             }
 
             for (let node of nodes) {
-                // TODO: should we use count or self_count here?
                 output.push(new TaxaElement(node.name, level, node.data.count));
             }
             return output;
@@ -64,7 +69,6 @@ export default class TaxaDataSource extends DataSource {
             }
 
             for (let node of nodes) {
-                // TODO: should we use count or self_count here?
                 output.push(new TaxaElement(node.name, convertStringToTaxumRank(node.rank), node.data.count));
             }
             return output;
@@ -120,6 +124,43 @@ export default class TaxaDataSource extends DataSource {
     public async getAmountOfSearchedPeptides(): Promise<number> {
         await this.process();
         return this._searchedPeptides;
+    }
+
+    public async getTaxonomicSummaries(): Promise<TaxonomicSummary[]> {
+        await this.process();
+        const tree: Tree = await this.getTree();
+        const ontology: NCBITaxonomy = this._countTable.getOntology();
+
+        const output: TaxonomicSummary[] = [];
+
+        for (const peptide of tree.getAllSequences(tree.getRoot().id)) {
+            const ids = this._countTable.peptide2ontology.get(peptide);
+
+            // TODO there seems to be only one ID per definition here?
+            const definition: Readonly<NCBITaxon> = ontology.getDefinition(ids[0]);
+
+            let lcaIdx: number = -1;
+            for (const [idx, item ] of definition.lineage.entries()) {
+                if (item !== null) {
+                    lcaIdx = idx;
+                }
+            }
+
+            let lcaName: string = "root";
+            if (lcaIdx !== -1) {
+                lcaName = ontology.getDefinition(definition.lineage[lcaIdx]).name;
+            }
+
+            const lineages: string[] = definition.lineage.map(e => {
+                if (e !== null) {
+                    return ontology.getDefinition(e).name;
+                }
+                return null;
+            });
+
+            output.push(new TaxonomicSummary(peptide, lcaName, lineages));
+        }
+        return output;
     }
 
     private async process(): Promise<void> {

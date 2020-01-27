@@ -2,10 +2,10 @@ import Element from "../data-source/Element";
 import DataRepository from "../data-source/DataRepository";
 
 export default abstract class FAElement extends Element {
-    public code: string;
+    public readonly code: string;
     // How many of the total amount of peptides is associated with this GO-term?
-    public fractionOfPepts: number;
-    public affectedPeptides: string[];
+    public readonly fractionOfPepts: number;
+    public readonly affectedPeptides: string[];
 
     constructor(code: string, name: string, popularity: number, fractionOfPepts: number, affectedPeptides: string[]) {
         super(name, popularity);

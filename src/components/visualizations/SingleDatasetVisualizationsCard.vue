@@ -169,6 +169,7 @@ import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue"
 import DataRepository from "../../logic/data-source/DataRepository";
 import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 import $ from "jquery";
+import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 
 @Component({
     components: {

@@ -1,6 +1,6 @@
 {
   "name": "unipept-web-components",
-  "version": "0.1.6",
+  "version": "0.1.10",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
