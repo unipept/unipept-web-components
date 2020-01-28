@@ -37,7 +37,7 @@ provides the user with the option to select any one of these.
                                 v-model="selectedSampleDataset[dataset.id]">
                             </v-select>
                         </v-col>
-                        <v-col :cols="5" style="display: flex; align-items: center;">
+                        <v-col :cols="5" style="display: flex; align-items: center;" class="load-dataset-button">
                             <v-btn @click="selectSampleDataset(dataset.id)">Load dataset</v-btn>
                         </v-col>
                     </v-row>

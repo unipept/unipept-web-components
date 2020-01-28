@@ -4,7 +4,7 @@ import Vuetify from "vuetify";
 import Vuex from "vuex";
 import LoadPrideDatasetCard from "./../LoadPrideDatasetCard.vue";
 import Setup from "@/test/Setup";
-import { sleep, waitForPromises } from "@/test/Utils";
+import { sleep, waitForPromises, waitForElement, waitForCondition } from "@/test/Utils";
 
 
 Vue.use(Vuetify);
@@ -37,18 +37,17 @@ describe("LoadPrideDatasetCard", () => {
         const setup: Setup = new Setup();
         setup.setUpPrideNock();
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, ".fetch-pride-button button");
 
         const fetchPrideButton = wrapper.find(".fetch-pride-button button");
         fetchPrideButton.trigger("click");
 
         // Now check if the required peptides are loaded into the textfield
-        await waitForPromises(500);
+        await wrapper.vm.$nextTick();
+        await waitForCondition(() => !wrapper.vm.$data.prideLoading);
 
-        wrapper.vm.$nextTick(() => {
-            expect(wrapper.vm.$data.pridePeptides).toMatchSnapshot();
-            done();
-        });
+        expect(wrapper.vm.$data.pridePeptides).toMatchSnapshot();
+        done();
     });
 
     it("correctly fires the create-assay and store-assay events", async(done) => {
@@ -66,15 +65,18 @@ describe("LoadPrideDatasetCard", () => {
         const setup: Setup = new Setup();
         setup.setUpPrideNock();
 
-        await waitForPromises(500);
+        await waitForElement(wrapper, ".fetch-pride-button button");
 
         const fetchPrideButton = wrapper.find(".fetch-pride-button button");
         fetchPrideButton.trigger("click");
 
-        await waitForPromises(500);
+        await wrapper.vm.$nextTick();
+        await waitForCondition(() => !wrapper.vm.$data.prideLoading);
 
         const selectPrideButton = wrapper.find("#select-pride-assay-button button");
         selectPrideButton.trigger("click");
+
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted("create-assay")).toBeTruthy();
         expect(wrapper.emitted("store-assay")).toBeTruthy();

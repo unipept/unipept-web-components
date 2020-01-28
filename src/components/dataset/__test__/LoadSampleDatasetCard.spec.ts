@@ -4,10 +4,12 @@ import Vuetify from "vuetify";
 import Vuex from "vuex";
 import LoadSampleDatasetCard from "./../LoadSampleDatasetCard.vue";
 import Setup from "@/test/Setup";
-import { sleep, waitForPromises } from "@/test/Utils";
+import { sleep, waitForPromises, waitForElement, waitForCondition } from "@/test/Utils";
 import SampleDatasetCollection from "@/logic/data-management/SampleDatasetCollection";
 import * as expectedSampleData from "@/test/resources/sampledata.json";
 import SampleDataset from "@/logic/data-management/SampleDataset";
+import { StorageType } from "@/logic/data-management/StorageType";
+import { VMenu } from "vuetify/lib";
 
 
 Vue.use(Vuetify);
@@ -42,7 +44,7 @@ describe("LoadSampleDatasetCard", () => {
             vuetify
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, ".load-dataset-button button");
 
         const sampleDatasets: SampleDatasetCollection[] = wrapper.vm.$data.sampleDatasets;
 
@@ -80,7 +82,7 @@ describe("LoadSampleDatasetCard", () => {
             vuetify
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, ".connection-error");
 
         // Check if the error message is present
         const connectionErrorElement = wrapper.find(".connection-error");
@@ -95,6 +97,37 @@ describe("LoadSampleDatasetCard", () => {
      * environment, the references and a link to the project website and / or associated publication.
      */
     // it("correctly prints all sample datasets metadata")
-    // it("correctly loads the dataset chosen by the user")
 
+    it("correctly fires the create-assay and store-assay event", async(done) => {
+        const setup: Setup = new Setup();
+        setup.setupUnipeptNock();
+
+        const getters = {
+            baseUrl: () => "http://unipept.ugent.be"
+        }
+
+        store = new Vuex.Store({
+            getters
+        });
+
+        const wrapper = mount(LoadSampleDatasetCard, {
+            store,
+            localVue,
+            vuetify
+        });
+        
+        await waitForElement(wrapper, ".load-dataset-button button");
+
+        wrapper.find(".load-dataset-button button").trigger("click");
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.emitted("create-assay")).toBeTruthy();
+        expect(wrapper.emitted("store-assay")).toBeTruthy();
+
+        // Sample datasets cannot be stored in persistent storage and thus the storage type should be session storage.
+        expect(wrapper.emitted("store-assay")[0][0].getStorageType()).toEqual(StorageType.SessionStorage);
+
+        done();
+    });
 })

@@ -6,7 +6,7 @@ import Vuex, { Store } from "vuex";
 import Mock from "@/test/Mock";
 import Assay from "@/logic/data-management/assay/Assay";
 import { CombinedVueInstance } from "vue/types/vue";
-import { waitForPromises } from "@/test/Utils";
+import { waitForPromises, waitForElement, waitForCondition } from "@/test/Utils";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -37,7 +37,7 @@ describe("ExperimentSummaryCard", () => {
     it("correctly renders all items that are currently present", async(done) => {
         const wrapper = await mountWithValidDatasets(vuetify);
 
-        await waitForPromises(1000);
+        await waitForCondition(() => !wrapper.vm.$data.loading);
 
         expect(wrapper.find(".peptide-match-text").html()).toMatchSnapshot();
         done();

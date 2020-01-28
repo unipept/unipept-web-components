@@ -3,11 +3,7 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
 import DatasetForm from "./../DatasetForm.vue";
-import Setup from "@/test/Setup";
-import { sleep, waitForPromises } from "@/test/Utils";
-import Assay from "@/logic/data-management/assay/Assay";
-import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
-
+import { waitForElement } from "@/test/Utils";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -33,12 +29,12 @@ describe("DatasetForm", () => {
             vuetify
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, "#qs-textarea");
 
         const peptidesTextField = wrapper.find("#qs-textarea");
         peptidesTextField.setValue(peptides);
 
-        await waitForPromises(500);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted("peptide-change")[0][0]).toEqual(peptides);
 
@@ -54,13 +50,12 @@ describe("DatasetForm", () => {
             vuetify
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, "#name-input");
 
         const nameInput = wrapper.find("#name-input");
         nameInput.setValue(name);
 
-        await waitForPromises(500);
-
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted("name-change")[0][0]).toEqual(name);
 
@@ -80,12 +75,12 @@ describe("DatasetForm", () => {
             }
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, "#save-checkbox");
 
         const saveCheckbox = wrapper.find("#save-checkbox");
         saveCheckbox.trigger("click");
 
-        await waitForPromises(500);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted("save-change")[0][0]).toBeTruthy();
 
@@ -102,7 +97,7 @@ describe("DatasetForm", () => {
             vuetify
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, "#qs-textarea");
 
         // Nothing is filled in and the form validation should return false.
         expect((wrapper.vm as any).isValid()).toBeFalsy();
@@ -110,8 +105,12 @@ describe("DatasetForm", () => {
         const peptidesTextField = wrapper.find("#qs-textarea");
         peptidesTextField.setValue(peptides);
 
+        await wrapper.vm.$nextTick();
+
         const nameInput = wrapper.find("#name-input");
         nameInput.setValue(name);
+
+        await wrapper.vm.$nextTick();
 
         // Valid inputs have been filled and the form validation should now return true.
         expect((wrapper.vm as any).isValid()).toBeTruthy();

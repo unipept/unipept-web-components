@@ -4,7 +4,7 @@ import Vuetify from "vuetify";
 import Vuex from "vuex";
 import CreateDatasetCard from "./../CreateDatasetCard.vue";
 import Setup from "@/test/Setup";
-import { sleep, waitForPromises } from "@/test/Utils";
+import { sleep, waitForPromises, waitForElement } from "@/test/Utils";
 import Assay from "@/logic/data-management/assay/Assay";
 import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
 
@@ -47,12 +47,12 @@ describe("CreateDatasetCard", () => {
             }
         });
 
-        await waitForPromises(1000);
+        await waitForElement(wrapper, "#create-assay-button button");
 
         const createAssayButton = wrapper.find("#create-assay-button button");
         createAssayButton.trigger("click");
 
-        await waitForPromises(500);
+        await wrapper.vm.$nextTick();
 
         const createdAssay: MetaProteomicsAssay = wrapper.emitted("store-assay")[0][0] as MetaProteomicsAssay;
 
