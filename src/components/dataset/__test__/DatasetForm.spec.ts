@@ -12,7 +12,6 @@ const localVue = createLocalVue();
 
 describe("DatasetForm", () => {
     let vuetify;
-    let getters;
     let store;
 
     beforeEach(() => {

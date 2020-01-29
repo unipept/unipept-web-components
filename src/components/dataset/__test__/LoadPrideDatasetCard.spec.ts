@@ -14,7 +14,6 @@ const localVue = createLocalVue();
 
 describe("LoadPrideDatasetCard", () => {
     let vuetify;
-    let getters;
     let store;
 
     beforeEach(() => {

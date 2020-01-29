@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoadLocalDatasetCard shows a placeholder if no datasets are present 1`] = `
+"<span id=\\"empty-dataset-placeholder\\">
+            There are currently no datasets present in your browser's local storage.
+        </span>"
+`;
