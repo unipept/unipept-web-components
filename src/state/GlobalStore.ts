@@ -6,8 +6,6 @@ import MPAConfig from "../logic/data-management/MPAConfig";
 import Vue from "vue";
 
 export interface GlobalState {
-    selectedDatasets: Assay[],
-    storedDatasets: Assay[],
     analysis: boolean,
     searchSettings: MPAConfig,
     activeDataset: Assay | null,
@@ -18,8 +16,6 @@ export interface GlobalState {
 }
 
 const mpaState: GlobalState = {
-    storedDatasets: [],
-    selectedDatasets: [],
     analysis: false,
     searchSettings: { il: true, dupes: true, missed: false },
     activeDataset: null,
@@ -29,12 +25,6 @@ const mpaState: GlobalState = {
 };
 
 const mpaGetters: GetterTree<GlobalState, any> = {
-    selectedDatasets(state: GlobalState): Assay[] {
-        return state.selectedDatasets;
-    },
-    storedDatasets(state: GlobalState): Assay[] {
-        return state.storedDatasets;
-    },
     isAnalysis(state: GlobalState): boolean {
         return state.analysis;
     },
@@ -56,40 +46,6 @@ const mpaGetters: GetterTree<GlobalState, any> = {
 };
 
 const mpaMutations: MutationTree<GlobalState> = {
-    SELECT_DATASET(state: GlobalState, dataset: Assay) {
-        let index: number = state.selectedDatasets.findIndex((value: Assay, index: number, arr: Assay[]) => {
-            return value.getId() === dataset.getId();
-        });
-
-        if (index === -1) {
-            state.selectedDatasets.push(dataset);
-        }
-        Vue.set(state, "selectedDatasets", state.selectedDatasets);
-    },
-    DESELECT_DATASET(state: GlobalState, dataset: Assay) {
-        let index: number = state.selectedDatasets.findIndex((value: Assay, index: number, arr: Assay[]) => {
-            return value.getId() === dataset.getId();
-        });
-
-        if (index !== -1) {
-            state.selectedDatasets.splice(index, 1);
-        }
-    },
-    CLEAR_SELECTED_DATASETS(state: GlobalState) {
-        state.selectedDatasets.splice(0, state.selectedDatasets.length);
-    },
-    ADD_STORED_DATASET(state: GlobalState, dataset: Assay) {
-        state.storedDatasets.push(dataset);
-    },
-    REMOVE_STORED_DATASET(state: GlobalState, dataset: Assay) {
-        let index: number = state.storedDatasets.findIndex((value: Assay, index: number) => value.getId() === dataset.getId());
-        if (index !== -1) {
-            state.storedDatasets.splice(index, 1);
-        }
-    },
-    ADD_STORED_DATASET_BATCH(state: GlobalState, datasets: Assay[]) {
-        state.storedDatasets.push(...datasets);
-    },
     SET_ANALYSIS(state: GlobalState, isAnalysing: boolean) {
         state.analysis = isAnalysing;
     },
@@ -114,55 +70,6 @@ const mpaMutations: MutationTree<GlobalState> = {
 };
 
 const mpaActions: ActionTree<GlobalState, any> = {
-    selectDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        if (store.getters.selectedDatasets.indexOf(dataset) !== -1) {
-            return;
-        }
-
-        store.commit("SELECT_DATASET", dataset);
-        if (store.getters.isAnalysis) {
-            store.dispatch("processDataset", dataset);
-        }
-    },
-    deselectDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.commit("DESELECT_DATASET", dataset);
-
-        if (dataset === store.getters.activeDataset) {
-            // Find first processed dataset that could replace the previous active dataset
-            let newActiveDataset: Assay = null;
-
-            for (let current of store.getters.selectedDatasets) {
-                if (current.progress === 1) {
-                    newActiveDataset = current;
-                }
-            }
-
-            store.commit("SET_ACTIVE_DATASET", newActiveDataset);
-        }
-    },
-    deleteDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.dispatch("deselectDataset", dataset);
-        let datasetManager: DatasetManager = new DatasetManager();
-        datasetManager.deleteDatasetFromStorage(dataset).then(() => store.commit("REMOVE_STORED_DATASET", dataset));
-    },
-    clearSelectedDatasets(store: ActionContext<GlobalState, any>) {
-        store.commit("CLEAR_SELECTED_DATASETS");
-        store.commit("SET_ACTIVE_DATASET", null);
-    },
-    addStoredDataset(store: ActionContext<GlobalState, any>, dataset: Assay) {
-        store.commit("ADD_STORED_DATASET", dataset);
-    },
-    /**
-     * Load all datasets stored in the browser's local storage and update the current Vuex's store accordingly.
-     */
-    loadStoredDatasets(store: ActionContext<GlobalState, any>) {
-        let datasetManager: DatasetManager = new DatasetManager();
-
-        datasetManager.listDatasets()
-            .then((values) => {
-                store.commit("ADD_STORED_DATASET_BATCH", values);
-            });
-    },
     setAnalysis(store: ActionContext<GlobalState, any>, isAnalysing: boolean) {
         store.commit("SET_ANALYSIS", isAnalysing);
     },
