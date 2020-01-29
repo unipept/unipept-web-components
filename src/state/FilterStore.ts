@@ -1,6 +1,4 @@
-import Assay from "../logic/data-management/assay/Assay";
 import { ActionContext, ActionTree, GetterTree, MutationTree } from "vuex";
-import MpaAnalysisManager from "../logic/data-management/MpaAnalysisManager";
 import MPAConfig from "../logic/data-management/MPAConfig";
 
 export interface FilterState {
