@@ -1,5 +1,13 @@
 <template>
-    <amount-table :items="items" :loading="loading" annotation-name="GO term" :namespace="namespace" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
+    <amount-table 
+        :items="items" 
+        :loading="loading" 
+        annotation-name="GO term" 
+        :namespace="namespace" 
+        :searchSettings="searchSettings" 
+        :taxaRetriever="taxaRetriever" 
+        :summaryRetriever="summaryRetriever">
+    </amount-table>
 </template>
 
 <script lang="ts">

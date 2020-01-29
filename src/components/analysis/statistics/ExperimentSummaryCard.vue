@@ -44,8 +44,8 @@ change the currently active search settings and redo the analysis of all selecte
                 </tooltip>
             </div>
             <v-divider></v-divider>
-            <span v-if="!activeAssay">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
-            <span v-else>
+            <span v-if="!activeAssay" class="dataset-placeholder-text">No dataset is selected... Wait for at least one dataset to be loaded or select one.</span>
+            <span v-else class="peptide-match-text">
                 We managed to match {{ matchedPeptides }} of your {{ searchedPeptides }} peptides.
                 Unfortunately, <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">{{ missedPeptides.length }}</a> peptides couldn't be found.
             </span>
@@ -141,6 +141,10 @@ export default class ExperimentSummaryCard extends Vue {
         this.equateIl = this.$store.getters.searchSettings.il;
         this.filterDuplicates = this.$store.getters.searchSettings.dupes;
         this.missingCleavage = this.$store.getters.searchSettings.missed;
+    }
+
+    mounted() {
+        this.onActiveDatasetChanged();
     }
 
     reprocess(): void {

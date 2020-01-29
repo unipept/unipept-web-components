@@ -7,6 +7,7 @@ import HierarchicalOutlineVisualization from "./../HierarchicalOutlineVisualizat
 import "jsdom-worker-fix";
 import Vuex from "vuex";
 import flushPromises from "flush-promises"
+import { waitForElement } from "@/test/Utils";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -37,25 +38,23 @@ describe("HierarchicalOutlineVisualization", () => {
         });
     });
 
-    it("renders simple datasets", (done) => {
-        let mock: Mock = new Mock();
-        mock.mockDataRepository().then(async(dataRepository: DataRepository) => {
-            const wrapper = mount(HierarchicalOutlineVisualization, {
-                store,
-                localVue,
-                vuetify,
-                propsData: {
-                    dataRepository: dataRepository
-                }
-            });
-    
-            // Wait for all async operations to be finished, before expecting anything.
-            await sleep(2000);
-            await flushPromises();
-            expect(wrapper.html()).toMatchSnapshot();
-            // Call done here in the promise resolve.
-            done();
+    it("renders simple datasets", async(done) => {
+        const mock: Mock = new Mock();
+        const dataRepository: DataRepository = await mock.mockDataRepository();
+        const wrapper = mount(HierarchicalOutlineVisualization, {
+            store,
+            localVue,
+            vuetify,
+            propsData: {
+                dataRepository: dataRepository
+            }
         });
+
+        // Wait for all async operations to be finished, before expecting anything.
+        await waitForElement(wrapper, ".collapsibleListOpen");
+        expect(wrapper.html()).toMatchSnapshot();
+        // Call done here in the promise resolve.
+        done();
     });
 
     // it("updates accordingly to the selected term", (done) => {

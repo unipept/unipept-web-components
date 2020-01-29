@@ -5,6 +5,8 @@ import taxa2 from "./resources/taxa2.json";
 import goterms1 from "./resources/goterms1.json";
 import goterms2 from "./resources/goterms2.json";
 import ecnumbers from "./resources/ecnumbers.json";
+import pridedata from "./resources/pridedata.json";
+import sampledata from "./resources/sampledata.json";
 import LocalStorageMock from "./LocalStorageMock";
 import ClipboardMock from "./ClipboardMock";
 const fetchPolifill = require("whatwg-fetch")
@@ -13,7 +15,8 @@ export default class Setup {
     public setupAll() {
         this.setupLocalStorage();
         this.setupFetch();
-        this.setupNock();
+        this.setupUnipeptNock();
+        this.setUpPrideNock();
         this.setupClipboard();
     }
 
@@ -32,7 +35,27 @@ export default class Setup {
         writableNavigator.clipboard = new ClipboardMock();
     }
 
-    public setupNock() {
+    public setUpPrideNock() {
+        const prideQueryScope = nock("https://www.ebi.ac.uk")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
+            .persist()
+            .get("/pride/ws/archive/peptide/count/assay/2600")
+            .reply(200, "588");
+
+        const prideResultScope = nock("https://www.ebi.ac.uk")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
+            .persist()
+            .get("/pride/ws/archive/peptide/list/assay/2600?show=1000&page=0")
+            .reply(200, pridedata);
+    }
+
+    public setupUnipeptNock() {
+        const sampleScope = nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
+            .persist()
+            .post("/datasets/sampledata")
+            .reply(200, sampledata);
+
         const pept2dataScope = nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()

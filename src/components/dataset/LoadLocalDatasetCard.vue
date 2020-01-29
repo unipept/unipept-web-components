@@ -6,9 +6,11 @@ component provides him with the option to select one of these assays for analysi
 <template>
     <v-card flat>
         <v-card-text v-if="storedAssays.length === 0">
-            <span>There are currently no datasets present in your browser's local storage.</span>
+            <span id="empty-dataset-placeholder">
+                There are currently no datasets present in your browser's local storage.
+            </span>
         </v-card-text>
-        <v-list two-line>
+        <v-list two-line class="stored-assays-list">
             <template v-for="dataset of storedAssays">
                 <v-list-item :key="dataset.id" ripple @click="selectDataset(dataset)">
                     <v-list-item-action>
@@ -30,7 +32,7 @@ component provides him with the option to select one of these assays for analysi
                             {{ dataset.getDateFormatted() }}
                         </v-list-item-action-text>
                         <tooltip message="Delete this sample from local storage.">
-                            <v-btn icon text @click="removeAssay(dataset)" v-on:click.stop>
+                            <v-btn class="remove-assay-button" icon text @click="removeAssay(dataset)" v-on:click.stop>
                                 <v-icon color="grey darken-1">mdi-close</v-icon>
                             </v-btn>
                         </tooltip>
@@ -39,7 +41,7 @@ component provides him with the option to select one of these assays for analysi
             </template>
         </v-list>
 
-        <v-dialog v-model="confirmationDialog" max-width="400">
+        <v-dialog class="remove-confirmation-dialog" v-model="confirmationDialog" max-width="400">
             <v-card>
                 <v-card-title class="headline">Confirm sample deletion?</v-card-title>
 
@@ -51,11 +53,15 @@ component provides him with the option to select one of these assays for analysi
                 <v-card-actions>
                 <v-spacer></v-spacer>
 
-                <v-btn color="black" text @click="confirmationDialog = false">
+                <v-btn class="confirmation-cancel-button" color="black" text @click="confirmationDialog = false">
                     Cancel
                 </v-btn>
 
-                <v-btn color="primary" text @click="confirmAssayDeletion(markedForDeletion)">
+                <v-btn 
+                    class="confirmation-ok-button" 
+                    color="primary" 
+                    text 
+                    @click="confirmAssayDeletion(markedForDeletion)">
                     OK
                 </v-btn>
                 </v-card-actions>

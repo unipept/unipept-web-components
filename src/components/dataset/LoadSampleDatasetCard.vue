@@ -9,7 +9,7 @@ provides the user with the option to select any one of these.
             <div v-if="loadingSampleDatasets" style="display: flex; justify-content: center;">
                 <v-progress-circular indeterminate color="primary"></v-progress-circular>
             </div>
-            <div v-else-if="errorSampleDatasets">
+            <div v-else-if="errorSampleDatasets" class="connection-error">
                 <v-alert type="error">
                     Unable to retrieve list of sample datasets.
                 </v-alert>
@@ -37,7 +37,7 @@ provides the user with the option to select any one of these.
                                 v-model="selectedSampleDataset[dataset.id]">
                             </v-select>
                         </v-col>
-                        <v-col :cols="5" style="display: flex; align-items: center;">
+                        <v-col :cols="5" style="display: flex; align-items: center;" class="load-dataset-button">
                             <v-btn @click="selectSampleDataset(dataset.id)">Load dataset</v-btn>
                         </v-col>
                     </v-row>
