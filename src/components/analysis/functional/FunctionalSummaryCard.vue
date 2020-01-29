@@ -207,16 +207,6 @@ import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
         ImageDownloadModal
     },
     computed: {
-        watchableDataset: {
-            get(): PeptideContainer {
-                return this.$store.getters.activeDataset
-            }
-        },
-        watchableSelectedSearchTerm: {
-            get(): string {
-                return this.$store.getters.selectedTerm
-            }
-        },
         watchableSelectedTaxonId: {
             get(): string {
                 return this.$store.getters.selectedTaxonId;

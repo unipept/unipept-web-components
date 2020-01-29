@@ -15,7 +15,7 @@ change the currently active search settings and redo the analysis of all selecte
             <h3>Peptide list</h3>
             <v-textarea :readonly="true" v-model="peptideList"></v-textarea>
             <search-settings-form
-                :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)"
+                :disabled="disabled"
                 :equate-il.sync="equateIl"
                 :filter-duplicates.sync="filterDuplicates"
                 :missing-cleavage.sync="missingCleavage"
@@ -23,7 +23,7 @@ change the currently active search settings and redo the analysis of all selecte
             </search-settings-form>
             <div class="card-actions" >
                 <tooltip message="Restart search with selected samples using the settings chosen above.">
-                    <v-btn :disabled="$store.getters.selectedDatasets.some(el => el.progress !== 1)" @click="reprocess()" color="primary">
+                    <v-btn :disabled="disabled || exportLoading" @click="reprocess()" color="primary">
                         <v-icon left>
                             mdi-restore
                         </v-icon>
@@ -31,7 +31,7 @@ change the currently active search settings and redo the analysis of all selecte
                     </v-btn>
                 </tooltip>
                 <tooltip message="Download a CSV-file with the results of this analysis.">
-                    <v-btn min-width="187" :disabled="$store.getters.selectedDatasets.some(el => el.progres !== 1) || exportLoading" @click="downloadCsv()" color="default">
+                    <v-btn min-width="187" :disabled="disabled || exportLoading" @click="downloadCsv()" color="default">
                         <div v-if="!exportLoading">
                             <v-icon>
                                 mdi-download

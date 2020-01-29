@@ -35,7 +35,10 @@ describe("ExperimentSummaryCard", () => {
     });
 
     it("correctly renders all items that are currently present", async(done) => {
-        const wrapper = await mountWithValidDatasets(vuetify);
+        const mock: Mock = new Mock();
+        const assay: Assay = await mock.mockInitializedAssay();
+
+        const wrapper = await mountComponent(vuetify, assay);
 
         await waitForCondition(() => !wrapper.vm.$data.loading);
 
@@ -44,7 +47,7 @@ describe("ExperimentSummaryCard", () => {
     });
 
     it("correctly renders a placeholder when no dataset is selected", async(done) => {
-        const wrapper = await mountWithoutDatasets(vuetify);
+        const wrapper = await mountComponent(vuetify, null);
         expect(wrapper.find(".dataset-placeholder-text").html()).toMatchSnapshot();
         done();
     });
@@ -55,7 +58,10 @@ describe("ExperimentSummaryCard", () => {
         app.setAttribute("data-app", "");
         document.body.append(app);
 
-        const wrapper = await mountWithValidDatasets(vuetify);
+        const mock: Mock = new Mock();
+        const assay: Assay = await mock.mockInitializedAssay();
+
+        const wrapper = await mountComponent(vuetify, assay);
     
         // The dialog should not be open when first loading the component.
         expect(wrapper.find(".v-dialog--active").exists()).toBeFalsy();
@@ -67,63 +73,13 @@ describe("ExperimentSummaryCard", () => {
     });
 });
 
-const getValidStore = async function(actions = null): Promise<Store<unknown>> {
-    const mock: Mock = new Mock();
-    const assay: Assay = await mock.mockInitializedAssay();
-
-    const getters = {
-        selectedTerm: () => "Organism",
-        searchSettings: () => {
-            return {
-                il: true,
-                dupes: true,
-                missed: false
-            }
-        },
-        selectedDatasets: () => [assay]
-    };
-
-    let store;
-
-    if (actions !== null) {
-        store = new Vuex.Store({
-            actions,
-            getters
-        });
-    } else {
-        store = new Vuex.Store({
-            getters
-        });
-    }
-
-    return store;
-}
-
 /**
  * Mount the ExperimentSummaryCard-component with a valid lists of assays in the store and a valid activeDataset
  * entry in the Vuex store.
  * 
  * @param vuetify A valid Vuetify instance that should be used during the tests.
  */
-const mountWithValidDatasets = async function(vuetify, actions = null): Promise<Wrapper<CombinedVueInstance<ExperimentSummaryCard, object, object, object, Record<never, any>>>> {
-    const store = await getValidStore(actions);
-
-    return mount(ExperimentSummaryCard, {
-        store,
-        localVue,
-        vuetify,
-        propsData: {
-            activeAssay: store.getters.selectedDatasets[0]
-        }
-    });
-}
-
-/**
- * Mount the ExperimentSummaryCard-component without valid assay.
- * 
- * @param vuetify A valid Vuetify instance that should be used during the tests.
- */
-const mountWithoutDatasets = async function(vuetify): Promise<Wrapper<CombinedVueInstance<ExperimentSummaryCard, object, object, object, Record<never, any>>>> {
+const mountComponent = async function(vuetify, assay: Assay): Promise<Wrapper<CombinedVueInstance<ExperimentSummaryCard, object, object, object, Record<never, any>>>> {
     const getters = {
         selectedTerm: () => "Organism",
         searchSettings: () => {
@@ -132,8 +88,7 @@ const mountWithoutDatasets = async function(vuetify): Promise<Wrapper<CombinedVu
                 dupes: true,
                 missed: false
             }
-        },
-        selectedDatasets: () => []
+        }
     };
 
     const store = new Vuex.Store({
@@ -145,7 +100,8 @@ const mountWithoutDatasets = async function(vuetify): Promise<Wrapper<CombinedVu
         localVue,
         vuetify,
         propsData: {
-            activeAssay: null
+            activeAssay: assay,
+            disabled: false
         }
     });
 }
