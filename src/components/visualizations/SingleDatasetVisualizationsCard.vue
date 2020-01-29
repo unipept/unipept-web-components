@@ -214,10 +214,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
-    private mounted() {
-        
-    }
-
     private switchToFullScreen() {
         // @ts-ignore
         if (!this.isFullScreen && window.fullScreenApi.supportsFullScreen) {

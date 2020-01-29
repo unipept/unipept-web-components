@@ -1,5 +1,12 @@
 <template>
-    <amount-table :items="items" :loading="loading" annotation-name="EC number" :searchSettings="searchSettings" :taxaRetriever="taxaRetriever" :summaryRetriever="summaryRetriever"></amount-table>
+    <amount-table 
+        :items="items" 
+        :loading="loading" 
+        annotation-name="EC number" 
+        :searchSettings="searchSettings" 
+        :taxaRetriever="taxaRetriever" 
+        :summaryRetriever="summaryRetriever">
+    </amount-table>
 </template>
 
 <script lang="ts">
@@ -45,7 +52,7 @@ export default class EcAmountTable extends Vue {
             let ecDataSource: EcDataSource = await this.dataRepository.createEcDataSource();
             return ecDataSource.getECNumberSummary(number);
         }
-        return []
+        return [];
     }
 }
 </script>
