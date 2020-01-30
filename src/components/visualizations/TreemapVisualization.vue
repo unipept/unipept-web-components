@@ -42,7 +42,7 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         this.initTreeMap();
     }
 
-    @Watch("dataset") onDatasetChanged() {
+    @Watch("dataRepository") onDataRepositoryChanged() {
         this.initTreeMap();
     }
 
