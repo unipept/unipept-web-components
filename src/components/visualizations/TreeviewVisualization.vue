@@ -63,7 +63,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
         this.initTreeview();
     }
 
-    @Watch("dataset") onDatasetChanged() {
+    @Watch("dataRepository") onDataRepositoryChanged() {
         this.initTreeview();
     }
 
