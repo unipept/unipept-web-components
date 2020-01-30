@@ -32,6 +32,7 @@ import Canvg, { presets } from "canvg";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { downloadDataByLink } from "../../logic/utils";
+import htmlToImage from "html-to-image";
 
 @Component
 export default class ImageDownloadModal extends Vue {
@@ -59,12 +60,13 @@ export default class ImageDownloadModal extends Vue {
     }
 
     async downloadPNG(baseFileName, selector) {
+        this.svgDownload = false;
         this.baseFileName = baseFileName;
 
         this.preparingImage = true;
         this.downloadDialogOpen = true;
 
-        this.pngDataURL = await this.dom2pngDataURL(selector);
+        this.$set(this, "pngDataURL", await this.dom2pngDataURL(selector));
 
         this.preparingImage = false;
     }
@@ -114,12 +116,11 @@ export default class ImageDownloadModal extends Vue {
      * @returns {string} A dataURL containing the resulting PNG
     */
     async dom2pngDataURL(selector: string) : Promise<string> {
-        const html2canvas = require("html2canvas");
         // Use html2canvas to convert selected element to canvas, 
         // then convert that canvas to a dataURL
         const element = $(selector).get(0);
-        return html2canvas(element, { scale: 2 })
-            .then((canvasElement) => canvasElement.toDataURL())
+        const dataUrl: string = await htmlToImage.toPng(element);
+        return dataUrl;
     }
 }
 </script>
