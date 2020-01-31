@@ -10,7 +10,8 @@
             </v-card-text>
         </v-card>
         <v-card v-else>
-            <v-img class="white--text align-end" :src="pngDataURL" />
+            <img v-if="!svgDownload" :src="pngDataURL" />
+            <v-img v-else class="white--text align-end" :src="pngDataURL" />
             <v-card-actions class="justify-center">
                 <v-btn v-if="svgDownload" @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
                 <v-btn @click="savePNG()" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
@@ -32,6 +33,7 @@ import Canvg, { presets } from "canvg";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { downloadDataByLink } from "../../logic/utils";
+import htmlToImage from "html-to-image-no-fonts";
 
 @Component
 export default class ImageDownloadModal extends Vue {
@@ -44,6 +46,8 @@ export default class ImageDownloadModal extends Vue {
 
     private svgDataURL: string = "";
     private pngDataURL: string = "";
+
+    private imageKey: number = 0;
 
     async downloadSVG(baseFileName, selector) {
         this.svgDownload = true;
@@ -59,17 +63,24 @@ export default class ImageDownloadModal extends Vue {
     }
 
     async downloadPNG(baseFileName, selector) {
+        this.svgDownload = false;
         this.baseFileName = baseFileName;
 
         this.preparingImage = true;
         this.downloadDialogOpen = true;
 
-        this.pngDataURL = await this.dom2pngDataURL(selector);
+        this.pngDataURL =  await this.dom2pngDataURL(selector);
 
         this.preparingImage = false;
     }
 
+
+    private  sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }   
+
     private async savePNG() {
+
         downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
     }
 
@@ -114,12 +125,11 @@ export default class ImageDownloadModal extends Vue {
      * @returns {string} A dataURL containing the resulting PNG
     */
     async dom2pngDataURL(selector: string) : Promise<string> {
-        const html2canvas = require("html2canvas");
         // Use html2canvas to convert selected element to canvas, 
         // then convert that canvas to a dataURL
         const element = $(selector).get(0);
-        return html2canvas(element, { scale: 2 })
-            .then((canvasElement) => canvasElement.toDataURL())
+        const dataUrl: string = await htmlToImage.toPng(element);
+        return dataUrl;
     }
 }
 </script>
