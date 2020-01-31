@@ -24,7 +24,7 @@
     "d3": "^5.11.0",
     "d3-selection": "^1.4.0",
     "electron": "^7.1.4",
-    "html-to-image": "^0.1.1",
+    "html-to-image-no-fonts": "^0.1.2",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.4.1",
     "less": "^3.10.3",
