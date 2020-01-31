@@ -10,10 +10,10 @@
             </v-card-text>
         </v-card>
         <v-card v-else>
-            <img v-if="!svgDownload" :src="pngDataURL" />
+            <img v-if="!svgDownload" :src="pngDataURL" style="max-width: 800px;" />
             <v-img v-else class="white--text align-end" :src="pngDataURL" />
             <v-card-actions class="justify-center">
-                <v-btn v-if="svgDownload" @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
+                <v-btn @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
                 <v-btn @click="savePNG()" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
             </v-card-actions>
             <v-divider/>
@@ -70,6 +70,7 @@ export default class ImageDownloadModal extends Vue {
         this.downloadDialogOpen = true;
 
         this.pngDataURL =  await this.dom2pngDataURL(selector);
+        this.svgDataURL = await htmlToImage.toSvgDataURL($(selector).get(0));
 
         this.preparingImage = false;
     }
