@@ -6,14 +6,14 @@ import { Ontologies } from "../../data-management/ontology/Ontologies";
 export namespace TaxaPeptideProcessor
 {
     export async function process(processedPeptides: ProcessedPeptideContainer, baseURL: string): Promise<TaxaCountTable> {
-        var peptideCounts = processedPeptides.countTable;
+        const peptideCounts = processedPeptides.countTable;
 
-        var lcaCounts = new Map<number, Count>();
-        var lca2peptides = new Map<number, Set<string>>();
+        const lcaCounts = new Map<number, Count>();
+        const lca2peptides = new Map<number, Set<string>>();
 
         processedPeptides.response.forEach((data, peptide, _) => {
-            let lca = data.lca
-            let peptideCount = peptideCounts.get(peptide)
+            const lca = data.lca
+            const peptideCount = peptideCounts.get(peptide)
 
             lcaCounts.set(lca, (lcaCounts.get(lca) || 0) + peptideCount)
 
@@ -23,7 +23,7 @@ export namespace TaxaPeptideProcessor
             lca2peptides.get(lca).add(peptide)
         })
 
-        let missingIds: Set<number> = await Ontologies.ncbiTaxonomy.fetchTaxaInfo(Array.from(lcaCounts.keys()), baseURL);
+        const missingIds: Set<number> = await Ontologies.ncbiTaxonomy.fetchTaxaInfo(Array.from(lcaCounts.keys()), baseURL);
 
         missingIds.forEach(id => {
             lcaCounts.delete(id)
