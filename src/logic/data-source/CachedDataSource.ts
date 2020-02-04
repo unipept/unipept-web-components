@@ -67,9 +67,9 @@ export abstract class CachedDataSource<T, S extends FAElement> extends DataSourc
                 this._cachedSequencesLRU.unshift(sequenceHash);
                 return this._cache.get(sequenceHash).get(namespace);
             } else {
-                // The item is not currently stored in the cache. We need to get it.
+                // The item is not currently stored in the cache. We need to compute it.
                 const result: [Map<T, S[]>, Map<T, FATrust>] = await this.computeTerms(cutoff, sequences);
-
+        
                 // Enter the item into the cache
                 this._cachedSequencesLRU.unshift(sequenceHash);
                 const cacheMap: Map<T, [S[], FATrust]> = new Map();

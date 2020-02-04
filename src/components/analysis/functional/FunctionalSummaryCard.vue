@@ -8,6 +8,9 @@
                 <v-tab>
                     EC Numbers
                 </v-tab>
+                <v-tab>
+                    Interpro Entries
+                </v-tab>
                 <v-spacer>
                 </v-spacer>
                 <v-menu :close-on-content-click="false" bottom left ref="sortMenu">
@@ -155,6 +158,34 @@
                         </v-card-text>
                     </v-card>
                 </v-tab-item>
+                <v-tab-item>
+                    <v-card flat>
+                        <v-card-text>
+                            <div v-if="!this.dataRepository">
+                                <span class="ec-waiting" v-if="this.analysisInProgress">
+                                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                                </span>
+                                <span v-else class="placeholder-text">
+                                    Please select at least one dataset for analysis.
+                                </span>
+                            </div>
+                            <div v-else>
+                                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
+                                <span>This panel shows the Interpro entries that were matched to your peptides. </span>
+                                <span v-html="ecTrustLine"></span>
+                                <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
+                                <interpro-amount-table :loading="faCalculationsInProgress" :dataRepository="dataRepository" :items="interproData" :searchSettings="faSortSettings"></interpro-amount-table>
+                                <!-- <v-card outlined v-if="ecTreeData">
+                                    <v-btn small depressed class="item-treeview-dl-btn" @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
+                                        <v-icon>mdi-download</v-icon>
+                                        Save as image
+                                    </v-btn>
+                                    <treeview id="ec-treeview" :data="ecTreeData" :autoResize="true" :height="300" :width="800" :tooltip="ecTreeTooltip" :enableAutoExpand="true"></treeview>
+                                </v-card> -->
+                            </div>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
             </v-tabs-items>
         </v-card>
         <div id="tooltip" class="tip"></div>
@@ -183,6 +214,7 @@ import GoDataSource from "../../../logic/data-source/GoDataSource";
 import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
 import GoTerm from "../../../logic/functional-annotations/GoTerm";
 import GoAmountTable from "../../tables/GoAmountTable.vue";
+import InterproAmountTable from "../../tables/InterproAmountTable.vue";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import EcNumber from "../../../logic/functional-annotations/EcNumber";
 import EcDataSource from "../../../logic/data-source/EcDataSource";
@@ -194,6 +226,8 @@ import FATrust from "../../../logic/functional-annotations/FATrust";
 import { NCBITaxon } from "../../../logic/data-management/ontology/taxa/NCBITaxon";
 import { NCBITaxonomy } from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
 import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
+import InterproDataSource from "../../../logic/data-source/InterproDataSource";
+import InterproEntry from "../../../logic/functional-annotations/InterproEntry";
 
 @Component({
     components: {
@@ -243,6 +277,9 @@ export default class FunctionalSummaryCard extends Vue {
 
     private ecData: EcNumber[] = [];
     private ecTreeData: TreeViewNode = null;
+
+    private interproData: InterproEntry[] = [];
+    private interproTreeData: TreeViewNode = null;
 
     private ecTrustLine: string = "";
     private goTrustLine: string = "";
@@ -376,8 +413,9 @@ export default class FunctionalSummaryCard extends Vue {
 
     private async doFAcalculations(sequences: string[] = null) {
         if (this.dataRepository) {
-            let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-            let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
+            const goSource: GoDataSource = await this.dataRepository.createGoDataSource();
+            const ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
+            const interproSource: InterproDataSource = await this.dataRepository.createInterproDataSource();
 
             const percent = parseInt(this.percentSettings);
 
@@ -392,8 +430,11 @@ export default class FunctionalSummaryCard extends Vue {
             // recalculate ec-data for those sequences
             this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
             this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
-            // @ts-ignore
             this.ecTreeData = await ecSource.getEcTree(null, percent, sequences);
+
+            // recalculate interpro-data
+            this.interproData = await interproSource.getInterproEntries(null, percent, sequences);
+            // this.interproTreeData = await interproSource.getInterproTree(null, percent, sequences);
         }
     }
 

@@ -21,5 +21,5 @@ export function convertStringToInterproNameSpace(ns: string): InterproNameSpace 
         ["repeat", InterproNameSpace.Repeat]
     ]);
 
-    return mapping[ns.toLowerCase()];
+    return mapping.get(ns.toLowerCase());
 }

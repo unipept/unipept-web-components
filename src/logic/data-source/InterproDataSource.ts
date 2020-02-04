@@ -76,8 +76,18 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
      * @param sequences array of peptides to take into account
      */
     public async getInterproEntries(namespace: InterproNameSpace, cutoff: number = 50, sequences: string[] = null): Promise<InterproEntry[]> {
-        const result: [InterproEntry[], FATrust] = await this.getFromCache(namespace, Object.values(InterproNameSpace), cutoff, sequences);
-        return result[0].sort((a: InterproEntry, b: InterproEntry) => b.popularity - a.popularity);
+        if (namespace) {
+            const result: [InterproEntry[], FATrust] = await this.getFromCache(namespace, Object.values(InterproNameSpace), cutoff, sequences);
+            return result[0];
+        } else {
+            const output: InterproEntry[] = [];
+            for (const ns of Object.values(InterproNameSpace)) {
+                const result: [InterproEntry[], FATrust] = await this.getFromCache(ns, Object.values(InterproNameSpace), cutoff, sequences);
+                output.push(... result[0]);
+            }
+            output.sort((a: InterproEntry, b: InterproEntry) => b.popularity - a.popularity);
+            return output;
+        }
     }
 
     /**
@@ -104,11 +114,13 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
 
     protected async computeTerms(percent = 50, sequences = null): Promise<[Map<InterproNameSpace, InterproEntry[]>, Map<InterproNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
-        var ontology: InterproOntology = this._countTable.getOntology();
+        console.log(this._countTable);
+        const ontology: InterproOntology = this._countTable.getOntology();
+        console.log(ontology);
         await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl);
 
-        var dataOutput: Map<InterproNameSpace, InterproEntry[]> = new Map();
-        var trustOutput: Map<InterproNameSpace, FATrust> = new Map();
+        const dataOutput: Map<InterproNameSpace, InterproEntry[]> = new Map();
+        const trustOutput: Map<InterproNameSpace, FATrust> = new Map();
 
         // calculate terms without peptide information if it is not available
         if (!this._processedPeptideContainer) {
@@ -116,7 +128,7 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
 
             // first calculate the total counts for each namespace
             this._countTable.counts.forEach((count, term) => {
-                let namespace = ontology.getDefinition(term).namespace
+                const namespace = ontology.getDefinition(term).namespace
                 namespaceCounts.set(namespace, (namespaceCounts.get(namespace) || 0) + count)
             })
 
@@ -129,11 +141,11 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
 
             // create InterproEntries
             this._countTable.counts.forEach((count, term) => {
-                let def = ontology.getDefinition(term)
-                let namespaceCount = namespaceCounts.get(def.namespace)
-                let ns: InterproNameSpace = def.namespace as InterproNameSpace
+                const def = ontology.getDefinition(term)
+                const namespaceCount = namespaceCounts.get(def.namespace)
+                const ns: InterproNameSpace = def.namespace as InterproNameSpace
 
-                let entry = new InterproEntry(def.code, def.name, ns, count, count / namespaceCount, [])
+                const entry = new InterproEntry(def.code, def.name, ns, count, count / namespaceCount, [])
                 dataOutput.get(ns).push(entry);
             })
 
@@ -145,7 +157,7 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
             return [dataOutput, trustOutput];
         }
 
-        var peptideCountTable = this._processedPeptideContainer.countTable
+        const peptideCountTable = this._processedPeptideContainer.countTable
 
         if (sequences == null) {
             sequences = Array.from(this._processedPeptideContainer.response.keys())

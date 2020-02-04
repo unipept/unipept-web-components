@@ -4,12 +4,12 @@ import { Count } from "../../data-management/counts/CountTable";
 export namespace FAPeptideProcessor
 {
     export async function process(processedPeptides: ProcessedPeptideContainer, faPrefix: string, ontology: any, baseURL: string, createFACountTable: (ontologyCounts, ontology2peptide, peptide2ontology) => any): Promise<any> {
-        var peptideCounts = processedPeptides.countTable;
-        var pept2dataResponse = processedPeptides.response;
+        const peptideCounts = processedPeptides.countTable;
+        const pept2dataResponse = processedPeptides.response;
 
-        var ontologyCounts = new Map<string, Count>();
-        var ontology2peptide = new Map<string, Set<string>>();
-        var peptide2ontology = new Map<string, string[]>();
+        const ontologyCounts = new Map<string, Count>();
+        const ontology2peptide = new Map<string, Set<string>>();
+        const peptide2ontology = new Map<string, string[]>();
 
         pept2dataResponse.forEach((data, peptide, _) => {
             let fas = data.fa.data || [];

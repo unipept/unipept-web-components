@@ -9,9 +9,11 @@ import { ProcessedPeptideContainer } from "../../data-management/ProcessedPeptid
 import { TaxaPeptideProcessor } from "../../processors/peptide/TaxaPeptideProcessor"
 import { GOPeptideProcessor } from "../../processors/peptide/GOPeptideProcessor";
 import { ECPeptideProcessor } from "../../processors/peptide/ECPeptideProcessor";
+import { InterproPeptideProcessor } from "../../processors/peptide/InterproPeptideProcessor";
 import MetaProteomicsAssay from "../../data-management/assay/MetaProteomicsAssay";
 import { PeptideData } from "../../api/pept2data/Response";
 import { Ontologies } from "../../data-management/ontology/Ontologies";
+import InterproDataSource from "../InterproDataSource";
 
 export default class MetaProteomicsDataRepository extends DataRepository {
     private _metaproteomicsAssay: MetaProteomicsAssay;
@@ -36,8 +38,8 @@ export default class MetaProteomicsDataRepository extends DataRepository {
     }
 
     protected async initTaxaDataSource(): Promise<void> {
-        let processedPeptideContainer = await this._processedPeptideContainer;
-        let countTable = await TaxaPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
+        const processedPeptideContainer = await this._processedPeptideContainer;
+        const countTable = await TaxaPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
 
         this._taxaSourceCache = new TaxaDataSource(
             countTable, 
@@ -48,8 +50,8 @@ export default class MetaProteomicsDataRepository extends DataRepository {
     }
 
     protected async initGoDataSource(): Promise<void> {
-        let processedPeptideContainer = await this._processedPeptideContainer;
-        let countTable = await GOPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
+        const processedPeptideContainer = await this._processedPeptideContainer;
+        const countTable = await GOPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
 
         this._goSourceCache = new GoDataSource(
             countTable,
@@ -60,10 +62,22 @@ export default class MetaProteomicsDataRepository extends DataRepository {
     }
 
     protected async initEcDataSource(): Promise<void> {
-        let processedPeptideContainer = await this._processedPeptideContainer;
-        let countTable = await ECPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
+        const processedPeptideContainer = await this._processedPeptideContainer;
+        const countTable = await ECPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
 
         this._ecSourceCache = new EcDataSource(
+            countTable,
+            processedPeptideContainer,
+            this,
+            this._baseUrl
+        );
+    }
+
+    protected async initInterproDataSource(): Promise<void> {
+        const processedPeptideContainer = await this._processedPeptideContainer;
+        const countTable = await InterproPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
+
+        this._interproSourceCache = new InterproDataSource(
             countTable,
             processedPeptideContainer,
             this,
