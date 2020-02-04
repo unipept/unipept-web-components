@@ -2,6 +2,19 @@ import FAElement from "./FAElement";
 import { EcNameSpace } from "./EcNameSpace";
 
 export default class EcNumber extends FAElement {
+    /**
+     * Construct a new EcNumber.
+     *
+     * @param code The code that uniquely identifies this EC-number. This code should not include the "EC:"-prefix!
+     * @param name The name that's associated with the given EC-code.
+     * @param namespace The namespace that's associated with the given EC-code.
+     * @param popularity The amount of peptides that's associated with this EC-number in the associated sample.
+     * @param fractionOfPepts The fraction of the total amount of peptides that's associated with this EC-number.
+     */
+    constructor(code: string, name: string, namespace: EcNameSpace, popularity: number, fractionOfPepts: number, affectedPeptides: string[]) {
+        super(code, name, popularity, fractionOfPepts, affectedPeptides);
+        this.namespace = namespace;
+    }
 
     public get ancestors(): string[] {
         return EcNumber.computeAncestors(this.code);
@@ -45,18 +58,4 @@ export default class EcNumber extends FAElement {
         return (code + ".-").split(".").indexOf("-");
     }
     public namespace: EcNameSpace;
-
-    /**
-     * Construct a new EcNumber.
-     *
-     * @param code The code that uniquely identifies this EC-number. This code should not include the "EC:"-prefix!
-     * @param name The name that's associated with the given EC-code.
-     * @param namespace The namespace that's associated with the given EC-code.
-     * @param popularity The amount of peptides that's associated with this EC-number in the associated sample.
-     * @param fractionOfPepts The fraction of the total amount of peptides that's associated with this EC-number.
-     */
-    constructor(code: string, name: string, namespace: EcNameSpace, popularity: number, fractionOfPepts: number, affectedPeptides: string[]) {
-        super(code, name, popularity, fractionOfPepts, affectedPeptides);
-        this.namespace = namespace;
-    }
 }

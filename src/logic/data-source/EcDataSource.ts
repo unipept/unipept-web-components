@@ -10,8 +10,6 @@ import { PeptideData } from "../api/pept2data/Response";
 import { DataSourceCommon } from "./DataSourceCommon";
 import TreeViewNode from "../../components/visualizations/TreeViewNode";
 
-// import TreeViewNode from '../ui/visualizations/TreeViewNode';
-
 export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> {
     private _countTable: ECCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
