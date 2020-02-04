@@ -1,80 +1,83 @@
 import DataRepository from "./DataRepository";
 import { GoNameSpace } from "../functional-annotations/GoNameSpace";
-import GoTerm from "../functional-annotations/GoTerm";
 import FATrust from "../functional-annotations/FATrust";
 import { CachedDataSource } from "./CachedDataSource";
-import { GeneOntology } from "../data-management/ontology/go/GeneOntology";
-import { GOCountTable } from "../data-management/counts/GOCountTable";
 import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
 import { PeptideData } from "../api/pept2data/Response";
 import { DataSourceCommon } from "./DataSourceCommon";
+import { InterproNameSpace } from "../functional-annotations/InterproNameSpace";
+import InterproEntry from "../functional-annotations/InterproEntry";
+import { InterproCountTable } from "../data-management/counts/InterproCountTable";
+import { InterproOntology } from "../data-management/ontology/interpro/InterproOntology";
 
 /**
- * A GoDataSource can be used to access all GoTerms associated with a specific Sample. Note that this class contains
- * an extensive cache that reduces the amount of information that must be transfered between the server and the client's
- * browser.
+ * An InterproDataSource can be used to access all Interpro entries associated with a specific Assay. Note that this 
+ * class contains an extensive cache that reduces the amount of information that must be transfered between the server 
+ * and the client's browser.
  *
  * @see Assay
  */
-export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> {
-    private _countTable: GOCountTable;
+export default class InterproDataSource extends CachedDataSource<InterproNameSpace, InterproEntry> {
+    private _countTable: InterproCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
     private _baseUrl: string;
 
-    constructor(countTable: GOCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
+    constructor(countTable: InterproCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository);
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
         this._baseUrl = baseUrl;
     }
 
-    public getPeptidesByGoTerm(term: GoTerm): string[] {
+    public getPeptidesByInterproEntry(term: InterproEntry): string[] {
         return Array.from(this._countTable.ontology2peptide.get(term.code) || [])
     }
 
-    public getGoTermSummary(term: GoTerm): string[][] {
+    public getInterproSummary(term: InterproEntry): string[][] {
         return DataSourceCommon.getFASummary(term, this._processedPeptideContainer);
     }
 
     /**
-     * Get the n most popular GO-Terms for a specific namespace. The returned GO-Terms are sorted by popularity.
+     * Get the n most popular Interpro-entries for a specific namespace. The returned entries are sorted by popularity.
      *
-     * @param n The amount of most popular GO-Terms that should be returned. If n is larger than the amount of terms
-     * exist, all terms of the given namespace will be returned.
-     * @param namespace The GO-namespace for which the most popular terms must be returned. Leave blanc if the most
-     * popular terms over all namespaces must be returned.
+     * @param n The amount of most popular Interpro-entries that should be returned. If n is larger than the amount of 
+     * terms that exist, all terms of the given namespace will be returned.
+     * @param namespace The Interpro-namespace for which the most popular terms must be returned. Leave blank if the 
+     * most popular terms over all namespaces must be returned.
      */
-    public async getTopItems(n: number, namespace: GoNameSpace = null): Promise<GoTerm[]> {
+    public async getTopItems(n: number, namespace: InterproNameSpace = null): Promise<InterproEntry[]> {
         if (namespace) {
-            const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace));
+            const result: [InterproEntry[], FATrust] = await this.getFromCache(namespace, Object.values(InterproNameSpace));
             // The GO-Terms in the cache are sorted per namespace from high to low popularity. We can just return the first
             // n items of the found
-            const list: GoTerm[] = result[0];
+            const list: InterproEntry[] = result[0];
             return list.slice(0, Math.min(n, list.length));
         } else {
-            const output: GoTerm[] = [];
-            for (const ns of Object.values(GoNameSpace)) {
-                const result: [GoTerm[], FATrust] = await this.getFromCache(ns, Object.values(GoNameSpace));
+            const output: InterproEntry[] = [];
+            for (const ns of Object.values(InterproNameSpace)) {
+                const result: [InterproEntry[], FATrust] = await this.getFromCache(ns, Object.values(InterproNameSpace));
                 if (result && result[0] && result[0].length > 0) {
                     output.push(...result[0].slice(0, Math.min(n, result[0].length)));
                 }
             }
 
-            return output.sort((a: GoTerm, b: GoTerm) => b.popularity - a.popularity).slice(0, Math.min(n, output.length));
+            return output.sort(
+                (a: InterproEntry, b: InterproEntry) => b.popularity - a.popularity
+            ).slice(0, Math.min(n, output.length));
         }
     }
 
     /**
-     * Get all GO-terms for a specific cutoff, and taking into account only those sequences found in the given
+     * Get all Interpro-entries for a specific cutoff, and taking into account only those sequences found in the given
      * sequences array.
      *
-     * @param namespace the specific GO namespace for which GO-terms should be returned.
+     * @param namespace the specific Interpro namespace for which Interpro-entries should be returned.
      * @param cutoff as percent (0-100)
      * @param sequences array of peptides to take into account
      */
-    public async getGoTerms(namespace: GoNameSpace, cutoff: number = 50, sequences: string[] = null): Promise<GoTerm[]> {
-        const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
-        return result[0].sort((a: GoTerm, b: GoTerm) => b.popularity - a.popularity);
+    public async getInterproEntries(namespace: InterproNameSpace, cutoff: number = 50, sequences: string[] = null): Promise<InterproEntry[]> {
+        const result: [InterproEntry[], FATrust] = await this.getFromCache(namespace, Object.values(InterproNameSpace), cutoff, sequences);
+        return result[0].sort((a: InterproEntry, b: InterproEntry) => b.popularity - a.popularity);
     }
 
     /**
@@ -84,14 +87,14 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
      * @param cutoff
      * @param sequences
      */
-    public async getTrust(namespace: GoNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<FATrust> {
+    public async getTrust(namespace: InterproNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<FATrust> {
         if (namespace) {
-            const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
+            const result: [InterproEntry[], FATrust] = await this.getFromCache(namespace, Object.values(InterproNameSpace), cutoff, sequences);
             return result[1];
         } else {
             const trusts: FATrust[] = [];
-            for (const ns of Object.values(GoNameSpace)) {
-                const result: [GoTerm[], FATrust] = await this.getFromCache(ns, Object.values(GoNameSpace), cutoff, sequences);
+            for (const ns of Object.values(InterproNameSpace)) {
+                const result: [InterproEntry[], FATrust] = await this.getFromCache(ns, Object.values(InterproNameSpace), cutoff, sequences);
                 trusts.push(result[1]);
             }
             return this.agregateTrust(trusts);
@@ -99,14 +102,13 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
 
     }
 
-    // TODO: use percent in calculations
-    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<GoNameSpace, GoTerm[]>, Map<GoNameSpace, FATrust>]> {
+    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<InterproNameSpace, InterproEntry[]>, Map<InterproNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
-        var ontology: GeneOntology = this._countTable.getOntology()
-        await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl)
+        var ontology: InterproOntology = this._countTable.getOntology();
+        await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl);
 
-        var dataOutput: Map<GoNameSpace, GoTerm[]> = new Map()
-        var trustOutput: Map<GoNameSpace, FATrust> = new Map()
+        var dataOutput: Map<InterproNameSpace, InterproEntry[]> = new Map();
+        var trustOutput: Map<InterproNameSpace, FATrust> = new Map();
 
         // calculate terms without peptide information if it is not available
         if (!this._processedPeptideContainer) {
@@ -119,24 +121,24 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
             })
 
             // create FATrusts for each namespace, at the same time init dataOutput arrays
-            for (let namespace of Object.values(GoNameSpace)) {
+            for (let namespace of Object.values(InterproNameSpace)) {
                 let namespaceCount = namespaceCounts.get(namespace) || 0
                 trustOutput.set(namespace, new FATrust(namespaceCount, namespaceCount, 0));
                 dataOutput.set(namespace, [])
             }
 
-            // create GoTerms
+            // create InterproEntries
             this._countTable.counts.forEach((count, term) => {
                 let def = ontology.getDefinition(term)
                 let namespaceCount = namespaceCounts.get(def.namespace)
-                let goNameSpace: GoNameSpace = def.namespace as GoNameSpace
+                let ns: InterproNameSpace = def.namespace as InterproNameSpace
 
-                let goTerm = new GoTerm(def.code, def.name, goNameSpace, count, count / namespaceCount, [])
-                dataOutput.get(goNameSpace).push(goTerm);
+                let entry = new InterproEntry(def.code, def.name, ns, count, count / namespaceCount, [])
+                dataOutput.get(ns).push(entry);
             })
 
             // sort the GoTerms for each namespace
-            for (let namespace of Object.values(GoNameSpace)) {
+            for (let namespace of Object.values(InterproEntry)) {
                 dataOutput.set(namespace, dataOutput.get(namespace).sort((a, b) => b.popularity - a.popularity))
             }
 
@@ -149,7 +151,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
             sequences = Array.from(this._processedPeptideContainer.response.keys())
         }
 
-        for (let namespace of Object.values(GoNameSpace)) {
+        for (let namespace of Object.values(InterproNameSpace)) {
             let totalCount = 0;
             let annotatedCount = 0;
             let trustCount = 0;
@@ -191,14 +193,14 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
                 }
             }
             
-            // convert calculated data to GoTerms
-            let convertedItems: GoTerm[] = [...termCounts].sort((a, b) => b[1] - a[1])
+            // convert calculated data to interpros
+            let convertedItems: InterproEntry[] = [...termCounts].sort((a, b) => b[1] - a[1])
                 .map(term => {
                     let code = term[0]
                     let count = term[1]
                     let ontologyData = ontology.getDefinition(code)
                     let fractionOfPepts = count / totalCount
-                    return new GoTerm(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
+                    return new InterproEntry(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
                 })
 
             dataOutput.set(namespace, convertedItems);
