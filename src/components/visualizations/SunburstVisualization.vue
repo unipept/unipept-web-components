@@ -67,13 +67,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
     @Watch("dataRepository") onDataRepositoryChanged() {
         this.initTree();
     }
-
-    @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
-        if (this.watchableTaxonId === -1) {
-            this.reset();
-        }
-    }
-
+    
     @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
         this.sunburst.setFullScreen(newFullScreen)
     }

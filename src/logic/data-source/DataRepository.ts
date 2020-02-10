@@ -1,11 +1,13 @@
 import TaxaDataSource from "./TaxaDataSource";
 import GoDataSource from "./GoDataSource";
 import EcDataSource from "./EcDataSource";
+import InterproDataSource from "./InterproDataSource";
 
 export default abstract class DataRepository {
     protected _taxaSourceCache: TaxaDataSource;
     protected _goSourceCache: GoDataSource;
     protected _ecSourceCache: EcDataSource;
+    protected _interproSourceCache: InterproDataSource;
 
     public async createTaxaDataSource(): Promise<TaxaDataSource> {
         if (!this._taxaSourceCache) {
@@ -28,7 +30,15 @@ export default abstract class DataRepository {
         return this._ecSourceCache;
     }
 
+    public async createInterproDataSource(): Promise<InterproDataSource> {
+        if (!this._interproSourceCache) {
+            await this.initInterproDataSource();
+        }
+        return this._interproSourceCache;
+    }
+
     protected abstract async initTaxaDataSource(): Promise<void>;
     protected abstract async initGoDataSource(): Promise<void>;
     protected abstract async initEcDataSource(): Promise<void>;
+    protected abstract async initInterproDataSource(): Promise<void>;
 }

@@ -46,12 +46,6 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         this.initTreeMap();
     }
 
-    @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
-        if (this.watchableTaxonId === -1) {
-            this.reset();
-        }
-    }
-
     @Watch("fullScreen")
     private onFullScreenChanged(isFullScreen: boolean) {
         this.treemap.setFullScreen(isFullScreen);

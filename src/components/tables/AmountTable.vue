@@ -147,7 +147,7 @@ export default class AmountTable extends Vue {
         private computeTree(term: FAElement): boolean {
             this.taxaRetriever(term).then((node) => {
                 this.treeAvailable.set(term, node);
-            })
+            }).catch(err => console.error(err));
             return true;
         }
 

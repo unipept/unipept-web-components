@@ -1,12 +1,15 @@
 <template>
     <div>
         <v-card>
-            <v-tabs :color="tabsTextColor" :dark="isDark" v-model="currentTab" :slider-color="tabsSliderColor" :background-color="tabsColor">
+            <v-tabs color="white" :dark="true" v-model="currentTab" slider-color="secondary" background-color="primary">
                 <v-tab>
                     GO Terms
                 </v-tab>
                 <v-tab>
                     EC Numbers
+                </v-tab>
+                <v-tab>
+                    Interpro Entries
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
@@ -68,92 +71,49 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
-            <v-alert v-if="this.showTaxonInfo && this.selectedNCBITaxon && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
+            <v-alert v-if="this.selectedNCBITaxon && this.taxonId != -1" dense colored-border id="filtered-taxon-information">
                 <v-row dense align="center">
-                    <v-col class="grow"><b>Filtered results</b>: These results are limited to the {{this.totalPeptides}} peptides specific to <b>{{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}})</b>.</v-col>
-                    <v-col class="shrink">
-                        <v-btn @click="doFAcalculations(); showTaxonInfo = false;">Undo</v-btn>
+                    <v-col class="grow">
+                        <b>
+                            Filtered results
+                        </b>
+                        : These results are limited to the {{ this.totalPeptides }} peptides specific to 
+                        <b>
+                            {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.rank}})
+                        </b>.
                     </v-col>
-                </v-row>
-            </v-alert>
-            <v-alert v-if="!this.showTaxonInfo && this.selectedNCBITaxon && this.watchableSelectedTaxonId != -1" dense colored-border id="filtered-taxon-information">
-                <v-row dense align="center">
-                    <v-col class="grow"><b>Unfiltered results:</b> filtered results are available specific to {{this.selectedNCBITaxon.name}} ({{this.selectedNCBITaxon.rank}}).</v-col>
                     <v-col class="shrink">
-                        <v-btn @click="redoFAcalculations(); showTaxonInfo = true;">Redo</v-btn>
+                        <v-btn @click="taxonId = -1">Undo</v-btn>
                     </v-col>
                 </v-row>
             </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
-                    <v-card flat>
-                        <v-card-text>
-                            <div v-if="!this.dataRepository" class="mpa-unavailable go">
-                                <div v-if="this.analysisInProgress">
-                                    <h2>Biological Process</h2>
-                                    <span class="go-waiting">
-                                        <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                    </span>
-                                    <h2>Cellular Component</h2>
-                                    <span class="go-waiting">
-                                        <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                    </span>
-                                    <h2>Molecular Function</h2>
-                                    <span class="go-waiting">
-                                        <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
-                                    </span>
-                                </div>
-                                <div v-else class="placeholder-text">
-                                    Please select at least one dataset for analysis.
-                                </div>
-                            </div>
-                            <div v-else>
-                                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
-                                <span>This panel shows the Gene Ontology annotations that were matched to your peptides. </span>
-                                <span v-html="goTrustLine"></span>
-                                <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                                <div v-for="(namespace, idx) of goNamespaces" v-bind:key="namespace" style="margin-top: 16px;" class="go-table-container">
-                                    <h2>{{ goData[idx].title }}</h2>
-                                    <v-row>
-                                        <v-col :cols="9">
-                                            <go-amount-table :loading="faCalculationsInProgress" :dataRepository="dataRepository" :items="goData[idx].goTerms" :namespace="namespace" :searchSettings="faSortSettings"></go-amount-table>
-                                        </v-col>
-                                        <v-col :cols="3">
-                                            <quick-go-card :sort-settings="faSortSettings" :items="goData[idx].goTerms"></quick-go-card>
-                                        </v-col>
-                                    </v-row>
-                                </div>
-                            </div>
-                        </v-card-text>
-                    </v-card>
+                    <go-summary-card
+                        ref="goSummaryCard"
+                        :dataRepository="dataRepository"
+                        :analysisInProgress="analysisInProgress"
+                        :filterTaxonId="taxonId"
+                        :sortSettings="faSortSettings">
+                    </go-summary-card>
                 </v-tab-item>
                 <v-tab-item>
-                    <v-card flat>
-                        <v-card-text>
-                            <div v-if="!this.dataRepository">
-                                <span class="ec-waiting" v-if="this.analysisInProgress">
-                                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                                </span>
-                                <span v-else class="placeholder-text">
-                                    Please select at least one dataset for analysis.
-                                </span>
-                            </div>
-                            <div v-else>
-                                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
-                                <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
-                                <span v-html="ecTrustLine"></span>
-                                <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                                <ec-amount-table :loading="faCalculationsInProgress" :dataRepository="dataRepository" :items="ecData" :searchSettings="faSortSettings"></ec-amount-table>
-                                <v-card outlined v-if="ecTreeData">
-                                    <v-btn small depressed class="item-treeview-dl-btn" @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
-                                        <v-icon>mdi-download</v-icon>
-                                        Save as image
-                                    </v-btn>
-                                    <treeview id="ec-treeview" :data="ecTreeData" :autoResize="true" :height="300" :width="800" :tooltip="ecTreeTooltip" :enableAutoExpand="true"></treeview>
-                                </v-card>
-                            </div>
-                        </v-card-text>
-                    </v-card>
+                    <ec-summary-card
+                        ref="ecSummaryCard"
+                        :dataRepository="dataRepository"
+                        :analysisInProgress="analysisInProgress"
+                        :filterTaxonId="taxonId"
+                        :sortSettings="faSortSettings">
+                    </ec-summary-card>
+                </v-tab-item>
+                <v-tab-item>
+                    <interpro-summary-card
+                        ref="interproSummaryCard"
+                        :dataRepository="dataRepository"
+                        :analysisInProgress="analysisInProgress"
+                        :filterTaxonId="taxonId"
+                        :sortSettings="faSortSettings">
+                    </interpro-summary-card>
                 </v-tab-item>
             </v-tabs-items>
         </v-card>
@@ -182,96 +142,58 @@ import DataRepository from "../../../logic/data-source/DataRepository";
 import GoDataSource from "../../../logic/data-source/GoDataSource";
 import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
 import GoTerm from "../../../logic/functional-annotations/GoTerm";
-import GoAmountTable from "../../tables/GoAmountTable.vue";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import EcNumber from "../../../logic/functional-annotations/EcNumber";
 import EcDataSource from "../../../logic/data-source/EcDataSource";
-import EcAmountTable from "../../tables/EcAmountTable.vue";
-import TreeViewNode from "../../visualizations/TreeViewNode";
-import Treeview from "../../visualizations/Treeview.vue";
 import FATrust from "../../../logic/functional-annotations/FATrust";
 
 import { NCBITaxon } from "../../../logic/data-management/ontology/taxa/NCBITaxon";
 import { NCBITaxonomy } from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
 import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
+import InterproDataSource from "../../../logic/data-source/InterproDataSource";
+import InterproEntry from "../../../logic/functional-annotations/InterproEntry";
+import { InterproNameSpace, convertStringToInterproNameSpace } from "../../../logic/functional-annotations/InterproNameSpace";
+import GoSummaryCard from "./GoSummaryCard.vue";
+import EcSummaryCard from "./EcSummaryCard.vue";
+import InterproSummaryCard from "./InterproSummaryCard.vue";
 
 @Component({
     components: {
         CardHeader,
         IndeterminateProgressBar,
         FilterFunctionalAnnotationsDropdown,
-        GoAmountTable,
-        EcAmountTable,
-        Treeview,
         QuickGoCard,
-        ImageDownloadModal
-    },
-    computed: {
-        watchableSelectedTaxonId: {
-            get(): string {
-                return this.$store.getters.selectedTaxonId;
-            }
-        }
+        ImageDownloadModal,
+        GoSummaryCard,
+        EcSummaryCard,
+        InterproSummaryCard
     }
 })
 export default class FunctionalSummaryCard extends Vue {
     $refs!: {
-        imageDownloadModal: ImageDownloadModal
+        imageDownloadModal: ImageDownloadModal,
+        goSummaryCard: GoSummaryCard,
+        ecSummaryCard: EcSummaryCard,
+        interproSummaryCard: InterproSummaryCard
     }
     
     @Prop({ required: true })
     private dataRepository: DataRepository;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
-    @Prop({ required: false, default: "primary" })
-    private tabsColor: string;
-    @Prop({ required: false, default: "secondary" })
-    private tabsSliderColor: string;
-    @Prop({ required: false, default: "white" })
-    private tabsTextColor: string;
-    @Prop({ required: false, default: true })
-    private isDark: boolean;
+    @Prop({ required: true })
+    private selectedTaxonId: number;
+
+    private taxonId: number = -1;
 
     private totalPeptides: number = 0;
-    private selectedNCBITaxon: NCBITaxon = null; 
-    private showTaxonInfo: boolean = false;
-
-    // We need to define all namespaces as a list here, as Vue templates cannot access the GoNameSpace class 
-    // directly
-    private goNamespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
-    private goData: {goTerms: GoTerm[], title: string}[] = [];
-
-    private ecData: EcNumber[] = [];
-    private ecTreeData: TreeViewNode = null;
-
-    private ecTrustLine: string = "";
-    private goTrustLine: string = "";
+    private selectedNCBITaxon: NCBITaxon = null;
 
     private formatType: string = "int";
 
     private currentTab: number = 0;
 
     private dialogOpen: boolean = false;
-
-    private ecTreeTooltip: (d: any) => string = (d: any) => {
-        const fullCode = (d.name + ".-.-.-.-").split(".").splice(0, 4).join(".");
-        let tip = "";
-        tip += `<div class="tooltip-fa-text">
-                    <strong>${d.data.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
-
-        if (d.data.self_count == 0) {
-            tip += "no specific annotations";
-        } else {
-            if (d.data.self_count == d.data.count) {
-                tip += " <strong>all specifically</strong> for this number";
-            } else {
-                tip += ` <strong>${d.data.self_count} specificly</strong> for this number`;
-            }
-        }
-
-        tip += "</div>";
-        return tip;
-    };
 
     private readonly formatters = {
         "int": x => x.toString(),
@@ -287,36 +209,26 @@ export default class FunctionalSummaryCard extends Vue {
         (a, b) => b["popularity"] - a["popularity"]
     );
 
-    private percentSettings: string = "5";
-
     private filteredScope: string = "";
     private numOfFilteredPepts: string = "";
     private faCalculationsInProgress: boolean = false;
 
     mounted() {
-        for (let ns of this.goNamespaces) {
-            this.goData.push({
-                goTerms: [],
-                title: stringTitleize(ns.toString())
-            });
-        }
-        this.onDataRepositoryChanged();
+        this.onSelectedTaxonIdChanged();
     }
 
-    @Watch("dataRepository") onDataRepositoryChange() {
-        this.onDataRepositoryChanged();
+    @Watch("selectedTaxonId")
+    private onSelectedTaxonIdChanged() {
+        this.taxonId = this.selectedTaxonId;
     }
 
-    @Watch("percentSettings") onPercentSettingsChange() {
-        this.onDataRepositoryChanged();
-    }
-    
-    @Watch("watchableSelectedTaxonId") onWatchableSelectedTaxonIdChanged() {
-        this.onDataRepositoryChanged();
-        this.getSelectedTaxonInfo();
+    private async redoCalculations() {
+        this.$refs.goSummaryCard.recompute();
+        this.$refs.ecSummaryCard.recompute();
+        this.$refs.interproSummaryCard.recompute();
     }
 
-    setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
+    private setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
         this.formatType = formatType;
 
         this.faSortSettings.format = (x: GoTerm) => this.formatters[this.formatType](x[fieldType]);
@@ -324,119 +236,19 @@ export default class FunctionalSummaryCard extends Vue {
         this.faSortSettings.shadeField = shadeFieldType;
         this.faSortSettings.name = name;
         this.faSortSettings.sortFunc = (a, b) => b[fieldType] - a[fieldType];
-
-        // Recalculate stuff
-        this.onDataRepositoryChanged();
     }
 
-    reset() {
-        this.$store.dispatch("setSelectedTerm", "Organism");
-        this.$store.dispatch("setSelectedTaxonId", -1);
-    }
-
-    private async onDataRepositoryChanged() {
-        this.faCalculationsInProgress = true;
-        if (this.dataRepository) {
-            await this.redoFAcalculations();
-        }
-        this.faCalculationsInProgress = false;
-    }
-
-    private async getSelectedTaxonInfo() {
+    @Watch("taxonId")
+    private async onTaxonIdChanged() {
         if (this.dataRepository) {
             const taxaSource = await this.dataRepository.createTaxaDataSource();
-            const taxonId = this.$store.getters.selectedTaxonId;
 
             // get selecton taxon information
-            if (taxonId != -1) {
-                this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(taxonId);
-                this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(taxonId);
-                this.showTaxonInfo = true;
+            if (this.selectedTaxonId != -1) {
+                this.totalPeptides = taxaSource.getNrOfPeptidesByTaxonId(this.selectedTaxonId);
+                this.selectedNCBITaxon = Ontologies.ncbiTaxonomy.getDefinition(this.selectedTaxonId);
             }
         }
-    }
-
-    private async redoFAcalculations(): Promise<void> {
-        if (this.dataRepository) {
-            let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-            const taxonId = this.$store.getters.selectedTaxonId;
-
-            // get sequences corresponding to selected taxon id
-            let sequences = null;
-            if (taxonId > 0) {
-                let tree = await taxaSource.getTree();
-                sequences = tree.getAllSequences(taxonId);
-                let taxonData = tree.nodes.get(taxonId);
-                this.filteredScope = `${taxonData.name} (${taxonData.rank})`;
-            }
-
-            await this.doFAcalculations(sequences);
-        }
-    }
-
-    private async doFAcalculations(sequences: string[] = null) {
-        if (this.dataRepository) {
-            let goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-            let ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
-
-            const percent = parseInt(this.percentSettings);
-
-            // recalculate go-data for those sequences
-            for (let i = 0; i < this.goNamespaces.length; i++) {
-                let namespace: GoNameSpace = this.goNamespaces[i];
-                this.goData[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
-            }
-
-            this.goTrustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
-
-            // recalculate ec-data for those sequences
-            this.ecData = await ecSource.getEcNumbers(null, percent, sequences);
-            this.ecTrustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
-            // @ts-ignore
-            this.ecTreeData = await ecSource.getEcTree(null, percent, sequences);
-        }
-    }
-
-    /**
-     * Generate a tooltip for an EC number
-     * 
-     * @param  ecNumber   The EC number to generate a tooltip for
-     * @return {string}    HTML for the tooltip
-     */
-    private tooltipEC(ecNumber: EcNumber) {
-        // const fmt = x => `<div class="tooltip-ec-ancestor"><span class="tooltip-ec-term">EC ${x}</span><span class="tooltip-ec-name">${ECNumbers.nameOf(x)}</span></div>`;
-        // const fmth = x => `<div class="tooltip-ec-ancestor tooltip-ec-current"><span class="tooltip-ec-term">EC ${x}</span><h4 class="tooltip-fa-title">${ECNumbers.nameOf(x)}</h4></div>`;
-
-        // let result = "";
-
-        // if (ECNumbers.ancestorsOf(ecNumber).length > 0) {
-        //     result += `${ECNumbers.ancestorsOf(ecNumber).reverse().map(c => fmt(c)).join("\n")}`;
-        // }
-        // result += fmth(ecNumber);
-
-        // result += this.tootipResultSet(ecNumber, ecResultSet, oldEcResultSet);
-        // return result;
-        return "";
-    }
-
-    /**
-     * Creates a line indicating the trust of the function annotations
-     * 
-     * @param trust The FATrust object that contains all necessary trust information.
-     * @param kind Human readable word that fits in "To have at least one … assigned to it"
-     * @return
-     */
-    private computeTrustLine(trust: FATrust, kind: string): string {
-        if (trust.annotatedCount === 0) {
-            return `<strong>No peptide</strong> has a ${kind} assigned to it. `;
-        }
-        if (trust.annotatedCount === trust.totalCount) {
-            return `<strong>All peptides</strong> ${trust.annotatedCount <= 5 ? `(only ${trust.annotatedCount})` : ""} have at least one ${kind} assigned to them. `;
-        }
-        if (trust.annotatedCount === 1) {
-            return `Only <strong>one peptide</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) has at least one ${kind} assigned to it. `;
-        }
-        return `<strong>${trust.annotatedCount} peptides</strong> (${numberToPercent(trust.annotatedCount / trust.totalCount)}) have at least one ${kind} assigned to them. `;
     }
 }
 </script>
@@ -455,21 +267,6 @@ export default class FunctionalSummaryCard extends Vue {
 
     .menu-header .v-icon {
         font-size: 16px;
-    }
-
-    .go-waiting, .ec-waiting {
-        margin-top: 16px;
-        margin-bottom: 16px;
-        position: relative;
-        transform: translateX(-50%);
-    }
-
-    .go-waiting {
-        transform: translate(-25px);
-    }
-
-    .ec-waiting {
-        transform: translate(-35px);
     }
 
     #filtered-taxon-information

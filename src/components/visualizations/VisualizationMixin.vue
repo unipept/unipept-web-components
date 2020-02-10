@@ -18,13 +18,24 @@ export default class VisualizationMixin extends Vue {
      */
     public search(id: number, searchTerm, timeout = 500) {
         setTimeout(() => {
-            this.$store.dispatch("setSelectedTerm", searchTerm);
-            this.$store.dispatch("setSelectedTaxonId", id);
-        }, timeout);
-    }
+            /**
+             * Fired after the user indicated that he somehow wants to filter the currently visible results.
+             * 
+             * @event update-selected-term
+             * @property {string} searchTerm The search term that was used by the user to filter.
+             */
+            this.$emit("update-selected-term", searchTerm);
 
-    get watchableTaxonId() {
-        return this.$store.getters.selectedTaxonId;
+            /**
+             * Fired after the user indicated that he soehow wants to filter the currently visible results in the
+             * application.
+             * 
+             * @event update-selected-taxon-id
+             * @property {string} id The id of the taxon to which results should be restricted. Note that alle taxa
+             * that are (both direct and indirect) children of this taxon should also be present in the filtering.
+             */
+            this.$emit("update-selected-taxon-id", id);
+        }, timeout);
     }
 }
 </script>

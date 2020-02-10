@@ -70,9 +70,18 @@
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <v-card flat>
-                        <sunburst-visualization ref="sunburst" :autoResize="true" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></sunburst-visualization>
+                        <sunburst-visualization 
+                            ref="sunburst" 
+                            :autoResize="true" 
+                            :full-screen="isFullScreen" 
+                            v-if="this.dataRepository" 
+                            :dataRepository="this.dataRepository"
+                            v-on:update-selected-term="onUpdateSelectedTerm"
+                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                        </sunburst-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
                         </div>
                         <div v-else>
                             <v-card-text>
@@ -86,9 +95,17 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treemap-visualization ref="treemap" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treemap-visualization>
+                        <treemap-visualization 
+                            ref="treemap" 
+                            :full-screen="isFullScreen" 
+                            v-if="this.dataRepository" 
+                            :dataRepository="this.dataRepository"
+                            v-on:update-selected-term="onUpdateSelectedTerm"
+                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                        </treemap-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
                         </div>
                         <div v-else>
                             <v-card-text>
@@ -101,9 +118,20 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treeview-visualization ref="treeview" :autoResize="true" :width="600" :height="350" :full-screen="isFullScreen" v-if="this.dataRepository" :dataRepository="this.dataRepository"></treeview-visualization>
+                        <treeview-visualization 
+                            ref="treeview" 
+                            :autoResize="true" 
+                            :width="600" 
+                            :height="350" 
+                            :full-screen="isFullScreen" 
+                            v-if="this.dataRepository" 
+                            :dataRepository="this.dataRepository"
+                            v-on:update-selected-term="onUpdateSelectedTerm"
+                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                        </treeview-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
                         </div>
                         <div v-else>
                             <v-card-text>
@@ -117,9 +145,15 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <hierarchical-outline-visualization v-if="this.dataRepository" :dataRepository="this.dataRepository"></hierarchical-outline-visualization>
+                            <hierarchical-outline-visualization 
+                                v-if="this.dataRepository" 
+                                :dataRepository="this.dataRepository"
+                                v-on:update-selected-term="onUpdateSelectedTerm"
+                                v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                            </hierarchical-outline-visualization>
                             <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                                <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                                <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                                </v-progress-circular>
                             </div>
                             <div v-else>
                                 <div class="placeholder-text">
@@ -131,9 +165,13 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <heatmap-wizard-single-sample v-if="this.dataRepository" :dataRepository="this.dataRepository"></heatmap-wizard-single-sample>
+                        <heatmap-wizard-single-sample 
+                            v-if="this.dataRepository" 
+                            :dataRepository="this.dataRepository">
+                        </heatmap-wizard-single-sample>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
                         </div>
                         <div v-else>
                             <v-card-text>
@@ -265,6 +303,28 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private openHeatmapWizard(): void {
         this.dialogOpen = true;
+    }
+
+    private onUpdateSelectedTerm(searchTerm: string): void {
+        /**
+         * Fired after the user indicated that he somehow wants to filter the currently visible results.
+         * 
+         * @event update-selected-term
+         * @property {string} searchTerm The search term that was used by the user to filter.
+         */
+        this.$emit("update-selected-term", searchTerm);
+    }
+
+    private onUpdateSelectedTaxonId(id: string): void {
+        /**
+         * Fired after the user indicated that he soehow wants to filter the currently visible results in the
+         * application.
+         * 
+         * @event update-selected-taxon-id
+         * @property {string} id The id of the taxon to which results should be restricted. Note that alle taxa
+         * that are (both direct and indirect) children of this taxon should also be present in the filtering.
+         */
+        this.$emit("update-selected-taxon-id", id);
     }
 }
 </script>

@@ -67,12 +67,6 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
         this.initTreeview();
     }
 
-    @Watch("watchableTaxonId") onWatchableTaxonIdChanged() {
-        if (this.watchableTaxonId === -1) {
-            this.reset();
-        }
-    }
-
     @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
         this.$refs.treeview.setFullScreen(newFullScreen)
     }

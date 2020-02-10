@@ -17,10 +17,10 @@ const mpaGetters: GetterTree<FilterState, any> = {
     searchSettings(state: FilterState): MPAConfig {
         return state.searchSettings;
     },
-    selectedTerm(state: FilterState): string {
+    getSelectedTerm(state: FilterState): string {
         return state.selectedTerm;
     },
-    selectedTaxonId(state: FilterState): number {
+    getSelectedTaxonId(state: FilterState): number {
         return state.selectedTaxonId;
     },
 };
