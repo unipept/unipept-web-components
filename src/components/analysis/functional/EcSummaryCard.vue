@@ -31,8 +31,7 @@
 import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import Component, { mixins } from "vue-class-component";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
-import EcAmountTable from "../../tables/GoAmountTable.vue";
-import QuickGoCard from "./QuickGOCard.vue";
+import EcAmountTable from "../../tables/EcAmountTable.vue";
 import EcDataSource from "../../../logic/data-source/EcDataSource";
 import EcNumber from "../../../logic/functional-annotations/EcNumber";
 import TreeViewNode from "../../visualizations/TreeViewNode";
@@ -42,7 +41,6 @@ import Treeview from "../../visualizations/Treeview.vue";
     components: {
         FilterFunctionalAnnotationsDropdown,
         EcAmountTable,
-        QuickGoCard,
         Treeview
     }
 })
@@ -96,7 +94,7 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     .ec-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
-        position: relative;
-        transform: translateX(-50%), translate(-35px);
+        display: flex;
+        justify-content: center;
     }
 </style>

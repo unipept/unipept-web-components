@@ -29,7 +29,13 @@
                     <h2>{{ items[idx].title }}</h2>
                     <v-row>
                         <v-col :cols="9">
-                            <go-amount-table :loading="calculationsInProgress" :dataRepository="dataRepository" :items="items[idx].goTerms" :namespace="namespace" :searchSettings="sortSettings"></go-amount-table>
+                            <go-amount-table 
+                                :loading="calculationsInProgress" 
+                                :dataRepository="dataRepository" 
+                                :items="items[idx].goTerms" 
+                                :namespace="namespace" 
+                                :searchSettings="sortSettings">
+                            </go-amount-table>
                         </v-col>
                         <v-col :cols="3">
                             <quick-go-card :sort-settings="sortSettings" :items="items[idx].goTerms"></quick-go-card>
@@ -102,8 +108,8 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
     .go-waiting {
         margin-top: 16px;
         margin-bottom: 16px;
-        position: relative;
-        transform: translateX(-50%), translate(-25px);
+        display: flex;
+        justify-content: center;
     }
 
     .go-table-container .row {

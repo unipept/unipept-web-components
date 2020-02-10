@@ -101,7 +101,7 @@ export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) 
     .waiting {
         margin-top: 16px;
         margin-bottom: 16px;
-        position: relative;
-        transform: translateX(-50%), translate(-35px);
+        display: flex;
+        justify-content: center;
     }
 </style>
