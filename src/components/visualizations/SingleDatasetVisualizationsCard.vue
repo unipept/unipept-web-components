@@ -306,7 +306,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     private onUpdateSelectedTerm(searchTerm: string): void {
-        console.log("Received in SingleDatasetVisualizationsCard: " + searchTerm);
         /**
          * Fired after the user indicated that he somehow wants to filter the currently visible results.
          * 
@@ -317,7 +316,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     private onUpdateSelectedTaxonId(id: string): void {
-        console.log("Received in SingleDatasetVisualizationsCard: " + id);
         /**
          * Fired after the user indicated that he soehow wants to filter the currently visible results in the
          * application.

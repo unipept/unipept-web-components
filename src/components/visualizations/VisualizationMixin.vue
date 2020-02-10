@@ -25,7 +25,6 @@ export default class VisualizationMixin extends Vue {
              * @property {string} searchTerm The search term that was used by the user to filter.
              */
             this.$emit("update-selected-term", searchTerm);
-            console.log("Fired from VisualizationMixin: " + searchTerm);
 
             /**
              * Fired after the user indicated that he soehow wants to filter the currently visible results in the
@@ -36,7 +35,6 @@ export default class VisualizationMixin extends Vue {
              * that are (both direct and indirect) children of this taxon should also be present in the filtering.
              */
             this.$emit("update-selected-taxon-id", id);
-            console.log("Fired from VisualizationMixin: " + id);
         }, timeout);
     }
 }
