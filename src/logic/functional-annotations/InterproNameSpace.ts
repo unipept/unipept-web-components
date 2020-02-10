@@ -11,12 +11,12 @@ export enum InterproNameSpace {
 
 export function convertStringToInterproNameSpace(ns: string): InterproNameSpace {
     const mapping: Map<String, InterproNameSpace> = new Map([
-        ["active_site", InterproNameSpace.ActiveSite],
-        ["binding_site", InterproNameSpace.BindingSite],
-        ["conserved_site", InterproNameSpace.ConservedSite],
+        ["active site", InterproNameSpace.ActiveSite],
+        ["binding site", InterproNameSpace.BindingSite],
+        ["conserved site", InterproNameSpace.ConservedSite],
         ["domain", InterproNameSpace.Domain],
         ["family", InterproNameSpace.Family],
-        ["homologous_superfamily", InterproNameSpace.HomologousSuperfamily],
+        ["homologous superfamily", InterproNameSpace.HomologousSuperfamily],
         ["ptm", InterproNameSpace.PTM],
         ["repeat", InterproNameSpace.Repeat]
     ]);

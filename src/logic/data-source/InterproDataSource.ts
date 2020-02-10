@@ -9,6 +9,7 @@ import { InterproNameSpace } from "../functional-annotations/InterproNameSpace";
 import InterproEntry from "../functional-annotations/InterproEntry";
 import { InterproCountTable } from "../data-management/counts/InterproCountTable";
 import { InterproOntology } from "../data-management/ontology/interpro/InterproOntology";
+import TreeViewNode from "./../../components/visualizations/TreeViewNode";
 
 /**
  * An InterproDataSource can be used to access all Interpro entries associated with a specific Assay. Note that this 
@@ -114,9 +115,7 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
 
     protected async computeTerms(percent = 50, sequences = null): Promise<[Map<InterproNameSpace, InterproEntry[]>, Map<InterproNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
-        console.log(this._countTable);
         const ontology: InterproOntology = this._countTable.getOntology();
-        console.log(ontology);
         await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl);
 
         const dataOutput: Map<InterproNameSpace, InterproEntry[]> = new Map();

@@ -25,7 +25,7 @@ export class InterproOntology extends Ontology<OntologyId, InterproDefinition> {
                         {
                             code: interpro.code, 
                             name: interpro.name, 
-                            namespace: convertStringToInterproNameSpace(interpro.category)
+                            namespace: convertStringToInterproNameSpace(interpro.category.replace(/_/, " "))
                         })
                 }
 

@@ -56,7 +56,7 @@ export default class GoAmountTable extends Vue {
             const interproSource: InterproDataSource = await this.dataRepository.createInterproDataSource();
             return interproSource.getInterproSummary(entry);
         }
-        return []
+        return [];
     }
 }
 </script>
