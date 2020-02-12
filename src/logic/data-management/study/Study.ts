@@ -7,7 +7,6 @@ export default class Study implements Visitable<StudyVisitor>, Entity<string> {
     private readonly assays: Assay[] = [];
     private name: string;
     private id: string;
-    private project: Project;
 
     public getId(): string {
         return this.id;

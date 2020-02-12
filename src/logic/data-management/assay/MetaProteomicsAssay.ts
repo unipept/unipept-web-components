@@ -4,7 +4,7 @@ import PeptideContainer from "../PeptideContainer";
 import MetaProteomicsDataRepository from "../../data-source/repository/MetaProteomicsDataRepository";
 import ProgressListener from "../../patterns/progress/ProgressListener";
 import AssayVisitor from "./visitors/AssayVisitor";
-import StorageDataReader from "./visitors/storage/StorageDataReader";
+import StorageDataReader from "./visitors/browser/BrowserStorageDataReader";
 
 export default class MetaProteomicsAssay extends Assay implements ProgressListener {
     public peptideContainer: PeptideContainer = new PeptideContainer();
