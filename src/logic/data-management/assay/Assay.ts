@@ -1,10 +1,11 @@
 import DataRepository from "../../data-source/DataRepository";
 import Visitable from "../../patterns/visitor/Visitable";
-import Visitor from "../../patterns/visitor/Visitor";
+import AssayVisitor from "./visitors/AssayVisitor";
 import { StorageType } from "../StorageType";
 import MPAConfig from "../MPAConfig";
+import Entity from "./Entity";
 
-export default abstract class Assay implements Visitable {
+export default abstract class Assay implements Visitable<AssayVisitor>, Entity<string> {
     private _id: string;
     private _name: string;
     private _date: Date;
@@ -63,5 +64,5 @@ export default abstract class Assay implements Visitable {
     }
 
     abstract async initDataRepository(mpaConfig: MPAConfig, baseUrl: string);
-    abstract async visit(visitor: Visitor): Promise<void>;
+    abstract async accept(visitor: AssayVisitor): Promise<void>;
 }

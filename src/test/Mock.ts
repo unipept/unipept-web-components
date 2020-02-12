@@ -6,7 +6,7 @@ import { PeptideContainer } from "@/logic/data-management";
 import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
 import MPAConfig from "@/logic/data-management/MPAConfig";
 import Setup from "./Setup";
-import StorageWriter from "@/logic/data-management/visitors/storage/StorageWriter";
+import StorageWriter from "@/logic/data-management/assay/visitors/storage/StorageWriter";
 
 export default class Mock {
     public mockAssay(): Assay {

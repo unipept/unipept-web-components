@@ -2,9 +2,9 @@ import { StorageType } from "./StorageType";
 import { get, getJSON } from "../utils";
 import Assay from "./assay/Assay";
 import MetaProteomicsAssay from "./assay/MetaProteomicsAssay";
-import { BrowserStorageConsts } from "./visitors/storage/browser/BrowserStorageConsts";
-import StorageMetadataReader from "./visitors/storage/StorageMetadataReader";
-import StorageRemover from "./visitors/storage/StorageRemover";
+import { BrowserStorageConsts } from "./assay/visitors/storage/browser/BrowserStorageConsts";
+import StorageMetadataReader from "./assay/visitors/storage/StorageMetadataReader";
+import StorageRemover from "./assay/visitors/storage/StorageRemover";
 
 export default class DatasetManager {
     /**
@@ -22,7 +22,7 @@ export default class DatasetManager {
             let key = storage.key(i);
             if (key.startsWith(BrowserStorageConsts.MPA_METADATA_PREFIX)) {
                 let dataset = new MetaProteomicsAssay(key.substr(BrowserStorageConsts.MPA_METADATA_PREFIX.length), StorageType.LocalStorage);
-                await dataset.visit(metadataReader)
+                await dataset.accept(metadataReader)
                 output.push(dataset);
             }
         }
@@ -75,6 +75,6 @@ export default class DatasetManager {
 
     async deleteDatasetFromStorage(dataSet: Assay): Promise<void> {
         let storageRemover = new StorageRemover();
-        dataSet.visit(storageRemover);
+        dataSet.accept(storageRemover);
     }
 }

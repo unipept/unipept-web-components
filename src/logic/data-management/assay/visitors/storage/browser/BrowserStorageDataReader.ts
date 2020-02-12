@@ -1,8 +1,8 @@
-import MetaGenomicsAssay from "../../../assay/MetaGenomicsAssay";
-import MetaProteomicsAssay from "../../../assay/MetaProteomicsAssay";
+import MetaGenomicsAssay from "../../../MetaGenomicsAssay";
+import MetaProteomicsAssay from "../../../MetaProteomicsAssay";
 import { BrowserStorageConsts } from "./BrowserStorageConsts";
 import { BrowserStorageCommon } from "./BrowserStorageCommon";
-import { StorageType } from "../../../StorageType";
+import { StorageType } from "../../../../StorageType";
 
 export namespace BrowserStorageDataReader
 {

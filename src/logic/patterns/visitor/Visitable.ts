@@ -1,6 +1,4 @@
-import Visitor from "./Visitor";
-
-export default interface Visitable
+export default interface Visitable<T>
 {
-    visit(visitor: Visitor) : Promise<void>;
+    accept(visitor: T) : Promise<void>;
 }

@@ -4,7 +4,7 @@ import { TaxaCountTable } from "../counts/TaxaCountTable";
 import { GOCountTable } from "../counts/GOCountTable";
 import { ECCountTable } from "../counts/ECCountTable";
 
-import Visitor from "../../patterns/visitor/Visitor";
+import AssayVisitor from "./visitors/AssayVisitor";
 
 export default class MetaGenomicsAssay extends Assay {
     private _taxaCountTable: TaxaCountTable;
@@ -15,7 +15,7 @@ export default class MetaGenomicsAssay extends Assay {
         throw new Error("Method not implemented.");
     }
 
-    async visit(visitor: Visitor): Promise<void> {
+    async accept(visitor: AssayVisitor): Promise<void> {
         await visitor.visitMetaGenomicsAssay(this);
     }
 }

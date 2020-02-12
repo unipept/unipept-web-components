@@ -1,12 +1,12 @@
-import Visitor from "../../../patterns/visitor/Visitor";
-import MetaGenomicsAssay from "../../assay/MetaGenomicsAssay";
-import MetaProteomicsAssay from "../../assay/MetaProteomicsAssay";
+import AssayVisitor from "../AssayVisitor";
+import MetaGenomicsAssay from "../../MetaGenomicsAssay";
+import MetaProteomicsAssay from "../../MetaProteomicsAssay";
 
 import { BrowserStorageWriter } from "./browser/BrowserStorageWriter";
 
-import { StorageType } from "../../StorageType";
+import { StorageType } from "../../../StorageType";
 
-export default class StorageWriter implements Visitor {
+export default class StorageWriter implements AssayVisitor {
     visitMetaGenomicsAssay(mgAssay: MetaGenomicsAssay): Promise<void> {
         let storageType = mgAssay.getStorageType();
 
