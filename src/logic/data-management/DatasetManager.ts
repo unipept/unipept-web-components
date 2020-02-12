@@ -2,7 +2,7 @@ import { StorageType } from "./StorageType";
 import { get, getJSON } from "../utils";
 import Assay from "./assay/Assay";
 import MetaProteomicsAssay from "./assay/MetaProteomicsAssay";
-import { BrowserStorageConsts } from "./assay/visitors/storage/browser/BrowserStorageConsts";
+import { BrowserStorageConsts } from "./assay/visitors/storage/BrowserStorageConsts";
 import StorageMetadataReader from "./assay/visitors/storage/StorageMetadataReader";
 import StorageRemover from "./assay/visitors/storage/StorageRemover";
 

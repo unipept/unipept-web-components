@@ -1,4 +1,4 @@
-import { StorageType } from "../../../../StorageType";
+import { StorageType } from "../../../StorageType";
 import { BrowserStorageConsts } from "./BrowserStorageConsts";
 
 export namespace BrowserStorageCommon
