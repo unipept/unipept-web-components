@@ -3,15 +3,13 @@ import MPAConfig from "../MPAConfig";
 import PeptideContainer from "../PeptideContainer";
 import MetaProteomicsDataRepository from "../../data-source/repository/MetaProteomicsDataRepository";
 import ProgressListener from "../../patterns/progress/ProgressListener";
-import AssayVisitor from "./visitors/AssayVisitor";
-import StorageDataReader from "./visitors/browser/BrowserStorageDataReader";
+import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import StorageDataReader from "./browser/BrowserStorageDataReader";
 
 export default class MetaProteomicsAssay extends Assay implements ProgressListener {
     public peptideContainer: PeptideContainer = new PeptideContainer();
 
     async initDataRepository(mpaConfig: MPAConfig, baseUrl: string) {
-        let dataReader = new StorageDataReader();
-        await this.accept(dataReader);
         let dataRepo = new MetaProteomicsDataRepository(this, mpaConfig, baseUrl);
         await dataRepo.initProcessedPeptideContainer();
         this._dataRepository = dataRepo;

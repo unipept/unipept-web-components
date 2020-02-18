@@ -1,11 +1,11 @@
-import AssayVisitor from "../AssayVisitor";
-import MetaGenomicsAssay from "../../MetaGenomicsAssay";
-import MetaProteomicsAssay from "../../MetaProteomicsAssay";
+import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import MetaGenomicsAssay from "src/logic/data-management/assay/MetaGenomicsAssay";
+import MetaProteomicsAssay from "src/logic/data-management/assay/MetaProteomicsAssay";
 
-import { StorageType } from "../../../StorageType";
-import { BrowserStorageCommon } from "./BrowserStorageCommon";
-import PeptideContainer from "../../../PeptideContainer";
-import { BrowserStorageConsts } from "./BrowserStorageConsts";
+import { StorageType } from "src/logic/data-management/StorageType";
+import { BrowserStorageCommon } from "src/logic/data-management/assay/browser/BrowserStorageCommon";
+import PeptideContainer from "src/logic/data-management/PeptideContainer";
+import { BrowserStorageConsts } from "src/logic/data-management/assay/browser/BrowserStorageConsts";
 
 export default class BrowserStorageWriter implements AssayVisitor {
     visitMetaGenomicsAssay(mgAssay: MetaGenomicsAssay): Promise<void> {
@@ -32,7 +32,7 @@ export default class BrowserStorageWriter implements AssayVisitor {
 
         storage.setItem(BrowserStorageConsts.MPA_METADATA_PREFIX + mpAssay.getId(), metadata);
         storage.setItem(BrowserStorageConsts.MPA_PEPTIDE_PREFIX + mpAssay.getId(), JSON.stringify({ peptides: peptideContainer.getPeptides() }));
- 
+
 
         return;
     }

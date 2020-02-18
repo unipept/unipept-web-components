@@ -1,5 +1,5 @@
-import MetaGenomicsAssay from "../MetaGenomicsAssay";
-import MetaProteomicsAssay from "../MetaProteomicsAssay";
+import MetaGenomicsAssay from "src/logic/data-management/assay/MetaGenomicsAssay";
+import MetaProteomicsAssay from "src/logic/data-management/assay/MetaProteomicsAssay";
 
 export default interface AssayVisitor {
     visitMetaGenomicsAssay(mgAssay: MetaGenomicsAssay): Promise<void>;

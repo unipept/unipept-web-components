@@ -2,9 +2,9 @@ import { StorageType } from "./StorageType";
 import { get, getJSON } from "../utils";
 import Assay from "./assay/Assay";
 import MetaProteomicsAssay from "./assay/MetaProteomicsAssay";
-import { BrowserStorageConsts } from "./assay/visitors/browser/BrowserStorageConsts";
-import StorageMetadataReader from "./assay/visitors/browser/BrowserStorageMetadataReader";
-import StorageRemover from "./assay/visitors/browser/BrowserStorageRemover";
+import { BrowserStorageConsts } from "./assay/browser/BrowserStorageConsts";
+import StorageMetadataReader from "./assay/browser/BrowserStorageMetadataReader";
+import StorageRemover from "./assay/browser/BrowserStorageRemover";
 
 export default class DatasetManager {
     /**

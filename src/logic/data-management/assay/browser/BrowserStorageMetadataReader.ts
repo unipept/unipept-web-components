@@ -1,15 +1,15 @@
-import AssayVisitor from "../AssayVisitor";
-import MetaGenomicsAssay from "../../MetaGenomicsAssay";
-import MetaProteomicsAssay from "../../MetaProteomicsAssay";
+import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import MetaGenomicsAssay from "src/logic/data-management/assay/MetaGenomicsAssay";
+import MetaProteomicsAssay from "src/logic/data-management/assay/MetaProteomicsAssay";
 
-import { BrowserStorageCommon } from "./BrowserStorageCommon";
-import { BrowserStorageConsts } from "./BrowserStorageConsts";
+import { BrowserStorageCommon } from "src/logic/data-management/assay/browser/BrowserStorageCommon";
+import { BrowserStorageConsts } from "src/logic/data-management/assay/browser/BrowserStorageConsts";
 
 export default class BrowserStorageMetadatReader implements AssayVisitor {
     visitMetaGenomicsAssay(mgAssay: MetaGenomicsAssay): Promise<void> {
         throw new Error("Method not implemented.");
-    }    
-    
+    }
+
     visitMetaProteomicsAssay(mpAssay: MetaProteomicsAssay): Promise<void> {
         const storageType = mpAssay.getStorageType();
 

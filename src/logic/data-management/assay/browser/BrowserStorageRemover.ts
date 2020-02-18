@@ -1,10 +1,10 @@
-import AssayVisitor from "../AssayVisitor";
-import MetaGenomicsAssay from "../../MetaGenomicsAssay";
-import MetaProteomicsAssay from "../../MetaProteomicsAssay";
+import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import MetaGenomicsAssay from "src/logic/data-management/assay/MetaGenomicsAssay";
+import MetaProteomicsAssay from "src/logic/data-management/assay/MetaProteomicsAssay";
 
-import { StorageType } from "../../../StorageType";
-import { BrowserStorageCommon } from "./BrowserStorageCommon";
-import { BrowserStorageConsts } from "./BrowserStorageConsts";
+import { StorageType } from "src/logic/data-management/StorageType";
+import { BrowserStorageCommon } from "src/logic/data-management/assay/browser/BrowserStorageCommon";
+import { BrowserStorageConsts } from "src/logic/data-management/assay/browser/BrowserStorageConsts";
 
 export default class BrowserStorageRemover implements AssayVisitor {
     visitMetaGenomicsAssay(mgAssay: MetaGenomicsAssay): Promise<void> {
@@ -15,7 +15,7 @@ export default class BrowserStorageRemover implements AssayVisitor {
         const storage: Storage = BrowserStorageCommon.getStorage(mpAssay.getStorageType());
         storage.removeItem(BrowserStorageConsts.MPA_METADATA_PREFIX + mpAssay.getId());
         storage.removeItem(BrowserStorageConsts.MPA_PEPTIDE_PREFIX + mpAssay.getId());
-        
+
         return;
     }
 }

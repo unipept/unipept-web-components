@@ -1,5 +1,5 @@
-import { StorageType } from "../../../StorageType";
-import { BrowserStorageConsts } from "./BrowserStorageConsts";
+import { StorageType } from "src/logic/data-management/StorageType";
+import { BrowserStorageConsts } from "src/logic/data-management/assay/browser/BrowserStorageConsts";
 
 export namespace BrowserStorageCommon
 {
