@@ -3,7 +3,7 @@ import MPAConfig from "../MPAConfig";
 import PeptideContainer from "../PeptideContainer";
 import MetaProteomicsDataRepository from "../../data-source/repository/MetaProteomicsDataRepository";
 import ProgressListener from "../../patterns/progress/ProgressListener";
-import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import AssayVisitor from "./AssayVisitor";
 import StorageDataReader from "./browser/BrowserStorageDataReader";
 
 export default class MetaProteomicsAssay extends Assay implements ProgressListener {

@@ -1,5 +1,5 @@
-import { StorageType } from "src/logic/data-management/StorageType";
-import { BrowserStorageConsts } from "src/logic/data-management/assay/browser/BrowserStorageConsts";
+import { StorageType } from "./../../StorageType";
+import { BrowserStorageConsts } from "./BrowserStorageConsts";
 
 export namespace BrowserStorageCommon
 {
@@ -17,7 +17,9 @@ export namespace BrowserStorageCommon
         if (counter) {
             counterValue = parseInt(counter) + 1;
         }
-        window.localStorage.setItem(BrowserStorageConsts.MPA_STORAGE_PREFIX + "unique-id-counter", counterValue.toString());
+        window.localStorage.setItem(
+            BrowserStorageConsts.MPA_STORAGE_PREFIX + "unique-id-counter", counterValue.toString()
+        );
         return counter;
     }
 }

@@ -4,7 +4,7 @@ import { TaxaCountTable } from "../counts/TaxaCountTable";
 import { GOCountTable } from "../counts/GOCountTable";
 import { ECCountTable } from "../counts/ECCountTable";
 
-import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import AssayVisitor from "./AssayVisitor";
 
 export default class MetaGenomicsAssay extends Assay {
     private _taxaCountTable: TaxaCountTable;

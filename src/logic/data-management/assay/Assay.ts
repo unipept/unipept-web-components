@@ -1,23 +1,23 @@
 import DataRepository from "../../data-source/DataRepository";
 import Visitable from "../../patterns/visitor/Visitable";
-import AssayVisitor from "src/logic/data-management/assay/AssayVisitor";
+import AssayVisitor from "./AssayVisitor";
 import { StorageType } from "../StorageType";
 import MPAConfig from "../MPAConfig";
 import Entity from "./Entity";
-import ChangeListener from "@/logic/data-management/ChangeListener";
+import ChangeListener from "./../ChangeListener";
 
 export default abstract class Assay implements Visitable<AssayVisitor>, Entity<string> {
     protected id: string;
     protected name: string;
     protected date: Date;
-    protected changeListener: ChangeListener;
+    protected changeListener: ChangeListener<Assay>;
     protected storageType: StorageType;
 
     protected _dataRepository: DataRepository;
 
     public progress: number = 0;
 
-    constructor(changeListener?: ChangeListener, id?: string, storageType?: StorageType, name?: string, date?: Date) {
+    constructor(changeListener?: ChangeListener<Assay>, id?: string, storageType?: StorageType, name?: string, date?: Date) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -30,8 +30,9 @@ export default abstract class Assay implements Visitable<AssayVisitor>, Entity<s
     }
 
     setId(id: string) {
+        const oldId: string = this.id;
         this.id = id;
-        this.changeListener.onChange("id");
+        this.changeListener.onChange(this, "id", oldId, id);
     }
 
     getName() {
@@ -39,8 +40,9 @@ export default abstract class Assay implements Visitable<AssayVisitor>, Entity<s
     }
 
     setName(name: string) {
+        const oldName: string = this.name;
         this.name = name;
-        this.changeListener.onChange("name");
+        this.changeListener.onChange(this, "name", oldName, name);
     }
 
     getDate() {
@@ -48,8 +50,9 @@ export default abstract class Assay implements Visitable<AssayVisitor>, Entity<s
     }
 
     setDate(date: Date) {
+        const oldDate: Date = date;
         this.date = date;
-        this.changeListener.onChange("date");
+        this.changeListener.onChange(this, "date", oldDate, date);
     }
 
     getStorageType() {

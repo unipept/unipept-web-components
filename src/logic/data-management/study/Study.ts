@@ -1,17 +1,17 @@
 import Visitable from "./../../patterns/visitor/Visitable";
-import StudyVisitor from "src/logic/data-management/study/StudyVisitor";
+import StudyVisitor from "./StudyVisitor";
 import Assay from "../assay/Assay";
 import Entity from "../assay/Entity";
 import uuidv4 from "uuid/v4";
-import ChangeListener from "@/logic/data-management/ChangeListener";
+import ChangeListener from "./../ChangeListener";
 
-export default abstract class Study implements Visitable<StudyVisitor>, Entity<string> {
+export default class Study implements Visitable<StudyVisitor>, Entity<string> {
     protected readonly assays: Assay[] = [];
     protected name: string;
     protected id: string;
-    protected changeListener: ChangeListener;
+    protected changeListener: ChangeListener<Study>;
 
-    constructor(changeListener: ChangeListener, id?: string, name?: string) {
+    constructor(changeListener: ChangeListener<Study>, id?: string, name?: string) {
         if (this.id) {
             this.id = id;
         } else {
@@ -26,8 +26,9 @@ export default abstract class Study implements Visitable<StudyVisitor>, Entity<s
     }
 
     public setName(name: string) {
+        const oldName: string = this.name;
         this.name = name;
-        this.changeListener.onChange("name");
+        this.changeListener.onChange(this, "name", oldName, name);
     }
 
     public getId(): string {
@@ -35,8 +36,9 @@ export default abstract class Study implements Visitable<StudyVisitor>, Entity<s
     }
 
     public setId(id: string): void {
+        const oldId: string = this.id;
         this.id = id;
-        this.changeListener.onChange("id");
+        this.changeListener.onChange(this, "id", oldId, id);
     }
 
     public getAssays(): Assay[] {
@@ -45,7 +47,8 @@ export default abstract class Study implements Visitable<StudyVisitor>, Entity<s
 
     public addAssay(assay: Assay): void {
         this.assays.push(assay);
-        this.changeListener.onChange("assays");
+        // TODO improve this
+        this.changeListener.onChange(this, "assays", [], []);
     }
 
     public async removeAssay(assay: Assay) {
@@ -53,7 +56,8 @@ export default abstract class Study implements Visitable<StudyVisitor>, Entity<s
         if (idx >= 0) {
             this.assays.splice(idx, 1);
         }
-        this.changeListener.onChange("assays");
+        // TODO Improve this
+        this.changeListener.onChange(this, "assays", [], []);
     }
 
     public async accept(visitor: StudyVisitor): Promise<void> {
