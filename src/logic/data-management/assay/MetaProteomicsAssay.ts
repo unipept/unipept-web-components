@@ -4,7 +4,6 @@ import PeptideContainer from "../PeptideContainer";
 import MetaProteomicsDataRepository from "../../data-source/repository/MetaProteomicsDataRepository";
 import ProgressListener from "../../patterns/progress/ProgressListener";
 import AssayVisitor from "./AssayVisitor";
-import StorageDataReader from "./browser/BrowserStorageDataReader";
 
 export default class MetaProteomicsAssay extends Assay implements ProgressListener {
     public peptideContainer: PeptideContainer = new PeptideContainer();
@@ -24,15 +23,13 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
     }
 
     setPeptides(peptides: string[]) {
-        this.peptideContainer.setPeptides(peptides)
+        const oldPeptides: string[] = this.peptideContainer.getPeptides();
+        this.peptideContainer.setPeptides(peptides);
+        this.changeListener.onChange(this, "peptides", oldPeptides, peptides);
     }
 
     getAmountOfPeptides(): number {
         return this.peptideContainer.getAmountOfPeptides();
-    }
-
-    setAmountOfPeptides(amount: number) {
-        this.peptideContainer.setAmountOfPeptides(amount)
     }
 
     onProgressUpdate(progress: number): void {

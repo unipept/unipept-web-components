@@ -18,6 +18,7 @@ export default abstract class Assay implements Visitable<AssayVisitor>, Entity<s
     public progress: number = 0;
 
     constructor(changeListener?: ChangeListener<Assay>, id?: string, storageType?: StorageType, name?: string, date?: Date) {
+        console.log("name is: " + name);
         this.id = id;
         this.name = name;
         this.date = date;

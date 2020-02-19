@@ -5,6 +5,7 @@ import Entity from "../assay/Entity";
 import uuidv4 from "uuid/v4";
 import ChangeListener from "./../ChangeListener";
 
+
 export default class Study implements Visitable<StudyVisitor>, Entity<string> {
     protected readonly assays: Assay[] = [];
     protected name: string;
