@@ -23,9 +23,9 @@ export default class MetaProteomicsAssay extends Assay implements ProgressListen
     }
 
     setPeptides(peptides: string[]) {
-        const oldPeptides: string[] = this.peptideContainer.getPeptides();
+        const oldPeptides: string[] = [...this.peptideContainer.getPeptides()];
         this.peptideContainer.setPeptides(peptides);
-        this.changeListener.onChange(this, "peptides", oldPeptides, peptides);
+        this.onUpdate("peptides", oldPeptides, peptides);
     }
 
     getAmountOfPeptides(): number {

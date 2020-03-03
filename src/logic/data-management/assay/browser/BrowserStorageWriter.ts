@@ -17,10 +17,6 @@ export default class BrowserStorageWriter implements AssayVisitor {
         let storage: Storage = BrowserStorageCommon.getStorage(storageType);
         let peptideContainer: PeptideContainer = mpAssay.peptideContainer;
 
-        if (!mpAssay.getId()) {
-            mpAssay.setId(BrowserStorageCommon.generateUniqueId())
-        }
-
         let metadata = JSON.stringify({
             id: mpAssay.getId(),
             name: mpAssay.getName(),

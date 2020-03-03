@@ -5,6 +5,7 @@ import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomic
 import { StorageType } from "../../logic/data-management/StorageType";
 import StorageWriter from "../../logic/data-management/assay/browser/BrowserStorageWriter";
 import Assay from "../../logic/data-management/assay/Assay";
+import { v4 as uuidv4 } from "uuid";
 
 @Component
 export default class DatasetMixin extends Vue {
@@ -35,15 +36,14 @@ export default class DatasetMixin extends Vue {
      * creates a new assay-object and emits the corresponding event.
      *
      * @param peptides One big string containing all peptides for this dataset. The peptides inside this string should
-     * be seperated by "\n" and will automatically be split by this function.
+     * be separated by "\n" and will automatically be split by this function.
      * @param name The name of the new assay that should be stored.
      * @param save Whether the new assay should be stored in persistent storage or not. Pass true if it should be
      * stored.
      * @return The assay that was created and stored by this function.
      */
     protected storeDataset(peptides: string, name: string, save: boolean): Assay {
-        let assay: MetaProteomicsAssay = new MetaProteomicsAssay();
-        let storageWriter: StorageWriter = new StorageWriter();
+        let assay: MetaProteomicsAssay = new MetaProteomicsAssay([], uuidv4());
 
         assay.setPeptides(peptides.split("\n"));
         assay.setDate(new Date());
