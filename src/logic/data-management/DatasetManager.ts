@@ -21,7 +21,11 @@ export default class DatasetManager {
         for (let i = 0; i < storage.length; i++) {
             let key = storage.key(i);
             if (key.startsWith(BrowserStorageConsts.MPA_METADATA_PREFIX)) {
-                let dataset = new MetaProteomicsAssay(key.substr(BrowserStorageConsts.MPA_METADATA_PREFIX.length), StorageType.LocalStorage);
+                let dataset = new MetaProteomicsAssay(
+                    [],
+                    key.substr(BrowserStorageConsts.MPA_METADATA_PREFIX.length),
+                    StorageType.LocalStorage
+                );
                 await dataset.accept(metadataReader)
                 output.push(dataset);
             }

@@ -1,4 +1,3 @@
-import Clipboard from "clipboard";
 import $ from "jquery";
 import * as d3 from "d3";
 import Utils from "./../components/custom/Utils";
@@ -22,21 +21,22 @@ export function addCopy(selector, textFunction, tooltip = "Copy to clipboard", c
     if (container !== null) {
         clipSettings["container"] = container;
     }
-    const clip = new Clipboard(selector, clipSettings);
-    clip.on("success", e => {
-        $el.attr("title", "Copied!")
-            .tooltip("fixTitle")
-            .tooltip("show")
-            .attr("title", tooltip)
-            .tooltip("fixTitle");
-    });
-    clip.on("error", e => {
-        $el.attr("title", "Sorry, something went wrong")
-            .tooltip("fixTitle")
-            .tooltip("show")
-            .attr("title", tooltip)
-            .tooltip("fixTitle");
-    });
+    // TODO check this
+    // const clip = new Clipboard(selector, clipSettings);
+    // clip.on("success", e => {
+    //     $el.attr("title", "Copied!")
+    //         .tooltip("fixTitle")
+    //         .tooltip("show")
+    //         .attr("title", tooltip)
+    //         .tooltip("fixTitle");
+    // });
+    // clip.on("error", e => {
+    //     $el.attr("title", "Sorry, something went wrong")
+    //         .tooltip("fixTitle")
+    //         .tooltip("show")
+    //         .attr("title", tooltip)
+    //         .tooltip("fixTitle");
+    // });
 }
 
 /**
@@ -292,7 +292,7 @@ export function stringTitleize(s) {
  * @return {string}      The csv string
  */
 export function toCSVString(grid) {
-    return grid.map(line => 
+    return grid.map(line =>
         line.map(cell => {
             let content = cell.toString();
             if (content.includes(",") || content.includes("\"") ||

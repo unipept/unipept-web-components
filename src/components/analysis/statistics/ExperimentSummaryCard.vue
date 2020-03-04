@@ -1,5 +1,5 @@
 <docs>
-The ExperimentSummaryCard summarizes an experiment into statistics: mainly the amount of peptides that were found, the 
+The ExperimentSummaryCard summarizes an experiment into statistics: mainly the amount of peptides that were found, the
 peptides that were not found (including the ability to show these as a list). This component also allows the user to
 change the currently active search settings and redo the analysis of all selected assays.
 </docs>
@@ -74,7 +74,6 @@ import CardHeader from "../../custom/CardHeader.vue";
 import CardTitle from "../../custom/CardTitle.vue";
 import MissingPeptidesList from "./MissingPeptidesList.vue";
 
-import Clipboard from "clipboard";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import Tooltip from "../../custom/Tooltip.vue";
