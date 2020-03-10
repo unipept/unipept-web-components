@@ -10,10 +10,11 @@ import InterproEntry from "../functional-annotations/InterproEntry";
 import { InterproCountTable } from "../data-management/counts/InterproCountTable";
 import { InterproOntology } from "../data-management/ontology/interpro/InterproOntology";
 import TreeViewNode from "./../../components/visualizations/TreeViewNode";
+import InterproDefinition from "./../data-management/ontology/interpro/InterproDefinition";
 
 /**
- * An InterproDataSource can be used to access all Interpro entries associated with a specific Assay. Note that this 
- * class contains an extensive cache that reduces the amount of information that must be transfered between the server 
+ * An InterproDataSource can be used to access all Interpro entries associated with a specific Assay. Note that this
+ * class contains an extensive cache that reduces the amount of information that must be transfered between the server
  * and the client's browser.
  *
  * @see Assay
@@ -41,9 +42,9 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
     /**
      * Get the n most popular Interpro-entries for a specific namespace. The returned entries are sorted by popularity.
      *
-     * @param n The amount of most popular Interpro-entries that should be returned. If n is larger than the amount of 
+     * @param n The amount of most popular Interpro-entries that should be returned. If n is larger than the amount of
      * terms that exist, all terms of the given namespace will be returned.
-     * @param namespace The Interpro-namespace for which the most popular terms must be returned. Leave blank if the 
+     * @param namespace The Interpro-namespace for which the most popular terms must be returned. Leave blank if the
      * most popular terms over all namespaces must be returned.
      */
     public async getTopItems(n: number, namespace: InterproNameSpace = null): Promise<InterproEntry[]> {
@@ -144,7 +145,7 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
                 const namespaceCount = namespaceCounts.get(def.namespace)
                 const ns: InterproNameSpace = def.namespace as InterproNameSpace
 
-                const entry = new InterproEntry(def.code, def.name, ns, count, count / namespaceCount, [])
+                const entry = new InterproEntry(def, count, count / namespaceCount, [])
                 dataOutput.get(ns).push(entry);
             })
 
@@ -203,7 +204,7 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
                     annotatedCount += peptCount
                 }
             }
-            
+
             // convert calculated data to interpros
             let convertedItems: InterproEntry[] = [...termCounts].sort((a, b) => b[1] - a[1])
                 .map(term => {
@@ -211,7 +212,8 @@ export default class InterproDataSource extends CachedDataSource<InterproNameSpa
                     let count = term[1]
                     let ontologyData = ontology.getDefinition(code)
                     let fractionOfPepts = count / totalCount
-                    return new InterproEntry(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
+                    const definition = new InterproDefinition(code, ontologyData.name, namespace);
+                    return new InterproEntry(definition, count, fractionOfPepts, affectedPeptides.get(code))
                 })
 
             dataOutput.set(namespace, convertedItems);

@@ -1,10 +1,10 @@
 <template>
-    <amount-table 
-        :items="items" 
-        :loading="loading" 
-        annotation-name="EC number" 
-        :searchSettings="searchSettings" 
-        :taxaRetriever="taxaRetriever" 
+    <amount-table
+        :items="items"
+        :loading="loading"
+        annotation-name="EC number"
+        :searchSettings="searchSettings"
+        :taxaRetriever="taxaRetriever"
         :summaryRetriever="summaryRetriever">
     </amount-table>
 </template>
@@ -13,7 +13,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import EcNumber from "../../logic/functional-annotations/EcNumber";
+import ECAnnotation from "../../logic/functional-annotations/ECAnnotation";
 import { Node } from "../../logic/data-management/Node";
 import { EcNameSpace } from "../../logic/functional-annotations/EcNameSpace";
 import Treeview from "../../components/visualizations/Treeview.vue";
@@ -30,7 +30,7 @@ import FaSortSettings from "./FaSortSettings";
 })
 export default class EcAmountTable extends Vue {
     @Prop({ required: true })
-    private items: EcNumber[]
+    private items: ECAnnotation[]
     @Prop({ required: true })
     private searchSettings: FaSortSettings;
     // The Sample that should be summarized in this AmountTable.
@@ -39,7 +39,7 @@ export default class EcAmountTable extends Vue {
     @Prop({ required: false, default: false })
     private loading: boolean;
 
-    private async taxaRetriever(number: EcNumber): Promise<Node> {
+    private async taxaRetriever(number: ECAnnotation): Promise<Node> {
         if (this.dataRepository) {
             let ecDataSource: EcDataSource = await this.dataRepository.createEcDataSource();
             let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
@@ -47,7 +47,7 @@ export default class EcAmountTable extends Vue {
         }
     }
 
-    private async summaryRetriever(number: EcNumber): Promise<string[][]> {
+    private async summaryRetriever(number: ECAnnotation): Promise<string[][]> {
         if (this.dataRepository) {
             let ecDataSource: EcDataSource = await this.dataRepository.createEcDataSource();
             return ecDataSource.getECNumberSummary(number);

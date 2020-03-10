@@ -7,7 +7,13 @@ export default abstract class FAElement extends Element {
     public readonly fractionOfPepts: number;
     public readonly affectedPeptides: string[];
 
-    constructor(code: string, name: string, popularity: number, fractionOfPepts: number, affectedPeptides: string[]) {
+    protected constructor(
+        code: string,
+        name: string,
+        popularity: number,
+        fractionOfPepts: number,
+        affectedPeptides: string[]
+    ) {
         super(name, popularity);
         this.code = code;
         this.popularity = popularity;

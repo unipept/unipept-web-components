@@ -5,7 +5,7 @@
             <v-card>
                 <v-card-title>QuickGo biological process</v-card-title>
                 <v-card-text v-if="top5 && top5.length > 0">
-                    This chart shows the relationship between the {{ top5.length }} most occurring GO terms: 
+                    This chart shows the relationship between the {{ top5.length }} most occurring GO terms:
                     {{ top5Sentence }}.
                     <br/>
                     <a @click="openInBrowser(quickGOChartURL(top5.map(x => x.code), true))">
@@ -27,7 +27,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import GoTerm from "./../../../logic/functional-annotations/GoTerm";
+import GOAnnotation from "./../../../logic/functional-annotations/GOAnnotation";
 import FaSortSettings from "../../tables/FaSortSettings";
 import { GoNameSpace } from "./../../../logic/functional-annotations/GoNameSpace";
 import Utils from "./../../custom/Utils";
@@ -35,11 +35,11 @@ import Utils from "./../../custom/Utils";
 @Component
 export default class QuickGOCard extends Vue {
     @Prop({ required: true })
-    private items: GoTerm[];
+    private items: GOAnnotation[];
     @Prop({ required: true })
     private sortSettings: FaSortSettings;
 
-    private top5: GoTerm[] = null;
+    private top5: GOAnnotation[] = null;
     private top5Sentence: string = "";
 
     private showModal: boolean = false;

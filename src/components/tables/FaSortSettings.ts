@@ -1,15 +1,15 @@
-import GoTerm from "../../logic/functional-annotations/GoTerm";
+import GOAnnotation from "../../logic/functional-annotations/GOAnnotation";
 import FAInfo from "../../logic/data-management/FAInfo";
 
 export default class FaSortSettings {
-    public format: (x: GoTerm) => string;
+    public format: (x: GOAnnotation) => string;
     public field: string;
     public shadeField: string;
     public name: string;
     public sortFunc: (a: FAInfo, b: FAInfo) => number;
 
     constructor(
-        format: (x: GoTerm) => string,
+        format: (x: GOAnnotation) => string,
         field: string,
         shadeField: string,
         name: string,

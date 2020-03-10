@@ -1,12 +1,11 @@
 <template>
     <div>
-        <v-select :items="ecNameSpaces" v-model="selectedNameSpace" label="Namespace"></v-select>
-        <v-data-table 
-            v-model="selectedItems" 
-            :headers="headers" 
-            :items="items" 
-            show-select 
-            item-key="code" 
+        <v-data-table
+            v-model="selectedItems"
+            :headers="headers"
+            :items="items"
+            show-select
+            item-key="code"
             :itemsPerPage="5"
             sort-by="popularity"
             :sort-desc="true"
@@ -18,7 +17,6 @@
                     </td>
                     <td>{{ props.item.name }}</td>
                     <td>{{ props.item.code }}</td>
-                    <td class="text-xs-right">{{ props.item.popularity }}</td>
                 </tr>
             </template>
         </v-data-table>
@@ -30,41 +28,58 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import EcDataSource from "../../logic/data-source/EcDataSource";
-import { EcNameSpace, convertEcNumberToEcNameSpace, convertStringToEcNameSpace } from "../../logic/functional-annotations/EcNameSpace";
-import EcNumber from "../../logic/functional-annotations/EcNumber";
+import { EcNameSpace, convertStringToEcNameSpace } from "../../logic/functional-annotations/EcNameSpace";
+import ECAnnotation from "../../logic/functional-annotations/ECAnnotation";
 import DataSourceMixin from "./DataSourceMixin.vue";
+import Assay from "../../logic/data-management/assay/Assay";
+import ECDefinition from "../../logic/data-management/ontology/ec/ECDefinition";
 
 @Component
 export default class EcDataSourceComponent extends mixins(DataSourceMixin) {
-    // TODO This component should be merged with the GoDataSourceComponent to reduce code duplication
+    @Prop({ required: true })
+    private namespace: string;
+    @Prop({ required: true })
+    private assaysInComparison: Assay[];
 
-    private ecNameSpaces: string[] = ["all"].concat(Object.values(EcNameSpace)).map(el => this.capitalize(el));
-    private selectedNameSpace: string = this.ecNameSpaces[0];
-
-    private items: EcNumber[] = [];
-    private selectedItems: Element[] = [];
+    private items: ECDefinition[] = [];
+    private selectedItems: ECDefinition[] = [];
 
     private loading: boolean = true;
 
-    mounted() {
-        this.onSelectedNameSpaceChanged();
+    private mounted() {
+        this.onNamespaceChanged();
     }
 
-    @Watch("selectedNameSpace")
-    async onSelectedNameSpaceChanged() {
+    @Watch("namespace")
+    private async onNamespaceChanged() {
         this.loading = true;
+
         // Reset lists without changing the list-object reference.
         this.items.length = 0;
         this.selectedItems.length = 0;
 
-        let result: EcNumber[] = await (this.dataSource as EcDataSource).getTopItems(30, convertStringToEcNameSpace(this.selectedNameSpace));
-        this.items.push(...result);
+        this.items.push(...await this.computeUniqueEcNumbers());
+
         this.loading = false;
     }
 
     @Watch("selectedItems", { deep: true })
-    async onSelectedItemsChanged() {
+    private async onSelectedItemsChanged() {
         this.$emit("selected-items", this.selectedItems);
+    }
+
+    private async computeUniqueEcNumbers(): Promise<Set<ECDefinition>> {
+        const items: Set<ECDefinition> = new Set();
+        for (const assay of this.assaysInComparison) {
+            const ecSource: EcDataSource = await assay.dataRepository.createEcDataSource();
+            const ecAnnotations: ECAnnotation[] = await ecSource.getEcNumbers(
+                convertStringToEcNameSpace(this.namespace)
+            );
+            for (const def of ecAnnotations.map(a => a.definition)) {
+                items.add(def);
+            }
+        }
+        return items;
     }
 }
 </script>

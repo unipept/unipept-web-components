@@ -77,7 +77,7 @@
                         <b>
                             Filtered results
                         </b>
-                        : These results are limited to the {{ this.totalPeptides }} peptides specific to 
+                        : These results are limited to the {{ this.totalPeptides }} peptides specific to
                         <b>
                             {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.rank}})
                         </b>.
@@ -126,10 +126,8 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import MpaAnalysisManager from "../../../logic/data-management/MpaAnalysisManager";
 import FaSortSettings from "../../tables/FaSortSettings";
 import { numberToPercent, stringTitleize } from "../../../logic/utils";
-import PeptideContainer from "../../../logic/data-management/PeptideContainer";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 
 import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
@@ -137,22 +135,11 @@ import CardHeader from "../../custom/CardHeader.vue";
 import QuickGoCard from "./QuickGOCard.vue";
 
 import ImageDownloadModal from "../../utils/ImageDownloadModal.vue";
-import { showInfoModal } from "../../../logic/modal";
 import DataRepository from "../../../logic/data-source/DataRepository";
-import GoDataSource from "../../../logic/data-source/GoDataSource";
-import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
-import GoTerm from "../../../logic/functional-annotations/GoTerm";
-import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
-import EcNumber from "../../../logic/functional-annotations/EcNumber";
-import EcDataSource from "../../../logic/data-source/EcDataSource";
-import FATrust from "../../../logic/functional-annotations/FATrust";
+import GOAnnotation from "../../../logic/functional-annotations/GOAnnotation";
 
-import { NCBITaxon } from "../../../logic/data-management/ontology/taxa/NCBITaxon";
-import { NCBITaxonomy } from "../../../logic/data-management/ontology/taxa/NCBITaxonomy";
+import NCBITaxon from "../../../logic/data-management/ontology/taxa/NCBITaxon";
 import { Ontologies } from "../../../logic/data-management/ontology/Ontologies";
-import InterproDataSource from "../../../logic/data-source/InterproDataSource";
-import InterproEntry from "../../../logic/functional-annotations/InterproEntry";
-import { InterproNameSpace, convertStringToInterproNameSpace } from "../../../logic/functional-annotations/InterproNameSpace";
 import GoSummaryCard from "./GoSummaryCard.vue";
 import EcSummaryCard from "./EcSummaryCard.vue";
 import InterproSummaryCard from "./InterproSummaryCard.vue";
@@ -176,7 +163,7 @@ export default class FunctionalSummaryCard extends Vue {
         ecSummaryCard: EcSummaryCard,
         interproSummaryCard: InterproSummaryCard
     }
-    
+
     @Prop({ required: true })
     private dataRepository: DataRepository;
     @Prop({ required: false, default: true })
@@ -202,7 +189,7 @@ export default class FunctionalSummaryCard extends Vue {
     };
 
     private faSortSettings: FaSortSettings = new FaSortSettings(
-        (x: GoTerm) => this.formatters[this.formatType](x["popularity"]),
+        (x: GOAnnotation) => this.formatters[this.formatType](x["popularity"]),
         "popularity",
         "fractionOfPepts",
         "Peptides",
@@ -231,7 +218,7 @@ export default class FunctionalSummaryCard extends Vue {
     private setFormatSettings(formatType: string, fieldType: string, shadeFieldType: string, name: string): void {
         this.formatType = formatType;
 
-        this.faSortSettings.format = (x: GoTerm) => this.formatters[this.formatType](x[fieldType]);
+        this.faSortSettings.format = (x: GOAnnotation) => this.formatters[this.formatType](x[fieldType]);
         this.faSortSettings.field = fieldType;
         this.faSortSettings.shadeField = shadeFieldType;
         this.faSortSettings.name = name;

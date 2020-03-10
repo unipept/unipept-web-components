@@ -29,11 +29,11 @@
                     <h2>{{ items[idx].title }}</h2>
                     <v-row>
                         <v-col :cols="9">
-                            <go-amount-table 
-                                :loading="calculationsInProgress" 
-                                :dataRepository="dataRepository" 
-                                :items="items[idx].goTerms" 
-                                :namespace="namespace" 
+                            <go-amount-table
+                                :loading="calculationsInProgress"
+                                :dataRepository="dataRepository"
+                                :items="items[idx].goTerms"
+                                :namespace="namespace"
                                 :searchSettings="sortSettings">
                             </go-amount-table>
                         </v-col>
@@ -56,7 +56,7 @@ import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDr
 import GoAmountTable from "../../tables/GoAmountTable.vue";
 import QuickGoCard from "./QuickGOCard.vue";
 import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
-import GoTerm from "../../../logic/functional-annotations/GoTerm";
+import GOAnnotation from "../../../logic/functional-annotations/GOAnnotation";
 import GoDataSource from "../../../logic/data-source/GoDataSource";
 import { numberToPercent, stringTitleize } from "../../../logic/utils";
 
@@ -69,7 +69,7 @@ import { numberToPercent, stringTitleize } from "../../../logic/utils";
 })
 export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
     private namespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
-    private items: {goTerms: GoTerm[], title: string}[] = [];
+    private items: {goTerms: GOAnnotation[], title: string}[] = [];
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
 

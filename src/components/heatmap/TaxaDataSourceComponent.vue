@@ -1,12 +1,11 @@
 <template>
     <div>
-        <v-select :items="taxaRanks" v-model="selectedRank" label="Rank" :item-text="item => capitalize(item)"></v-select>
-        <v-data-table 
-            v-model="selectedItems" 
-            :headers="headers" 
-            :items="itemsWithId" 
+        <v-data-table
+            v-model="selectedItems"
+            :headers="headers"
+            :items="itemsWithId"
             show-select
-            item-key="id" 
+            item-key="id"
             :itemsPerPage="5"
             sort-by="popularity"
             :sort-desc="true"
@@ -35,7 +34,9 @@ import DataSourceComponent from "./data-source-component.vue";
 
 import DataSourceMixin from "./DataSourceMixin.vue";
 import { TaxumRank, convertStringToTaxumRank } from "../../logic/data-source/TaxumRank";
-import TaxaElement from "../../logic/data-source/TaxaElement";
+import NCBIAnnotation from "./../../logic/data-source/taxonomical-annotations/NCBIAnnotation";
+import NCBITaxon from "./../../logic/data-management/ontology/taxa/NCBITaxon";
+import Assay from "./../../logic/data-management/assay/Assay";
 
 @Component({
     computed: {
@@ -50,10 +51,12 @@ import TaxaElement from "../../logic/data-source/TaxaElement";
     }
 })
 export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
-    private taxaRanks: string[] = ["all"].concat(Object.values(TaxumRank)).map(el => this.capitalize(el));
-    private selectedRank: string = this.taxaRanks[0];
-    
-    private items: TaxaElement[] = [];
+    @Prop({ required: true })
+    private rank: string;
+    @Prop({ required: true })
+    private assaysInComparison: Assay[];
+
+    private items: NCBITaxon[] = [];
     private selectedItems: Element[] = [];
 
     private loading: boolean = true;
@@ -63,26 +66,32 @@ export default class TaxaDataSourceComponent extends mixins(DataSourceMixin) {
     mounted() {
         this.headers[1].text = "Rank";
         this.headers[1].value = "rank";
-        this.onSelectedRankChanged();
+        this.onRankChanged();
     }
 
-    @Watch("selectedRank")
-    async onSelectedRankChanged() {
+    @Watch("rank")
+    async onRankChanged() {
         this.loading = true;
         // Reset lists without changing the list-object reference.
         this.items.length = 0;
         this.selectedItems.length = 0;
-        let rank: TaxumRank;
 
-        let result: TaxaElement[] = await (this.dataSource as TaxaDataSource).getTopItems(30, convertStringToTaxumRank(this.selectedRank));
-        this.items.push(...result);
+        this.items.push(...await this.computeUniqueTaxons());
+
         this.loading = false;
     }
 
-    @Watch("selectedItems")
-    async onSelectedItemsChanged(newItems: Element[], oldItems: Element[]) {
-        
-        this.$emit("selected-items", this.selectedItems);
+    private async computeUniqueTaxons(): Promise<Set<NCBITaxon>> {
+        const items: Set<NCBITaxon> = new Set();
+        for (const assay of this.assaysInComparison) {
+            const taxaSource: TaxaDataSource = await assay.dataRepository.createTaxaDataSource();
+            // TODO continue from here!
+            // const taxaAnnotations: NCBIAnnotation[] = await taxaSource.getTopItems();
+            // for (const def of ecAnnotations.map(a => a.definition)) {
+            //     items.add(def);
+            // }
+        }
+        return items;
     }
 }
 </script>

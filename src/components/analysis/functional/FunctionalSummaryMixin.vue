@@ -3,7 +3,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import DataRepository from "../../../logic/data-source/DataRepository";
-import { NCBITaxon } from "../../../logic/data-management/ontology/taxa/NCBITaxon";
+import NCBITaxon from "../../../logic/data-management/ontology/taxa/NCBITaxon";
 import FATrust from "../../../logic/functional-annotations/FATrust";
 import TaxaDataSource from "../../../logic/data-source/TaxaDataSource";
 import FaSortSettings from "../../tables/FaSortSettings";
@@ -18,10 +18,10 @@ export default class FunctionalSummaryMixin extends Vue {
     @Prop({ required: true })
     protected filterTaxonId: number;
     @Prop({ required: true })
-    protected sortSettings: FaSortSettings; 
+    protected sortSettings: FaSortSettings;
 
     protected totalPeptides: number = 0;
-    protected selectedNCBITaxon: NCBITaxon = null; 
+    protected selectedNCBITaxon: NCBITaxon = null;
     protected showTaxonInfo: boolean = false;
 
     protected percentSettings: string = "5";
@@ -38,7 +38,7 @@ export default class FunctionalSummaryMixin extends Vue {
 
     /**
      * Creates a line indicating the trust of the function annotations
-     * 
+     *
      * @param trust The FATrust object that contains all necessary trust information.
      * @param kind Human readable word that fits in "To have at least one … assigned to it"
      * @return

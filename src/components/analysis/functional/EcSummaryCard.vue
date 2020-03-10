@@ -33,7 +33,7 @@ import Component, { mixins } from "vue-class-component";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 import EcAmountTable from "../../tables/EcAmountTable.vue";
 import EcDataSource from "../../../logic/data-source/EcDataSource";
-import EcNumber from "../../../logic/functional-annotations/EcNumber";
+import ECAnnotation from "../../../logic/functional-annotations/ECAnnotation";
 import TreeViewNode from "../../visualizations/TreeViewNode";
 import Treeview from "../../visualizations/Treeview.vue";
 
@@ -47,7 +47,7 @@ import Treeview from "../../visualizations/Treeview.vue";
 export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
-    private items: EcNumber[] = [];
+    private items: ECAnnotation[] = [];
     private ecTree: TreeViewNode = null;
 
     mounted() {

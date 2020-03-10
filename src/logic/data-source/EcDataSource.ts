@@ -1,4 +1,4 @@
-import EcNumber from "../functional-annotations/EcNumber";
+import ECAnnotation from "./../functional-annotations/ECAnnotation";
 import { EcNameSpace } from "../functional-annotations/EcNameSpace";
 import FATrust from "../functional-annotations/FATrust";
 import { CachedDataSource } from "./CachedDataSource";
@@ -9,20 +9,26 @@ import DataRepository from "./DataRepository";
 import { PeptideData } from "../api/pept2data/Response";
 import { DataSourceCommon } from "./DataSourceCommon";
 import TreeViewNode from "../../components/visualizations/TreeViewNode";
+import ECDefinition from "./../data-management/ontology/ec/ECDefinition";
 
-export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber> {
+export default class EcDataSource extends CachedDataSource<EcNameSpace, ECAnnotation> {
     private _countTable: ECCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
     private _baseUrl: string;
 
-    constructor(countTable: ECCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
+    constructor(
+        countTable: ECCountTable,
+        processedPeptideContainer: ProcessedPeptideContainer,
+        repository: DataRepository,
+        baseUrl: string
+    ) {
         super(repository)
         this._countTable = countTable;
         this._processedPeptideContainer = processedPeptideContainer;
         this._baseUrl = baseUrl;
     }
 
-    public getPeptidesByEcNumber(number: EcNumber): string[] {
+    public getPeptidesByEcNumber(number: ECAnnotation): string[] {
         return Array.from(this._countTable.ontology2peptide.get(number.code) || [])
     }
 
@@ -30,7 +36,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
         return Array.from(this._countTable.ontology2peptide.get(code) || [])
     }
 
-    public getECNumberSummary(number: EcNumber): string[][] {
+    public getECNumberSummary(number: ECAnnotation): string[][] {
         return DataSourceCommon.getFASummary(number, this._processedPeptideContainer)
     }
 
@@ -44,20 +50,22 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
      * should be performed.
      * @return A list of EC-Numbers, sorted by popularity.
      */
-    public async getTopItems(n: number, namespace: EcNameSpace = null): Promise<EcNumber[]> {
+    public async getTopItems(n: number, namespace: EcNameSpace = null): Promise<ECAnnotation[]> {
         if (namespace) {
-            const result: [EcNumber[], FATrust] = await this.getFromCache(namespace, Object.values(EcNameSpace));
+            const result: [ECAnnotation[], FATrust] = await this.getFromCache(namespace, Object.values(EcNameSpace));
             return result[0].slice(0, Math.min(n, result[0].length));
         } else {
-            const output: EcNumber[] = [];
+            const output: ECAnnotation[] = [];
             for (const ns of Object.values(EcNameSpace)) {
-                const result: [EcNumber[], FATrust] = await this.getFromCache(ns, Object.values(EcNameSpace));
+                const result: [ECAnnotation[], FATrust] = await this.getFromCache(ns, Object.values(EcNameSpace));
                 if (result && result[0] && result[0].length > 0) {
                     output.push(...result[0].slice(0, Math.min(n, result[0].length)));
                 }
             }
 
-            return output.sort((a: EcNumber, b: EcNumber) => b.popularity - a.popularity).slice(0, Math.min(n, output.length));
+            return output.sort(
+                (a: ECAnnotation, b: ECAnnotation) => b.popularity - a.popularity).slice(0, Math.min(n, output.length)
+            );
         }
     }
 
@@ -69,29 +77,57 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
      * @param cutoff
      * @param sequences Restrict the search to this given list of peptides.
      */
-    public async getEcNumbers(namespace: EcNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<EcNumber[]> {
+    public async getEcNumbers(
+        namespace: EcNameSpace = null,
+        cutoff: number = 50,
+        sequences: string[] = null
+    ): Promise<ECAnnotation[]> {
         if (namespace) {
-            const result: [EcNumber[], FATrust] = await this.getFromCache(namespace, Object.values(EcNameSpace), cutoff, sequences);
+            const result: [ECAnnotation[], FATrust] = await this.getFromCache(
+                namespace,
+                Object.values(EcNameSpace),
+                cutoff,
+                sequences
+            );
             return result[0];
         } else {
-            const output: EcNumber[] = [];
+            const output: ECAnnotation[] = [];
             for (const ns of Object.values(EcNameSpace)) {
-                const result: [EcNumber[], FATrust] = await this.getFromCache(ns, Object.values(EcNameSpace), cutoff, sequences);
+                const result: [ECAnnotation[], FATrust] = await this.getFromCache(
+                    ns,
+                    Object.values(EcNameSpace),
+                    cutoff,
+                    sequences
+                );
                 output.push(... result[0]);
             }
-            output.sort((a: EcNumber, b: EcNumber) => b.popularity - a.popularity);
+            output.sort((a: ECAnnotation, b: ECAnnotation) => b.popularity - a.popularity);
             return output;
         }
     }
 
-    public async getTrust(namespace: EcNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<FATrust> {
+    public async getTrust(
+        namespace: EcNameSpace = null,
+        cutoff: number = 50,
+        sequences: string[] = null
+    ): Promise<FATrust> {
         if (namespace) {
-            const result: [EcNumber[], FATrust] = await this.getFromCache(namespace, Object.values(EcNameSpace), cutoff, sequences);
+            const result: [ECAnnotation[], FATrust] = await this.getFromCache(
+                namespace,
+                Object.values(EcNameSpace),
+                cutoff,
+                sequences
+            );
             return result[1];
         } else {
             const trusts: FATrust[] = [];
             for (const ns of Object.values(EcNameSpace)) {
-                const result: [EcNumber[], FATrust] = await this.getFromCache(ns, Object.values(EcNameSpace), cutoff, sequences);
+                const result: [ECAnnotation[], FATrust] = await this.getFromCache(
+                    ns,
+                    Object.values(EcNameSpace),
+                    cutoff,
+                    sequences
+                );
                 trusts.push(result[1]);
             }
             return this.agregateTrust(trusts);
@@ -107,7 +143,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
      * @return A data model that can be used for a treeview.
      */
     public async getEcTree(namespace: EcNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<TreeViewNode> {
-        const result: EcNumber[] = await this.getEcNumbers(namespace, cutoff, sequences);
+        const result: ECAnnotation[] = await this.getEcNumbers(namespace, cutoff, sequences);
         // Maps an EC-code onto a Node.
         const codeNodeMap: Map<string, TreeViewNode> = new Map();
 
@@ -138,14 +174,14 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
                         self_sequences: Object.create(null),
                     } },
                 });
-                const ancestors = EcNumber.computeAncestors(key, true);
+                const ancestors = ECAnnotation.computeAncestors(key, true);
                 getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
             }
             return codeNodeMap.get(key);
         };
 
         // Sort from generic to specific
-        const sortedEC = result.sort((a: EcNumber, b: EcNumber) => a.level - b.level);
+        const sortedEC = result.sort((a: ECAnnotation, b: ECAnnotation) => a.level - b.level);
 
         for (const data of sortedEC) {
             const toInsert = {
@@ -161,7 +197,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
             codeNodeMap.set(data.code, toInsert);
 
-            const ancestors = EcNumber.computeAncestors(data.code, true);
+            const ancestors = ECAnnotation.computeAncestors(data.code, true);
             getOrNew(ancestors[0]).children.push(toInsert);
             for (const a of ancestors) {
                 getOrNew(a).data.count += toInsert.data.count;
@@ -177,13 +213,13 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
     }
 
     // TODO: use percent in calculations
-    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, EcNumber[]>, Map<EcNameSpace, FATrust>]> {
+    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<EcNameSpace, ECAnnotation[]>, Map<EcNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
-        var ontology: ECOntology = this._countTable.getOntology()
+        const ontology: ECOntology = this._countTable.getOntology()
         await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl);
 
-        var dataOutput: Map<EcNameSpace, EcNumber[]> = new Map()
-        var trustOutput: Map<EcNameSpace, FATrust> = new Map()
+        const dataOutput: Map<EcNameSpace, ECAnnotation[]> = new Map()
+        const trustOutput: Map<EcNameSpace, FATrust> = new Map()
 
         // calculate terms without peptide information if it is not available
         if (!this._processedPeptideContainer) {
@@ -208,7 +244,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
                 let namespaceCount = namespaceCounts.get(def.namespace)
                 let ecNameSpace: EcNameSpace = def.namespace as EcNameSpace
 
-                let ecNumber = new EcNumber(def.code, def.name, ecNameSpace, count, count / namespaceCount, [])
+                let ecNumber = new ECAnnotation(def, count, count / namespaceCount, [])
                 dataOutput.get(ecNameSpace).push(ecNumber);
             })
 
@@ -220,7 +256,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
             return [dataOutput, trustOutput];
         }
 
-        var peptideCountTable = this._processedPeptideContainer.countTable
+        const peptideCountTable = this._processedPeptideContainer.countTable
 
         if (sequences == null) {
             sequences = Array.from(this._processedPeptideContainer.response.keys())
@@ -228,7 +264,7 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
 
         for (let namespace of Object.values(EcNameSpace)) {
             let totalCount = 0;
-            let annotatedCount = 0;            
+            let annotatedCount = 0;
             let trustCount = 0;
 
             let termCounts = new Map<string, number>()
@@ -267,15 +303,16 @@ export default class EcDataSource extends CachedDataSource<EcNameSpace, EcNumber
                     annotatedCount += peptCount
                 }
             }
-            
+
             // convert calculated data to GoTerms
-            let convertedItems: EcNumber[] = [...termCounts].sort((a, b) => b[1] - a[1])
+            let convertedItems: ECAnnotation[] = [...termCounts].sort((a, b) => b[1] - a[1])
                 .map(term => {
                     let code = term[0]
                     let count = term[1]
                     let ontologyData = ontology.getDefinition(code)
                     let fractionOfPepts = count / totalCount
-                    return new EcNumber(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
+                    const definition: ECDefinition = new ECDefinition(code, ontologyData.name, namespace);
+                    return new ECAnnotation(definition, count, fractionOfPepts, affectedPeptides.get(code))
                 })
 
             dataOutput.set(namespace, convertedItems)

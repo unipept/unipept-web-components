@@ -1,19 +1,17 @@
 import FAElement from "./FAElement";
 import { InterproNameSpace } from "./InterproNameSpace";
+import InterproDefinition from "./../data-management/ontology/interpro/InterproDefinition";
 
-export default class InterproEntry extends FAElement {
-    // The GO-namespace associated with this code. Must be a valid namespace!
-    public namespace: InterproNameSpace;
+export default class InterproAnnotation extends FAElement {
+    public definition: InterproDefinition;
 
     constructor(
-        code: string, 
-        name: string, 
-        namespace: InterproNameSpace, 
-        popularity: number, 
-        fractionOfPepts: number, 
+        definition: InterproDefinition,
+        popularity: number,
+        fractionOfPepts: number,
         affectedPeptides: string[]
     ) {
-        super(code, name, popularity, fractionOfPepts, affectedPeptides);
-        this.namespace = namespace;
+        super(definition.code, definition.name, popularity, fractionOfPepts, affectedPeptides);
+        this.definition = definition;
     }
 }

@@ -1,23 +1,25 @@
 import FAElement from "./FAElement";
 import { EcNameSpace } from "./EcNameSpace";
+import ECDefinition from "./../data-management/ontology/ec/ECDefinition";
 
-export default class EcNumber extends FAElement {
+export default class ECAnnotation extends FAElement {
+    public readonly definition: ECDefinition;
+
     /**
-     * Construct a new EcNumber.
+     * Construct a new ECAnnotation.
      *
-     * @param code The code that uniquely identifies this EC-number. This code should not include the "EC:"-prefix!
-     * @param name The name that's associated with the given EC-code.
-     * @param namespace The namespace that's associated with the given EC-code.
+     * @param definition The EC-number to which this concrete annotation is associated.
      * @param popularity The amount of peptides that's associated with this EC-number in the associated sample.
      * @param fractionOfPepts The fraction of the total amount of peptides that's associated with this EC-number.
+     * @param affectedPeptides The peptides that are associated with this functional annotation for a specific assay.
      */
-    constructor(code: string, name: string, namespace: EcNameSpace, popularity: number, fractionOfPepts: number, affectedPeptides: string[]) {
-        super(code, name, popularity, fractionOfPepts, affectedPeptides);
-        this.namespace = namespace;
+    constructor(definition: ECDefinition, popularity: number, fractionOfPepts: number, affectedPeptides: string[]) {
+        super(definition.code, definition.name, popularity, fractionOfPepts, affectedPeptides);
+        this.definition = definition;
     }
 
     public get ancestors(): string[] {
-        return EcNumber.computeAncestors(this.code);
+        return ECAnnotation.computeAncestors(this.code);
     }
 
     /**
@@ -27,7 +29,7 @@ export default class EcNumber extends FAElement {
      * @return {number}  Level of this EC-number.
      */
     public get level(): number {
-        return EcNumber.computeLevel(this.code);
+        return ECAnnotation.computeLevel(this.code);
     }
 
     /**
@@ -57,5 +59,4 @@ export default class EcNumber extends FAElement {
     public static computeLevel(code: string): number {
         return (code + ".-").split(".").indexOf("-");
     }
-    public namespace: EcNameSpace;
 }

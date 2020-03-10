@@ -1,5 +1,5 @@
 import { Ontology } from "../Ontology"
-import { GODefinition } from "./GODefinition";
+import GODefinition from "./GODefinition";
 import { postJSON } from "../../../utils";
 
 type OntologyId = string;
@@ -19,7 +19,7 @@ export class GeneOntology extends Ontology<OntologyId, GODefinition> {
             });
 
             const res = await postJSON(baseUrl + GO_URL, data);
-            
+
             res.forEach(term => {
                 if (!this._definitions.has(term.code)) {
                     this._definitions.set(term.code, term)

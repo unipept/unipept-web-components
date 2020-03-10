@@ -1,5 +1,5 @@
 import { Ontology } from "../Ontology"
-import { NCBITaxon } from "./NCBITaxon";
+import NCBITaxon from "./NCBITaxon";
 import { postJSON } from "../../../utils";
 
 type OntologyId = number;
@@ -21,8 +21,8 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
     }
 
     async fetchTaxaInfo(ids: OntologyId[], baseUrl: string): Promise<Set<OntologyId>> {
-        ids = ids.filter(id => 
-            !this._definitions.has(id) 
+        ids = ids.filter(id =>
+            !this._definitions.has(id)
             ||  !("name" in this._definitions.get(id)))
 
         let missedIds = new Set<number>(ids)
@@ -34,12 +34,12 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
             });
 
             const res = await postJSON(baseUrl + TAXA_URL, data);
-            
+
             res.forEach(taxon => {
                 if (!this._definitions.has(taxon.id)) {
                     this._definitions.set(taxon.id, taxon)
                 } else {
-                    let ncbiTaxon = this._definitions.get(taxon.id)
+                    let ncbiTaxon = this._definitions.get(taxon.id);
                     ncbiTaxon.name = taxon.name;
                     ncbiTaxon.rank = taxon.rank;
                 }
@@ -53,8 +53,8 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
 
     async fetchLineages(ids: OntologyId[], baseUrl): Promise<Set<OntologyId>> {
         // first check which ids need to be fetched
-        ids = ids.filter(id => 
-            !this._definitions.has(id) 
+        ids = ids.filter(id =>
+            !this._definitions.has(id)
             || !("lineage" in this._definitions.get(id)))
 
         let missedIds = new Set<number>(ids)
@@ -66,7 +66,7 @@ export class NCBITaxonomy extends Ontology<OntologyId, NCBITaxon> {
             });
 
             const res = await postJSON(baseUrl + LINEAGE_URL, data);
-            
+
             res.forEach(l => {
                 if (!this._definitions.has(l.id)) {
                     this._definitions.set(l.id, l)

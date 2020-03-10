@@ -1,11 +1,11 @@
 <template>
-    <amount-table 
-        :items="items" 
-        :loading="loading" 
-        annotation-name="GO term" 
-        :namespace="namespace" 
-        :searchSettings="searchSettings" 
-        :taxaRetriever="taxaRetriever" 
+    <amount-table
+        :items="items"
+        :loading="loading"
+        annotation-name="GO term"
+        :namespace="namespace"
+        :searchSettings="searchSettings"
+        :taxaRetriever="taxaRetriever"
         :summaryRetriever="summaryRetriever">
     </amount-table>
 </template>
@@ -14,7 +14,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import GoTerm from "../../logic/functional-annotations/GoTerm";
+import GOAnnotation from "../../logic/functional-annotations/GOAnnotation";
 import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
 import DataRepository from "../../logic/data-source/DataRepository";
 import GoDataSource from "../../logic/data-source/GoDataSource";
@@ -34,7 +34,7 @@ import FAElement from "../../logic/functional-annotations/FAElement";
 })
 export default class GoAmountTable extends Vue {
     @Prop({ required: true })
-    private items: GoTerm[]
+    private items: GOAnnotation[]
     @Prop({ required: true })
     private searchSettings: FaSortSettings;
     @Prop({ required: true })
@@ -45,7 +45,7 @@ export default class GoAmountTable extends Vue {
     @Prop({ required: true })
     private dataRepository: DataRepository;
 
-    private async taxaRetriever(term: GoTerm): Promise<Node> {
+    private async taxaRetriever(term: GOAnnotation): Promise<Node> {
         if (this.dataRepository) {
             let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
             let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
@@ -53,7 +53,7 @@ export default class GoAmountTable extends Vue {
         }
     }
 
-    private async summaryRetriever(term: GoTerm): Promise<string[][]> {
+    private async summaryRetriever(term: GOAnnotation): Promise<string[][]> {
         if (this.dataRepository) {
             let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
             return goDataSource.getGoTermSummary(term);

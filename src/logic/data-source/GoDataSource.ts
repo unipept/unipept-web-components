@@ -1,6 +1,6 @@
 import DataRepository from "./DataRepository";
 import { GoNameSpace } from "../functional-annotations/GoNameSpace";
-import GoTerm from "../functional-annotations/GoTerm";
+import GOAnnotation from "./../functional-annotations/GOAnnotation";
 import FATrust from "../functional-annotations/FATrust";
 import { CachedDataSource } from "./CachedDataSource";
 import { GeneOntology } from "../data-management/ontology/go/GeneOntology";
@@ -8,6 +8,7 @@ import { GOCountTable } from "../data-management/counts/GOCountTable";
 import { ProcessedPeptideContainer } from "../data-management/ProcessedPeptideContainer";
 import { PeptideData } from "../api/pept2data/Response";
 import { DataSourceCommon } from "./DataSourceCommon";
+import GODefinition from "./../data-management/ontology/go/GODefinition";
 
 /**
  * A GoDataSource can be used to access all GoTerms associated with a specific Sample. Note that this class contains
@@ -16,7 +17,7 @@ import { DataSourceCommon } from "./DataSourceCommon";
  *
  * @see Assay
  */
-export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> {
+export default class GoDataSource extends CachedDataSource<GoNameSpace, GOAnnotation> {
     private _countTable: GOCountTable;
     private _processedPeptideContainer: ProcessedPeptideContainer;
     private _baseUrl: string;
@@ -28,11 +29,11 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
         this._baseUrl = baseUrl;
     }
 
-    public getPeptidesByGoTerm(term: GoTerm): string[] {
+    public getPeptidesByGoTerm(term: GOAnnotation): string[] {
         return Array.from(this._countTable.ontology2peptide.get(term.code) || [])
     }
 
-    public getGoTermSummary(term: GoTerm): string[][] {
+    public getGoTermSummary(term: GOAnnotation): string[][] {
         return DataSourceCommon.getFASummary(term, this._processedPeptideContainer);
     }
 
@@ -44,23 +45,23 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
      * @param namespace The GO-namespace for which the most popular terms must be returned. Leave blanc if the most
      * popular terms over all namespaces must be returned.
      */
-    public async getTopItems(n: number, namespace: GoNameSpace = null): Promise<GoTerm[]> {
+    public async getTopItems(n: number, namespace: GoNameSpace = null): Promise<GOAnnotation[]> {
         if (namespace) {
-            const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace));
+            const result: [GOAnnotation[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace));
             // The GO-Terms in the cache are sorted per namespace from high to low popularity. We can just return the first
             // n items of the found
-            const list: GoTerm[] = result[0];
+            const list: GOAnnotation[] = result[0];
             return list.slice(0, Math.min(n, list.length));
         } else {
-            const output: GoTerm[] = [];
+            const output: GOAnnotation[] = [];
             for (const ns of Object.values(GoNameSpace)) {
-                const result: [GoTerm[], FATrust] = await this.getFromCache(ns, Object.values(GoNameSpace));
+                const result: [GOAnnotation[], FATrust] = await this.getFromCache(ns, Object.values(GoNameSpace));
                 if (result && result[0] && result[0].length > 0) {
                     output.push(...result[0].slice(0, Math.min(n, result[0].length)));
                 }
             }
 
-            return output.sort((a: GoTerm, b: GoTerm) => b.popularity - a.popularity).slice(0, Math.min(n, output.length));
+            return output.sort((a: GOAnnotation, b: GOAnnotation) => b.popularity - a.popularity).slice(0, Math.min(n, output.length));
         }
     }
 
@@ -72,9 +73,9 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
      * @param cutoff as percent (0-100)
      * @param sequences array of peptides to take into account
      */
-    public async getGoTerms(namespace: GoNameSpace, cutoff: number = 50, sequences: string[] = null): Promise<GoTerm[]> {
-        const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
-        return result[0].sort((a: GoTerm, b: GoTerm) => b.popularity - a.popularity);
+    public async getGoTerms(namespace: GoNameSpace, cutoff: number = 50, sequences: string[] = null): Promise<GOAnnotation[]> {
+        const result: [GOAnnotation[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
+        return result[0].sort((a: GOAnnotation, b: GOAnnotation) => b.popularity - a.popularity);
     }
 
     /**
@@ -86,12 +87,12 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
      */
     public async getTrust(namespace: GoNameSpace = null, cutoff: number = 50, sequences: string[] = null): Promise<FATrust> {
         if (namespace) {
-            const result: [GoTerm[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
+            const result: [GOAnnotation[], FATrust] = await this.getFromCache(namespace, Object.values(GoNameSpace), cutoff, sequences);
             return result[1];
         } else {
             const trusts: FATrust[] = [];
             for (const ns of Object.values(GoNameSpace)) {
-                const result: [GoTerm[], FATrust] = await this.getFromCache(ns, Object.values(GoNameSpace), cutoff, sequences);
+                const result: [GOAnnotation[], FATrust] = await this.getFromCache(ns, Object.values(GoNameSpace), cutoff, sequences);
                 trusts.push(result[1]);
             }
             return this.agregateTrust(trusts);
@@ -100,12 +101,12 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
     }
 
     // TODO: use percent in calculations
-    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<GoNameSpace, GoTerm[]>, Map<GoNameSpace, FATrust>]> {
+    protected async computeTerms(percent = 50, sequences = null): Promise<[Map<GoNameSpace, GOAnnotation[]>, Map<GoNameSpace, FATrust>]> {
         // first fetch Ontology data if needed
         var ontology: GeneOntology = this._countTable.getOntology()
         await ontology.fetchDefinitions(this._countTable.getOntologyIds(), this._baseUrl)
 
-        var dataOutput: Map<GoNameSpace, GoTerm[]> = new Map()
+        var dataOutput: Map<GoNameSpace, GOAnnotation[]> = new Map()
         var trustOutput: Map<GoNameSpace, FATrust> = new Map()
 
         // calculate terms without peptide information if it is not available
@@ -131,7 +132,7 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
                 let namespaceCount = namespaceCounts.get(def.namespace)
                 let goNameSpace: GoNameSpace = def.namespace as GoNameSpace
 
-                let goTerm = new GoTerm(def.code, def.name, goNameSpace, count, count / namespaceCount, [])
+                let goTerm = new GOAnnotation(def, count, count / namespaceCount, [])
                 dataOutput.get(goNameSpace).push(goTerm);
             })
 
@@ -159,10 +160,10 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
             let affectedPeptides = new Map<string, string[]>()
 
             for (const pept of sequences) {
-                let peptCount = peptideCountTable.get(pept)
-                let peptideData: PeptideData = this._processedPeptideContainer.response.get(pept);
-                let proteinCount = peptideData.fa.counts.GO;
-                let trust = proteinCount / peptideData.fa.counts.all;
+                const peptCount = peptideCountTable.get(pept)
+                const peptideData: PeptideData = this._processedPeptideContainer.response.get(pept);
+                const proteinCount = peptideData.fa.counts.GO;
+                const trust = proteinCount / peptideData.fa.counts.all;
 
                 totalCount += peptCount
 
@@ -190,15 +191,16 @@ export default class GoDataSource extends CachedDataSource<GoNameSpace, GoTerm> 
                     annotatedCount += peptCount
                 }
             }
-            
+
             // convert calculated data to GoTerms
-            let convertedItems: GoTerm[] = [...termCounts].sort((a, b) => b[1] - a[1])
+            let convertedItems: GOAnnotation[] = [...termCounts].sort((a, b) => b[1] - a[1])
                 .map(term => {
                     let code = term[0]
                     let count = term[1]
                     let ontologyData = ontology.getDefinition(code)
                     let fractionOfPepts = count / totalCount
-                    return new GoTerm(code, ontologyData.name, namespace, count, fractionOfPepts, affectedPeptides.get(code))
+                    const definition: GODefinition = new GODefinition(code, ontologyData.name, namespace);
+                    return new GOAnnotation(definition, count, fractionOfPepts, affectedPeptides.get(code))
                 })
 
             dataOutput.set(namespace, convertedItems);

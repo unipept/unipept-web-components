@@ -1,15 +1,15 @@
 <template>
     <div>
         <v-select :items="goNameSpaces" v-model="selectedNameSpace" label="Namespace"></v-select>
-        <v-data-table 
-            v-model="selectedItems" 
-            :headers="headers" 
-            :items="items" 
-            show-select 
+        <v-data-table
+            v-model="selectedItems"
+            :headers="headers"
+            :items="items"
+            show-select
             item-key="code"
             :itemsPerPage="5"
             sort-by="popularity"
-            :sort-desc="true" 
+            :sort-desc="true"
             :loading="loading">
             <template v-slot:items="props">
                 <tr :active="props.selected" @click="props.selected = !props.selected">
@@ -31,7 +31,7 @@ import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { GoNameSpace, convertStringToGoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
 import GoDataSource from "../../logic/data-source/GoDataSource";
-import GoTerm from "../../logic/functional-annotations/GoTerm";
+import GOAnnotation from "../../logic/functional-annotations/GOAnnotation";
 import DataSourceMixin from "./DataSourceMixin.vue";
 
 @Component
@@ -39,11 +39,11 @@ export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
     private goNameSpaces: string[] = ["all"].concat(Object.values(GoNameSpace)).map(el => this.capitalize(el));
     private selectedNameSpace: string = this.goNameSpaces[0];
 
-    private items: GoTerm[] = [];
+    private items: GOAnnotation[] = [];
     private selectedItems: Element[] = [];
 
     private loading: boolean = true;
-    
+
     private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
 
 
@@ -58,7 +58,7 @@ export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
         this.items.length = 0;
         this.selectedItems.length = 0;
 
-        let result: GoTerm[] = await (this.dataSource as GoDataSource).getTopItems(30, convertStringToGoNameSpace(this.selectedNameSpace));
+        let result: GOAnnotation[] = await (this.dataSource as GoDataSource).getTopItems(30, convertStringToGoNameSpace(this.selectedNameSpace));
         this.items.push(...result);
         this.loading = false;
     }

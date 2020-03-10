@@ -1,5 +1,5 @@
 import { Ontology } from "../Ontology"
-import { ECDefinition } from "./ECDefinition";
+import ECDefinition from "./ECDefinition";
 import { postJSON } from "../../../utils";
 import { convertEcNumberToEcNameSpace } from "../../../functional-annotations/EcNameSpace";
 
@@ -39,14 +39,14 @@ export class ECOntology extends Ontology<OntologyId, ECDefinition> {
             });
 
             const res = await postJSON(baseUrl + EC_URL, data);
-            
+
             res.forEach(ecNumber => {
                 let prefixedNumber = "EC:" + ecNumber.code
                 if (!this._definitions.has(prefixedNumber)) {
-                    this._definitions.set(prefixedNumber, 
+                    this._definitions.set(prefixedNumber,
                         {
-                            code: ecNumber.code, 
-                            name: ecNumber.name, 
+                            code: ecNumber.code,
+                            name: ecNumber.name,
                             namespace: convertEcNumberToEcNameSpace(ecNumber.code)
                         })
                 }

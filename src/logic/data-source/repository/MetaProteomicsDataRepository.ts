@@ -26,7 +26,7 @@ export default class MetaProteomicsDataRepository extends DataRepository {
 
     public constructor(metaProteomicsAssay: MetaProteomicsAssay, mpaConfig: MPAConfig, baseUrl: string) {
         super()
-        
+
         this._metaproteomicsAssay = metaProteomicsAssay;
 
         this._processor = new PeptideContainerProcessor();
@@ -42,7 +42,7 @@ export default class MetaProteomicsDataRepository extends DataRepository {
         const countTable = await TaxaPeptideProcessor.process(processedPeptideContainer, this._baseUrl);
 
         this._taxaSourceCache = new TaxaDataSource(
-            countTable, 
+            countTable,
             processedPeptideContainer,
             this,
             this._baseUrl
@@ -55,7 +55,7 @@ export default class MetaProteomicsDataRepository extends DataRepository {
 
         this._goSourceCache = new GoDataSource(
             countTable,
-            processedPeptideContainer, 
+            processedPeptideContainer,
             this,
             this._baseUrl
         );
@@ -94,7 +94,11 @@ export default class MetaProteomicsDataRepository extends DataRepository {
     }
 
     private async processPeptideContainer() {
-        let processedPeptideContainer = await this._processor.process(this._metaproteomicsAssay.peptideContainer, this._mpaConfig, this._baseUrl);
+        let processedPeptideContainer = await this._processor.process(
+            this._metaproteomicsAssay.peptideContainer,
+            this._mpaConfig,
+            this._baseUrl
+        );
 
         // set lineages in ncbiTaxonomy
         processedPeptideContainer.response.forEach((data: PeptideData) => {

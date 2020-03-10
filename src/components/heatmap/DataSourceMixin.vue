@@ -21,13 +21,6 @@ export default class DataSourceMixin extends Vue {
             align: "left",
             value: "code",
             width: "40%"
-        }, 
-        
-        {
-            text: "# peptides",
-            align: "left",
-            value: "popularity",
-            width: "40%"
         }
     ];
 

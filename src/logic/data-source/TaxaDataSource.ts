@@ -1,5 +1,5 @@
 import DataSource from "./DataSource";
-import TaxaElement from "./TaxaElement";
+import NCBIAnnotation from "./taxonomical-annotations/NCBIAnnotation";
 import Tree from "../data-management/Tree";
 import { Node } from "../data-management/Node";
 
@@ -13,7 +13,7 @@ import { GoNameSpace } from "../functional-annotations/GoNameSpace";
 import TaxonInfo from "../data-management/TaxonInfo";
 import { postJSON } from "../utils";
 import { NCBITaxonomy } from "../data-management/ontology/taxa/NCBITaxonomy";
-import { NCBITaxon } from "../data-management/ontology/taxa/NCBITaxon";
+import NCBITaxon from "../data-management/ontology/taxa/NCBITaxon";
 import TaxonomicSummary from "./TaxonomicSummary";
 
 export default class TaxaDataSource extends DataSource {
@@ -29,7 +29,7 @@ export default class TaxaDataSource extends DataSource {
     // searched.
     private _searchedPeptides: number;
     private _baseUrl: string;
- 
+
     constructor(countTable: TaxaCountTable, processedPeptideContainer: ProcessedPeptideContainer, repository: DataRepository, baseUrl: string) {
         super(repository);
         this._countTable = countTable;
@@ -40,16 +40,16 @@ export default class TaxaDataSource extends DataSource {
     /**
      * Get the n most popular items from this DataSource. The popularity is based on the amount of peptides that
      * associated with a particular DataElement.
-     * 
+     *
      * @param n The amount of items that should be listed. If n is larger than the amount of available items in this
-     * DataSource, all items will be returned. The returned list is sorted on the amount of peptides associated with 
+     * DataSource, all items will be returned. The returned list is sorted on the amount of peptides associated with
      * each item.
-     * @param level The TaxumRank with whome the returned TaxaElement's must be associated. 
+     * @param level The TaxumRank with whome the returned NCBIAnnotation's must be associated.
      */
-    public async getTopItems(n: number, level: TaxumRank = null): Promise<TaxaElement[]> {
+    public async getTopItems(n: number, level: TaxumRank = null): Promise<NCBIAnnotation[]> {
         await this.process();
         if (level) {
-            let output: TaxaElement[] = [];
+            let output: NCBIAnnotation[] = [];
 
             let nodes: Set<Node> = this._tree.getNodesWithRank(level);
             if (!nodes) {
@@ -57,11 +57,12 @@ export default class TaxaDataSource extends DataSource {
             }
 
             for (let node of nodes) {
-                output.push(new TaxaElement(node.name, level, node.data.count));
+                // TODO check to fill in NCBI id and lineage here.
+                output.push(new NCBIAnnotation(new NCBITaxon(undefined, node.name, level, []), node.data.count));
             }
             return output;
         } else {
-            let output: TaxaElement[] = [];
+            let output: NCBIAnnotation[] = [];
 
             let nodes: Set<Node> = this._tree.getAllNodes();
             if (!nodes) {
@@ -69,7 +70,11 @@ export default class TaxaDataSource extends DataSource {
             }
 
             for (let node of nodes) {
-                output.push(new TaxaElement(node.name, convertStringToTaxumRank(node.rank), node.data.count));
+                // TODO fill in NCBI id and lineage here!
+                output.push(new NCBIAnnotation(
+                    new NCBITaxon(undefined, node.name, convertStringToTaxumRank(node.rank), []),
+                    node.data.count
+                ));
             }
             return output;
         }
@@ -82,7 +87,7 @@ export default class TaxaDataSource extends DataSource {
         await this.process();
         return this._tree;
     }
-    
+
     public async getTreeByPeptides(peptides: string[]) : Promise<Node> {
         await this.process();
         return this._tree.getRoot().callRecursivelyPostOder((t: Node, c: any) => {
@@ -91,12 +96,12 @@ export default class TaxaDataSource extends DataSource {
         });
     }
 
-    public async getAffectedPeptides(element: TaxaElement): Promise<string[]> {
+    public async getAffectedPeptides(element: NCBIAnnotation): Promise<string[]> {
         await this.process();
         // TODO enumerating all nodes here should not be necessary!
-        let nodesForRank: Set<Node> = this._tree.getNodesWithRank(element.rank);
+        let nodesForRank: Set<Node> = this._tree.getNodesWithRank(element.definition.rank);
         for (let node of nodesForRank) {
-            if (node.name === element.name) {                
+            if (node.name === element.name) {
                 return this._tree.getAllSequences(node.id);
             }
         }

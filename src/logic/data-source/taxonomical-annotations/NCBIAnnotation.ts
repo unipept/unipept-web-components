@@ -1,14 +1,14 @@
-import { TaxumRank } from "./TaxumRank";
-import Element from "./Element";
-import DataRepository from "./DataRepository";
-import TaxaDataSource from "./TaxaDataSource";
+import Element from "./../Element";
+import DataRepository from "./../DataRepository";
+import TaxaDataSource from "./../TaxaDataSource";
+import NCBITaxon from "./../../data-management/ontology/taxa/NCBITaxon";
 
-export default class TaxaElement extends Element {
-    public rank: TaxumRank;
+export default class NCBIAnnotation extends Element {
+    public definition: NCBITaxon;
 
-    constructor(name: string, rank: TaxumRank, popularity: number) {
-        super(name, popularity);
-        this.rank = rank;
+    constructor(definition: NCBITaxon, popularity: number) {
+        super(definition.name, popularity);
+        this.definition = definition;
     }
 
     public async computeCrossPopularity(x: Element, dataRepository: DataRepository): Promise<number> {
