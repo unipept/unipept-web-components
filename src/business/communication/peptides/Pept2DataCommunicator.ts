@@ -1,0 +1,99 @@
+import { PeptideDataResponse } from "@/business/communication/peptides/PeptideDataResponse";
+import { CountTable } from "@/business/counts/CountTable";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import SearchConfiguration from "@/business/configuration/SearchConfiguration";
+import Worker from "worker-loader!./Pept2Data.worker.js";
+import ProgressListener from "@/business/progress/ProgressListener";
+import NetworkCommunicationException from "@/business/exceptions/NetworkCommunicationException";
+import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+
+/**
+ * Communicates with the Unipept API through a separate worker in its own thread.
+ *
+ * @author Pieter Verschaffelt
+ */
+export default class Pept2DataCommunicator {
+    // Maps a configuration (as string) onto a map in which peptides are mapped onto their responses.
+    private static configurationToResponses = new Map<string, Map<string, PeptideDataResponse>>();
+    // Keeps track of which peptides have been processed per concrete configuration
+    private static configurationToProcessed = new Map<string, Set<Peptide>>();
+
+    /**
+     * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed peptides
+     * that were processed before, will not be looked up again, in order to save bandwidth and computation time.
+     *
+     * @param countTable A count table containing all peptides for which all available information through the API
+     * must be looked up. Only peptides that were not processed before, will be processed.
+     * @param configuration Search settings that should be used while looking up the peptides.
+     * @param progressListener Listener that will be updated with current progress of resolving this
+     */
+    public static process(
+        countTable: CountTable<Peptide>,
+        configuration: SearchConfiguration,
+        progressListener?: ProgressListener
+    ): Promise<void> {
+        const peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
+
+        return new Promise<void>((resolve, reject) => {
+            const worker = new Worker();
+            worker.onmessage = (event) => {
+                switch (event.data.type) {
+                case "progress":
+                    if (progressListener) {
+                        progressListener.onProgressUpdate(event.data.value);
+                    }
+                    break;
+                case "result":
+                    // Set all data values that we received from the worker.
+                    const resultMap: Map<Peptide, PeptideDataResponse> = event.data.value;
+                    const config = JSON.stringify(configuration);
+
+                    if (this.configurationToResponses.has(config)) {
+                        this.configurationToResponses.set(config, new Map());
+                    }
+                    const configMap = this.configurationToResponses.get(config);
+
+                    for (const [pep, response] of resultMap) {
+                        configMap.set(pep, response);
+                    }
+
+                    // We're done. Resolve this promise.
+                    resolve();
+                    break;
+                case "error":
+                    // An error occurred during communication with Unipept's API in the worker.
+                    reject(new NetworkCommunicationException(event.data.value));
+                    break;
+                }
+            }
+
+            worker.postMessage({
+                peptides: peptides,
+                config: configuration,
+                baseUrl: NetworkConfiguration.BASE_URL
+            });
+        });
+    }
+
+    /**
+     * Returns all data associated with a specific peptide, if this peptide has been processed before. This means that
+     * for an unseen count table, you must first call process!
+     *
+     * @param peptide A peptide sequence for which the response from Unipept's API should be returned.
+     * @param configuration The search settings that need to be applied when looking for this peptide.
+     * @return The data that was retrieved through Unipept's API if the peptide is known. Returns undefined otherwise.
+     */
+    public static getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideDataResponse {
+        return this.configurationToResponses.get(JSON.stringify(configuration)).get(peptide);
+    }
+
+    private static getUnprocessedPeptides(peptides: Peptide[], configuration: SearchConfiguration): Peptide[] {
+        const configString = JSON.stringify(configuration);
+        if (!this.configurationToProcessed.has(configString)) {
+            return peptides;
+        }
+
+        const processed = this.configurationToProcessed.get(configString);
+        return peptides.filter(p => !processed.has(p));
+    }
+}

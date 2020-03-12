@@ -1,6 +1,6 @@
 import Definition from "@/business/ontology/Definition";
 
-export abstract class Ontology<OntologyId, DefinitionType extends Definition> {
+export class Ontology<OntologyId, DefinitionType extends Definition> {
     constructor(
         private readonly definitions = new Map<OntologyId, DefinitionType>()
     ) {}
