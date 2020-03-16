@@ -1,10 +1,14 @@
-import OntologyProcessor from "@/business/ontology/OntologyProcessor";
-import InterproDefinition, { InterproCode } from "@/business/ontology/functional/interpro/InterproDefinition";
-import { CountTable } from "@/business/counts/CountTable";
-import { Ontology } from "@/business/ontology/Ontology";
+import OntologyProcessor from "./../../OntologyProcessor";
+import InterproDefinition, { InterproCode } from "./../../functional/interpro/InterproDefinition";
+import { CountTable } from "./../../../counts/CountTable";
+import { Ontology } from "./../../Ontology";
 
 export default class InterproOntologyProcessor implements OntologyProcessor<InterproCode, InterproDefinition> {
-    public getOntology(table: CountTable<InterproCode>): Promise<Ontology<InterproCode, InterproDefinition>> {
-        return Promise.resolve(undefined);
+    public async getOntology(table: CountTable<InterproCode>): Promise<Ontology<InterproCode, InterproDefinition>> {
+        return undefined;
+    }
+
+    public async getDefinition(id: InterproCode): Promise<InterproDefinition> {
+        return undefined;
     }
 }

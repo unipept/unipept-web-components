@@ -1,7 +1,7 @@
-import { GoResponse } from "@/business/communication/functional/go/GoResponse";
-import { GoCode } from "@/business/ontology/functional/go/GoDefinition";
-import NetworkUtils from "@/business/communication/NetworkUtils";
-import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+import { GoResponse } from "./GoResponse";
+import { GoCode } from "./../../../ontology/functional/go/GoDefinition";
+import NetworkUtils from "./../../NetworkUtils";
+import NetworkConfiguration from "./../../NetworkConfiguration";
 
 export default class GoResponseCommunicator {
     private static goCodeToResponseMap = new Map<GoCode, GoResponse>();

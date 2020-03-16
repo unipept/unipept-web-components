@@ -10,17 +10,35 @@
                 </span>
             </div>
             <div v-else>
-                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
+                <filter-functional-annotations-dropdown v-model="percentSettings">
+                </filter-functional-annotations-dropdown>
                 <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
                 <span v-html="trustLine"></span>
                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                <ec-amount-table :loading="calculationsInProgress" :dataRepository="dataRepository" :items="items" :searchSettings="sortSettings"></ec-amount-table>
+                <ec-amount-table
+                    :loading="calculationsInProgress"
+                    :dataRepository="dataRepository"
+                    :items="items"
+                    :searchSettings="sortSettings">
+                </ec-amount-table>
                 <v-card outlined v-if="ecTree">
-                    <v-btn small depressed class="item-treeview-dl-btn" @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
+                    <v-btn
+                        small
+                        depressed
+                        class="item-treeview-dl-btn"
+                        @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
                         <v-icon>mdi-download</v-icon>
                         Save as image
                     </v-btn>
-                    <treeview id="ec-treeview" :data="ecTree" :autoResize="true" :height="300" :width="800" :tooltip="ecTreeTooltip" :enableAutoExpand="true"></treeview>
+                    <treeview
+                        id="ec-treeview"
+                        :data="ecTree"
+                        :autoResize="true"
+                        :height="300"
+                        :width="800"
+                        :tooltip="ecTreeTooltip"
+                        :enableAutoExpand="true">
+                    </treeview>
                 </v-card>
             </div>
         </v-card-text>
@@ -32,8 +50,6 @@ import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import Component, { mixins } from "vue-class-component";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 import EcAmountTable from "../../tables/EcAmountTable.vue";
-import EcDataSource from "../../../logic/data-source/EcDataSource";
-import ECAnnotation from "../../../logic/functional-annotations/ECAnnotation";
 import TreeViewNode from "../../visualizations/TreeViewNode";
 import Treeview from "../../visualizations/Treeview.vue";
 

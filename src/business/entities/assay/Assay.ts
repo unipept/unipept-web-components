@@ -1,9 +1,10 @@
-import { CountTable } from "@/business/counts/CountTable";
-import Visitable from "@/logic/patterns/visitor/Visitable";
+import ChangeListener from "./../ChangeListener";
+import AssayVisitor from "./AssayVisitor";
+import Visitable from "./../Visitable";
 
 export default abstract class Assay implements Visitable<AssayVisitor> {
     protected constructor(
-        public readonly changeListeners: ChangeListener<Assay>[],
+        protected readonly changeListeners: ChangeListener<Assay>[],
         public readonly id: string,
         protected name?: string,
         protected date?: Date,

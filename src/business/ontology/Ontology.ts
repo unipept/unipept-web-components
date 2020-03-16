@@ -1,4 +1,4 @@
-import Definition from "@/business/ontology/Definition";
+import Definition from "./Definition";
 
 export class Ontology<OntologyId, DefinitionType extends Definition> {
     constructor(

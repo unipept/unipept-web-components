@@ -39,7 +39,7 @@ export default class Tree {
                     currentNode = newNode;
                 }
             }
-            
+
             currentNode.values = Array.from(taxaCountTable.ontology2peptide.get(id));
             currentNode.data.self_count = count;
         })
@@ -111,9 +111,9 @@ export default class Tree {
     }
 
     /**
-     * Returns a list of nodes that are associated with the given rank. This method might return undefined when the 
+     * Returns a list of nodes that are associated with the given rank. This method might return undefined when the
      * given rank does not exist.
-     * 
+     *
      * @param rank A string representing the rank for whome nodes should be queried.
      */
     getNodesWithRank(rank: string): Set<Node> {
@@ -146,7 +146,6 @@ export default class Tree {
         } else {
             node = nodeId;
         }
-        return node.values;
     }
 
     /**

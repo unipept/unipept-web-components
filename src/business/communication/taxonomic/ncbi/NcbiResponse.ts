@@ -1,5 +1,5 @@
-import { NcbiRank } from "@/business/ontology/taxonomic/ncbi/NcbiRank";
-import { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
+import { NcbiRank } from "./../../../ontology/taxonomic/ncbi/NcbiRank";
+import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 
 export default interface NcbiResponse {
     id: NcbiId,

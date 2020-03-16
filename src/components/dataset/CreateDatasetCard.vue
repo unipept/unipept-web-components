@@ -1,18 +1,18 @@
 <docs>
-The CreateDatasetCard provides the user with a form for creating a new Assay, based on a list of peptides. The user 
-can indicate it's preference to storing this card in persistent storage. Note that this component does not store or 
+The CreateDatasetCard provides the user with a form for creating a new Assay, based on a list of peptides. The user
+can indicate it's preference to storing this card in persistent storage. Note that this component does not store or
 select assays by itself, it only emits an event with it's intended action.
 </docs>
 
 <template>
     <v-card flat>
         <v-card-text>
-            <dataset-form ref="createdDatasetForm" 
-                v-on:peptide-change="createPeptides = $event" 
-                :peptides="createPeptides" 
-                v-on:name-change="createName = $event" 
-                :name="createName" 
-                v-on:save-change="createSave = $event" 
+            <dataset-form ref="createdDatasetForm"
+                v-on:peptide-change="createPeptides = $event"
+                :peptides="createPeptides"
+                v-on:name-change="createName = $event"
+                :name="createName"
+                v-on:save-change="createSave = $event"
                 :save="createSave">
             </dataset-form>
             <div class="card-actions" id="create-assay-button">
@@ -30,8 +30,7 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
 import DatasetForm from "./DatasetForm.vue";
-import Assay from "../../logic/data-management/assay/Assay";
-
+import Assay from "@/business/entities/assay/Assay";
 
 @Component({
     components: {

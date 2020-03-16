@@ -1,5 +1,5 @@
-import { EcNamespace } from "@/business/ontology/functional/ec/EcNamespace";
-import Definition from "@/business/ontology/Definition";
+import { EcNamespace } from "./EcNamespace";
+import Definition from "./../../Definition";
 
 export type EcCode = string;
 

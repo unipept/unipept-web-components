@@ -1,9 +1,9 @@
-import OntologyProcessor from "@/business/ontology/OntologyProcessor";
-import EcDefinition, { EcCode } from "@/business/ontology/functional/ec/EcDefinition";
-import { CountTable } from "@/business/counts/CountTable";
-import { Ontology } from "@/business/ontology/Ontology";
-import EcResponseCommunicator from "@/business/communication/functional/ec/EcResponseCommunicator";
-import { convertEcNumberToEcNamespace } from "@/business/ontology/functional/ec/EcNamespace";
+import OntologyProcessor from "./../../OntologyProcessor";
+import EcDefinition, { EcCode } from "./EcDefinition";
+import { CountTable } from "./../../../counts/CountTable";
+import { Ontology } from "./../../Ontology";
+import EcResponseCommunicator from "./../../../communication/functional/ec/EcResponseCommunicator";
+import { convertEcNumberToEcNamespace } from "./EcNamespace";
 
 export default class EcOntologyProcessor implements OntologyProcessor<EcCode, EcDefinition> {
     private static codeDefinitionMap = new Map<EcCode, EcDefinition>();
@@ -29,4 +29,13 @@ export default class EcOntologyProcessor implements OntologyProcessor<EcCode, Ec
         return new Ontology<EcCode, EcDefinition>(definitions);
     }
 
+    public async getDefinition(id: EcCode): Promise<EcDefinition> {
+        await EcResponseCommunicator.process(new Set(id));
+        const response = EcResponseCommunicator.getResponse(id);
+        if (response) {
+            return new EcDefinition(id, response.name, convertEcNumberToEcNamespace(id));
+        } else {
+            return undefined;
+        }
+    }
 }

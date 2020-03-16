@@ -4,9 +4,8 @@
         :loading="loading"
         annotation-name="GO term"
         :namespace="namespace"
-        :searchSettings="searchSettings"
-        :taxaRetriever="taxaRetriever"
-        :summaryRetriever="summaryRetriever">
+        :search-configuration="searchConfiguration"
+        :item-to-peptides-mapping="goPeptideMapping">
     </amount-table>
 </template>
 
@@ -14,18 +13,15 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import GOAnnotation from "../../logic/functional-annotations/GOAnnotation";
 import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
-import DataRepository from "../../logic/data-source/DataRepository";
-import GoDataSource from "../../logic/data-source/GoDataSource";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 import Treeview from "../visualizations/treeview.vue";
 import AmountTable from "./AmountTable.vue";
-import { downloadDataByForm, logToGoogle } from "../../logic/utils";
-import { GoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
-import FaSortSettings from "./FaSortSettings";
-import { Node } from "../../logic/data-management/Node";
-import FAElement from "../../logic/functional-annotations/FAElement";
+import GoDefinition, { GoCode } from "./../../business/ontology/functional/go/GoDefinition";
+import { CountTable } from "./../../business/counts/CountTable";
+import { Peptide } from "./../../business/ontology/raw/Peptide";
+import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
+import TableItem from "./../tables/TableItem";
+import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
 
 @Component({
     components: {
@@ -34,31 +30,40 @@ import FAElement from "../../logic/functional-annotations/FAElement";
 })
 export default class GoAmountTable extends Vue {
     @Prop({ required: true })
-    private items: GOAnnotation[]
-    @Prop({ required: true })
-    private searchSettings: FaSortSettings;
-    @Prop({ required: true })
-    private namespace: GoNameSpace;
-    // The sample that should be summarized in this AmountTable
+    private goCountTable: CountTable<GoCode>;
+    @Prop({ required: false })
+    private goPeptideMapping: Map<GoCode, Peptide[]>;
     @Prop({ required: false, default: false })
     private loading: boolean;
-    @Prop({ required: true })
-    private dataRepository: DataRepository;
+    @Prop({ required: false })
+    private searchConfiguration: SearchConfiguration;
+    @Prop({ required: false })
+    private namespace: string;
 
-    private async taxaRetriever(term: GOAnnotation): Promise<Node> {
-        if (this.dataRepository) {
-            let taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
-            let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
-            return await taxaDataSource.getTreeByPeptides(goDataSource.getPeptidesByGoTerm(term));
-        }
+    private items: TableItem[] = [];
+
+    public async mounted() {
+        await this.onCountTableChanged();
     }
 
-    private async summaryRetriever(term: GOAnnotation): Promise<string[][]> {
-        if (this.dataRepository) {
-            let goDataSource: GoDataSource = await this.dataRepository.createGoDataSource();
-            return goDataSource.getGoTermSummary(term);
-        }
-        return []
+    @Watch("goCountTable")
+    private async onCountTableChanged() {
+        this.loading = true;
+
+        const goOntologyProcessor = new GoOntologyProcessor();
+        const goOntology = await goOntologyProcessor.getOntology(this.goCountTable);
+        const newItems = this.goCountTable.getOntologyIds().map(goCode => {
+            const definition: GoDefinition = goOntology.getDefinition(goCode);
+
+            return new TableItem(
+                this.goCountTable.getCounts(goCode),
+                definition.name,
+                definition.code,
+                definition
+            );
+        });
+
+        this.loading = false;
     }
 }
 </script>

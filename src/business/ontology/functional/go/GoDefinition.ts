@@ -1,5 +1,5 @@
 import { GoNamespace } from "./GoNamespace";
-import Definition from "@/business/ontology/Definition";
+import Definition from "./../../Definition";
 
 export type GoCode = string;
 

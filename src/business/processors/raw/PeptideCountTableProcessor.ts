@@ -1,6 +1,6 @@
-import { Peptide } from "@/business/ontology/raw/Peptide";
-import { CountTable } from "@/business/counts/CountTable";
-import SearchConfiguration from "@/business/configuration/SearchConfiguration";
+import { Peptide } from "./../../ontology/raw/Peptide";
+import { CountTable } from "./../../counts/CountTable";
+import SearchConfiguration from "./../../configuration/SearchConfiguration";
 
 export default class PeptideCountTableProcessor {
     /**

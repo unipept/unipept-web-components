@@ -1,7 +1,7 @@
-import { EcCode } from "@/business/ontology/functional/ec/EcDefinition";
-import { EcResponse } from "@/business/communication/functional/ec/EcResponse";
-import { postJSON } from "@/logic/utils";
-import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+import { EcCode } from "./../../../ontology/functional/ec/EcDefinition";
+import { EcResponse } from "./EcResponse";
+import NetworkConfiguration from "./../../NetworkConfiguration";
+import NetworkUtils from "./../../NetworkUtils";
 
 export default class EcResponseCommunicator {
     private static ecCodeToResponseMap = new Map<EcCode, EcResponse>();
@@ -18,7 +18,7 @@ export default class EcResponseCommunicator {
                 ecnumbers: toProcess.slice(i, i + this.EC_BATCH_SIZE)
             });
 
-            const res = await postJSON(NetworkConfiguration.BASE_URL + this.EC_ENDPOINT, data);
+            const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + this.EC_ENDPOINT, data);
 
             for (const term of res) {
                 if (!this.ecCodeToResponseMap.has(term.code)) {

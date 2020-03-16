@@ -1,11 +1,12 @@
-import { PeptideDataResponse } from "@/business/communication/peptides/PeptideDataResponse";
-import { CountTable } from "@/business/counts/CountTable";
-import { Peptide } from "@/business/ontology/raw/Peptide";
-import SearchConfiguration from "@/business/configuration/SearchConfiguration";
+import { PeptideDataResponse } from "./PeptideDataResponse";
+import { CountTable } from "./../../counts/CountTable";
+import { Peptide } from "./../../ontology/raw/Peptide";
+import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import Worker from "worker-loader!./Pept2Data.worker.js";
-import ProgressListener from "@/business/progress/ProgressListener";
-import NetworkCommunicationException from "@/business/exceptions/NetworkCommunicationException";
-import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+import ProgressListener from "./../../progress/ProgressListener";
+import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
+import NetworkConfiguration from "./../NetworkConfiguration";
+import PeptideTrust from "./../../processors/raw/PeptideTrust";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -73,6 +74,26 @@ export default class Pept2DataCommunicator {
                 baseUrl: NetworkConfiguration.BASE_URL
             });
         });
+    }
+
+    public static async getPeptideTrust(
+        countTable: CountTable<Peptide>,
+        configuration: SearchConfiguration
+    ): Promise<PeptideTrust> {
+        const responseMap = this.configurationToResponses.get(JSON.stringify(configuration));
+
+        let matchedPeptides: number = 0;
+        let missedPeptides: Peptide[] = [];
+
+        for (const peptide of countTable.getOntologyIds()) {
+            if (!responseMap.has(peptide)) {
+                missedPeptides.push(peptide);
+            } else {
+                matchedPeptides += countTable.getCounts(peptide);
+            }
+        }
+
+        return new PeptideTrust(missedPeptides, matchedPeptides, countTable.totalCount);
     }
 
     /**

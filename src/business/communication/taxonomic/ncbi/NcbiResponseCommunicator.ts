@@ -1,7 +1,7 @@
-import NcbiResponse from "@/business/communication/taxonomic/ncbi/NcbiResponse";
-import { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
-import { postJSON } from "@/logic/utils";
-import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+import NcbiResponse from "./NcbiResponse";
+import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
+import NetworkConfiguration from "./../../NetworkConfiguration";
+import NetworkUtils from "./../../NetworkUtils";
 
 export default class NcbiResponseCommunicator {
     private static idToResponseMap = new Map<NcbiId, NcbiResponse>();
@@ -18,7 +18,7 @@ export default class NcbiResponseCommunicator {
                 taxids: toProcess.slice(i, i + this.NCBI_BATCH_SIZE)
             });
 
-            const res = await postJSON(NetworkConfiguration.BASE_URL + this.NCBI_ENDPOINT, data);
+            const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + this.NCBI_ENDPOINT, data);
 
             for (const term of res) {
                 if (!this.idToResponseMap.has(term.code)) {

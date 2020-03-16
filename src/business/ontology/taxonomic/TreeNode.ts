@@ -1,11 +1,8 @@
-export default class NcbiNode {
-    public id: number;
-    public name: string;
-    public rank: string;
+import { Peptide } from "@/business/ontology/raw/Peptide";
 
-    public children: NcbiNode[];
-    public values: string[];
-    public data: {count: number, self_count: number};
+export default class TreeNode {
+    public children: TreeNode[] = [];
+    public data: { count: number, self_count: number } = { count: undefined, self_count: 0 };
 
     /**
      * Creates a node based on a mandatory id. Name and rank are optional.
@@ -14,37 +11,29 @@ export default class NcbiNode {
      * @param name The name of the organism
      * @param rank The taxonomic rank of the organism
      */
-    constructor(id: number, name: string = "", rank: string = "no rank") {
-        this.id = id;
-        this.name = name;
-        this.rank = rank;
-        this.children = [];
-        this.values = [];
-        this.data = { count: undefined, self_count: 0 }
-    }
+    constructor(
+        public readonly id: number,
+        public readonly name: string = "",
+        public readonly rank: string = "no rank"
+    ) {}
 
     /**
-     * Searches for a node with the given taxon id in its children. Returns null
-     * if it is not found.
+     * Searches for a node with the given taxon id in its children. Returns null if it is not found.
      *
-     * @param taxId The taxon id to search for
-     * @return A matching Node object or null
+     * @param taxonId NCBI taxon id to search for.
+     * @return A matching TreeNode object or null.
      */
-    getChild(taxId: number): NcbiNode {
-        for (let child of this.children) {
-            if (child.id === taxId) {
-                return child;
-            }
-        }
-        return null;
+    public getChild(taxonId: number): TreeNode {
+        const child = this.children.find(c => c.id === taxonId);
+        return (child? child : null);
     }
 
     /**
      * Returns the number of children for this node.
      *
-     * @return The number of children
+     * @return The number of children.
      */
-    getChildCount(): number {
+    public getChildCount(): number {
         return this.children.length;
     }
 
@@ -52,19 +41,18 @@ export default class NcbiNode {
      * !! Please use the addChild function of the parent tree instead !!
      * Adds a child to this node.
      *
-     * @param node The child to add
+     * @param node The child to add.
      */
-    addChild(node: NcbiNode) {
+    public addChild(node: TreeNode): void {
         this.children.push(node);
     }
 
     /**
-     * Returns the number of peptides associated with this node and all of its
-     * children
+     * Returns the number of peptides associated with this node and all of its children.
      *
-     * @return The number of peptides
+     * @return The number of peptides.
      */
-    getCounts(): number {
+    public getCounts(): number {
         if (this.data.count === undefined) {
             this.data.count = this.data.self_count;
             if (this.getChildCount() !== 0) {
@@ -75,11 +63,11 @@ export default class NcbiNode {
     }
 
     /**
-     * Recursively calls a function on this object and its children
+     * Recursively calls a function on this object and its children.
      *
-     * @param f The function to call
+     * @param f The function to call.
      */
-    callRecursively(f: (NcbiNode) => any) {
+    public callRecursively(f: (Node) => any) {
         f.call(this);
         if (this.children) {
             this.children.forEach(c => {
@@ -94,7 +82,7 @@ export default class NcbiNode {
      * @param f The function to call
      * @return cs
      */
-    callRecursivelyPostOder(f: (NcbiNode, any) => any): any {
+    public callRecursivelyPostOder(f: (Node, any) => any): any {
         let childResults = [];
         if (this.children) {
             childResults = this.children.map(c =>

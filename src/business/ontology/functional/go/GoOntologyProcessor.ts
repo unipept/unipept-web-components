@@ -2,7 +2,7 @@ import OntologyProcessor from "./../../OntologyProcessor";
 import GoDefinition, { GoCode } from "./GoDefinition";
 import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../Ontology";
-import GoResponseCommunicator from "@/business/communication/functional/go/GoResponseCommunicator";
+import GoResponseCommunicator from "./../../../communication/functional/go/GoResponseCommunicator";
 
 export default class GoOntologyProcessor implements OntologyProcessor<GoCode, GoDefinition> {
     public async getOntology(table: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {
@@ -20,5 +20,15 @@ export default class GoOntologyProcessor implements OntologyProcessor<GoCode, Go
         }
 
         return new Ontology<GoCode, GoDefinition>(definitions);
+    }
+
+    public async getDefinition(id: GoCode): Promise<GoDefinition> {
+        await GoResponseCommunicator.process(new Set(id));
+        const response = GoResponseCommunicator.getResponse(id);
+        if (response) {
+            return new GoDefinition(id, response.name, response.namespace);
+        } else {
+            return undefined;
+        }
     }
 }

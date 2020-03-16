@@ -1,3 +1,6 @@
+import $ from "jquery";
+import SystemUtils from "@/business/system/SystemUtils";
+
 export default class NetworkUtils {
     /**
      * Posts data to a url as JSON and returns a promise containing the parsed (JSON) response.
@@ -15,5 +18,50 @@ export default class NetworkUtils {
             },
             body: data,
         }).then(res => res.json());
+    }
+
+    public static async downloadDataByForm(data: string, fileName: string, fileType: string = null): Promise<string> {
+        if (SystemUtils.isElectron()) {
+            const fs = require("fs");
+            const { dialog } = require("electron").remote;
+            const returnValue = await dialog.showSaveDialog(
+                null,
+                {
+                    title: "save to CSV",
+                    defaultPath: fileName
+                }
+            );
+
+            if (!returnValue.canceled) {
+                fs.writeFileSync(returnValue.filePath, data);
+            }
+        } else {
+            return new Promise(function(resolve, reject) {
+                let nonce = Math.random();
+                $("form.download").remove();
+
+                $("body").append("<form class='download' method='post' action='/download'></form>");
+
+                let $downloadForm = $("form.download").append(
+                    "<input type='hidden' name='filename' value='" + fileName + "'/>"
+                );
+                $downloadForm.append("<input type='hidden' name='data' class='data'/>");
+                if (fileType !== null) {
+                    $downloadForm.append(`<input type='hidden' name='filetype' value='${fileType}'/>`);
+                }
+                $downloadForm.append("<input type='hidden' name='nonce' value='" + nonce + "'/>");
+                // The x-www-form-urlencoded spec replaces newlines with \n\r
+                $downloadForm.find(".data").val(data.replace(/\n\r/g, "\n"));
+
+                let downloadTimer = setInterval(() => {
+                    if (document.cookie.indexOf(nonce.toString()) !== -1) {
+                        clearInterval(downloadTimer);
+                        resolve(fileName);
+                    }
+                }, 100);
+
+                $downloadForm.submit();
+            });
+        }
     }
 }
