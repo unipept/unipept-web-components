@@ -41,6 +41,7 @@ export default abstract class FunctionalCountTableProcessor<
         return this.countTables.get(namespace);
     }
 
+
     /**
      * @return A trust-object that describes how many of the given peptides are in fact associated with at least one
      * annotation.

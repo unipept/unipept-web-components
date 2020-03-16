@@ -1,31 +1,40 @@
 <template>
-    <span class="filter-annotations-menu">
-        <v-menu :close-on-content-click="false">
-            <template v-slot:activator="{ on }">
-                <v-btn fab x-small v-on="on" :elevation="0">
-                    <v-icon>mdi-settings</v-icon>
-                </v-btn>
-            </template>
-            <v-card max-width="310px" height="100px">
-                <v-card-text>
-                    <span>Filtering</span>
-                    <div class="input-group">
-                        <span class="input-group-addon">≥</span>
-                        <input type="number" min="0" max="100" autocomplete="off" step="5" class="form-control" v-model.lazy="model" @change="model = Math.min(Math.max(parseInt(model), 0), 100)">
-                        <span class="input-group-addon">% of annotated proteins</span>
-                    </div>
-                    <a v-if="model !== '5'" class="pull-right" @click="model = '5'">reset to 5%</a>
-                </v-card-text>
-            </v-card>
-        </v-menu>
-    </span>
+    <div>
+        <span class="filter-annotations-menu">
+            <v-menu :close-on-content-click="false">
+                <template v-slot:activator="{ on }">
+                    <v-btn fab x-small v-on="on" :elevation="0">
+                        <v-icon>mdi-settings</v-icon>
+                    </v-btn>
+                </template>
+                <v-card max-width="310px" height="100px">
+                    <v-card-text>
+                        <span>Filtering</span>
+                        <div class="input-group">
+                            <span class="input-group-addon">≥</span>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                autocomplete="off"
+                                step="5"
+                                class="form-control"
+                                v-model.lazy="model"
+                                @change="model = Math.min(Math.max(parseInt(model), 0), 100)">
+                            <span class="input-group-addon">% of annotated proteins</span>
+                        </div>
+                        <a v-if="model !== '5'" class="pull-right" @click="model = '5'">reset to 5%</a>
+                    </v-card-text>
+                </v-card>
+            </v-menu>
+        </span>
+    </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { showInfoModal } from "../../../logic/modal";
 
 @Component({
     components: {},
@@ -42,14 +51,17 @@ import { showInfoModal } from "../../../logic/modal";
     }
 })
 export default class FilterFunctionalAnnotationsDropdown extends Vue {
-    @Prop({ default: "5" }) value: string;
+    @Prop({ required: false, default: "5" })
+    private value: string;
 
     content: string = this.value;
 
-    @Watch("value") onValueChanged(newValue: string, oldValue: string) {
+    @Watch("value")
+    private onValueChanged(newValue: string, oldValue: string) {
         this.content = newValue;
     }
 
+    // TODO migrate modal and show to users with help button
     showFunctionalModal() {
         let modalContent = `
             <h4 id="quick-explanation">Quick explanation</h4>

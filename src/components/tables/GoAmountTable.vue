@@ -1,7 +1,7 @@
 <template>
     <amount-table
         :items="items"
-        :loading="loading"
+        :loading="isLoading"
         annotation-name="GO term"
         :namespace="namespace"
         :search-configuration="searchConfiguration"
@@ -22,15 +22,25 @@ import { Peptide } from "./../../business/ontology/raw/Peptide";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import TableItem from "./../tables/TableItem";
 import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
+import { Ontology } from "@/business/ontology/Ontology";
 
 @Component({
     components: {
         AmountTable
+    },
+    computed: {
+        isLoading: {
+            get(): boolean {
+                return this.loading || this.isComputing;
+            }
+        }
     }
 })
 export default class GoAmountTable extends Vue {
     @Prop({ required: true })
     private goCountTable: CountTable<GoCode>;
+    @Prop({ required: true })
+    private goOntology: Ontology<GoCode, GoDefinition>;
     @Prop({ required: false })
     private goPeptideMapping: Map<GoCode, Peptide[]>;
     @Prop({ required: false, default: false })
@@ -39,31 +49,39 @@ export default class GoAmountTable extends Vue {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: false })
     private namespace: string;
+    /**
+     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
+     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
+     * relative values will be shown (by dividing every count by x).
+     */
+    @Prop({ required: false, default: 0 })
+    private relativeCounts: number;
 
     private items: TableItem[] = [];
+    private isComputing: boolean = false;
 
     public async mounted() {
-        await this.onCountTableChanged();
+        await this.onInputsChanged();
     }
 
     @Watch("goCountTable")
-    private async onCountTableChanged() {
-        this.loading = true;
+    @Watch("relativeCounts")
+    private async onInputsChanged() {
+        this.isComputing = true;
 
-        const goOntologyProcessor = new GoOntologyProcessor();
-        const goOntology = await goOntologyProcessor.getOntology(this.goCountTable);
         const newItems = this.goCountTable.getOntologyIds().map(goCode => {
-            const definition: GoDefinition = goOntology.getDefinition(goCode);
+            const definition: GoDefinition = this.goOntology.getDefinition(goCode);
+            const currentCount = this.goCountTable.getCounts(goCode);
 
             return new TableItem(
-                this.goCountTable.getCounts(goCode),
+                this.relativeCounts === 0 ? currentCount : currentCount / this.relativeCounts,
                 definition.name,
                 definition.code,
                 definition
             );
         });
 
-        this.loading = false;
+        this.isComputing = false;
     }
 }
 </script>
