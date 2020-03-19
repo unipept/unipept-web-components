@@ -1,8 +1,8 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!dataRepository">
-                <span class="ec-waiting" v-if="analysisInProgress">
+            <div v-if="!peptideCountTable">
+                <span class="ec-waiting" v-if="isLoading">
                     <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                 </span>
                 <span v-else class="placeholder-text">

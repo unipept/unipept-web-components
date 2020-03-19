@@ -35,8 +35,9 @@
                                 :namespace="namespace"
                                 :go-count-table="items[idx].countTable"
                                 :go-peptide-mapping="items[idx].peptideMapping"
-                                :go-ontology="goOntology"
-                                :relative-counts="relativeCounts">
+                                :go-ontology="items[idx].ontology"
+                                :relative-counts="relativeCounts"
+                                :search-configuration="searchConfiguration">
                             </go-amount-table>
                         </v-col>
                         <v-col :cols="3">
@@ -97,9 +98,9 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
         countTable: CountTable<GoCode>,
         peptideMapping: Map<GoCode, Peptide[]>,
         definitions: GoDefinition[],
-        title: string
+        title: string,
+        ontology: Ontology<GoCode, GoDefinition>
     }[] = [];
-    private goOntology: Ontology<GoCode, GoDefinition> = null;
 
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
@@ -110,7 +111,8 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
                 countTable: undefined,
                 peptideMapping: undefined,
                 definitions: [],
-                title: StringUtils.stringTitleize(ns.toString())
+                title: StringUtils.stringTitleize(ns.toString()),
+                ontology: undefined
             });
         }
 
@@ -118,6 +120,7 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
     }
 
     @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
     public async recompute() {
         this.calculationsInProgress = true;
         if (this.peptideCountTable) {
@@ -128,16 +131,17 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
                 percentage
             );
 
-            const ontologyProcessor = new GoOntologyProcessor();
-            this.goOntology = await ontologyProcessor.getOntology(this.peptideCountTable);
-
             for (let i = 0; i < this.namespaces.length; i++) {
                 const namespace: GoNamespace = this.namespaces[i];
                 this.items[i].countTable = await goCountTableProcessor.getCountTable(namespace);
                 this.items[i].peptideMapping = await goCountTableProcessor.getAnnotationPeptideMapping();
+
+                const ontologyProcessor = new GoOntologyProcessor();
+                this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
+
                 this.items[i].definitions.length = 0;
                 this.items[i].definitions.push(
-                    ...this.items[i].countTable.getOntologyIds().map(id => this.goOntology.getDefinition(id))
+                    ...this.items[i].countTable.getOntologyIds().map(id => this.items[i].ontology.getDefinition(id))
                 );
             }
 

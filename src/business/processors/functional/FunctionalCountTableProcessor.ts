@@ -12,8 +12,8 @@ export default abstract class FunctionalCountTableProcessor<
     OntologyId,
     DefinitionType extends FunctionalDefinition
 > {
-    private countTables: Map<FunctionalNamespace, CountTable<OntologyId>>;
-    private item2Peptides: Map<OntologyId, Peptide[]>;
+    private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
+    private item2Peptides: Map<OntologyId, Peptide[]> = new Map();
     private trust: FunctionalTrust;
 
     protected constructor(
@@ -78,6 +78,11 @@ export default abstract class FunctionalCountTableProcessor<
         for (const peptide of this.peptideCountTable.getOntologyIds()) {
             const peptideCount = this.peptideCountTable.getCounts(peptide);
             const peptideData = Pept2DataCommunicator.getPeptideResponse(peptide, this.configuration);
+
+            if (!peptideData) {
+                continue;
+            }
+
             const proteinCount = this.peptideData2ProteinCount(peptideData);
 
             const uniqueTerms: OntologyId[] = Object.keys(peptideData.fa.data).filter(
@@ -111,6 +116,8 @@ export default abstract class FunctionalCountTableProcessor<
             tablePerNamespace.set(ns, new Map<OntologyId, number>());
         }
 
+        console.log(ontology);
+
         // Add each definition to the count table of it's specific namespace.
         for (const [term, counts] of countsPerCode) {
             const definition: DefinitionType = ontology.getDefinition(term);
@@ -119,6 +126,8 @@ export default abstract class FunctionalCountTableProcessor<
                 nsMap.set(term, counts);
             }
         }
+
+        console.log(tablePerNamespace);
 
         // Convert the maps to real CountTable-objects.
         for (const [ns, table] of tablePerNamespace) {

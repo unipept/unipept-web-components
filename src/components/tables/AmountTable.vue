@@ -18,7 +18,7 @@
             </template>
             <template v-slot:expanded-item="{ headers, item }">
                 <td class="item-treeview" :colspan="headers.length">
-                    <div v-if="computeTree(item) && treeAvailable.get(item)">
+                    <div v-if="treeAvailable.get(item) || computeTree(item)">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
                             <v-icon>mdi-download</v-icon>
                             Save as image
@@ -199,6 +199,8 @@ export default class AmountTable extends Vue {
 
             const tree = new Tree(countTable, taxaOntology);
             this.treeAvailable.set(term, tree.getRoot());
+        }).catch((err) => {
+            console.error(err);
         });
         return true;
     }

@@ -6,12 +6,10 @@ import GoResponseCommunicator from "./../../../communication/functional/go/GoRes
 
 export default class GoOntologyProcessor implements OntologyProcessor<GoCode, GoDefinition> {
     public async getOntology(table: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {
-        const codes = new Set<GoCode>(table.getOntologyIds());
-        await GoResponseCommunicator.process(codes);
-
+        await GoResponseCommunicator.process(table.getOntologyIds());
         const definitions = new Map<GoCode, GoDefinition>();
 
-        for (const code of codes) {
+        for (const code of table.getOntologyIds()) {
             const apiResponse = GoResponseCommunicator.getResponse(code);
 
             if (apiResponse) {
@@ -23,7 +21,7 @@ export default class GoOntologyProcessor implements OntologyProcessor<GoCode, Go
     }
 
     public async getDefinition(id: GoCode): Promise<GoDefinition> {
-        await GoResponseCommunicator.process(new Set(id));
+        await GoResponseCommunicator.process([id]);
         const response = GoResponseCommunicator.getResponse(id);
         if (response) {
             return new GoDefinition(id, response.name, response.namespace);

@@ -10,8 +10,8 @@ export default class GoResponseCommunicator {
     public static readonly GO_BATCH_SIZE: number = 100;
     public static readonly GO_ENDPOINT: string = "/private_api/goterms";
 
-    public static async process(codes: Set<GoCode>): Promise<void> {
-        const toProcess = [...codes].filter(c => this.codesProcessed.has(c));
+    public static async process(codes: GoCode[]): Promise<void> {
+        const toProcess = codes.filter(c => !this.codesProcessed.has(c));
 
         for (let i = 0; i < toProcess.length; i += this.GO_BATCH_SIZE) {
             const data = JSON.stringify({

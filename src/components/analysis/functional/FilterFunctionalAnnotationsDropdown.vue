@@ -4,7 +4,7 @@
             <v-menu :close-on-content-click="false">
                 <template v-slot:activator="{ on }">
                     <v-btn fab x-small v-on="on" :elevation="0">
-                        <v-icon>mdi-settings</v-icon>
+                        <v-icon>mdi-cog-outline</v-icon>
                     </v-btn>
                 </template>
                 <v-card max-width="310px" height="100px">

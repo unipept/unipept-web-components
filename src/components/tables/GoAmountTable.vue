@@ -31,6 +31,9 @@ import { Ontology } from "./../../business/ontology/Ontology";
     computed: {
         isLoading: {
             get(): boolean {
+                console.log(this.namespace);
+                console.log("loading: " + this.loading);
+                console.log("isComputing: " + this.isComputing);
                 return this.loading || this.isComputing;
             }
         }
@@ -67,21 +70,30 @@ export default class GoAmountTable extends Vue {
     @Watch("goCountTable")
     @Watch("relativeCounts")
     @Watch("goOntology")
-    private async onInputsChanged() {
+    private onInputsChanged() {
         this.isComputing = true;
 
+        console.log("Input changed...");
+
         if (this.goCountTable && this.goOntology) {
-            const newItems = this.goCountTable.getOntologyIds().map(goCode => {
+            const newItems: TableItem[] = [];
+
+            for (const goCode of this.goCountTable.getOntologyIds()) {
                 const definition: GoDefinition = this.goOntology.getDefinition(goCode);
                 const currentCount = this.goCountTable.getCounts(goCode);
 
-                return new TableItem(
-                    this.relativeCounts === 0 ? currentCount : currentCount / this.relativeCounts,
-                    definition.name,
-                    definition.code,
-                    definition
-                );
-            });
+                if (definition) {
+                    newItems.push(new TableItem(
+                        this.relativeCounts === 0 ? currentCount : currentCount / this.relativeCounts,
+                        definition.name,
+                        definition.code,
+                        definition
+                    ));
+                }
+            }
+
+            this.items.length = 0;
+            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
         }
 
         this.isComputing = false;

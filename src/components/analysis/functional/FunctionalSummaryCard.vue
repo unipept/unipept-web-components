@@ -214,6 +214,8 @@ export default class FunctionalSummaryCard extends Vue {
         this.redoCalculations();
     }
 
+    @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
     private async redoCalculations() {
         this.faCalculationsInProgress = true;
         if (this.taxonId === -1) {
