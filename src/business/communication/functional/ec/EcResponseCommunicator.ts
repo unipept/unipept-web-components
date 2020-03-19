@@ -10,8 +10,10 @@ export default class EcResponseCommunicator {
     public static readonly EC_BATCH_SIZE: number = 100;
     public static readonly EC_ENDPOINT: string = "/private_api/ecnumbers";
 
-    public static async process(codes: Set<EcCode>): Promise<void> {
-        const toProcess = [...codes].filter(c => this.codesProcessed.has(c));
+    public static async process(codes: EcCode[]): Promise<void> {
+        // Cut of the "EC:" prefix, as this is not being used in the API.
+        codes = codes.map(c => c.substr(3))
+        const toProcess = codes.filter(c => !this.codesProcessed.has(c));
 
         for (let i = 0; i < toProcess.length; i += this.EC_BATCH_SIZE) {
             const data = JSON.stringify({
@@ -21,6 +23,7 @@ export default class EcResponseCommunicator {
             const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + this.EC_ENDPOINT, data);
 
             for (const term of res) {
+                term.code = "EC:" + term.code;
                 if (!this.ecCodeToResponseMap.has(term.code)) {
                     this.ecCodeToResponseMap.set(term.code, term);
                 }

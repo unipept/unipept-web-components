@@ -60,9 +60,10 @@ export default class EcAmountTable extends Vue {
     }
 
     @Watch("ecCountTable")
+    @Watch("ecOntology")
     @Watch("relativeCounts")
     public async onInputsChanged() {
-        if (this.ecCountTable) {
+        if (this.ecCountTable && this.ecOntology) {
             this.computeInProgress = true;
 
             const newItems = this.ecCountTable.getOntologyIds().map(ecCode => {
@@ -78,7 +79,7 @@ export default class EcAmountTable extends Vue {
             });
 
             this.items.length = 0;
-            this.items.push(...newItems);
+            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
 
             this.computeInProgress = false;
         }

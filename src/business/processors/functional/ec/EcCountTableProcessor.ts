@@ -19,7 +19,13 @@ export default class EcCountTableProcessor extends FunctionalCountTableProcessor
         readonly configuration: SearchConfiguration,
         readonly percentage: number = 50
     ) {
-        super(peptideCountTable, configuration, percentage, item => item.fa.counts.EC, "EC:")
+        super(
+            peptideCountTable,
+            configuration,
+            percentage,
+            item => item.fa.counts.EC,
+            "EC:"
+        )
     }
 
     protected getNamespaces(): EcNamespace[] {

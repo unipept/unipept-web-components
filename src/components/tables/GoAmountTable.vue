@@ -31,9 +31,6 @@ import { Ontology } from "./../../business/ontology/Ontology";
     computed: {
         isLoading: {
             get(): boolean {
-                console.log(this.namespace);
-                console.log("loading: " + this.loading);
-                console.log("isComputing: " + this.isComputing);
                 return this.loading || this.isComputing;
             }
         }
@@ -72,8 +69,6 @@ export default class GoAmountTable extends Vue {
     @Watch("goOntology")
     private onInputsChanged() {
         this.isComputing = true;
-
-        console.log("Input changed...");
 
         if (this.goCountTable && this.goOntology) {
             const newItems: TableItem[] = [];

@@ -13,9 +13,20 @@ export default abstract class FunctionalCountTableProcessor<
     DefinitionType extends FunctionalDefinition
 > {
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
+    // Aggregation of all counts over all namespaces
+    private generalCountTable: CountTable<OntologyId>;
     private item2Peptides: Map<OntologyId, Peptide[]> = new Map();
     private trust: FunctionalTrust;
 
+    /**
+     * @param peptideCountTable The peptide count table for which functional count tables must be computed.
+     * @param configuration The search configuration that should be applied while processing the peptides.
+     * @param percentage Threshold for determining if a functional annotation should be included in the output or not.
+     * @param peptideData2ProteinCount Function that extracts the amount of proteins annotated with the given
+     * functional annotation from a PeptideDataResponse.
+     * @param termPrefix With which string is every functional annotation of the desired type prefixed in the results
+     * returned by the Unipept API?
+     */
     protected constructor(
         protected readonly peptideCountTable: CountTable<Peptide>,
         protected readonly configuration: SearchConfiguration,
@@ -38,7 +49,11 @@ export default abstract class FunctionalCountTableProcessor<
         namespace?: FunctionalNamespace
     ): Promise<CountTable<OntologyId>> {
         await this.compute();
-        return this.countTables.get(namespace);
+        if (namespace) {
+            return this.countTables.get(namespace);
+        } else {
+            return this.generalCountTable;
+        }
     }
 
 
@@ -116,7 +131,7 @@ export default abstract class FunctionalCountTableProcessor<
             tablePerNamespace.set(ns, new Map<OntologyId, number>());
         }
 
-        console.log(ontology);
+        const generalCounts = new Map<OntologyId, number>();
 
         // Add each definition to the count table of it's specific namespace.
         for (const [term, counts] of countsPerCode) {
@@ -124,15 +139,15 @@ export default abstract class FunctionalCountTableProcessor<
             if (definition) {
                 const nsMap = tablePerNamespace.get(definition.namespace);
                 nsMap.set(term, counts);
+                generalCounts.set(term, counts);
             }
         }
-
-        console.log(tablePerNamespace);
 
         // Convert the maps to real CountTable-objects.
         for (const [ns, table] of tablePerNamespace) {
             this.countTables.set(ns, new CountTable<OntologyId>(table));
         }
+        this.generalCountTable = new CountTable<OntologyId>(generalCounts);
 
         this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
     }

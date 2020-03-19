@@ -21,7 +21,8 @@ export enum EcNamespace {
  * @param code The EC-Number for which the namespace should be computed.
  */
 export function convertEcNumberToEcNamespace(code: string): EcNamespace {
-    return Object.values(EcNamespace)[parseInt(code.substr(0, 1)) - 1];
+    // Cut of the "EC:"-prefix, and take the first number of the code to determine the EC namespace.
+    return Object.values(EcNamespace)[parseInt(code.substr(3).substr(0, 1)) - 1];
 }
 
 export function convertStringToEcNamespace(ns: string): EcNamespace {

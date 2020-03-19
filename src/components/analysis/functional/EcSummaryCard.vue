@@ -87,9 +87,9 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     @Prop({ required: false, default: 0 })
     private relativeCounts: 0;
 
-    private ecCountTable: CountTable<EcCode> = undefined;
-    private ecPeptideMapping: Map<EcCode, Peptide> = undefined;
-    private ecOntology: Ontology<EcCode, EcDefinition> = undefined;
+    private ecCountTable: CountTable<EcCode> = null;
+    private ecPeptideMapping: Map<EcCode, Peptide[]> = null;
+    private ecOntology: Ontology<EcCode, EcDefinition> = null;
 
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
@@ -120,6 +120,7 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     };
 
     @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
     private async recompute() {
         this.calculationsInProgress = true;
         if (this.peptideCountTable) {
@@ -130,6 +131,9 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
                 percentage
             );
             this.ecCountTable = await ecCountTableProcessor.getCountTable();
+            this.ecPeptideMapping = await ecCountTableProcessor.getAnnotationPeptideMapping();
+
+            console.log(this.ecCountTable);
 
             const ontologyProcessor = new EcOntologyProcessor();
             this.ecOntology = await ontologyProcessor.getOntology(this.ecCountTable);
