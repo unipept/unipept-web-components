@@ -18,24 +18,30 @@ export default class Pept2DataCommunicator {
     private static configurationToResponses = new Map<string, Map<string, PeptideDataResponse>>();
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
+    private static inProgress: Promise<void>;
 
     /**
-     * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed peptides
-     * that were processed before, will not be looked up again, in order to save bandwidth and computation time.
+     * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed that
+     * peptides that were processed before, will not be looked up again, in order to save bandwidth and computation
+     * time.
      *
      * @param countTable A count table containing all peptides for which all available information through the API
      * must be looked up. Only peptides that were not processed before, will be processed.
      * @param configuration Search settings that should be used while looking up the peptides.
      * @param progressListener Listener that will be updated with current progress of resolving this
      */
-    public static process(
+    public static async process(
         countTable: CountTable<Peptide>,
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
     ): Promise<void> {
+        if (this.inProgress) {
+            await this.inProgress;
+        }
+
         const peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
-        return new Promise<void>((resolve, reject) => {
+        this.inProgress = new Promise<void>((resolve, reject) => {
             const worker = new Worker();
             worker.onmessage = (event) => {
                 switch (event.data.type) {
@@ -54,8 +60,14 @@ export default class Pept2DataCommunicator {
                     }
                     const configMap = this.configurationToResponses.get(config);
 
+                    if (!this.configurationToProcessed.has(config)) {
+                        this.configurationToProcessed.set(config, new Set());
+                    }
+                    const processedMap = this.configurationToProcessed.get(config);
+
                     for (const [pep, response] of resultMap) {
                         configMap.set(pep, response);
+                        processedMap.add(pep);
                     }
 
                     // We're done. Resolve this promise.
@@ -78,6 +90,9 @@ export default class Pept2DataCommunicator {
                 baseUrl: NetworkConfiguration.BASE_URL
             });
         });
+
+        await this.inProgress;
+        this.inProgress = undefined;
     }
 
     public static async getPeptideTrust(

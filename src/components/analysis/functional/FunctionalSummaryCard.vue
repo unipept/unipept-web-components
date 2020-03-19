@@ -92,7 +92,7 @@
                         <b>
                             Filtered results
                         </b>
-                        : These results are limited to the {{ this.totalPeptides }} peptides specific to
+                        : These results are limited to the {{ this.filteredCountTable.totalCount }} peptides specific to
                         <b>
                             {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.rank}})
                         </b>.
@@ -211,9 +211,9 @@ export default class FunctionalSummaryCard extends Vue {
     @Watch("selectedTaxonId")
     private onSelectedTaxonIdChanged() {
         this.taxonId = this.selectedTaxonId;
-        this.redoCalculations();
     }
 
+    @Watch("taxonId")
     @Watch("peptideCountTable")
     @Watch("searchConfiguration")
     private async redoCalculations() {
@@ -222,7 +222,8 @@ export default class FunctionalSummaryCard extends Vue {
             this.filteredCountTable = this.peptideCountTable;
         } else {
             if (this.peptideCountTable) {
-                // Update the count tables so that they only count peptides that are associated with the current taxon filter
+                // Update the count tables so that they only count peptides that are associated with the current taxon
+                // filter
                 const taxaProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
                 const taxaMapping = await taxaProcessor.getLcaPeptideMapping();
                 const peptidesForTaxon = taxaMapping.get(this.taxonId);
