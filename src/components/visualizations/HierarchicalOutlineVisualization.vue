@@ -24,7 +24,8 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { constructSearchtree } from "@/old-logic/data-management/SearchTree";
+import Tree from "./../../business/ontology/taxonomic/Tree";
+import { constructSearchtree } from "./SearchTree";
 
 @Component({
     components: {},
@@ -37,16 +38,13 @@ import { constructSearchtree } from "@/old-logic/data-management/SearchTree";
     }
 })
 export default class HierarchicalOutlineVisualization extends Vue {
+    @Prop({ required: true })
+    private tree: Tree;
     private searchTerm: string = "";
     private searchTree!: any;
 
     mounted() {
         this.searchTerm = this.$store.getters.selectedTerm;
-        this.initSearchTree();
-    }
-
-    @Watch("dataRepository")
-    private onDataRepositoryChanged() {
         this.initSearchTree();
     }
 
@@ -62,11 +60,10 @@ export default class HierarchicalOutlineVisualization extends Vue {
         this.searchTerm = newSearchTerm;
     }
 
+    @Watch("tree")
     private async initSearchTree() {
-        if (this.dataRepository != null) {
-            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-            let tree: Tree = await taxaDataSource.getTree();
-            this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
+        if (this.tree) {
+            this.searchTree = constructSearchtree(this.tree, this.$store.getters.searchSettings.il, () => {});
         }
     }
 }

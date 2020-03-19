@@ -4,9 +4,13 @@ const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
 
 async function handleEvent(event){
-    let result = await process(event.data.peptides, event.data.config, event.data.baseUrl, setProgress)
-    // Value is a mapping between a peptide sequence and the response it received from the Unipept API.
-    self.postMessage({ type: "result", value: result });
+    try {
+        let result = await process(event.data.peptides, event.data.config, event.data.baseUrl, setProgress)
+        // Value is a mapping between a peptide sequence and the response it received from the Unipept API.
+        self.postMessage({ type: "result", value: result });
+    } catch (err) {
+        self.postMessage({ type: "error", value: err.toString() });
+    }
 }
 
 /**
@@ -29,39 +33,36 @@ function setProgress(value) {
 async function process(peptides, config, baseUrl, setProgress) {
     // Maps each peptide onto the response it received from the Unipept API.
     const responses = new Map();
+
     setProgress(0.0);
+    for (let i = 0; i < peptides.length; i += PEPTDATA_BATCH_SIZE) {
+        const data = JSON.stringify({
+            peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
+            equate_il: config.equateIl,
+            missed: config.enableMissingCleavageHandling
+        });
 
-    try {
-        for (let i = 0; i < peptides.length; i += PEPTDATA_BATCH_SIZE) {
-            const data = JSON.stringify({
-                peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
-                equate_il: config.equateIl,
-                missed: config.enableMissingCleavageHandling
-            });
+        const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data);
 
-            const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data);
+        res.peptides.forEach(p => {
+            responses.set(p.sequence, p);
+        })
 
-            res.peptides.forEach(p => {
-                responses.set(p.sequence, p);
-            })
-
-            setProgress((i + PEPTDATA_BATCH_SIZE) / peptides.length);
-        }
-
-        return responses;
-    } catch (err) {
-        self.postMessage({ type: "error", value: err });
+        setProgress((i + PEPTDATA_BATCH_SIZE) / peptides.length);
     }
+
+    setProgress(1);
+    return responses;
 }
 
-function postJSON(url, data) {
-    return fetch(url, {
+async function postJSON(url, data) {
+    return (await fetch(url, {
         method: "POST",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
         },
         body: data,
-    }).then(res => res.json());
+    })).json();
 }
 

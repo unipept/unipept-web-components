@@ -1,5 +1,5 @@
 <docs>
-The `LoadSampleDatasetCard` asynchronously downloads all sample datasets that are present in the Unipept database and 
+The `LoadSampleDatasetCard` asynchronously downloads all sample datasets that are present in the Unipept database and
 provides the user with the option to select any one of these.
 </docs>
 
@@ -31,9 +31,9 @@ provides the user with the option to select any one of these.
                 <div class="load-sample-container">
                     <v-row>
                         <v-col :cols="7">
-                            <v-select 
-                                :items="dataset.datasets" 
-                                item-text="name" 
+                            <v-select
+                                :items="dataset.datasets"
+                                item-text="name"
                                 v-model="selectedSampleDataset[dataset.id]">
                             </v-select>
                         </v-col>
@@ -53,9 +53,8 @@ import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
 import { Watch, Prop } from "vue-property-decorator";
 import axios from "axios";
-import SampleDatasetCollection from "../../logic/data-management/SampleDatasetCollection";
-import Assay from "../../logic/data-management/assay/Assay";
-import SampleDataset from "../../logic/data-management/SampleDataset";
+import SampleAssayCollection from "@/business/entities/sample/SampleAssayCollection";
+import SampleAssay from "@/business/entities/sample/SampleAssay";
 
 @Component({
     computed: {
@@ -71,7 +70,7 @@ export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
     private errorSampleDatasets: boolean = false;
     private selectedSampleDataset = {};
 
-    private sampleDatasets: SampleDatasetCollection[] = [];
+    private sampleDatasets: SampleAssayCollection[] = [];
 
     mounted() {
         this.retrieveSampleDatasets();
@@ -86,11 +85,11 @@ export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
                 this.sampleDatasets = [];
                 this.selectedSampleDataset = {};
                 for (let item of result.data.sample_data) {
-                    let itemDatasets = item.datasets.map((el) => new SampleDataset(el.name, el.data, el.order));
+                    let itemDatasets = item.datasets.map((el) => new SampleAssay(el.name, el.data, el.order));
                     itemDatasets = itemDatasets.sort((a, b) => {
                         return a.order < b.order;
                     });
-                    this.sampleDatasets.push(new SampleDatasetCollection(
+                    this.sampleDatasets.push(new SampleAssayCollection(
                         item.id,
                         item.environment,
                         item.project_website,
@@ -111,10 +110,10 @@ export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
         let name: string = this.selectedSampleDataset[datasetId];
         // Only datasets with a valid name can be selected.
         if (name) {
-            let sampleDatasetCollection: SampleDatasetCollection = this.sampleDatasets.find(
+            let sampleDatasetCollection: SampleAssayCollection = this.sampleDatasets.find(
                 (dataset) => dataset.id == datasetId
             );
-            let sampleSet: SampleDataset = sampleDatasetCollection.datasets.find(
+            let sampleSet: SampleAssay = sampleDatasetCollection.datasets.find(
                 (dataset) => dataset.name == this.selectedSampleDataset[datasetId]
             );
             let assay = this.storeDataset(sampleSet.data.join("\n"), sampleSet.name, false);

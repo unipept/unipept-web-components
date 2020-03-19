@@ -26,6 +26,47 @@
                         <v-list-item :ripple="false" dense class="menu-header">
                             <v-list-item-title>
                                 Sort by number of peptides in related proteins
+
+                                <v-dialog v-model="dialogOpen" max-width="600">
+                                    <template v-slot:activator="{ on }">
+                                        <v-icon right v-on="on">mdi-help-circle</v-icon>
+                                    </template>
+                                    <v-card>
+                                        <v-card-title>
+                                            <v-icon left>mdi-help-circle</v-icon> Sorting functional annotations
+                                        </v-card-title>
+                                        <v-card-text>
+                                            <p>The functional annotations can be sorted on two metrics:</p>
+                                            <ul>
+                                                <li>
+                                                    <strong>Peptides</strong>:
+                                                    The absolute number of peptides that are associated with a given
+                                                    functional annotation.
+                                                </li>
+                                                <li>
+                                                    <strong>Peptides%</strong>:
+                                                    Like peptides, but the reported value is represented as a percentage
+                                                    indicating the fraction of the total number of peptides.
+                                                </li>
+                                            </ul>
+                                            <p>
+                                                <br>
+                                                Your "Filter duplicate peptides" setting is taken into account. If it is
+                                                enabled, peptides that occur multiple times in your input list are
+                                                counted that many times.
+                                            </p>
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn
+                                                    color="primary"
+                                                    text
+                                                    @click="dialogOpen = false">
+                                                I understand
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-dialog>
                             </v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="enableRelativeCounts">
@@ -93,46 +134,6 @@
         </v-card>
         <div id="tooltip" class="tip"></div>
         <image-download-modal ref="imageDownloadModal"/>
-        <v-dialog v-model="dialogOpen" max-width="600">
-            <template v-slot:activator="{ on }">
-                <v-icon right v-on="on">mdi-help-circle</v-icon>
-            </template>
-            <v-card>
-                <v-card-title>
-                    <v-icon left>mdi-help-circle</v-icon> Sorting functional annotations
-                </v-card-title>
-                <v-card-text>
-                    <p>The functional annotations can be sorted on two metrics:</p>
-                    <ul>
-                        <li>
-                            <strong>Peptides</strong>:
-                            The absolute number of peptides that are associated with a given
-                            functional annotation.
-                        </li>
-                        <li>
-                            <strong>Peptides%</strong>:
-                            Like peptides, but the reported value is represented as a percentage
-                            indicating the fraction of the total number of peptides.
-                        </li>
-                    </ul>
-                    <p>
-                        <br>
-                        Your "Filter duplicate peptides" setting is taken into account. If it is
-                        enabled, peptides that occur multiple times in your input list are
-                        counted that many times.
-                    </p>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="primary"
-                        text
-                        @click="dialogOpen = false">
-                        I understand
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </div>
 </template>
 
@@ -151,13 +152,13 @@ import ImageDownloadModal from "../../utils/ImageDownloadModal.vue";
 import GoSummaryCard from "./GoSummaryCard.vue";
 import EcSummaryCard from "./EcSummaryCard.vue";
 import InterproSummaryCard from "./InterproSummaryCard.vue";
-import { Peptide } from "@/business/ontology/raw/Peptide";
-import { CountTable } from "@/business/counts/CountTable";
-import NcbiTaxon, { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
-import SearchConfiguration from "@/business/configuration/SearchConfiguration";
-import NcbiCountTableProcessor from "@/business/processors/taxonomic/ncbi/NcbiCountTableProcessor";
-import PeptideCountTableProcessor from "@/business/processors/raw/PeptideCountTableProcessor";
-import NcbiOntologyProcessor from "@/business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
+import { CountTable } from "./../../../business/counts/CountTable";
+import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
+import NcbiCountTableProcessor from "./../../../business/processors/taxonomic/ncbi/NcbiCountTableProcessor";
+import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
+import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 
 @Component({
     components: {
@@ -188,7 +189,7 @@ export default class FunctionalSummaryCard extends Vue {
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
 
-    private filteredCountTable: CountTable<Peptide> = undefined;
+    private filteredCountTable: CountTable<Peptide> = null;
 
     private selectedSortTypeName: string = "Peptides";
     private relativeCounts: number = 0;
@@ -218,19 +219,21 @@ export default class FunctionalSummaryCard extends Vue {
         if (this.taxonId === -1) {
             this.filteredCountTable = this.peptideCountTable;
         } else {
-            // Update the count tables so that they only count peptides that are associated with the current taxon filter
-            const taxaProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
-            const taxaMapping = await taxaProcessor.getLcaPeptideMapping();
-            const peptidesForTaxon = taxaMapping.get(this.taxonId);
+            if (this.peptideCountTable) {
+                // Update the count tables so that they only count peptides that are associated with the current taxon filter
+                const taxaProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
+                const taxaMapping = await taxaProcessor.getLcaPeptideMapping();
+                const peptidesForTaxon = taxaMapping.get(this.taxonId);
 
-            const peptideProcessor = new PeptideCountTableProcessor();
+                const peptideProcessor = new PeptideCountTableProcessor();
 
-            this.filteredCountTable = await peptideProcessor.getPeptideCountTable(
-                peptidesForTaxon,
-                this.searchConfiguration
-            );
-            const taxaOntologyProcessor = new NcbiOntologyProcessor();
-            this.selectedNCBITaxon = await taxaOntologyProcessor.getDefinition(this.taxonId);
+                this.filteredCountTable = await peptideProcessor.getPeptideCountTable(
+                    peptidesForTaxon,
+                    this.searchConfiguration
+                );
+                const taxaOntologyProcessor = new NcbiOntologyProcessor();
+                this.selectedNCBITaxon = await taxaOntologyProcessor.getDefinition(this.taxonId);
+            }
         }
         this.faCalculationsInProgress = false;
     }

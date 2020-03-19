@@ -30,7 +30,7 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
 import DatasetForm from "./DatasetForm.vue";
-import Assay from "@/business/entities/assay/Assay";
+import Assay from "./../../business/entities/assay/Assay";
 
 @Component({
     components: {

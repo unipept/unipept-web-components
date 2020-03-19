@@ -22,7 +22,7 @@
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
-                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.dataRepository">
+                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.peptideCountTable">
                     <template v-slot:activator="{ on }">
                         <v-btn text class="align-self-center mr-4" v-on="on">
                             More
@@ -70,12 +70,12 @@
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <v-card flat>
-                        <sunburst-visualization 
-                            ref="sunburst" 
-                            :autoResize="true" 
-                            :full-screen="isFullScreen" 
-                            v-if="this.dataRepository" 
-                            :dataRepository="this.dataRepository"
+                        <sunburst-visualization
+                            ref="sunburst"
+                            :autoResize="true"
+                            :full-screen="isFullScreen"
+                            v-if="tree"
+                            :tree="tree"
                             v-on:update-selected-term="onUpdateSelectedTerm"
                             v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                         </sunburst-visualization>
@@ -95,11 +95,11 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treemap-visualization 
-                            ref="treemap" 
-                            :full-screen="isFullScreen" 
-                            v-if="this.dataRepository" 
-                            :dataRepository="this.dataRepository"
+                        <treemap-visualization
+                            ref="treemap"
+                            :full-screen="isFullScreen"
+                            v-if="tree"
+                            :tree="tree"
                             v-on:update-selected-term="onUpdateSelectedTerm"
                             v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                         </treemap-visualization>
@@ -118,14 +118,14 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <treeview-visualization 
-                            ref="treeview" 
-                            :autoResize="true" 
-                            :width="600" 
-                            :height="350" 
-                            :full-screen="isFullScreen" 
-                            v-if="this.dataRepository" 
-                            :dataRepository="this.dataRepository"
+                        <treeview-visualization
+                            ref="treeview"
+                            :autoResize="true"
+                            :width="600"
+                            :height="350"
+                            :full-screen="isFullScreen"
+                            v-if="tree"
+                            :tree="tree"
                             v-on:update-selected-term="onUpdateSelectedTerm"
                             v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                         </treeview-visualization>
@@ -145,9 +145,9 @@
                 <v-tab-item>
                     <v-card flat>
                         <v-card-text>
-                            <hierarchical-outline-visualization 
-                                v-if="this.dataRepository" 
-                                :dataRepository="this.dataRepository"
+                            <hierarchical-outline-visualization
+                                v-if="tree"
+                                :tree="tree"
                                 v-on:update-selected-term="onUpdateSelectedTerm"
                                 v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                             </hierarchical-outline-visualization>
@@ -165,21 +165,21 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-                        <heatmap-wizard-single-sample 
-                            v-if="this.dataRepository" 
-                            :dataRepository="this.dataRepository">
-                        </heatmap-wizard-single-sample>
-                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            </v-progress-circular>
-                        </div>
-                        <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
-                        </div>
+<!--                        <heatmap-wizard-single-sample -->
+<!--                            v-if="this.dataRepository" -->
+<!--                            :dataRepository="this.dataRepository">-->
+<!--                        </heatmap-wizard-single-sample>-->
+<!--                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">-->
+<!--                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>-->
+<!--                            </v-progress-circular>-->
+<!--                        </div>-->
+<!--                        <div v-else>-->
+<!--                            <v-card-text>-->
+<!--                                <div class="placeholder-text">-->
+<!--                                    {{ placeholderText }}-->
+<!--                                </div>-->
+<!--                            </v-card-text>-->
+<!--                        </div>-->
                     </v-card>
                 </v-tab-item>
             </v-tabs-items>
@@ -197,17 +197,22 @@ import TreemapVisualization from "./TreemapVisualization.vue";
 import TreeviewVisualization from "./TreeviewVisualization.vue";
 import HeatmapVisualization from "../heatmap/HeatmapVisualization.vue";
 import HierarchicalOutlineVisualization from "./HierarchicalOutlineVisualization.vue";
-
-import CardHeader from "../custom/CardHeader.vue";
-//@ts-ignore
-import fullscreen from "vue-fullscreen";
-
-import { logToGoogle } from "../../logic/utils";
 import HeatmapWizardSingleSample from "../heatmap/HeatmapWizardSingleSample.vue";
-import DataRepository from "../../logic/data-source/DataRepository";
 import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 import $ from "jquery";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
+import CardHeader from "../custom/CardHeader.vue";
+
+//@ts-ignore
+import fullscreen from "vue-fullscreen";
+import { Peptide } from "./../../business/ontology/raw/Peptide";
+import { CountTable } from "./../../business/counts/CountTable";
+import Tree from "./../../business/ontology/taxonomic/Tree";
+import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import NcbiCountTableProcessor from "./../../business/processors/taxonomic/ncbi/NcbiCountTableProcessor";
+import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
+import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
+
+
 
 @Component({
     components: {
@@ -232,7 +237,9 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     @Prop({ required: true })
-    private dataRepository: DataRepository;
+    private peptideCountTable: CountTable<Peptide>;
+    @Prop({ required: true })
+    private searchConfiguration: SearchConfiguration;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
     @Prop({ required: false, default: "primary" })
@@ -242,15 +249,34 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     @Prop({ required: false, default: "white" })
     private tabsTextColor: string;
     @Prop({ required: false, default: true })
-    private isDark: boolean;    
+    private isDark: boolean;
 
-    private placeholderText = "Please select at least one dataset for analysis.";
+    private placeholderText = "Please select at least one assay for analysis.";
     private isFullScreen: boolean = false;
     private dialogOpen: boolean = false;
+
+    private tree: Tree = null;
 
     private tab = null;
 
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
+
+    private async mounted() {
+        await this.onPeptideCountTableChanged();
+    }
+
+    @Watch("peptideCountTable")
+    private async onPeptideCountTableChanged() {
+        if (this.peptideCountTable) {
+            const taxaCountProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
+            const taxaCounts = await taxaCountProcessor.getLcaCountTable();
+
+            const taxaOntologyProcessor = new NcbiOntologyProcessor();
+            const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
+
+            this.tree = new Tree(taxaCounts, taxaOntology);
+        }
+    }
 
     private switchToFullScreen() {
         // @ts-ignore
@@ -258,7 +284,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             this.isFullScreen = true;
             this.$refs.fullScreenContainer.enter();
             // @ts-ignore
-            logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
+            AnalyticsUtil.logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
             $(".tip").appendTo(".full-screen-container");
         }
     }
@@ -308,7 +334,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     private onUpdateSelectedTerm(searchTerm: string): void {
         /**
          * Fired after the user indicated that he somehow wants to filter the currently visible results.
-         * 
+         *
          * @event update-selected-term
          * @property {string} searchTerm The search term that was used by the user to filter.
          */
@@ -317,9 +343,9 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private onUpdateSelectedTaxonId(id: string): void {
         /**
-         * Fired after the user indicated that he soehow wants to filter the currently visible results in the
+         * Fired after the user indicated that he somehow wants to filter the currently visible results in the
          * application.
-         * 
+         *
          * @event update-selected-taxon-id
          * @property {string} id The id of the taxon to which results should be restricted. Note that alle taxa
          * that are (both direct and indirect) children of this taxon should also be present in the filtering.

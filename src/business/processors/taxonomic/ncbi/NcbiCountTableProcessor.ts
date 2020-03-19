@@ -10,8 +10,7 @@ export default class NcbiCountTableProcessor {
 
     constructor(
         private readonly peptideCountTable: CountTable<Peptide>,
-        private readonly configuration: SearchConfiguration,
-        private readonly percentage: number = 50
+        private readonly configuration: SearchConfiguration
     ) {}
 
     public async getLcaCountTable(): Promise<CountTable<NcbiId>> {
@@ -38,10 +37,14 @@ export default class NcbiCountTableProcessor {
             const peptideCount = this.peptideCountTable.getCounts(peptide);
             const peptideData = Pept2DataCommunicator.getPeptideResponse(peptide, this.configuration);
 
+            if (!peptideData) {
+                continue;
+            }
+
             const lcaTaxon = peptideData.lca;
             countsPerLca.set(lcaTaxon, (countsPerLca.get(lcaTaxon) || 0) + peptideCount);
 
-            if (this.lca2Peptides.has(lcaTaxon)) {
+            if (!this.lca2Peptides.has(lcaTaxon)) {
                 this.lca2Peptides.set(lcaTaxon, []);
             }
 

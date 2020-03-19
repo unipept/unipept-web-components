@@ -39,14 +39,14 @@
                     </div>
                 </td>
             </template>
-            <template v-slot:[`item.${searchSettings.field}`]="{ item }">
-                <div :style="{
-                        padding: '12px',
-                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.fractionOfPepts * 100 + '%, rgba(255,255,255,0) ' + item.fractionOfPepts * 100 + '%)',
-                    }">
-                    {{searchSettings.format(item)}}
-                </div>
-            </template>
+<!--            <template v-slot:[`item.${searchSettings.field}`]="{ item }">-->
+<!--                <div :style="{-->
+<!--                        padding: '12px',-->
+<!--                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.fractionOfPepts * 100 + '%, rgba(255,255,255,0) ' + item.fractionOfPepts * 100 + '%)',-->
+<!--                    }">-->
+<!--                    {{searchSettings.format(item)}}-->
+<!--                </div>-->
+<!--            </template>-->
             <template v-slot:Name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
@@ -151,7 +151,7 @@ export default class AmountTable extends Vue {
     private async saveTableAsCsv(): Promise<void> {
         const columnNames = ["Peptides", this.annotationName, "Name"];
         let grid: string[][] = this.items.map(item => [item.count.toString(), item.code, item.name]);
-        grid = columnNames.concat(grid);
+        grid = [columnNames].concat(grid);
         await NetworkUtils.downloadDataByForm(
             CsvUtils.toCsvString(grid),
             this.annotationName.replace(/ /g, "_") + (this.namespace? "-" + this.namespace: "") + "-export.csv",

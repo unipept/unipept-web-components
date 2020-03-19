@@ -14,23 +14,20 @@
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import MpaAnalysisManager from "../../logic/data-management/MpaAnalysisManager";
-import Tree from "../../logic/data-management/Tree";
 import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import { TaxumRank } from "../../logic/data-source/TaxumRank";
-import DataRepository from "../../logic/data-source/DataRepository";
+import Tree from "./../../business/ontology/taxonomic/Tree";
+import { NcbiRank } from "./../../business/ontology/taxonomic/ncbi/NcbiRank";
 
 @Component
 export default class TreemapVisualization extends mixins(VisualizationMixin) {
     // Make field non-reactive by not setting the value here, but only after created() has been fired.
     treemap!: any;
 
-    @Prop({ default: false }) 
+    @Prop({ default: false })
     private fullScreen: boolean;
     @Prop({ required: true })
-    private dataRepository: DataRepository;
+    private tree: Tree;
     @Prop({ required: false, default: -1 })
     private width: number;
     @Prop({ required: false, default: 600 })
@@ -39,10 +36,6 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
     private levels: number;
 
     mounted() {
-        this.initTreeMap();
-    }
-
-    @Watch("dataRepository") onDataRepositoryChanged() {
         this.initTreeMap();
     }
 
@@ -57,11 +50,10 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         }
     }
 
+    @Watch("tree")
     private async initTreeMap() {
-        if (this.dataRepository != null) {
-            let taxaSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-            let tree: Tree = await taxaSource.getTree();
-            const data = JSON.stringify(tree.getRoot());
+        if (this.tree != null) {
+            const data = JSON.stringify(this.tree.getRoot());
 
             // @ts-ignore
             this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
@@ -71,7 +63,7 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
                 getBreadcrumbTooltip: d => d.rank,
                 getTooltip: tooltipContent,
                 getLabel: d => `${d.name} (${d.data.self_count}/${d.data.count})`,
-                getLevel: d => Object.values(TaxumRank).indexOf(d.rank),
+                getLevel: d => Object.values(NcbiRank).indexOf(d.rank),
                 rerootCallback: d => this.search(d.id, d.name, 1000)
             });
         }

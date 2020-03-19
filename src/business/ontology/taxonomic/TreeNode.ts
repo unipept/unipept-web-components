@@ -1,5 +1,3 @@
-import { Peptide } from "@/business/ontology/raw/Peptide";
-
 export default class TreeNode {
     public children: TreeNode[] = [];
     public data: { count: number, self_count: number } = { count: undefined, self_count: 0 };

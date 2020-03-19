@@ -1,8 +1,8 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!dataRepository" class="mpa-unavailable go">
-                <div v-if="analysisInProgress">
+            <div v-if="!this.peptideCountTable" class="mpa-unavailable go">
+                <div v-if="isLoading">
                     <h2>Biological Process</h2>
                     <span class="go-waiting">
                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
@@ -40,7 +40,7 @@
                             </go-amount-table>
                         </v-col>
                         <v-col :cols="3">
-                            <quick-go-card :sort-settings="sortSettings" :items="items[idx].definitions">
+                            <quick-go-card :items="items[idx].definitions">
                             </quick-go-card>
                         </v-col>
                     </v-row>
@@ -58,15 +58,15 @@ import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 import GoAmountTable from "../../tables/GoAmountTable.vue";
 import QuickGoCard from "./QuickGOCard.vue";
-import { CountTable } from "@/business/counts/CountTable";
-import { Peptide } from "@/business/ontology/raw/Peptide";
-import SearchConfiguration from "@/business/configuration/SearchConfiguration";
-import GoCountTableProcessor from "@/business/processors/functional/go/GoCountTableProcessor";
-import GoDefinition, { GoCode } from "@/business/ontology/functional/go/GoDefinition";
-import { GoNamespace } from "@/business/ontology/functional/go/GoNamespace";
-import StringUtils from "@/business/misc/StringUtils";
-import { Ontology } from "@/business/ontology/Ontology";
-import GoOntologyProcessor from "@/business/ontology/functional/go/GoOntologyProcessor";
+import { CountTable } from "./../../../business/counts/CountTable";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
+import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
+import GoCountTableProcessor from "./../../../business/processors/functional/go/GoCountTableProcessor";
+import GoDefinition, { GoCode } from "./../../../business/ontology/functional/go/GoDefinition";
+import { GoNamespace } from "./../../../business/ontology/functional/go/GoNamespace";
+import StringUtils from "./../../../business/misc/StringUtils";
+import { Ontology } from "./../../../business/ontology/Ontology";
+import GoOntologyProcessor from "./../../../business/ontology/functional/go/GoOntologyProcessor";
 
 @Component({
     components: {
@@ -99,7 +99,7 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
         definitions: GoDefinition[],
         title: string
     }[] = [];
-    private goOntology: Ontology<GoCode, GoDefinition> = undefined;
+    private goOntology: Ontology<GoCode, GoDefinition> = null;
 
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
@@ -141,7 +141,7 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
                 );
             }
 
-            this.trustLine = this.computeTrustLine(await goCountTableProcessor.getTrust());
+            this.trustLine = this.computeTrustLine(await goCountTableProcessor.getTrust(), "GO-terms");
         }
         this.calculationsInProgress = false;
     }

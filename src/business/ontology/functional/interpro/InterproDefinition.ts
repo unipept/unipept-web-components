@@ -1,5 +1,5 @@
 import { InterproNamespace } from "./InterproNamespace";
-import Definition from "@/business/ontology/Definition";
+import Definition from "./../../Definition";
 
 export type InterproCode = string;
 

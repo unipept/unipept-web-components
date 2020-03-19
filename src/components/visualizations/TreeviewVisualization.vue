@@ -16,13 +16,11 @@ import * as d3Scale from "d3-scale";
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import Tree from "../../logic/data-management/Tree";
 import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
 import Treeview from "./Treeview.vue";
-import { Node } from "../../logic/data-management/Node";
-import DataRepository from "../../logic/data-source/DataRepository";
+import Tree from "./../../business/ontology/taxonomic/Tree";
+import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 
 @Component({
     components: {
@@ -35,10 +33,10 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
         treeviewWrapper: Element
     }
 
-    @Prop({ default: false }) 
+    @Prop({ default: false })
     private fullScreen: boolean;
     @Prop({ required: true })
-    private dataRepository: DataRepository;
+    private tree: Tree;
     @Prop({ required: false, default: false })
     private autoResize: number;
     @Prop({ required: false, default: -1 })
@@ -56,8 +54,8 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     };
 
     private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);
-    private data: Node = null;
-    private tooltip: (d: any) => string = tooltipContent; 
+    private data: TreeNode = null;
+    private tooltip: (d: any) => string = tooltipContent;
 
     mounted() {
         this.initTreeview();
@@ -77,10 +75,8 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
 
     private async initTreeview() {
         this.width = this.width === -1 ? this.$refs.treeviewWrapper.clientWidth : this.width;
-        if (this.dataRepository != null) {
-            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-            let tree: Tree = await taxaDataSource.getTree();
-            this.data = tree.getRoot();
+        if (this.tree) {
+            this.data = this.tree.getRoot();
         }
     }
 }

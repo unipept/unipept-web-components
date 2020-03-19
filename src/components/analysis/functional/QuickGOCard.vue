@@ -28,7 +28,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Utils from "./../../custom/Utils";
-import GoDefinition from "@/business/ontology/functional/go/GoDefinition";
+import GoDefinition from "./../../../business/ontology/functional/go/GoDefinition";
 
 @Component
 export default class QuickGOCard extends Vue {

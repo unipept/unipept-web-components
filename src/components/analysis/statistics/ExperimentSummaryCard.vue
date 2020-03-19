@@ -81,10 +81,10 @@ import CardTitle from "../../custom/CardTitle.vue";
 import MissingPeptidesList from "./MissingPeptidesList.vue";
 
 import Tooltip from "../../custom/Tooltip.vue";
-import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
-import PeptideTrust from "@/business/processors/raw/PeptideTrust";
-import Pept2DataCommunicator from "@/business/communication/peptides/Pept2DataCommunicator";
-import PeptideCountTableProcessor from "@/business/processors/raw/PeptideCountTableProcessor";
+import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
+import PeptideTrust from "./../../../business/processors/raw/PeptideTrust";
+import Pept2DataCommunicator from "./../../../business/communication/peptides/Pept2DataCommunicator";
+import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },

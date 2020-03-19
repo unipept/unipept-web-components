@@ -32,7 +32,7 @@ import { Component, Prop, Watch } from "vue-property-decorator";
 import * as clipboard from "clipboard-polyfill";
 import Utils from "./../../custom/Utils";
 import Tooltip from "./../../custom/Tooltip.vue";
-import { Peptide } from "@/business/ontology/raw/Peptide";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
 
 @Component({
     components: {

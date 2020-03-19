@@ -135,7 +135,7 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
             this.ecOntology = await ontologyProcessor.getOntology(this.ecCountTable);
 
             this.ecTree = await this.computeEcTree(this.ecCountTable, this.ecOntology);
-            this.trustLine = this.computeTrustLine(ecCountTableProcessor.getTrust(), "EC number");
+            this.trustLine = this.computeTrustLine(await ecCountTableProcessor.getTrust(), "EC number");
         }
         this.calculationsInProgress = false;
     }

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import SystemUtils from "@/business/system/SystemUtils";
+import SystemUtils from "./../system/SystemUtils";
 
 export default class NetworkUtils {
     /**
@@ -18,6 +18,50 @@ export default class NetworkUtils {
             },
             body: data,
         }).then(res => res.json());
+    }
+
+    /**
+     * A promise based get function from http://www.html5rocks.com/en/tutorials/es6/promises/.
+     *
+     * @param url
+     */
+    public static get(url: string): Promise<any> {
+        // Return a new promise.
+        return new Promise(function(resolve, reject) {
+            // Do the usual XHR stuff
+            let req = new XMLHttpRequest();
+            req.open("GET", url);
+
+            req.onload = function() {
+                // This is called even on 404 etc
+                // so check the status
+                if (req.status === 200) {
+                    // Resolve the promise with the response text
+                    resolve(req.response);
+                } else {
+                    // Otherwise reject with the status text
+                    // which will hopefully be a meaningful error
+                    reject(Error(req.statusText));
+                }
+            };
+
+            // Handle network errors
+            req.onerror = function() {
+                reject(Error("Network Error"));
+            };
+
+            // Make the request
+            req.send();
+        });
+    }
+
+    /**
+     * Gets data and parses it directly as JSON.
+     *
+     * @param url
+     */
+    public static getJSON(url: string): any {
+        return this.get(url).then(JSON.parse);
     }
 
     public static async downloadDataByForm(data: string, fileName: string, fileType: string = null): Promise<string> {
@@ -63,5 +107,20 @@ export default class NetworkUtils {
                 $downloadForm.submit();
             });
         }
+    }
+
+    /**
+     * Triggers a file download in the browser using a hidden link and a data url.
+     *
+     * The download attribute doesn't work in IE and Safari: http://caniuse.com/#feat=download
+     *
+     * @param dataURL The dataURL of the data
+     * @param fileName The requested file name
+     */
+    public static downloadDataByLink(dataURL: string, fileName: string) {
+        $("a.downloadLink").remove();
+        $("body").append("<a class='downloadLink' style='display:none;' download='" + fileName + "' target='_blank'/>");
+        let $downloadLink = $("a.downloadLink").attr("href", dataURL);
+        $downloadLink[0].click();
     }
 }

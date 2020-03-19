@@ -22,7 +22,7 @@ import { Peptide } from "./../../business/ontology/raw/Peptide";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import TableItem from "./../tables/TableItem";
 import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
-import { Ontology } from "@/business/ontology/Ontology";
+import { Ontology } from "./../../business/ontology/Ontology";
 
 @Component({
     components: {
@@ -66,20 +66,23 @@ export default class GoAmountTable extends Vue {
 
     @Watch("goCountTable")
     @Watch("relativeCounts")
+    @Watch("goOntology")
     private async onInputsChanged() {
         this.isComputing = true;
 
-        const newItems = this.goCountTable.getOntologyIds().map(goCode => {
-            const definition: GoDefinition = this.goOntology.getDefinition(goCode);
-            const currentCount = this.goCountTable.getCounts(goCode);
+        if (this.goCountTable && this.goOntology) {
+            const newItems = this.goCountTable.getOntologyIds().map(goCode => {
+                const definition: GoDefinition = this.goOntology.getDefinition(goCode);
+                const currentCount = this.goCountTable.getCounts(goCode);
 
-            return new TableItem(
-                this.relativeCounts === 0 ? currentCount : currentCount / this.relativeCounts,
-                definition.name,
-                definition.code,
-                definition
-            );
-        });
+                return new TableItem(
+                    this.relativeCounts === 0 ? currentCount : currentCount / this.relativeCounts,
+                    definition.name,
+                    definition.code,
+                    definition
+                );
+            });
+        }
 
         this.isComputing = false;
     }

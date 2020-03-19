@@ -42,7 +42,6 @@ import Vue from "vue";
 import Component from "vue-class-component"
 
 import { Prop, Watch } from "vue-property-decorator";
-import PeptideContainer from "../../logic/data-management/PeptideContainer";
 
 @Component({
     components: {},

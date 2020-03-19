@@ -1,11 +1,9 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import MetaProteomicsAssay from "../../logic/data-management/assay/MetaProteomicsAssay";
-import { StorageType } from "../../logic/data-management/StorageType";
-import StorageWriter from "../../logic/data-management/assay/browser/BrowserStorageWriter";
-import Assay from "../../logic/data-management/assay/Assay";
 import { v4 as uuidv4 } from "uuid";
+import Assay from "./../../business/entities/assay/Assay";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 
 @Component
 export default class DatasetMixin extends Vue {
@@ -43,7 +41,7 @@ export default class DatasetMixin extends Vue {
      * @return The assay that was created and stored by this function.
      */
     protected storeDataset(peptides: string, name: string, save: boolean): Assay {
-        const assay: MetaProteomicsAssay = new MetaProteomicsAssay([], uuidv4());
+        const assay:ProteomicsAssay = new ProteomicsAssay([], uuidv4());
 
         assay.setPeptides(peptides.split("\n"));
         assay.setDate(new Date());

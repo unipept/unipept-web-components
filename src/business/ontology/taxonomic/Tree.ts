@@ -24,22 +24,27 @@ export default class Tree {
     ) {
         this.root = new TreeNode(id, name);
 
-        for (const ontologyId of taxaCountTable.getOntologyIds()) {
+        for (const ontologyId of taxaCountTable.getOntologyIds().sort()) {
             let currentNode = this.root;
             const taxonDefinition = taxaOntology.getDefinition(ontologyId);
 
-            for (const lineageTaxId of taxonDefinition.lineage.filter(t => t !== null)) {
-                let newNode = currentNode.getChild(lineageTaxId);
-                if (newNode === null) {
-                    newNode = new TreeNode(lineageTaxId);
-                    this.addChild(currentNode, newNode);
+            for (const lineageTaxId of taxonDefinition.lineage) {
+                if (lineageTaxId !== null) {
+                    let newNode = currentNode.getChild(lineageTaxId);
+                    if (newNode === null) {
+                        const definition = taxaOntology.getDefinition(lineageTaxId);
+                        newNode = new TreeNode(lineageTaxId, definition?.name, definition?.rank);
+                        this.addChild(currentNode, newNode);
+                    }
+                    currentNode = newNode;
                 }
-                currentNode = newNode;
             }
             currentNode.data.self_count = taxaCountTable.getCounts(ontologyId);
         }
 
         this.nodes.set(id, this.root);
+        this.root.getCounts();
+        this.sortTree();
     }
 
     /**
@@ -67,5 +72,18 @@ export default class Tree {
      */
     public getTaxa(): NcbiId[] {
         return this.taxa;
+    }
+
+    /**
+     * Sorts all children of the tree by name of the organism
+     */
+    public sortTree(): void {
+        this.root.callRecursively( function() {
+            this.children.sort(function(a, b) {
+                if (a.name < b.name) return -1;
+                if (a.name > b.name) return 1;
+                return 0;
+            });
+        });
     }
 }

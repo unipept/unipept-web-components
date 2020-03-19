@@ -1,5 +1,5 @@
-import Definition from "@/business/ontology/Definition";
-import { FunctionalNamespace } from "@/business/ontology/functional/FunctionalNamespace";
+import Definition from "./../Definition";
+import { FunctionalNamespace } from "./FunctionalNamespace";
 
 export default class FunctionalDefinition implements Definition {
     constructor(

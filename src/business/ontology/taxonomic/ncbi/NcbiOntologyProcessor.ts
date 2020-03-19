@@ -6,12 +6,11 @@ import NcbiResponseCommunicator from "./../../../communication/taxonomic/ncbi/Nc
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
     public async getOntology(table: CountTable<NcbiId>): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        const ids = new Set<NcbiId>(table.getOntologyIds());
-        await NcbiResponseCommunicator.process(ids);
+        await NcbiResponseCommunicator.process(table.getOntologyIds());
 
         const definitions = new Map<NcbiId, NcbiTaxon>();
 
-        for (const id of ids) {
+        for (const id of table.getOntologyIds()) {
             const apiResponse = NcbiResponseCommunicator.getResponse(id);
 
             if (apiResponse) {
@@ -20,7 +19,18 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
                     apiResponse.name,
                     apiResponse.rank,
                     apiResponse.lineage
-                ))
+                ));
+
+                for (const lineageId of apiResponse.lineage.filter(t => t !== null)) {
+                    const apiResponse = NcbiResponseCommunicator.getResponse(lineageId);
+
+                    definitions.set(lineageId, new NcbiTaxon(
+                        apiResponse.id,
+                        apiResponse.name,
+                        apiResponse.rank,
+                        apiResponse.lineage
+                    ));
+                }
             }
         }
 
@@ -28,7 +38,7 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
     }
 
     public async getDefinition(id: NcbiId): Promise<NcbiTaxon> {
-        await NcbiResponseCommunicator.process(new Set<NcbiId>([id]));
+        await NcbiResponseCommunicator.process([id]);
         const response = NcbiResponseCommunicator.getResponse(id);
         if (response) {
             return new NcbiTaxon(id, response.name, response.rank, response.lineage);

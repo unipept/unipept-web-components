@@ -1,27 +1,27 @@
 <template>
     <div>
-        <v-select :items="goNameSpaces" v-model="selectedNameSpace" label="Namespace"></v-select>
-        <v-data-table
-            v-model="selectedItems"
-            :headers="headers"
-            :items="items"
-            show-select
-            item-key="code"
-            :itemsPerPage="5"
-            sort-by="popularity"
-            :sort-desc="true"
-            :loading="loading">
-            <template v-slot:items="props">
-                <tr :active="props.selected" @click="props.selected = !props.selected">
-                    <td>
-                        <v-checkbox :input-value="props.selected" primary hide-details></v-checkbox>
-                    </td>
-                    <td>{{ props.item.name }}</td>
-                    <td>{{ props.item.code }}</td>
-                    <td class="text-xs-right">{{ props.item.popularity }}</td>
-                </tr>
-            </template>
-        </v-data-table>
+<!--        <v-select :items="goNameSpaces" v-model="selectedNameSpace" label="Namespace"></v-select>-->
+<!--        <v-data-table-->
+<!--            v-model="selectedItems"-->
+<!--            :headers="headers"-->
+<!--            :items="items"-->
+<!--            show-select-->
+<!--            item-key="code"-->
+<!--            :itemsPerPage="5"-->
+<!--            sort-by="popularity"-->
+<!--            :sort-desc="true"-->
+<!--            :loading="loading">-->
+<!--            <template v-slot:items="props">-->
+<!--                <tr :active="props.selected" @click="props.selected = !props.selected">-->
+<!--                    <td>-->
+<!--                        <v-checkbox :input-value="props.selected" primary hide-details></v-checkbox>-->
+<!--                    </td>-->
+<!--                    <td>{{ props.item.name }}</td>-->
+<!--                    <td>{{ props.item.code }}</td>-->
+<!--                    <td class="text-xs-right">{{ props.item.popularity }}</td>-->
+<!--                </tr>-->
+<!--            </template>-->
+<!--        </v-data-table>-->
     </div>
 </template>
 
@@ -29,44 +29,41 @@
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { GoNameSpace, convertStringToGoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
-import GoDataSource from "../../logic/data-source/GoDataSource";
-import GOAnnotation from "../../logic/functional-annotations/GOAnnotation";
 import DataSourceMixin from "./DataSourceMixin.vue";
 
 @Component
 export default class GoDataSourceComponent extends mixins(DataSourceMixin) {
-    private goNameSpaces: string[] = ["all"].concat(Object.values(GoNameSpace)).map(el => this.capitalize(el));
-    private selectedNameSpace: string = this.goNameSpaces[0];
-
-    private items: GOAnnotation[] = [];
-    private selectedItems: Element[] = [];
-
-    private loading: boolean = true;
-
-    private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
-
-
-    mounted() {
-        this.onSelectedNameSpaceChanged();
-    }
-
-    @Watch("selectedNameSpace")
-    async onSelectedNameSpaceChanged() {
-        this.loading = true;
-        // Reset lists without changing the list-object reference.
-        this.items.length = 0;
-        this.selectedItems.length = 0;
-
-        let result: GOAnnotation[] = await (this.dataSource as GoDataSource).getTopItems(30, convertStringToGoNameSpace(this.selectedNameSpace));
-        this.items.push(...result);
-        this.loading = false;
-    }
-
-    @Watch("selectedItems")
-    async onSelectedItemsChanged() {
-        this.$emit("selected-items", this.selectedItems);
-    }
+    // private goNameSpaces: string[] = ["all"].concat(Object.values(GoNameSpace)).map(el => this.capitalize(el));
+    // private selectedNameSpace: string = this.goNameSpaces[0];
+    //
+    // private items: GOAnnotation[] = [];
+    // private selectedItems: Element[] = [];
+    //
+    // private loading: boolean = true;
+    //
+    // private pagination = { "sortBy": "popularity", "descending": true, "rowsPerPage": 5 };
+    //
+    //
+    // mounted() {
+    //     this.onSelectedNameSpaceChanged();
+    // }
+    //
+    // @Watch("selectedNameSpace")
+    // async onSelectedNameSpaceChanged() {
+    //     this.loading = true;
+    //     // Reset lists without changing the list-object reference.
+    //     this.items.length = 0;
+    //     this.selectedItems.length = 0;
+    //
+    //     let result: GOAnnotation[] = await (this.dataSource as GoDataSource).getTopItems(30, convertStringToGoNameSpace(this.selectedNameSpace));
+    //     this.items.push(...result);
+    //     this.loading = false;
+    // }
+    //
+    // @Watch("selectedItems")
+    // async onSelectedItemsChanged() {
+    //     this.$emit("selected-items", this.selectedItems);
+    // }
 }
 </script>
 

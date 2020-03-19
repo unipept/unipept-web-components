@@ -19,7 +19,7 @@ import { Peptide } from "./../../business/ontology/raw/Peptide";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import TableItem from "./../tables/TableItem";
 import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
-import { Ontology } from "@/business/ontology/Ontology";
+import { Ontology } from "./../../business/ontology/Ontology";
 
 @Component({
     components: {

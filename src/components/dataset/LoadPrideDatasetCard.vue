@@ -1,5 +1,5 @@
 <docs>
-The `LoadPrideDatasetCard` allows the user to load any dataset from the PRIDE-archive. The user enters a valid PRIDE id 
+The `LoadPrideDatasetCard` allows the user to load any dataset from the PRIDE-archive. The user enters a valid PRIDE id
 after which the required information is downloaded and transformed into an Assay.
 </docs>
 
@@ -34,10 +34,10 @@ after which the required information is downloaded and transformed into an Assay
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
-import DatasetManager from "../../logic/data-management/DatasetManager";
 import DatasetForm from "./DatasetForm.vue";
 import Snackbar from "../custom/Snackbar.vue";
-import Assay from "../../logic/data-management/assay/Assay";
+import PrideCommunicator from "./../../business/communication/pride/PrideCommunicator";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 
 @Component({
     components: {
@@ -62,14 +62,15 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
     private fetchPrideAssay(): void {
         if (!this.prideLoading && this.$refs.prideAssayForm.validate()) {
             this.prideLoading = true;
-            let datasetManager: DatasetManager = new DatasetManager();
             let prideNumber: number = parseInt(this.prideAssay);
 
             this.prideName = "PRIDE assay " + prideNumber.toString();
 
             this.$refs.prideSnackbar.show();
-            datasetManager
-                .loadPrideDataset(prideNumber, (progress) => this.prideProgress = progress * 100)
+            PrideCommunicator
+                .getPeptidesByPrideId(prideNumber, {
+                    onProgressUpdate: (progress) => this.prideProgress = progress * 100
+                })
                 .then((peptides) => {
                     this.pridePeptides = peptides.join("\n");
                     this.prideLoading = false;
@@ -80,7 +81,7 @@ export default class LoadPrideDatasetCard extends mixins(DatasetMixin) {
 
     private selectPrideAssay() {
         if (this.$refs.prideDatasetForm.isValid()) {
-            const createdAssay: Assay = this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
+            const createdAssay: ProteomicsAssay = this.storeDataset(this.pridePeptides, this.prideName, this.prideSave);
             this.selectDataset(createdAssay);
         }
     }

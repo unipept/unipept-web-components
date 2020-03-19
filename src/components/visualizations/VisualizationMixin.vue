@@ -2,12 +2,9 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import Assay from "../../logic/data-management/assay/Assay";
 
 @Component
 export default class VisualizationMixin extends Vue {
-    @Prop({ default: null }) dataset: Assay | null;
-
     /**
      * Propagate selections in the visualisation to the search tree and
      * The functional analysis data.
@@ -20,7 +17,7 @@ export default class VisualizationMixin extends Vue {
         setTimeout(() => {
             /**
              * Fired after the user indicated that he somehow wants to filter the currently visible results.
-             * 
+             *
              * @event update-selected-term
              * @property {string} searchTerm The search term that was used by the user to filter.
              */
@@ -29,7 +26,7 @@ export default class VisualizationMixin extends Vue {
             /**
              * Fired after the user indicated that he soehow wants to filter the currently visible results in the
              * application.
-             * 
+             *
              * @event update-selected-taxon-id
              * @property {string} id The id of the taxon to which results should be restricted. Note that alle taxa
              * that are (both direct and indirect) children of this taxon should also be present in the filtering.

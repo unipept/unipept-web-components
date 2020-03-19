@@ -2,8 +2,8 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import FunctionalTrust from "@/business/processors/functional/FunctionalTrust";
-import StringUtils from "@/business/misc/StringUtils";
+import FunctionalTrust from "./../../../business/processors/functional/FunctionalTrust";
+import StringUtils from "./../../../business/misc/StringUtils";
 
 @Component
 export default class FunctionalSummaryMixin extends Vue {

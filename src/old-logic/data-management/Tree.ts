@@ -29,6 +29,7 @@ export default class Tree {
         taxaCountTable.counts.forEach((count, id) => {
             let currentNode = this.getRoot();
             let taxonDef = ontology.getDefinition(id);
+
             for (const taxid of taxonDef.lineage) {
                 if (taxid !== null) {
                     let newNode = currentNode.getChild(taxid);

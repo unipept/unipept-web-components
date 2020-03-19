@@ -20,7 +20,7 @@ import SearchConfiguration from "./../../business/configuration/SearchConfigurat
 import AmountTable from "./../tables/AmountTable.vue";
 import TableItem from "./../tables/TableItem";
 import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
-import { Ontology } from "@/business/ontology/Ontology";
+import { Ontology } from "./../../business/ontology/Ontology";
 
 @Component({
     components: {

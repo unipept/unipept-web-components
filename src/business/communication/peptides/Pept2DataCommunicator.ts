@@ -49,7 +49,7 @@ export default class Pept2DataCommunicator {
                     const resultMap: Map<Peptide, PeptideDataResponse> = event.data.value;
                     const config = JSON.stringify(configuration);
 
-                    if (this.configurationToResponses.has(config)) {
+                    if (!this.configurationToResponses.has(config)) {
                         this.configurationToResponses.set(config, new Map());
                     }
                     const configMap = this.configurationToResponses.get(config);
@@ -70,7 +70,11 @@ export default class Pept2DataCommunicator {
 
             worker.postMessage({
                 peptides: peptides,
-                config: configuration,
+                config: {
+                    equateIl: configuration.equateIl,
+                    filterDuplicates: configuration.filterDuplicates,
+                    enableMissingCleavageHandling: configuration.enableMissingCleavageHandling
+                },
                 baseUrl: NetworkConfiguration.BASE_URL
             });
         });
