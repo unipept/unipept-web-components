@@ -2,9 +2,10 @@
     <amount-table
         :items="items"
         :loading="isLoading"
-        annotation-name="Entry"
+        annotation-name="Interpro entry"
         :search-configuration="searchConfiguration"
-        :item-to-peptides-mapping="interproPeptideMapping">
+        :item-to-peptides-mapping="interproPeptideMapping"
+        :show-percentage="showPercentage">
     </amount-table>
 </template>
 
@@ -39,6 +40,14 @@ export default class GoAmountTable extends Vue {
     private interproCountTable: CountTable<InterproCode>;
     @Prop({ required: true })
     private interproOntology: Ontology<InterproCode, InterproDefinition>;
+    /**
+     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
+     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
+     * relative values will be shown (by dividing every count by x).
+     */
+    @Prop({ required: true })
+    private relativeCounts: number;
+
     @Prop({ required: false })
     private interproPeptideMapping: Map<InterproCode, Peptide[]>;
     @Prop({ required: false, default: false })
@@ -46,12 +55,10 @@ export default class GoAmountTable extends Vue {
     @Prop({ required: false })
     private searchConfiguration: SearchConfiguration;
     /**
-     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
-     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
-     * relative values will be shown (by dividing every count by x).
+     * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
      */
-    @Prop({ required: false, default: 0 })
-    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
 
     private items: TableItem[] = [];
     private isComputing: boolean = false;
@@ -61,24 +68,32 @@ export default class GoAmountTable extends Vue {
     }
 
     @Watch("interproCountTable")
+    @Watch("interproOntology")
     @Watch("relativeCounts")
     private async onInputsChanged() {
         this.isComputing = true;
 
-        const newItems = this.interproCountTable.getOntologyIds().map(interproCode => {
-            const interproDefinition = this.interproOntology.getDefinition(interproCode);
-            const currentCounts = this.interproCountTable.getCounts(interproCode);
+        if (this.interproCountTable && this.interproOntology) {
+            const newItems: TableItem[] = [];
+            console.log(this.relativeCounts);
+            for (const interproCode of this.interproCountTable.getOntologyIds()) {
+                const definition: InterproDefinition = this.interproOntology.getDefinition(interproCode);
+                const currentCount = this.interproCountTable.getCounts(interproCode);
 
-            return new TableItem(
-                this.relativeCounts === 0 ? currentCounts : currentCounts / this.relativeCounts,
-                interproDefinition.name,
-                interproDefinition.code,
-                interproDefinition
-            );
-        });
+                if (definition) {
+                    newItems.push(new TableItem(
+                        currentCount,
+                        currentCount / this.relativeCounts,
+                        definition.name,
+                        definition.code,
+                        definition
+                    ));
+                }
+            }
 
-        this.items.length = 0;
-        this.items.push(...newItems);
+            this.items.length = 0;
+            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
+        }
 
         this.isComputing = false;
     }

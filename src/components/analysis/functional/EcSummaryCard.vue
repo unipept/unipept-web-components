@@ -21,7 +21,8 @@
                     :ec-peptide-mapping="ecPeptideMapping"
                     :ec-ontology="ecOntology"
                     :search-configuration="searchConfiguration"
-                    :relative-counts="relativeCounts">
+                    :relative-counts="relativeCounts"
+                    :show-percentage="showPercentage">
                 </ec-amount-table>
                 <v-card outlined v-if="ecTree">
                     <v-btn
@@ -84,8 +85,10 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: false, default: false })
     private loading: boolean;
-    @Prop({ required: false, default: 0 })
-    private relativeCounts: 0;
+    @Prop({ required: true })
+    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
 
     private ecCountTable: CountTable<EcCode> = null;
     private ecPeptideMapping: Map<EcCode, Peptide[]> = null;
@@ -132,8 +135,6 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
             );
             this.ecCountTable = await ecCountTableProcessor.getCountTable();
             this.ecPeptideMapping = await ecCountTableProcessor.getAnnotationPeptideMapping();
-
-            console.log(this.ecCountTable);
 
             const ontologyProcessor = new EcOntologyProcessor();
             this.ecOntology = await ontologyProcessor.getOntology(this.ecCountTable);

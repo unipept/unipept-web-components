@@ -4,7 +4,8 @@
         annotation-name="EC number"
         :items="items"
         :search-configuration="searchConfiguration"
-        :item-to-peptides-mapping="ecPeptideMapping">
+        :item-to-peptides-mapping="ecPeptideMapping"
+        :show-percentage="showPercentage">
     </amount-table>
 </template>
 
@@ -38,6 +39,14 @@ export default class EcAmountTable extends Vue {
     private ecCountTable: CountTable<EcCode>;
     @Prop({ required: true })
     private ecOntology: Ontology<EcCode, EcDefinition>;
+    /**
+     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
+     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
+     * relative values will be shown (by dividing every count by x).
+     */
+    @Prop({ required: true })
+    private relativeCounts: number;
+
     @Prop({ required: false })
     private ecPeptideMapping: Map<EcCode, Peptide[]>;
     @Prop({ required: false, default: false })
@@ -45,12 +54,10 @@ export default class EcAmountTable extends Vue {
     @Prop({ required: false })
     private searchConfiguration: SearchConfiguration;
     /**
-     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
-     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
-     * relative values will be shown (by dividing every count by x).
+     * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
      */
-    @Prop({ required: false, default: 0 })
-    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
 
     private items: TableItem[] = [];
     private computeInProgress: boolean = false;
@@ -71,7 +78,8 @@ export default class EcAmountTable extends Vue {
                 const currentCount = this.ecCountTable.getCounts(ecCode);
 
                 return new TableItem(
-                    this.relativeCounts == 0 ? currentCount: currentCount / this.relativeCounts,
+                    currentCount,
+                    currentCount / this.relativeCounts,
                     definition.name,
                     definition.code,
                     definition

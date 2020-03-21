@@ -5,7 +5,8 @@
         annotation-name="GO term"
         :namespace="namespace"
         :search-configuration="searchConfiguration"
-        :item-to-peptides-mapping="goPeptideMapping">
+        :item-to-peptides-mapping="goPeptideMapping"
+        :show-percentage="showPercentage">
     </amount-table>
 </template>
 
@@ -41,6 +42,12 @@ export default class GoAmountTable extends Vue {
     private goCountTable: CountTable<GoCode>;
     @Prop({ required: true })
     private goOntology: Ontology<GoCode, GoDefinition>;
+    /**
+     * The total amount of counts (over all GO-terms / peptides)
+     */
+    @Prop({ required: true })
+    private relativeCounts: number;
+
     @Prop({ required: false })
     private goPeptideMapping: Map<GoCode, Peptide[]>;
     @Prop({ required: false, default: false })
@@ -50,12 +57,10 @@ export default class GoAmountTable extends Vue {
     @Prop({ required: false })
     private namespace: string;
     /**
-     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
-     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
-     * relative values will be shown (by dividing every count by x).
+     * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
      */
-    @Prop({ required: false, default: 0 })
-    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
 
     private items: TableItem[] = [];
     private isComputing: boolean = false;
@@ -79,7 +84,8 @@ export default class GoAmountTable extends Vue {
 
                 if (definition) {
                     newItems.push(new TableItem(
-                        this.relativeCounts === 0 ? currentCount : currentCount / this.relativeCounts,
+                        currentCount,
+                        currentCount / this.relativeCounts,
                         definition.name,
                         definition.code,
                         definition

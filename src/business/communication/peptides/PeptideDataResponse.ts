@@ -6,8 +6,9 @@ export type PeptideDataResponse = {
             counts:
                 {
                     all: number,
-                    EC: number;
-                    GO: number;
+                    EC: number,
+                    GO: number,
+                    IPR: number
                 },
             data: any
         }

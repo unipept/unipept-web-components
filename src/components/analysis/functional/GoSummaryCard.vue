@@ -37,7 +37,8 @@
                                 :go-peptide-mapping="items[idx].peptideMapping"
                                 :go-ontology="items[idx].ontology"
                                 :relative-counts="relativeCounts"
-                                :search-configuration="searchConfiguration">
+                                :search-configuration="searchConfiguration"
+                                :show-percentage="showPercentage">
                             </go-amount-table>
                         </v-col>
                         <v-col :cols="3">
@@ -90,8 +91,10 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: true })
     private loading: boolean;
-    @Prop({ required: false, default: 0 })
-    private relativeCounts: 0;
+    @Prop({ required: true })
+    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
 
     private namespaces: GoNamespace[] = Object.values(GoNamespace).sort();
     private items: {

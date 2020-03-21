@@ -39,14 +39,14 @@
                     </div>
                 </td>
             </template>
-<!--            <template v-slot:[`item.${searchSettings.field}`]="{ item }">-->
-<!--                <div :style="{-->
-<!--                        padding: '12px',-->
-<!--                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.fractionOfPepts * 100 + '%, rgba(255,255,255,0) ' + item.fractionOfPepts * 100 + '%)',-->
-<!--                    }">-->
-<!--                    {{searchSettings.format(item)}}-->
-<!--                </div>-->
-<!--            </template>-->
+            <template v-slot:[`item.count`]="{ item }">
+                <div :style="{
+                        padding: '12px',
+                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
+                    }">
+                    {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
+                </div>
+            </template>
             <template v-slot:Name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
@@ -96,7 +96,7 @@ import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
     {
         tableHeaders: function() {
             return [{
-                text: "Peptides",
+                text: "Peptides" + (this.showPercentage ? " %" : ""),
                 align: "left",
                 value: "count",
                 width: "20%"
@@ -138,6 +138,8 @@ export default class AmountTable extends Vue {
     protected itemToPeptidesMapping: Map<string, Peptide[]>;
     @Prop({ required: false, default: false })
     protected loading: boolean;
+    @Prop({ required: false, default: false })
+    protected showPercentage: boolean;
 
     protected treeAvailable = new Map<TableItem, TreeNode>();
 

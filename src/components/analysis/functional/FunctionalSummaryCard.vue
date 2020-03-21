@@ -109,7 +109,8 @@
                         :loading="analysisInProgress"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
-                        :relative-counts="relativeCounts">
+                        :relative-counts="relativeCounts"
+                        :show-percentage="showPercentage">
                     </go-summary-card>
                 </v-tab-item>
                 <v-tab-item>
@@ -118,17 +119,19 @@
                         :loading="analysisInProgress"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
-                        :relative-counts="relativeCounts">
+                        :relative-counts="relativeCounts"
+                        :show-percentage="showPercentage">
                     </ec-summary-card>
                 </v-tab-item>
                 <v-tab-item>
-<!--                    <interpro-summary-card-->
-<!--                        ref="interproSummaryCard"-->
-<!--                        :dataRepository="dataRepository"-->
-<!--                        :analysisInProgress="analysisInProgress"-->
-<!--                        :filterTaxonId="taxonId"-->
-<!--                        :sortSettings="faSortSettings">-->
-<!--                    </interpro-summary-card>-->
+                    <interpro-summary-card
+                        ref="interproSummaryCard"
+                        :loading="analysisInProgress"
+                        :peptide-count-table="filteredCountTable"
+                        :search-configuration="searchConfiguration"
+                        :relative-counts="relativeCounts"
+                        :show-percentage="showPercentage">
+                    </interpro-summary-card>
                 </v-tab-item>
             </v-tabs-items>
         </v-card>
@@ -203,6 +206,7 @@ export default class FunctionalSummaryCard extends Vue {
     private dialogOpen: boolean = false;
 
     private faCalculationsInProgress: boolean = false;
+    private showPercentage: boolean = false;
 
     mounted() {
         this.onSelectedTaxonIdChanged();
@@ -220,6 +224,7 @@ export default class FunctionalSummaryCard extends Vue {
         this.faCalculationsInProgress = true;
         if (this.taxonId === -1) {
             this.filteredCountTable = this.peptideCountTable;
+            this.relativeCounts = this.peptideCountTable.totalCount;
         } else {
             if (this.peptideCountTable) {
                 // Update the count tables so that they only count peptides that are associated with the current taxon
@@ -236,18 +241,19 @@ export default class FunctionalSummaryCard extends Vue {
                 );
                 const taxaOntologyProcessor = new NcbiOntologyProcessor();
                 this.selectedNCBITaxon = await taxaOntologyProcessor.getDefinition(this.taxonId);
+                this.relativeCounts = this.peptideCountTable.totalCount;
             }
         }
         this.faCalculationsInProgress = false;
     }
 
     private enableRelativeCounts(): void {
-        this.relativeCounts = this.peptideCountTable.totalCount;
+        this.showPercentage = true;
         this.selectedSortTypeName = "Peptides %"
     }
 
     private disableRelativeCounts(): void {
-        this.relativeCounts = 0;
+        this.showPercentage = false;
         this.selectedSortTypeName = "Peptides";
     }
 }
