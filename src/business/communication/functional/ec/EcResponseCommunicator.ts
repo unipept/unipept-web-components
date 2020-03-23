@@ -6,11 +6,26 @@ import NetworkUtils from "./../../NetworkUtils";
 export default class EcResponseCommunicator {
     private static ecCodeToResponseMap = new Map<EcCode, EcResponse>();
     private static codesProcessed = new Set<EcCode>();
+    private static inProgress: Promise<void>;
 
     public static readonly EC_BATCH_SIZE: number = 100;
     public static readonly EC_ENDPOINT: string = "/private_api/ecnumbers";
 
     public static async process(codes: EcCode[]): Promise<void> {
+        if (this.inProgress) {
+            await this.inProgress;
+        }
+
+        this.inProgress = this.doProcess(codes);
+        await this.inProgress;
+        this.inProgress = undefined;
+    }
+
+    public static getResponse(code: EcCode): EcResponse {
+        return this.ecCodeToResponseMap.get(code);
+    }
+
+    private static async doProcess(codes: EcCode[]): Promise<void> {
         // Cut of the "EC:" prefix, as this is not being used in the API.
         codes = codes.map(c => c.substr(3))
         const toProcess = codes.filter(c => !this.codesProcessed.has(c));
@@ -33,9 +48,5 @@ export default class EcResponseCommunicator {
         for (const processed of toProcess) {
             this.codesProcessed.add(processed);
         }
-    }
-
-    public static getResponse(code: EcCode): EcResponse {
-        return this.ecCodeToResponseMap.get(code);
     }
 }

@@ -16,9 +16,6 @@
                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
                     </span>
                 </div>
-                <div v-else class="placeholder-text">
-                    Please select at least one dataset for analysis.
-                </div>
             </div>
             <div v-else>
                 <filter-functional-annotations-dropdown v-model="percentSettings">
@@ -27,8 +24,8 @@
                 <span v-html="trustLine"></span>
                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
                 <div v-for="(namespace, idx) of namespaces" v-bind:key="namespace" style="margin-top: 16px;" class="go-table-container">
-                    <h2>{{ items[idx].title }}</h2>
-                    <v-row>
+                    <h2 v-if="items[idx]">{{ items[idx].title }}</h2>
+                    <v-row v-if="items[idx]">
                         <v-col :cols="9">
                             <go-amount-table
                                 :loading="isLoading"
@@ -89,7 +86,7 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
     private peptideCountTable: CountTable<Peptide>;
     @Prop({ required: true })
     private searchConfiguration: SearchConfiguration;
-    @Prop({ required: true })
+    @Prop({ required: false, default: false })
     private loading: boolean;
     @Prop({ required: true })
     private relativeCounts: number;

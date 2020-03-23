@@ -36,13 +36,19 @@ export default class Pept2DataCommunicator {
         progressListener?: ProgressListener
     ): Promise<void> {
         if (this.inProgress) {
-            await this.inProgress;
+            try {
+                await this.inProgress;
+            } catch (err) {
+                // Ignore errors here, to avoid them being thrown more than once...
+            }
         }
 
         const peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
         this.inProgress = new Promise<void>((resolve, reject) => {
             const worker = new Worker();
+            const config = JSON.stringify(configuration);
+
             worker.onmessage = (event) => {
                 switch (event.data.type) {
                 case "progress":
@@ -53,21 +59,22 @@ export default class Pept2DataCommunicator {
                 case "result":
                     // Set all data values that we received from the worker.
                     const resultMap: Map<Peptide, PeptideDataResponse> = event.data.value;
-                    const config = JSON.stringify(configuration);
 
                     if (!this.configurationToResponses.has(config)) {
                         this.configurationToResponses.set(config, new Map());
                     }
                     const configMap = this.configurationToResponses.get(config);
 
+                    for (const [pep, response] of resultMap) {
+                        configMap.set(pep, response);
+                    }
+
                     if (!this.configurationToProcessed.has(config)) {
                         this.configurationToProcessed.set(config, new Set());
                     }
-                    const processedMap = this.configurationToProcessed.get(config);
-
-                    for (const [pep, response] of resultMap) {
-                        configMap.set(pep, response);
-                        processedMap.add(pep);
+                    const processedSet = this.configurationToProcessed.get(config);
+                    for (const pep of peptides) {
+                        processedSet.add(pep);
                     }
 
                     // We're done. Resolve this promise.
@@ -91,8 +98,11 @@ export default class Pept2DataCommunicator {
             });
         });
 
-        await this.inProgress;
-        this.inProgress = undefined;
+        try {
+            await this.inProgress;
+        } finally {
+            this.inProgress = undefined;
+        }
     }
 
     public static async getPeptideTrust(

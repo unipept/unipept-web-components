@@ -105,33 +105,60 @@
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <go-summary-card
+                        v-if="filteredCountTable"
                         ref="goSummaryCard"
-                        :loading="analysisInProgress"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
                         :show-percentage="showPercentage">
                     </go-summary-card>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <div class="placeholder-text">
+                            {{ placeholderText }}
+                        </div>
+                    </div>
                 </v-tab-item>
                 <v-tab-item>
                     <ec-summary-card
+                        v-if="filteredCountTable"
                         ref="ecSummaryCard"
-                        :loading="analysisInProgress"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
                         :show-percentage="showPercentage">
                     </ec-summary-card>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <div class="placeholder-text">
+                            {{ placeholderText }}
+                        </div>
+                    </div>
                 </v-tab-item>
                 <v-tab-item>
                     <interpro-summary-card
+                        v-if="filteredCountTable"
                         ref="interproSummaryCard"
-                        :loading="analysisInProgress"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
                         :show-percentage="showPercentage">
                     </interpro-summary-card>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <div class="placeholder-text">
+                            {{ placeholderText }}
+                        </div>
+                    </div>
                 </v-tab-item>
             </v-tabs-items>
         </v-card>
@@ -208,6 +235,8 @@ export default class FunctionalSummaryCard extends Vue {
     private faCalculationsInProgress: boolean = false;
     private showPercentage: boolean = false;
 
+    private placeholderText = "Please select at least one assay for analysis.";
+
     mounted() {
         this.onSelectedTaxonIdChanged();
     }
@@ -222,11 +251,11 @@ export default class FunctionalSummaryCard extends Vue {
     @Watch("searchConfiguration")
     private async redoCalculations() {
         this.faCalculationsInProgress = true;
-        if (this.taxonId === -1) {
-            this.filteredCountTable = this.peptideCountTable;
-            this.relativeCounts = this.peptideCountTable.totalCount;
-        } else {
-            if (this.peptideCountTable) {
+        if (this.peptideCountTable && this.searchConfiguration) {
+            if (this.taxonId === -1) {
+                this.filteredCountTable = this.peptideCountTable;
+                this.relativeCounts = this.peptideCountTable.totalCount;
+            } else {
                 // Update the count tables so that they only count peptides that are associated with the current taxon
                 // filter
                 const taxaProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
@@ -281,5 +310,12 @@ export default class FunctionalSummaryCard extends Vue {
 
     .go-table-container .row {
         flex-wrap: nowrap;
+    }
+
+    .mpa-waiting {
+        margin-top: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: center;
     }
 </style>

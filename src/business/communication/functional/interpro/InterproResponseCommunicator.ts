@@ -6,11 +6,26 @@ import NetworkConfiguration from "./../../NetworkConfiguration";
 export default class InterproResponseCommunicator {
     private static interproCodeToResponseMap = new Map<InterproCode, InterproResponse>();
     private static codesProcessed = new Set<InterproCode>();
+    private static inProgress: Promise<void>;
 
     public static readonly INTERPRO_BATCH_SIZE: number = 100;
     public static readonly INTERPRO_ENDPOINT: string = "/private_api/interpros";
 
     public static async process(codes: InterproCode[]): Promise<void> {
+        if (this.inProgress) {
+            await this.inProgress;
+        }
+
+        this.inProgress = this.doProcess(codes);
+        await this.inProgress;
+        this.inProgress = undefined;
+    }
+
+    public static getResponse(code: InterproCode): InterproResponse | undefined {
+        return this.interproCodeToResponseMap.get(code);
+    }
+
+    private static async doProcess(codes: InterproCode[]): Promise<void> {
         codes = codes.map(c => c.substr(4));
         const toProcess = codes.filter(c => !this.codesProcessed.has(c));
 
@@ -32,9 +47,5 @@ export default class InterproResponseCommunicator {
         for (const processed of toProcess) {
             this.codesProcessed.add(processed);
         }
-    }
-
-    public static getResponse(code: InterproCode): InterproResponse | undefined {
-        return this.interproCodeToResponseMap.get(code);
     }
 }

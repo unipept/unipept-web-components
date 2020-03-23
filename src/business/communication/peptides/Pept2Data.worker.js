@@ -1,3 +1,5 @@
+import NetworkCommunicationException from "../../exceptions/NetworkCommunicationException";
+
 self.addEventListener("message", handleEvent);
 
 const PEPTDATA_BATCH_SIZE = 100;
@@ -56,13 +58,19 @@ async function process(peptides, config, baseUrl, setProgress) {
 }
 
 async function postJSON(url, data) {
-    return (await fetch(url, {
+    const result = await fetch(url, {
         method: "POST",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
         },
         body: data,
-    })).json();
+    });
+
+    if (!result.ok) {
+        throw new NetworkCommunicationException("Network request failed: " + result.error());
+    }
+
+    return result.json();
 }
 
