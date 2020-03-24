@@ -10,7 +10,24 @@ export default class NcbiResponseCommunicator {
     public static readonly NCBI_BATCH_SIZE: number = 100;
     public static readonly NCBI_ENDPOINT: string = "/private_api/taxa";
 
+    private static inProgress: Promise<void>;
+
     public static async process(codes: NcbiId[]): Promise<void> {
+        if (this.inProgress) {
+            await this.inProgress;
+        }
+
+        this.inProgress = this.doProcess(codes);
+
+        await this.inProgress;
+        this.inProgress = undefined;
+    }
+
+    public static getResponse(id: NcbiId): NcbiResponse {
+        return this.idToResponseMap.get(id);
+    }
+
+    private static async doProcess(codes: NcbiId[]): Promise<void> {
         const toProcess = codes.filter(c => !this.idsProcessed.has(c));
 
         const lineagesToProcess: Set<NcbiId> = new Set();
@@ -49,9 +66,5 @@ export default class NcbiResponseCommunicator {
         for (const processed of toProcess) {
             this.idsProcessed.add(processed);
         }
-    }
-
-    public static getResponse(id: NcbiId): NcbiResponse {
-        return this.idToResponseMap.get(id);
     }
 }

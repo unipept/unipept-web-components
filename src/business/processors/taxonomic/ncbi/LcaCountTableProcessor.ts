@@ -3,8 +3,9 @@ import { CountTable } from "./../../../counts/CountTable";
 import SearchConfiguration from "./../../../configuration/SearchConfiguration";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import Pept2DataCommunicator from "./../../../communication/peptides/Pept2DataCommunicator";
+import ProteomicsCountTableProcessor from "@/business/processors/ProteomicsCountTableProcessor";
 
-export default class NcbiCountTableProcessor {
+export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;
     private lca2Peptides: Map<NcbiId, Peptide[]>;
 
@@ -13,12 +14,12 @@ export default class NcbiCountTableProcessor {
         private readonly configuration: SearchConfiguration
     ) {}
 
-    public async getLcaCountTable(): Promise<CountTable<NcbiId>> {
+    public async getCountTable(): Promise<CountTable<NcbiId>> {
         await this.compute();
         return this.countTable;
     }
 
-    public async getLcaPeptideMapping(): Promise<Map<NcbiId, Peptide[]>> {
+    public async getAnnotationPeptideMapping(): Promise<Map<NcbiId, Peptide[]>> {
         await this.compute();
         return this.lca2Peptides;
     }

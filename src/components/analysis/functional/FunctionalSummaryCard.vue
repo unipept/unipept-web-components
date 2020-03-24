@@ -94,7 +94,7 @@
                         </b>
                         : These results are limited to the {{ this.filteredCountTable.totalCount }} peptides specific to
                         <b>
-                            {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.rank}})
+                            {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.category}})
                         </b>.
                     </v-col>
                     <v-col class="shrink">
@@ -186,9 +186,11 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
-import NcbiCountTableProcessor from "./../../../business/processors/taxonomic/ncbi/NcbiCountTableProcessor";
+import LcaCountTableProcessor from "./../../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
 import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
+import TreeNode from "./../../../business/ontology/taxonomic/TreeNode";
 
 @Component({
     components: {
@@ -258,9 +260,14 @@ export default class FunctionalSummaryCard extends Vue {
             } else {
                 // Update the count tables so that they only count peptides that are associated with the current taxon
                 // filter
-                const taxaProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
-                const taxaMapping = await taxaProcessor.getLcaPeptideMapping();
-                const peptidesForTaxon = taxaMapping.get(this.taxonId);
+                const taxaProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
+                const taxaOntologyProcessor = new NcbiOntologyProcessor();
+
+                const peptidesForTaxon = await this.getOwnAndChildrenSequences(
+                    this.taxonId,
+                    taxaProcessor,
+                    taxaOntologyProcessor
+                )
 
                 const peptideProcessor = new PeptideCountTableProcessor();
 
@@ -268,12 +275,40 @@ export default class FunctionalSummaryCard extends Vue {
                     peptidesForTaxon,
                     this.searchConfiguration
                 );
-                const taxaOntologyProcessor = new NcbiOntologyProcessor();
                 this.selectedNCBITaxon = await taxaOntologyProcessor.getDefinition(this.taxonId);
                 this.relativeCounts = this.peptideCountTable.totalCount;
             }
         }
         this.faCalculationsInProgress = false;
+    }
+
+    private async getOwnAndChildrenSequences(
+        taxonId: NcbiId,
+        taxaProcessor: LcaCountTableProcessor,
+        ontologyProcessor: NcbiOntologyProcessor
+    ): Promise<Peptide[]> {
+        const taxaTable = await taxaProcessor.getCountTable();
+        const peptideMapping = await taxaProcessor.getAnnotationPeptideMapping();
+
+        const tree = new Tree(taxaTable, await ontologyProcessor.getOntology(taxaTable));
+
+        const node = tree.nodes.get(taxonId);
+
+        const sequences: Peptide[] = [];
+        const nodes: TreeNode[] = [node];
+        while (nodes.length > 0) {
+            const node = nodes.pop();
+
+            if (peptideMapping.has(node.id)) {
+                sequences.push(...peptideMapping.get(node.id));
+            }
+
+            if (node.children) {
+                nodes.push(...node.children);
+            }
+        }
+
+        return sequences;
     }
 
     private enableRelativeCounts(): void {

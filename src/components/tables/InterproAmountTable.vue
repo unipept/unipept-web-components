@@ -75,7 +75,6 @@ export default class GoAmountTable extends Vue {
 
         if (this.interproCountTable && this.interproOntology) {
             const newItems: TableItem[] = [];
-            console.log(this.relativeCounts);
             for (const interproCode of this.interproCountTable.getOntologyIds()) {
                 const definition: InterproDefinition = this.interproOntology.getDefinition(interproCode);
                 const currentCount = this.interproCountTable.getCounts(interproCode);

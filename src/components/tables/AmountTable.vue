@@ -81,7 +81,7 @@ import CsvUtils from "./../../business/storage/CsvUtils";
 import FunctionalSummaryProcessor from "./../../business/processors/functional/FunctionalSummaryProcessor";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
-import NcbiCountTableProcessor from "./../../business/processors/taxonomic/ncbi/NcbiCountTableProcessor";
+import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
@@ -193,8 +193,8 @@ export default class AmountTable extends Vue {
             this.itemToPeptidesMapping.get(term.code),
             this.searchConfiguration
         ).then(async(peptideCounts) => {
-            const taxaProcessor = new NcbiCountTableProcessor(peptideCounts, this.searchConfiguration);
-            const countTable = await taxaProcessor.getLcaCountTable();
+            const taxaProcessor = new LcaCountTableProcessor(peptideCounts, this.searchConfiguration);
+            const countTable = await taxaProcessor.getCountTable();
 
             const taxaOntologyProcessor = new NcbiOntologyProcessor();
             const taxaOntology = await taxaOntologyProcessor.getOntology(countTable);

@@ -65,7 +65,7 @@ export default class TreeNode {
      *
      * @param f The function to call.
      */
-    public callRecursively(f: (Node) => any) {
+    public callRecursively(f: (x: TreeNode) => any) {
         f.call(this);
         if (this.children) {
             this.children.forEach(c => {

@@ -7,11 +7,12 @@ import { PeptideDataResponse } from "./../../communication/peptides/PeptideDataR
 import { Ontology } from "./../../ontology/Ontology";
 import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
 import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
+import ProteomicsCountTableProcessor from "@/business/processors/ProteomicsCountTableProcessor";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId,
     DefinitionType extends FunctionalDefinition
-> {
+> implements ProteomicsCountTableProcessor<OntologyId> {
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
     // Aggregation of all counts over all namespaces
     private generalCountTable: CountTable<OntologyId>;

@@ -165,21 +165,22 @@
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
-<!--                        <heatmap-wizard-single-sample -->
-<!--                            v-if="this.dataRepository" -->
-<!--                            :dataRepository="this.dataRepository">-->
-<!--                        </heatmap-wizard-single-sample>-->
-<!--                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">-->
-<!--                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>-->
-<!--                            </v-progress-circular>-->
-<!--                        </div>-->
-<!--                        <div v-else>-->
-<!--                            <v-card-text>-->
-<!--                                <div class="placeholder-text">-->
-<!--                                    {{ placeholderText }}-->
-<!--                                </div>-->
-<!--                            </v-card-text>-->
-<!--                        </div>-->
+                        <heatmap-wizard-single-sample
+                            v-if="peptideCountTable"
+                            :peptide-count-table="peptideCountTable"
+                            :search-configuration="searchConfiguration">
+                        </heatmap-wizard-single-sample>
+                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
+                        </div>
+                        <div v-else>
+                            <v-card-text>
+                                <div class="placeholder-text">
+                                    {{ placeholderText }}
+                                </div>
+                            </v-card-text>
+                        </div>
                     </v-card>
                 </v-tab-item>
             </v-tabs-items>
@@ -208,7 +209,7 @@ import { Peptide } from "./../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../business/counts/CountTable";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import NcbiCountTableProcessor from "./../../business/processors/taxonomic/ncbi/NcbiCountTableProcessor";
+import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
 
@@ -268,8 +269,8 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     @Watch("peptideCountTable")
     private async onPeptideCountTableChanged() {
         if (this.peptideCountTable) {
-            const taxaCountProcessor = new NcbiCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
-            const taxaCounts = await taxaCountProcessor.getLcaCountTable();
+            const taxaCountProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
+            const taxaCounts = await taxaCountProcessor.getCountTable();
 
             const taxaOntologyProcessor = new NcbiOntologyProcessor();
             const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);

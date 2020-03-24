@@ -121,6 +121,7 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
 
     @Watch("peptideCountTable")
     @Watch("searchConfiguration")
+    @Watch("percentSettings")
     public async recompute() {
         this.calculationsInProgress = true;
         if (this.peptideCountTable) {
