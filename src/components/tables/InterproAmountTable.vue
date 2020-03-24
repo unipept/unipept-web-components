@@ -5,7 +5,9 @@
         annotation-name="Interpro entry"
         :search-configuration="searchConfiguration"
         :item-to-peptides-mapping="interproPeptideMapping"
-        :show-percentage="showPercentage">
+        :show-percentage="showPercentage"
+        :tree="tree"
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
     </amount-table>
 </template>
 
@@ -22,6 +24,8 @@ import AmountTable from "./../tables/AmountTable.vue";
 import TableItem from "./../tables/TableItem";
 import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import { Ontology } from "./../../business/ontology/Ontology";
+import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -59,6 +63,10 @@ export default class GoAmountTable extends Vue {
      */
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
 
     private items: TableItem[] = [];
     private isComputing: boolean = false;

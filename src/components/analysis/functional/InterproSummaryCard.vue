@@ -24,6 +24,8 @@
                     :interpro-ontology="selectedItem.ontology"
                     :relative-counts="relativeCounts"
                     :search-configuration="searchConfiguration"
+                    :tree="tree"
+                    :taxa-to-peptides-mapping="taxaToPeptidesMapping"
                     :show-percentage="showPercentage">
                 </interpro-amount-table>
             </div>
@@ -50,6 +52,8 @@ import { Ontology } from "./../../../business/ontology/Ontology";
 import InterproCountTableProcessor from "./../../../business/processors/functional/interpro/InterproCountTableProcessor";
 import InterproOntologyProcessor from "./../../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import StringUtils from "./../../../business/misc/StringUtils";
+import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -87,6 +91,10 @@ export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) 
     private relativeCounts: number;
     @Prop( { required: false, default: false })
     private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
 
     private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace));
     private selectedNamespace: string = "all";

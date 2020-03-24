@@ -35,7 +35,9 @@
                                 :go-ontology="items[idx].ontology"
                                 :relative-counts="relativeCounts"
                                 :search-configuration="searchConfiguration"
-                                :show-percentage="showPercentage">
+                                :show-percentage="showPercentage"
+                                :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                                :tree="tree">
                             </go-amount-table>
                         </v-col>
                         <v-col :cols="3">
@@ -66,6 +68,8 @@ import { GoNamespace } from "./../../../business/ontology/functional/go/GoNamesp
 import StringUtils from "./../../../business/misc/StringUtils";
 import { Ontology } from "./../../../business/ontology/Ontology";
 import GoOntologyProcessor from "./../../../business/ontology/functional/go/GoOntologyProcessor";
+import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -92,6 +96,10 @@ export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
     private relativeCounts: number;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
 
     private namespaces: GoNamespace[] = Object.values(GoNamespace).sort();
     private items: {

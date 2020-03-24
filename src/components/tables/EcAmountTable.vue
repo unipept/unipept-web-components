@@ -5,6 +5,8 @@
         :items="items"
         :search-configuration="searchConfiguration"
         :item-to-peptides-mapping="ecPeptideMapping"
+        :tree="tree"
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping"
         :show-percentage="showPercentage">
     </amount-table>
 </template>
@@ -21,6 +23,8 @@ import SearchConfiguration from "./../../business/configuration/SearchConfigurat
 import TableItem from "./../tables/TableItem";
 import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
 import { Ontology } from "./../../business/ontology/Ontology";
+import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -58,6 +62,10 @@ export default class EcAmountTable extends Vue {
      */
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
 
     private items: TableItem[] = [];
     private computeInProgress: boolean = false;

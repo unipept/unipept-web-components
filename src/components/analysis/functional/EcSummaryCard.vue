@@ -22,6 +22,8 @@
                     :ec-ontology="ecOntology"
                     :search-configuration="searchConfiguration"
                     :relative-counts="relativeCounts"
+                    :tree="tree"
+                    :taxa-to-peptides-mapping="taxaToPeptidesMapping"
                     :show-percentage="showPercentage">
                 </ec-amount-table>
                 <v-card outlined v-if="ecTree">
@@ -63,6 +65,8 @@ import SearchConfiguration from "./../../../business/configuration/SearchConfigu
 import EcCountTableProcessor from "./../../../business/processors/functional/ec/EcCountTableProcessor";
 import { Ontology } from "./../../../business/ontology/Ontology";
 import EcOntologyProcessor from "./../../../business/ontology/functional/ec/EcOntologyProcessor";
+import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -89,6 +93,10 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     private relativeCounts: number;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
 
     private ecCountTable: CountTable<EcCode> = null;
     private ecPeptideMapping: Map<EcCode, Peptide[]> = null;

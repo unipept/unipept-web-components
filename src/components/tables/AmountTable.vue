@@ -18,7 +18,7 @@
             </template>
             <template v-slot:expanded-item="{ headers, item }">
                 <td class="item-treeview" :colspan="headers.length">
-                    <div v-if="treeAvailable.get(item) || computeTree(item)">
+                    <div v-if="tree && (treeAvailable.get(item) || computeTree(item))">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
                             <v-icon>mdi-download</v-icon>
                             Save as image
@@ -86,6 +86,8 @@ import Tree from "./../../business/ontology/taxonomic/Tree";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
+import { CountTable } from "./../../business/counts/CountTable";
+import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 
 @Component({
     components: {
@@ -135,7 +137,11 @@ export default class AmountTable extends Vue {
     @Prop({ required: false })
     protected searchConfiguration: SearchConfiguration;
     @Prop({ required: false })
+    protected tree: Tree;
+    @Prop({ required: false })
     protected itemToPeptidesMapping: Map<string, Peptide[]>;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
     @Prop({ required: false, default: false })
     protected loading: boolean;
     @Prop({ required: false, default: false })
@@ -146,7 +152,7 @@ export default class AmountTable extends Vue {
     // All settings for each Treeview that remain the same
     protected tooltip: (d: any) => string = tooltipContent;
     protected highlightColor: string = "#ffc107";
-    protected highlightColorFunc: (d: any) => string = d => (d.included ? this.highlightColor : "lightgrey");
+    protected highlightColorFunc: (d: any) => string = d => d.included ? this.highlightColor : "lightgrey";
     protected linkStrokeColor: (d: any) => string = ({ target: d }) => this.highlightColorFunc(d);
     protected expandedItemsList = [];
 
@@ -182,28 +188,28 @@ export default class AmountTable extends Vue {
         );
     }
 
+    @Watch("tree")
+    private onTreeChanged() {
+        this.treeAvailable.clear();
+    }
+
     /**
      * This function is called by the DataTable whenever it requests a tree. This function then asynchronously
      * computes this tree and fills in the associated entry in the treeAvailable map. The DataTable watches
      * changes in this map and reacts appropriately.
      */
     private computeTree(term: TableItem): boolean {
-        const peptideTableProcessor = new PeptideCountTableProcessor();
-        peptideTableProcessor.getPeptideCountTable(
-            this.itemToPeptidesMapping.get(term.code),
-            this.searchConfiguration
-        ).then(async(peptideCounts) => {
-            const taxaProcessor = new LcaCountTableProcessor(peptideCounts, this.searchConfiguration);
-            const countTable = await taxaProcessor.getCountTable();
+        const peptidesForTerm = this.itemToPeptidesMapping.get(term.code);
+        const rootNode = this.tree.getRoot().callRecursivelyPostOder((t: TreeNode, c: any) => {
+            const included = c.some(x => x.included) ||
+                (
+                    this.taxaToPeptidesMapping.has(t.id) &&
+                    this.taxaToPeptidesMapping.get(t.id).some(pept => peptidesForTerm.includes(pept))
+                );
 
-            const taxaOntologyProcessor = new NcbiOntologyProcessor();
-            const taxaOntology = await taxaOntologyProcessor.getOntology(countTable);
-
-            const tree = new Tree(countTable, taxaOntology);
-            this.treeAvailable.set(term, tree.getRoot());
-        }).catch((err) => {
-            console.error(err);
+            return Object.assign(Object.assign({}, t), { included: included, children: c });
         });
+        this.treeAvailable.set(term, rootNode);
         return true;
     }
 

@@ -6,7 +6,9 @@
         :namespace="namespace"
         :search-configuration="searchConfiguration"
         :item-to-peptides-mapping="goPeptideMapping"
-        :show-percentage="showPercentage">
+        :show-percentage="showPercentage"
+        :tree="tree"
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
     </amount-table>
 </template>
 
@@ -24,6 +26,8 @@ import SearchConfiguration from "./../../business/configuration/SearchConfigurat
 import TableItem from "./../tables/TableItem";
 import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
 import { Ontology } from "./../../business/ontology/Ontology";
+import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -54,6 +58,10 @@ export default class GoAmountTable extends Vue {
     private loading: boolean;
     @Prop({ required: false })
     private searchConfiguration: SearchConfiguration;
+    @Prop({ required: false })
+    private tree: Tree;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
     @Prop({ required: false })
     private namespace: string;
     /**

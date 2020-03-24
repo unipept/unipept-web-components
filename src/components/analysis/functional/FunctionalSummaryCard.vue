@@ -110,7 +110,9 @@
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
-                        :show-percentage="showPercentage">
+                        :show-percentage="showPercentage"
+                        :tree="tree"
+                        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
                     </go-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
@@ -129,7 +131,9 @@
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
-                        :show-percentage="showPercentage">
+                        :show-percentage="showPercentage"
+                        :tree="tree"
+                        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
                     </ec-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
@@ -148,7 +152,9 @@
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
-                        :show-percentage="showPercentage">
+                        :show-percentage="showPercentage"
+                        :tree="tree"
+                        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
                     </interpro-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
@@ -237,10 +243,14 @@ export default class FunctionalSummaryCard extends Vue {
     private faCalculationsInProgress: boolean = false;
     private showPercentage: boolean = false;
 
+    private tree: Tree = null;
+    private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
+
     private placeholderText = "Please select at least one assay for analysis.";
 
     mounted() {
         this.onSelectedTaxonIdChanged();
+        this.redoCalculations();
     }
 
     @Watch("selectedTaxonId")
@@ -278,8 +288,20 @@ export default class FunctionalSummaryCard extends Vue {
                 this.selectedNCBITaxon = await taxaOntologyProcessor.getDefinition(this.taxonId);
                 this.relativeCounts = this.peptideCountTable.totalCount;
             }
+            await this.computeTree();
         }
         this.faCalculationsInProgress = false;
+    }
+
+    private async computeTree() {
+        const taxaCountProcessor = new LcaCountTableProcessor(this.filteredCountTable, this.searchConfiguration);
+        this.taxaToPeptidesMapping = await taxaCountProcessor.getAnnotationPeptideMapping();
+        const taxaCounts = await taxaCountProcessor.getCountTable();
+
+        const taxaOntologyProcessor = new NcbiOntologyProcessor();
+        const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
+
+        this.tree = new Tree(taxaCounts, taxaOntology);
     }
 
     private async getOwnAndChildrenSequences(

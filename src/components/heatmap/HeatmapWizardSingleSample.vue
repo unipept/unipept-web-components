@@ -74,10 +74,6 @@ import {NormalizationType} from "./NormalizationType";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch, Prop } from "vue-property-decorator";
-import HeatmapConfiguration from "./HeatmapConfiguration";
-import GoDataSourceComponent from "./GoDataSourceComponent.vue";
-import EcDataSourceComponent from "./EcDataSourceComponent.vue";
-import TaxaDataSourceComponent from "./TaxaDataSourceComponent.vue";
 import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
 import HeatmapVisualization from "./HeatmapVisualization.vue";
 import sha256 from "crypto-js/sha256";
@@ -127,9 +123,6 @@ type SourceMetadata = {
 
 @Component({
     components: {
-        GoDataSourceComponent,
-        EcDataSourceComponent,
-        TaxaDataSourceComponent,
         HeatmapVisualization,
         DataSource
     },

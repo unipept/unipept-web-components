@@ -33,7 +33,7 @@ export default class Tree {
                     let newNode = currentNode.getChild(lineageTaxId);
                     if (newNode === null) {
                         const definition = taxaOntology.getDefinition(lineageTaxId);
-                        newNode = new TreeNode(lineageTaxId, definition.name, definition.category);
+                        newNode = new TreeNode(lineageTaxId, definition.name, definition.rank);
                         this.addChild(currentNode, newNode);
                     }
                     currentNode = newNode;
