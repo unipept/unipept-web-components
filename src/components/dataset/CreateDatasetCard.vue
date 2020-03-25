@@ -49,7 +49,7 @@ export default class CreateDatasetCard extends mixins(DatasetMixin) {
     private selectCreateDataset() {
         if (this.$refs.createdDatasetForm.isValid()) {
             const createdAssay: Assay = this.storeDataset(this.createPeptides, this.createName, this.createSave);
-            this.$emit("create-assay", createdAssay);
+            this.$emit("create-assay", createdAssay, this.createSave);
         }
     }
 }

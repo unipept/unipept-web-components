@@ -13,7 +13,7 @@ export default class BrowserStorageMetadataReader extends BrowserAssayVisitor {
         assay.setName(parsedMeta.name);
 
         const splitDate = parsedMeta.date.split("/");
-        assay.setDate(new Date(splitDate[0], splitDate[1] - 1, splitDate[2]));
+        assay.setDate(new Date(splitDate[2], splitDate[1], splitDate[0]));
         assay.setAmountOfPeptides(parsedMeta.amount);
     }
 }

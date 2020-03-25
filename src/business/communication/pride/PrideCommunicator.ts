@@ -1,7 +1,7 @@
 import ProteomicsAssay from "./../../entities/assay/ProteomicsAssay";
 import ProgressListener from "./../../progress/ProgressListener";
 import NetworkUtils from "./../NetworkUtils";
-import { Peptide } from "@/business/ontology/raw/Peptide";
+import { Peptide } from "./../../ontology/raw/Peptide";
 
 export default class PrideCommunicator {
     public static readonly PRIDE_BATCH_SIZE: number = 1000;
@@ -9,7 +9,9 @@ export default class PrideCommunicator {
     public static readonly PRIDE_LIST_ENDPOINT: string = "https://www.ebi.ac.uk/pride/ws/archive/peptide/list/assay/";
 
     public static async getPeptidesByPrideId(id: number, progressListener?: ProgressListener): Promise<Peptide[]> {
-        progressListener?.onProgressUpdate(0);
+        if (progressListener) {
+            progressListener.onProgressUpdate(0);
+        }
 
         let peptides: string[] = [];
         const datasetSize: number = await NetworkUtils.get(this.PRIDE_COUNT_ENDPOINT + id);
@@ -29,7 +31,9 @@ export default class PrideCommunicator {
                 }).then(function(response: any) {
                     page++;
 
-                    progressListener?.onProgressUpdate((10 + (90 * page * this.PRIDE_BATCH_SIZE) / datasetSize) / 100);
+                    if (progressListener) {
+                        progressListener.onProgressUpdate((10 + (90 * page * this.PRIDE_BATCH_SIZE) / datasetSize) / 100);
+                    }
                     peptides = peptides.concat(response.list.map(function(d) {
                         return d.sequence;
                     }));

@@ -29,7 +29,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import DataSourceItem from "@/components/heatmap/DataSourceItem";
+import DataSourceItem from "./DataSourceItem";
 
 @Component({
     computed: {

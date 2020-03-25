@@ -8,7 +8,7 @@ export default class BrowserStorageWriter extends BrowserAssayVisitor {
             id: mpAssay.getId(),
             name: mpAssay.getName(),
             amount: mpAssay.getAmountOfPeptides(),
-            date: mpAssay.getDate()
+            date: this.toDateString(mpAssay.getDate())
         });
 
         this.browserStorage.setItem(
@@ -22,5 +22,9 @@ export default class BrowserStorageWriter extends BrowserAssayVisitor {
                 peptides: mpAssay.getPeptides()
             })
         );
+    }
+
+    private toDateString(date: Date): string {
+        return date.getUTCDate() + "/" + date.getUTCMonth() + "/" + date.getUTCFullYear();
     }
 }

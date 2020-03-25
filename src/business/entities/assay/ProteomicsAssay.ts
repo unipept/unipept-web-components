@@ -37,6 +37,7 @@ export default class ProteomicsAssay extends Assay {
 
     public setPeptides(peptides: Peptide[]): void {
         super.onUpdate("peptides", this.peptides, peptides);
+        this.amountOfPeptides = peptides.length;
         this.peptides = peptides;
     }
 

@@ -53,8 +53,8 @@ import Component, { mixins } from "vue-class-component"
 import DatasetMixin from "./DatasetMixin.vue";
 import { Watch, Prop } from "vue-property-decorator";
 import axios from "axios";
-import SampleAssayCollection from "@/business/entities/sample/SampleAssayCollection";
-import SampleAssay from "@/business/entities/sample/SampleAssay";
+import SampleAssayCollection from "./../../business/entities/sample/SampleAssayCollection";
+import SampleAssay from "./../../business/entities/sample/SampleAssay";
 
 @Component({
     computed: {

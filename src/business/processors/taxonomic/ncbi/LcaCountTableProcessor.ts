@@ -3,7 +3,7 @@ import { CountTable } from "./../../../counts/CountTable";
 import SearchConfiguration from "./../../../configuration/SearchConfiguration";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import Pept2DataCommunicator from "./../../../communication/peptides/Pept2DataCommunicator";
-import ProteomicsCountTableProcessor from "@/business/processors/ProteomicsCountTableProcessor";
+import ProteomicsCountTableProcessor from "./../../ProteomicsCountTableProcessor";
 
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;

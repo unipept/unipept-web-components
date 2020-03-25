@@ -40,8 +40,8 @@ export default class DatasetMixin extends Vue {
      * stored.
      * @return The assay that was created and stored by this function.
      */
-    protected storeDataset(peptides: string, name: string, save: boolean): Assay {
-        const assay:ProteomicsAssay = new ProteomicsAssay([], uuidv4());
+    protected storeDataset(peptides: string, name: string, save: boolean): ProteomicsAssay {
+        const assay: ProteomicsAssay = new ProteomicsAssay([], uuidv4());
 
         assay.setPeptides(peptides.split("\n"));
         assay.setDate(new Date());
@@ -55,7 +55,7 @@ export default class DatasetMixin extends Vue {
          * @property {Assay} assay The assay that was created by the user and that should be persistently
          * stored.
          */
-        this.$emit("store-assay", assay);
+        this.$emit("store-assay", assay, save);
         return assay;
     }
 }

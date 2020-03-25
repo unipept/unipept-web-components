@@ -29,7 +29,7 @@ component provides him with the option to select one of these assays for analysi
 
                     <v-list-item-action>
                         <v-list-item-action-text>
-                            {{ dataset.getDateFormatted() }}
+                            {{ dataset.getDate().toLocaleDateString() }}
                         </v-list-item-action-text>
                         <tooltip message="Delete this sample from local storage.">
                             <v-btn class="remove-assay-button" icon text @click="removeAssay(dataset)" v-on:click.stop>
