@@ -31,7 +31,7 @@ change the currently active search settings and redo the analysis of all selecte
                     </v-btn>
                 </tooltip>
                 <tooltip message="Download a CSV-file with the results of this analysis.">
-                        <v-menu offset-y>
+                        <v-menu offset-y bottom left origin="top right">
                             <template v-slot:activator="{ on }">
                                 <v-btn min-width="187" :disabled="disabled || exportLoading" v-on="on" color="default">
                                     <div v-if="!exportLoading">
@@ -39,6 +39,7 @@ change the currently active search settings and redo the analysis of all selecte
                                             mdi-download
                                         </v-icon>
                                         Download results
+                                        <v-icon>mdi-menu-down</v-icon>
                                     </div>
                                     <v-progress-circular v-else indeterminate color="black" :size="20">
                                     </v-progress-circular>
