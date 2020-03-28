@@ -44,22 +44,22 @@ change the currently active search settings and redo the analysis of all selecte
                 </tooltip>
             </div>
             <v-divider></v-divider>
-            <span v-if="!activeAssay" class="dataset-placeholder-text">
+            <span v-if="!activeAssay || !peptideTrust" class="dataset-placeholder-text">
                 No dataset is selected... Wait for at least one dataset to be loaded or select one.
             </span>
             <span v-else class="peptide-match-text">
                 We managed to match {{ peptideTrust.matchedPeptides }} of your {{ peptideTrust.searchedPeptides }}
                 peptides. Unfortunately,
                 <a style="cursor: pointer;" @click="showNotFoundPeptidesModal">
-                    {{ missedPeptides.length }}
+                    {{ peptideTrust.missedPeptides.length }}
                 </a>
                 peptides couldn't be found.
             </span>
         </v-card-text>
         <v-dialog v-model="showNotFoundModal" :width="600">
-            <v-card>
+            <v-card v-if="peptideTrust">
                 <v-card-title>
-                    {{ missedPeptides.length }} missed peptides
+                    {{ peptideTrust.missedPeptides.length }} missed peptides
                 </v-card-title>
                 <v-card-text>
                     <missing-peptides-list :missed-peptides="peptideTrust.missedPeptides">
@@ -85,6 +85,7 @@ import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay"
 import PeptideTrust from "./../../../business/processors/raw/PeptideTrust";
 import Pept2DataCommunicator from "./../../../business/communication/peptides/Pept2DataCommunicator";
 import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
+import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
@@ -92,7 +93,7 @@ import PeptideCountTableProcessor from "./../../../business/processors/raw/Pepti
         peptideList: {
             get() {
                 if (this.activeAssay) {
-                    return this.activeAssay.getPeptides()
+                    return this.activeAssay.getPeptides().join("\n");
                 } else {
                     return "";
                 }
@@ -124,6 +125,8 @@ export default class ExperimentSummaryCard extends Vue {
      */
     @Prop({ required: true })
     private activeAssay: ProteomicsAssay;
+    @Prop({ required: true })
+    private searchConfiguration: SearchConfiguration;
 
     // Is the export system loading?
     private exportLoading: boolean = false;
@@ -133,18 +136,22 @@ export default class ExperimentSummaryCard extends Vue {
     private missingCleavage: boolean = false;
     private showNotFoundModal: boolean = false;
 
-    private peptideTrust: PeptideTrust;
+    private peptideTrust: PeptideTrust = null;
 
     private loading: boolean = true;
 
-    created() {
-        this.equateIl = this.$store.getters.searchSettings.il;
-        this.filterDuplicates = this.$store.getters.searchSettings.dupes;
-        this.missingCleavage = this.$store.getters.searchSettings.missed;
+    mounted() {
+        this.onSearchConfigurationChanged();
+        this.onActiveAssayChanged();
     }
 
-    mounted() {
-        this.onActiveAssayChanged();
+    @Watch("searchConfiguration")
+    private onSearchConfigurationChanged() {
+        if (this.searchConfiguration) {
+            this.equateIl = this.searchConfiguration.equateIl;
+            this.filterDuplicates = this.searchConfiguration.filterDuplicates;
+            this.missingCleavage = this.searchConfiguration.enableMissingCleavageHandling;
+        }
     }
 
     reprocess(): void {
@@ -153,7 +160,11 @@ export default class ExperimentSummaryCard extends Vue {
          */
         this.$emit(
             "update-search-settings",
-            { il: this.equateIl, dupes: this.filterDuplicates, missed: this.missingCleavage }
+            new SearchConfiguration(
+                this.equateIl,
+                this.filterDuplicates,
+                this.missingCleavage
+            )
         );
     }
 
@@ -163,18 +174,18 @@ export default class ExperimentSummaryCard extends Vue {
 
     @Watch("activeAssay")
     private async onActiveAssayChanged(): Promise<void> {
-        if (this.activeAssay) {
+        if (this.activeAssay && this.searchConfiguration) {
             this.loading = true;
 
             const peptideProcessor = new PeptideCountTableProcessor();
             const peptideCountTable = await peptideProcessor.getPeptideCountTable(
                 this.activeAssay.getPeptides(),
-                this.activeAssay.getSearchConfiguration()
+                this.searchConfiguration
             );
 
             this.peptideTrust = await Pept2DataCommunicator.getPeptideTrust(
                 peptideCountTable,
-                this.activeAssay.getSearchConfiguration()
+                this.searchConfiguration
             );
 
             this.loading = false;
