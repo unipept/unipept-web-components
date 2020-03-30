@@ -191,7 +191,8 @@ export default class ExperimentSummaryCard extends Vue {
             const csv: string = await exportMng.exportResultsAsCsv(
                 this.activeAssay.dataRepository as MetaProteomicsDataRepository,
                 separator,
-                functionalSeparator
+                functionalSeparator,
+                this.$store.getters.baseUrl
             );
 
             await downloadDataByForm(csv, "mpa_result.csv", "text/csv");
