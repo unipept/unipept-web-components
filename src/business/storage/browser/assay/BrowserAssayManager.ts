@@ -28,7 +28,6 @@ export default class BrowserAssayManager {
             }
         }
 
-        console.log(output);
         return output;
     }
 }
