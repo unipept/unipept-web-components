@@ -61,7 +61,7 @@ export default class NetworkUtils {
      * @param url
      */
     public static getJSON(url: string): any {
-        return this.get(url).then(JSON.parse);
+        return NetworkUtils.get(url).then(JSON.parse);
     }
 
     public static async downloadDataByForm(data: string, fileName: string, fileType: string = null): Promise<string> {

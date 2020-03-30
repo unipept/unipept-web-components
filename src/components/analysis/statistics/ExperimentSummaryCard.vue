@@ -13,7 +13,7 @@ change the currently active search settings and redo the analysis of all selecte
         </card-header>
         <v-card-text style="flex-grow: 1; display: flex; flex-direction: column;">
             <h3>Peptide list</h3>
-            <v-textarea :readonly="true" v-model="peptideList"></v-textarea>
+            <v-textarea :readonly="true" v-model="peptideList" :loading="disabled || exportLoading"></v-textarea>
             <search-settings-form
                 :disabled="disabled"
                 :equate-il.sync="equateIl"
@@ -23,7 +23,7 @@ change the currently active search settings and redo the analysis of all selecte
             </search-settings-form>
             <div class="card-actions" >
                 <tooltip message="Restart search with selected samples using the settings chosen above.">
-                    <v-btn :disabled="disabled || exportLoading" @click="reprocess()" color="primary">
+                    <v-btn :disabled="disabled || exportLoading || !isDirty" @click="reprocess()" color="primary">
                         <v-icon left>
                             mdi-restore
                         </v-icon>
@@ -109,6 +109,14 @@ import SearchConfiguration from "./../../../business/configuration/SearchConfigu
                 } else {
                     return "Experiment Summary";
                 }
+            }
+        },
+        // Did the data change without updating?
+        isDirty: {
+            get(): boolean {
+                return this.equateIl != this.searchConfiguration.equateIl ||
+                        this.filterDuplicates != this.searchConfiguration.filterDuplicates ||
+                        this.missingCleavage != this.searchConfiguration.enableMissingCleavageHandling;
             }
         }
     }

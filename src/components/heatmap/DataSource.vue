@@ -11,6 +11,12 @@
             sort-by="popularity"
             sort-desc
             :loading="loading">
+            <template v-slot:header.data-table-select="{ on, props }">
+                <v-simple-checkbox color="primary" v-bind="props" v-on="on"></v-simple-checkbox>
+            </template>
+            <template v-slot:item.data-table-select="{ isSelected, select }">
+                <v-simple-checkbox color="primary" :value="isSelected" @input="select($event)"></v-simple-checkbox>
+            </template>
             <template v-slot:items="props">
                 <tr :active="props.selected" @click="props.selected = !props.selected">
                     <td>

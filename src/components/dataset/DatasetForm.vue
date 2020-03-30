@@ -6,7 +6,7 @@
             label="Peptide list"
             :rows="7"
             v-model="peptideModel"
-            :disabled="loading"
+            :loading="loading"
             :rules="[value => !!value || 'At least one peptide is required']"
             spellcheck="false">
         </v-textarea>
@@ -17,7 +17,7 @@
                     id="name-input"
                     name="search_name"
                     label="Name this dataset"
-                    :disabled="loading"
+                    :loading="loading"
                     placeholder="e.g. Sample B5"
                     v-model="nameModel"
                     :rules="[value => !!value || 'Name is required when the dataset is set to be saved']"

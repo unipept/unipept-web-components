@@ -16,7 +16,6 @@ after which the required information is downloaded and transformed into an Assay
                     <v-icon left>mdi-cloud-download</v-icon>
                     Fetch PRIDE dataset
                 </v-btn>
-                <v-progress-linear v-if="prideLoading" v-model="prideProgress"></v-progress-linear>
             </div>
             <dataset-form ref="prideDatasetForm" v-on:peptide-change="pridePeptides = $event" :peptides="pridePeptides" v-on:name-change="prideName = $event" :name="prideName" v-on:save-change="prideSave = $event" :save="prideSave" :loading="prideLoading"></dataset-form>
             <div class="card-actions" id="select-pride-assay-button">

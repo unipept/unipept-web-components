@@ -94,7 +94,7 @@
                         </b>
                         : These results are limited to the {{ this.filteredCountTable.totalCount }} peptides specific to
                         <b>
-                            {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.category}})
+                            {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.rank}})
                         </b>.
                     </v-col>
                     <v-col class="shrink">

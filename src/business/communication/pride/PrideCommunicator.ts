@@ -25,14 +25,14 @@ export default class PrideCommunicator {
 
         page = 0;
         await urls.map(NetworkUtils.getJSON).reduce(
-            function(sequence: Promise<void>, batchPromise) {
+            (sequence: Promise<void>, batchPromise) => {
                 return sequence.then(function() {
                     return batchPromise;
                 }).then(function(response: any) {
                     page++;
 
                     if (progressListener) {
-                        progressListener.onProgressUpdate((10 + (90 * page * this.PRIDE_BATCH_SIZE) / datasetSize) / 100);
+                        progressListener.onProgressUpdate((10 + (90 * page * PrideCommunicator.PRIDE_BATCH_SIZE) / datasetSize) / 100);
                     }
                     peptides = peptides.concat(response.list.map(function(d) {
                         return d.sequence;
