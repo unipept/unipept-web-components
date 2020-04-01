@@ -9,7 +9,8 @@
         :items="items"
         :categories="categories"
         :headers="headers"
-        :loading="loading">
+        :loading="loading"
+        v-on:selected-items="onSelectedItems">
     </data-source>
 </template>
 
@@ -69,6 +70,9 @@ export default class SingleAssayDataSource extends Vue {
     @Prop({ required: false, default: "Category" })
     private categoryTitle: string;
 
+    private onSelectedItems(items) {
+        this.$emit("selected-items", items);
+    }
 }
 </script>
 

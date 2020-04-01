@@ -1,6 +1,6 @@
 {
   "name": "unipept-web-components",
-  "version": "0.1.13",
+  "version": "0.2.0-beta.0",
   "private": false,
   "typings": "src/",
   "scripts": {
