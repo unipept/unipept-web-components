@@ -12,6 +12,8 @@ export default interface OntologyProcessor<OntologyId, DefinitionType extends De
      */
     getOntology(table: CountTable<OntologyId>): Promise<Ontology<OntologyId, DefinitionType>>;
 
+    getOntologyByIds(ids: OntologyId[]): Promise<Ontology<OntologyId, DefinitionType>>;
+
     /**
      * Asynchronously fetches the definition for a specific ontology id. When multiple definitions should be fetched, it
      * is advised to use the getOntology function instead as network requests are grouped and optimised. Note if this

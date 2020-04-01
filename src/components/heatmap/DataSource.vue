@@ -35,59 +35,24 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import DataSourceItem from "./DataSourceItem";
+import SingleAssayDataSourceItem from "./SingleAssayDataSourceItem";
 
-@Component({
-    computed: {
-        headers: {
-            get() {
-                return [
-                    {
-                        text: "Name",
-                        align: "left",
-                        value: "name",
-                        width: "40%"
-                    },
-                    {
-                        text: this.identifierInsteadOfCategory ? "Identifier" : this.categoryTitle,
-                        align: "left",
-                        value: this.identifierInsteadOfCategory ? "id" : "category",
-                        width: "40%"
-                    },
-                    {
-                        text: "# Peptides",
-                        align: "left",
-                        value: "count",
-                        width: "20%"
-                    }
-                ];
-            }
-        }
-    }
-})
+@Component
 export default class DataSource extends Vue {
     @Prop({ required: true })
-    private items: DataSourceItem[];
+    private items: any[];
     @Prop({ required: true })
     private categories: string[];
+    @Prop({ required: true })
+    private headers: any[];
     @Prop({ required: false, default: false })
     private loading: boolean;
-    /**
-     * Show every items identifier in the table instead of the category it belongs to?
-     */
-    @Prop({ required: false, default: true })
-    private identifierInsteadOfCategory: boolean;
-    /**
-     * Override category title in the table?
-     */
-    @Prop({ required: false, default: "Category" })
-    private categoryTitle: string;
 
     private availableCategories: string[] = ["All"].concat(this.categories);
     private selectedCategory: string = this.availableCategories[0];
 
-    private visibleItems: DataSourceItem[] = [];
-    private selectedItems: DataSourceItem[] = [];
+    private visibleItems: any[] = [];
+    private selectedItems: any[] = [];
 
     mounted() {
         this.onInputsChanged();

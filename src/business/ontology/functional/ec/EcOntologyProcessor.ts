@@ -9,9 +9,11 @@ export default class EcOntologyProcessor implements OntologyProcessor<EcCode, Ec
     private static codeDefinitionMap = new Map<EcCode, EcDefinition>();
 
     public async getOntology(table: CountTable<EcCode>): Promise<Ontology<string, EcDefinition>> {
-        const codes = table.getOntologyIds();
-        await EcResponseCommunicator.process(codes);
+        return await this.getOntologyByIds(table.getOntologyIds());
+    }
 
+    public async getOntologyByIds(codes: EcCode[]): Promise<Ontology<string, EcDefinition>> {
+        await EcResponseCommunicator.process(codes);
         const definitions = new Map<EcCode, EcDefinition>();
 
         for (const code of codes) {

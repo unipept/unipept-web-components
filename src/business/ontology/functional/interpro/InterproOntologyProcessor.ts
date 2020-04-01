@@ -7,10 +7,15 @@ import { convertStringToInterproNamespace } from "./InterproNamespace";
 
 export default class InterproOntologyProcessor implements OntologyProcessor<InterproCode, InterproDefinition> {
     public async getOntology(table: CountTable<InterproCode>): Promise<Ontology<InterproCode, InterproDefinition>> {
-        await InterproResponseCommunicator.process(table.getOntologyIds());
+        return await this.getOntologyByIds(table.getOntologyIds());
+    }
+
+    public async getOntologyByIds(codes: InterproCode[]): Promise<Ontology<InterproCode, InterproDefinition>> {
+        await InterproResponseCommunicator.process(codes);
+
         const definitions = new Map<InterproCode, InterproDefinition>();
 
-        for (const code of table.getOntologyIds()) {
+        for (const code of codes) {
             const apiResponse = InterproResponseCommunicator.getResponse(code);
 
             if (apiResponse) {

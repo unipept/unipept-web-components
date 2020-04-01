@@ -1,6 +1,6 @@
 import { Peptide } from "./../../business/ontology/raw/Peptide";
 
-export default class DataSourceItem {
+export default class SingleAssayDataSourceItem {
     constructor(
         public readonly name: string,
         public readonly id: number | string,

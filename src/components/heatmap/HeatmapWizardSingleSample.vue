@@ -19,14 +19,14 @@ import {NormalizationType} from "./NormalizationType";
                 <v-select :items="dataSources" v-model="horizontalDataSource" label="Horizontal datasource">
                 </v-select>
                 <div>
-                    <data-source
-                        :items="countTables[horizontalIndex].items"
-                        :categories="countTables[horizontalIndex].categories"
-                        :loading="countTables[horizontalIndex].loading"
-                        :identifier-instead-of-category="countTables[horizontalIndex].showIdentifier"
-                        :category-title="countTables[horizontalIndex].categoryTitle"
+                    <single-assay-data-source
+                        :items="sourceMetadata[horizontalIndex].items"
+                        :categories="sourceMetadata[horizontalIndex].categories"
+                        :loading="sourceMetadata[horizontalIndex].loading"
+                        :identifier-instead-of-category="sourceMetadata[horizontalIndex].showIdentifier"
+                        :category-title="sourceMetadata[horizontalIndex].categoryTitle"
                         v-on:selected-items="updateHorizontalItems">
-                    </data-source>
+                    </single-assay-data-source>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
@@ -35,14 +35,14 @@ import {NormalizationType} from "./NormalizationType";
                 <v-select :items="dataSources" v-model="verticalDataSource" label="Vertical datasource">
                 </v-select>
                 <div>
-                    <data-source
-                        :items="countTables[verticalIndex].items"
-                        :categories="countTables[verticalIndex].categories"
-                        :loading="countTables[verticalIndex].loading"
-                        :identifier-instead-of-category="countTables[verticalIndex].showIdentifier"
-                        :category-title="countTables[verticalIndex].categoryTitle"
+                    <single-assay-data-source
+                        :items="sourceMetadata[verticalIndex].items"
+                        :categories="sourceMetadata[verticalIndex].categories"
+                        :loading="sourceMetadata[verticalIndex].loading"
+                        :identifier-instead-of-category="sourceMetadata[verticalIndex].showIdentifier"
+                        :category-title="sourceMetadata[verticalIndex].categoryTitle"
                         v-on:selected-items="updateVerticalItems">
-                    </data-source>
+                    </single-assay-data-source>
                 </div>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
@@ -88,7 +88,7 @@ import RowNormalizer from "./../../business/normalisation/RowNormalizer";
 import ColumnNormalizer from "./../../business/normalisation/ColumnNormalizer";
 import Normalizer from "./../../business/normalisation/Normalizer";
 import DataSource from "./DataSource.vue";
-import DataSourceItem from "./DataSourceItem";
+import SingleAssayDataSourceItem from "./SingleAssayDataSourceItem";
 import { NcbiRank } from "./../../business/ontology/taxonomic/ncbi/NcbiRank";
 import { GoNamespace } from "./../../business/ontology/functional/go/GoNamespace";
 import { EcNamespace } from "./../../business/ontology/functional/ec/EcNamespace";
@@ -105,14 +105,16 @@ import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntol
 import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
 import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import FunctionalDefinition from "./../../business/ontology/functional/FunctionalDefinition";
+import SingleAssayDataSource from "./SingleAssayDataSource.vue";
+import { OntologyIdType } from "./../../business/ontology/Ontology";
+import StringUtils from "./../../business/misc/StringUtils";
 
-type OntologyType = (GoCode | EcCode | InterproCode | NcbiId);
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
 type SourceMetadata = {
-    items: DataSourceItem[],
-    tableProcessor: (countTable: CountTable<Peptide>, config: SearchConfiguration) => ProteomicsCountTableProcessor<OntologyType>,
-    ontologyProcessor: OntologyProcessor<OntologyType, DefinitionType>,
+    items: SingleAssayDataSourceItem[],
+    tableProcessor: (countTable: CountTable<Peptide>, config: SearchConfiguration) => ProteomicsCountTableProcessor<OntologyIdType>,
+    ontologyProcessor: OntologyProcessor<OntologyIdType, DefinitionType>,
     loading: boolean,
     categories: string[],
     // What's the title of the category column that should be shown in the data table?
@@ -123,6 +125,7 @@ type SourceMetadata = {
 
 @Component({
     components: {
+        SingleAssayDataSource,
         HeatmapVisualization,
         DataSource
     },
@@ -161,18 +164,18 @@ export default class HeatmapWizardSingleSample extends Vue {
     private horizontalDataSource: string = this.dataSources[0];
     private verticalDataSource: string = this.dataSources[0];
 
-    private horizontalItems: DataSourceItem[] = [];
-    private verticalItems: DataSourceItem[] = [];
+    private horizontalItems: SingleAssayDataSourceItem[] = [];
+    private verticalItems: SingleAssayDataSourceItem[] = [];
 
     private normalizer: string = "";
 
-    private countTables: SourceMetadata[] = [
+    private sourceMetadata: SourceMetadata[] = [
         {
             items: [],
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c),
             ontologyProcessor: new NcbiOntologyProcessor(),
-            categories: Object.values(NcbiRank).map(this.capitalize),
+            categories: Object.values(NcbiRank).map(StringUtils.capitalize),
             showIdentifier: false,
             categoryTitle: "Rank"
         },
@@ -181,7 +184,7 @@ export default class HeatmapWizardSingleSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new GoCountTableProcessor(p, c),
             ontologyProcessor: new GoOntologyProcessor(),
-            categories: Object.values(GoNamespace).map(this.capitalize),
+            categories: Object.values(GoNamespace).map(StringUtils.capitalize),
             showIdentifier: true,
             categoryTitle: "Namespace"
         },
@@ -190,7 +193,7 @@ export default class HeatmapWizardSingleSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new EcCountTableProcessor(p, c),
             ontologyProcessor: new EcOntologyProcessor(),
-            categories: Object.values(EcNamespace).map(this.capitalize),
+            categories: Object.values(EcNamespace).map(StringUtils.capitalize),
             showIdentifier: true,
             categoryTitle: "Namespace"
         },
@@ -199,7 +202,7 @@ export default class HeatmapWizardSingleSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new InterproCountTableProcessor(p, c),
             ontologyProcessor: new InterproOntologyProcessor(),
-            categories: Object.values(InterproNamespace).map(this.capitalize),
+            categories: Object.values(InterproNamespace).map(StringUtils.capitalize),
             showIdentifier: true,
             categoryTitle: "Namespace"
         }
@@ -236,22 +239,17 @@ export default class HeatmapWizardSingleSample extends Vue {
     }
 
     @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
     private async onPeptideCountTableChanged() {
         // Switch back to the first step of the configuration.
         this.currentStep = 1;
 
         // Update all data source items
-        for (const item of this.countTables) {
+        for (const item of this.sourceMetadata) {
             await this.computeItems(item);
         }
     }
 
-    private capitalize(input: string): string {
-        return input.split(" ").map(el => el.length > 0 ? el.substr(0, 1).toUpperCase() + el.substr(1) : el).join(" ");
-    }
-
-    @Watch("peptideCountTable")
-    @Watch("searchConfiguration")
     private async computeItems(dataItem: SourceMetadata) {
         if (this.peptideCountTable && this.searchConfiguration) {
             dataItem.loading = true;
@@ -275,8 +273,8 @@ export default class HeatmapWizardSingleSample extends Vue {
                     category = definition.rank;
                 }
 
-                return new DataSourceItem(definition.name, id, countTable.getCounts(id), this.capitalize(category), peptideMapping.get(id))
-            }).sort((a: DataSourceItem, b: DataSourceItem) => b.count - a.count);
+                return new SingleAssayDataSourceItem(definition.name, id, countTable.getCounts(id), StringUtils.capitalize(category), peptideMapping.get(id))
+            }).sort((a: SingleAssayDataSourceItem, b: SingleAssayDataSourceItem) => b.count - a.count);
 
             dataItem.items.length = 0;
             dataItem.items.push(...items);
@@ -284,12 +282,12 @@ export default class HeatmapWizardSingleSample extends Vue {
         }
     }
 
-    private updateHorizontalItems(items: DataSourceItem[]) {
+    private updateHorizontalItems(items: SingleAssayDataSourceItem[]) {
         this.horizontalItems.length = 0;
         this.horizontalItems.push(...items);
     }
 
-    private updateVerticalItems(items: DataSourceItem[]) {
+    private updateVerticalItems(items: SingleAssayDataSourceItem[]) {
         this.verticalItems.length = 0;
         this.verticalItems.push(...items);
     }
@@ -316,12 +314,12 @@ export default class HeatmapWizardSingleSample extends Vue {
         let grid: number[][] = [];
 
         for (let i = 0; i < this.verticalItems.length; i++) {
-            let vertical: DataSourceItem = this.verticalItems[i];
+            let vertical: SingleAssayDataSourceItem = this.verticalItems[i];
             rows.push({ id: i.toString(), name: vertical.name });
         }
 
         for (let i = 0; i < this.horizontalItems.length; i++) {
-            let horizontal: DataSourceItem = this.horizontalItems[i];
+            let horizontal: SingleAssayDataSourceItem = this.horizontalItems[i];
             cols.push({ id: i.toString(), name: horizontal.name });
         }
 

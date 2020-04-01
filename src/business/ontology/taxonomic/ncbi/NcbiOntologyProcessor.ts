@@ -6,11 +6,15 @@ import NcbiResponseCommunicator from "./../../../communication/taxonomic/ncbi/Nc
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
     public async getOntology(table: CountTable<NcbiId>): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        await NcbiResponseCommunicator.process(table.getOntologyIds());
+        return await this.getOntologyByIds(table.getOntologyIds());
+    }
+
+    public async getOntologyByIds(ids: NcbiId[]): Promise<Ontology<NcbiId, NcbiTaxon>> {
+        await NcbiResponseCommunicator.process(ids);
 
         const definitions = new Map<NcbiId, NcbiTaxon>();
 
-        for (const id of table.getOntologyIds()) {
+        for (const id of ids) {
             const apiResponse = NcbiResponseCommunicator.getResponse(id);
 
             if (apiResponse) {
