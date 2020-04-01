@@ -19,12 +19,12 @@ export default class ExportManager {
         // These need to be manually specified here to retain a specific order!
         const goNameSpaces: GoNameSpace[] = [
             GoNameSpace.BiologicalProcess,
-            GoNameSpace.CellularComponent, 
+            GoNameSpace.CellularComponent,
             GoNameSpace.MolecularFunction
         ];
 
-        let result: string = 
-            "peptide,lca," + Object.values(TaxumRank).join(",") + "," + "EC," + 
+        let result: string =
+            "peptide,lca," + Object.values(TaxumRank).join(",") + "," + "EC," +
             goNameSpaces.map(ns => `GO (${ns})`).join(",") + "\n";
 
         const processedContainer: ProcessedPeptideContainer = await repo.initProcessedPeptideContainer();
@@ -68,7 +68,7 @@ export default class ExportManager {
             }))).join(",");
 
             row += "\n";
-            // Duplicate row in the case the peptide was more present more than once.
+            // Duplicate row in the case the peptide was present more than once.
             result += row.repeat(processedContainer.countTable.get(tax.sequence));
         }
 

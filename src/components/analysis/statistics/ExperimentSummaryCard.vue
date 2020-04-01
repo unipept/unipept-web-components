@@ -31,16 +31,29 @@ change the currently active search settings and redo the analysis of all selecte
                     </v-btn>
                 </tooltip>
                 <tooltip message="Download a CSV-file with the results of this analysis.">
-                    <v-btn min-width="187" :disabled="disabled || exportLoading" @click="downloadCsv()" color="default">
-                        <div v-if="!exportLoading">
-                            <v-icon>
-                                mdi-download
-                            </v-icon>
-                            Download results
-                        </div>
-                        <v-progress-circular v-else indeterminate color="black" :size="20">
-                        </v-progress-circular>
-                    </v-btn>
+                    <v-menu offset-y bottom left origin="top right">
+                        <template v-slot:activator="{ on }">
+                            <v-btn min-width="187" :disabled="disabled || exportLoading" v-on="on" color="default">
+                                <div v-if="!exportLoading">
+                                    <v-icon>
+                                        mdi-download
+                                    </v-icon>
+                                    Download results
+                                    <v-icon>mdi-menu-down</v-icon>
+                                </div>
+                                <v-progress-circular v-else indeterminate color="black" :size="20">
+                                </v-progress-circular>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item @click="downloadCsv()">
+                                <v-list-item-title>Comma-separated (international)</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="downloadCsv(';', ',')">
+                                <v-list-item-title>Semi-colon-separated (Europe)</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </tooltip>
             </div>
             <v-divider></v-divider>
@@ -86,6 +99,10 @@ import PeptideTrust from "./../../../business/processors/raw/PeptideTrust";
 import Pept2DataCommunicator from "./../../../business/communication/peptides/Pept2DataCommunicator";
 import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
 import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
+import PeptideExport from "./../../../business/export/PeptideExport";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
+import { CountTable } from "./../../../business/counts/CountTable";
+import NetworkUtils from "./../../../business/communication/NetworkUtils";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
@@ -145,6 +162,7 @@ export default class ExperimentSummaryCard extends Vue {
     private showNotFoundModal: boolean = false;
 
     private peptideTrust: PeptideTrust = null;
+    private peptideCountTable: CountTable<Peptide> = null;
 
     private loading: boolean = true;
 
@@ -186,13 +204,13 @@ export default class ExperimentSummaryCard extends Vue {
             this.loading = true;
 
             const peptideProcessor = new PeptideCountTableProcessor();
-            const peptideCountTable = await peptideProcessor.getPeptideCountTable(
+            this.peptideCountTable = await peptideProcessor.getPeptideCountTable(
                 this.activeAssay.getPeptides(),
                 this.searchConfiguration
             );
 
             this.peptideTrust = await Pept2DataCommunicator.getPeptideTrust(
-                peptideCountTable,
+                this.peptideCountTable,
                 this.searchConfiguration
             );
 
@@ -200,18 +218,18 @@ export default class ExperimentSummaryCard extends Vue {
         }
     }
 
-    private async downloadCsv(): Promise<void> {
-        // TODO this needs to be re-enabled.
-        // if (this.activeAssay) {
-        //     this.exportLoading = true;
-        //     const exportMng: ExportManager = new ExportManager();
-        //     const csv: string = await exportMng.exportResultsAsCsv(
-        //         this.activeAssay.dataRepository as MetaProteomicsDataRepository
-        //     );
-        //
-        //     await downloadDataByForm(csv, "mpa_result.csv", "text/csv");
-        //     this.exportLoading = false;
-        // }
+    private async downloadCsv(separator: string = ",", functionalSeparator: string = ";"): Promise<void> {
+        if (this.activeAssay && this.peptideCountTable) {
+            this.exportLoading = true;
+            const csv: string = await PeptideExport.exportSummaryAsCsv(
+                this.peptideCountTable,
+                this.searchConfiguration,
+                separator,
+                functionalSeparator
+            );
+            await NetworkUtils.downloadDataByForm(csv, `${this.activeAssay.getName()}_mpa_result.csv`, "text/csv");
+            this.exportLoading = false;
+        }
     }
 }
 </script>
