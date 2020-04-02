@@ -135,7 +135,12 @@ export default class Pept2DataCommunicator {
      * @return The data that was retrieved through Unipept's API if the peptide is known. Returns undefined otherwise.
      */
     public static getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideDataResponse {
-        return this.configurationToResponses.get(JSON.stringify(configuration)).get(peptide);
+        const configString = JSON.stringify(configuration);
+        const responseMap = this.configurationToResponses.get(configString);
+        if (!responseMap) {
+            return undefined;
+        }
+        return responseMap.get(peptide);
     }
 
     private static getUnprocessedPeptides(peptides: Peptide[], configuration: SearchConfiguration): Peptide[] {
