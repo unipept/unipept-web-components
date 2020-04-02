@@ -109,6 +109,7 @@ export default class Pept2DataCommunicator {
         countTable: CountTable<Peptide>,
         configuration: SearchConfiguration
     ): Promise<PeptideTrust> {
+        await this.process(countTable, configuration);
         const responseMap = this.configurationToResponses.get(JSON.stringify(configuration));
 
         let matchedPeptides: number = 0;

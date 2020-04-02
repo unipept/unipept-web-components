@@ -5,12 +5,9 @@ import Vuex from "vuex";
 import LoadSampleDatasetCard from "./../LoadSampleDatasetCard.vue";
 import Setup from "@/test/Setup";
 import { sleep, waitForPromises, waitForElement, waitForCondition } from "@/test/Utils";
-import SampleDatasetCollection from "@/logic/data-management/SampleDatasetCollection";
 import * as expectedSampleData from "@/test/resources/sampledata.json";
-import SampleDataset from "@/logic/data-management/SampleDataset";
-import { StorageType } from "@/logic/data-management/StorageType";
-import { VMenu } from "vuetify/lib";
-
+import SampleAssayCollection from "@/business/entities/sample/SampleAssayCollection";
+import SampleAssay from "@/business/entities/sample/SampleAssay";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -46,11 +43,11 @@ describe("LoadSampleDatasetCard", () => {
 
         await waitForElement(wrapper, ".load-dataset-button button");
 
-        const sampleDatasets: SampleDatasetCollection[] = wrapper.vm.$data.sampleDatasets;
+        const sampleDatasets: SampleAssayCollection[] = wrapper.vm.$data.sampleDatasets;
 
         // Check if each of the expected dataset collections is present.
         for (const collection of expectedSampleData.sample_data) {
-            const foundCollection: SampleDatasetCollection = sampleDatasets.find(item => item.url === collection.url);
+            const foundCollection: SampleAssayCollection = sampleDatasets.find(item => item.url === collection.url);
             expect(foundCollection).toBeTruthy();
 
             expect(foundCollection.id).toEqual(collection.id);
@@ -62,7 +59,7 @@ describe("LoadSampleDatasetCard", () => {
         expect(sampleDatasets.length).toEqual(expectedSampleData.sample_data.length);
 
         // Check (for one) sample dataset if the object was constructed correctly.
-        const sample7: SampleDataset = sampleDatasets.find(
+        const sample7: SampleAssay = sampleDatasets.find(
             item => item.url === "http://www.nature.com/ismej/journal/v3/n2/full/ismej2008108a.html"
         ).datasets.find(d => d.name === "Sample 7");
 
@@ -115,7 +112,7 @@ describe("LoadSampleDatasetCard", () => {
             localVue,
             vuetify
         });
-        
+
         await waitForElement(wrapper, ".load-dataset-button button");
 
         wrapper.find(".load-dataset-button button").trigger("click");
@@ -124,9 +121,6 @@ describe("LoadSampleDatasetCard", () => {
 
         expect(wrapper.emitted("create-assay")).toBeTruthy();
         expect(wrapper.emitted("store-assay")).toBeTruthy();
-
-        // Sample datasets cannot be stored in persistent storage and thus the storage type should be session storage.
-        expect(wrapper.emitted("store-assay")[0][0].getStorageType()).toEqual(StorageType.SessionStorage);
 
         done();
     });

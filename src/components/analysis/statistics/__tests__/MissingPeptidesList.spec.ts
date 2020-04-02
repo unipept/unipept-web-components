@@ -4,10 +4,14 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
 import Mock from "@/test/Mock";
-import Assay from "@/logic/data-management/assay/Assay";
 import flushPromises from "flush-promises";
 import Utils from "./../../../custom/Utils";
 import { sleep, waitForElement } from "./../../../../test/Utils";
+import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
+import Setup from "@/test/Setup";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import Pept2DataCommunicator from "@/business/communication/peptides/Pept2DataCommunicator";
+import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 
 jest.mock("./../../../custom/Utils");
 
@@ -34,8 +38,9 @@ describe("MissingPeptidesList", () => {
     let vuetify;
     let getters;
     let store;
+    let missedPeptides: Peptide[];
 
-    beforeEach(() => {
+    beforeEach(async() => {
         vuetify = new Vuetify();
 
         getters = {
@@ -52,90 +57,91 @@ describe("MissingPeptidesList", () => {
         store = new Vuex.Store({
             getters
         });
+
+        const setup = new Setup();
+        setup.setupAll();
+
+        const mock: Mock = new Mock();
+        const countTable = await mock.mockRealisticPeptideCountTable();
+
+        missedPeptides = (await Pept2DataCommunicator.getPeptideTrust(countTable, new SearchConfiguration())).missedPeptides;
     });
 
-    it("correctly renders all peptides", (done) => {
-        let mock: Mock = new Mock();
-        mock.mockInitializedAssay().then(async(assay: Assay) => {
-            const wrapper = mount(MissingPeptidesList, {
-                store,
-                localVue,
-                vuetify,
-                propsData: {
-                    dataset: assay 
-                }
-            });
-    
-            await waitForElement(wrapper, "div > div");
-
-            // Test whether the calculated amount of missing peptides is correct.
-            expect(wrapper.find("div > div").html()).toContain("we didn't manage to find 10 of your");
-            expect(wrapper.find("div > div").html()).toMatchSnapshot();
-
-            const dataTable = wrapper.find(".v-data-table").html();
-
-            for (let peptide of foundPeptides) {
-                expect(dataTable).toContain(peptide);
+    it("correctly renders all peptides", async(done) => {
+        const wrapper = mount(MissingPeptidesList, {
+            store,
+            localVue,
+            vuetify,
+            sync: false,
+            propsData: {
+                missedPeptides: missedPeptides
             }
-
-            // Test if no more peptides are rendered.
-            expect(wrapper.findAll("td.text-left").length).toEqual(10);
-
-            done();
         });
+
+        await waitForElement(wrapper, "div > div");
+
+        // Test whether the calculated amount of missing peptides is correct.
+        expect(wrapper.find("div > div").html()).toContain("we didn't manage to find 10 of your");
+        expect(wrapper.find("div > div").html()).toMatchSnapshot();
+
+        const dataTable = wrapper.find(".v-data-table").html();
+
+        for (let peptide of foundPeptides) {
+            expect(dataTable).toContain(peptide);
+        }
+
+        // Test if no more peptides are rendered.
+        expect(wrapper.findAll("td.text-left").length).toEqual(10);
+
+        done();
     });
 
-    it("correctly copies items to clipboard", (done) => {
-        let mock: Mock = new Mock();
-        mock.mockInitializedAssay().then(async(assay: Assay) => {
-            const wrapper = mount(MissingPeptidesList, {
-                store,
-                localVue,
-                vuetify,
-                propsData: {
-                    dataset: assay 
-                }
-            });
-    
-            await waitForElement(wrapper, ".copy-button-container button");
-
-            wrapper.find(".copy-button-container button").trigger("click");
-            await wrapper.vm.$nextTick();
-
-            const content: string = await navigator.clipboard.readText();
-            expect(content).toMatchSnapshot();
-            done();
+    it("correctly copies items to clipboard", async(done) => {
+        const wrapper = mount(MissingPeptidesList, {
+            store,
+            localVue,
+            vuetify,
+            sync: false,
+            propsData: {
+                missedPeptides: missedPeptides
+            }
         });
+
+        await waitForElement(wrapper, ".copy-button-container button");
+
+        wrapper.find(".copy-button-container button").trigger("click");
+        await wrapper.vm.$nextTick();
+
+        const content: string = await navigator.clipboard.readText();
+        expect(content).toMatchSnapshot();
+        done();
     });
 
-    it("opens the correct URL for a peptide", (done) => {
-        let mock: Mock = new Mock();
-        mock.mockInitializedAssay().then(async(assay: Assay) => {
-            const wrapper = mount(MissingPeptidesList, {
-                store,
-                localVue,
-                vuetify,
-                propsData: {
-                    dataset: assay 
-                }
-            });
-    
-            await waitForElement(wrapper, "td.text-center i");
+    it("opens the correct URL for a peptide", async(done) => {
+        const wrapper = mount(MissingPeptidesList, {
+            store,
+            localVue,
+            vuetify,
+            sync: false,
+            propsData: {
+                missedPeptides: missedPeptides
+            }
+        });
 
-            wrapper.find("td.text-center i").trigger("click");
-            await wrapper.vm.$nextTick();
+        await waitForElement(wrapper, "td.text-center .v-icon", 2000);
+        wrapper.find("td.text-center .v-icon").trigger("click");
+        await wrapper.vm.$nextTick();
 
-            const expectedUrl: string = "http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&SET_SAVED_SEARCH=on" +
-            "&USER_FORMAT_DEFAULTS=on&PAGE=Proteins&PROGRAM=blastp&QUERY=" + foundPeptides[0] + "&GAPCOSTS=11%201" + 
-            "&EQ_MENU=Enter%20organism%20name%20or%20id--completions%20will%20be%20suggested&DATABASE=nr" +
-            "&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=10&WORD_SIZE=3" + 
-            "&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&SHOW_OVERVIEW=on&SHOW_LINKOUT=on" + 
-            "&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100" + 
-            "&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&OLD_BLAST=false"
+        const expectedUrl: string = "http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&SET_SAVED_SEARCH=on" +
+        "&USER_FORMAT_DEFAULTS=on&PAGE=Proteins&PROGRAM=blastp&QUERY=" + foundPeptides[0] + "&GAPCOSTS=11%201" +
+        "&EQ_MENU=Enter%20organism%20name%20or%20id--completions%20will%20be%20suggested&DATABASE=nr" +
+        "&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=10&WORD_SIZE=3" +
+        "&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&SHOW_OVERVIEW=on&SHOW_LINKOUT=on" +
+        "&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100" +
+        "&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&OLD_BLAST=false"
 
-            expect(Utils.openInBrowser).toBeCalledWith(expectedUrl);
-            done();
-        })
+        expect(Utils.openInBrowser).toBeCalledWith(expectedUrl);
+        done();
     });
 })
 

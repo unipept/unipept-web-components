@@ -2,7 +2,6 @@ import { shallowMount, mount, createLocalVue } from "@vue/test-utils"
 import Vue from "vue"
 import Vuetify from "vuetify"
 import Mock from "../../../test/Mock"
-import DataRepository from "../../../logic/data-source/DataRepository";
 import HierarchicalOutlineVisualization from "./../HierarchicalOutlineVisualization.vue";
 import "jsdom-worker-fix";
 import Vuex from "vuex";
@@ -40,13 +39,13 @@ describe("HierarchicalOutlineVisualization", () => {
 
     it("renders simple datasets", async(done) => {
         const mock: Mock = new Mock();
-        const dataRepository: DataRepository = await mock.mockDataRepository();
+        const tree = await mock.mockRealisticTree();
         const wrapper = mount(HierarchicalOutlineVisualization, {
             store,
             localVue,
             vuetify,
             propsData: {
-                dataRepository: dataRepository
+                tree: tree
             }
         });
 
@@ -68,7 +67,7 @@ describe("HierarchicalOutlineVisualization", () => {
     //                 dataRepository: dataRepository
     //             }
     //         });
-    
+
     //         // getters.selectedTerm = () => "Bacteria";
 
     //         // Wait for all async operations to be finished, before expecting anything.

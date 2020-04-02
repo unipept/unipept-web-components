@@ -28,7 +28,7 @@ export default class NcbiResponseCommunicator {
     }
 
     private static async doProcess(codes: NcbiId[]): Promise<void> {
-        const toProcess = codes.filter(c => !this.idsProcessed.has(c));
+        const toProcess = codes.filter(c => c && !this.idsProcessed.has(c));
 
         const lineagesToProcess: Set<NcbiId> = new Set();
 
@@ -47,7 +47,7 @@ export default class NcbiResponseCommunicator {
             }
         }
 
-        const lineages = [...lineagesToProcess].filter(c => !this.idsProcessed.has(c));
+        const lineages = [...lineagesToProcess].filter(c => c && !this.idsProcessed.has(c));
 
         for (let i = 0; i < lineages.length; i += this.NCBI_BATCH_SIZE) {
             const data = JSON.stringify({

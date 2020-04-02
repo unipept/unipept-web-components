@@ -106,7 +106,7 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
-      "^worker-loader!./PeptideContainerProcessor.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
+      "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
     },
     "testEnvironment": "jsdom",
     "setupFilesAfterEnv": [

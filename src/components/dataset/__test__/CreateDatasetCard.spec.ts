@@ -5,9 +5,7 @@ import Vuex from "vuex";
 import CreateDatasetCard from "./../CreateDatasetCard.vue";
 import Setup from "@/test/Setup";
 import { sleep, waitForPromises, waitForElement } from "@/test/Utils";
-import Assay from "@/logic/data-management/assay/Assay";
-import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
-
+import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -27,7 +25,7 @@ describe("CreateDatasetCard", () => {
     /**
      * Check if this card correctly creates a new Assay with the required properties filled in. By doing this, we can
      * test whether the correct events, emitted by the DatasetForm, are handled.
-     * 
+     *
      * Both the store-assay and create-assay events should be emitted by this card.
      */
     it("correctly creates a new assay", async(done) => {
@@ -54,9 +52,9 @@ describe("CreateDatasetCard", () => {
 
         await wrapper.vm.$nextTick();
 
-        const createdAssay: MetaProteomicsAssay = wrapper.emitted("store-assay")[0][0] as MetaProteomicsAssay;
+        const createdAssay: ProteomicsAssay = wrapper.emitted("store-assay")[0][0] as ProteomicsAssay;
 
-        expect(createdAssay.peptideContainer.getPeptides()).toEqual(peptides.split("\n"));
+        expect(createdAssay.getPeptides()).toEqual(peptides.split("\n"));
         expect(createdAssay.getName()).toEqual(name);
 
         done();

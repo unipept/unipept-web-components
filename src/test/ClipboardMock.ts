@@ -1,3 +1,9 @@
+/**
+ * Mock for a clipboard that can only be used to read and write text from. Calls to the methods off this clipboard
+ * can be checked by Jest.
+ *
+ * @author Pieter Verschaffelt
+ */
 export default class ClipboardMock {
     private clipboardContents: string = "";
 

@@ -5,10 +5,10 @@
             peptides. You can BLAST them by clicking the links or copy them by using the button below.
         </div>
 
-        <v-data-table :headers="headers" :items="missedPeptides" :items-per-page="10">
+        <v-data-table :headers="headers" :items="items" :items-per-page="10">
             <template v-slot:item.action="{ item }">
                 <tooltip message="BLAST this peptide in an external window.">
-                    <v-icon @click="openBlastUrl(item)">mdi-open-in-new</v-icon>
+                    <v-icon @click="openBlastUrl(item.value)">mdi-open-in-new</v-icon>
                 </tooltip>
             </template>
         </v-data-table>
@@ -41,9 +41,10 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 })
 export default class MissingPeptidesList extends Vue {
     @Prop({ required: true })
-    private missedPeptides: Peptide[] = [];
+    private missedPeptides: Peptide[];
 
     private loading: boolean = true;
+    private items: { value: string }[] = [];
 
     private headers = [
         {
@@ -61,6 +62,20 @@ export default class MissingPeptidesList extends Vue {
             value: "action"
         }
     ]
+
+    private mounted() {
+        this.onMissedPeptidesChanged();
+    }
+
+    @Watch("missedPeptides")
+    private onMissedPeptidesChanged() {
+        this.items.length = 0;
+        this.items.push(...this.missedPeptides.map(i => {
+            return {
+                value: i
+            }
+        }));
+    }
 
     private openBlastUrl(peptide: string) {
         const url: string = "http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&SET_SAVED_SEARCH=on" +

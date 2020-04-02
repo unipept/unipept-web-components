@@ -9,7 +9,8 @@ import pridedata from "./resources/pridedata.json";
 import sampledata from "./resources/sampledata.json";
 import LocalStorageMock from "./LocalStorageMock";
 import ClipboardMock from "./ClipboardMock";
-const fetchPolifill = require("whatwg-fetch")
+import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+const fetchPolyfill = require("whatwg-fetch")
 
 export default class Setup {
     public setupAll() {
@@ -25,7 +26,7 @@ export default class Setup {
     }
 
     public setupFetch() {
-        globalThis.fetch = fetchPolifill.fetch;
+        globalThis.fetch = fetchPolyfill.fetch;
     }
 
     public setupClipboard() {
@@ -35,28 +36,38 @@ export default class Setup {
         writableNavigator.clipboard = new ClipboardMock();
     }
 
+    /**
+     * Intercepts calls to the PRIDE-API and makes sure that deterministic results are returned. Only calls required to
+     * retrieve assay 2600 are intercepted.
+     */
     public setUpPrideNock() {
-        const prideQueryScope = nock("https://www.ebi.ac.uk")
+        nock("https://www.ebi.ac.uk")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .get("/pride/ws/archive/peptide/count/assay/2600")
             .reply(200, "588");
 
-        const prideResultScope = nock("https://www.ebi.ac.uk")
+        nock("https://www.ebi.ac.uk")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .get("/pride/ws/archive/peptide/list/assay/2600?show=1000&page=0")
             .reply(200, pridedata);
     }
 
+    /**
+     * Set up interceptors for Unipept API-calls that are performed when analysing the realistic assay, given by the
+     * mockRealisticAssay-function in the Mock-class.
+     */
     public setupUnipeptNock() {
-        const sampleScope = nock("http://unipept.ugent.be")
+        NetworkConfiguration.BASE_URL = "http://unipept.ugent.be";
+
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/datasets/sampledata")
             .reply(200, sampledata);
 
-        const pept2dataScope = nock("http://unipept.ugent.be")
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/mpa/pept2data", {
@@ -91,28 +102,34 @@ export default class Setup {
                 "missed": false
             })
             .reply(200, pept2data);
-    
-        const taxa1Scope = nock("http://unipept.ugent.be")
+
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/taxa", {
                 "taxids": [
-                    976,
-                    9606,
+                    816,
                     1,
-                    186802,
-                    2,
                     9604,
-                    816
+                    9606,
+                    186802,
+                    976,
+                    2
                 ]
             })
             .reply(200, taxa1);
-    
-        const taxa2Scope = nock("http://unipept.ugent.be")
+
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/taxa", {
                 "taxids": [
+                    2,
+                    976,
+                    200643,
+                    171549,
+                    815,
+                    816,
                     2759,
                     33208,
                     7711,
@@ -125,18 +142,18 @@ export default class Setup {
                     314293,
                     9526,
                     314295,
+                    9604,
                     207598,
                     9605,
+                    9606,
                     1239,
                     186801,
-                    200643,
-                    171549,
-                    815
+                    186802
                 ]
             })
             .reply(200, taxa2);
-        
-        const goterms1Scope = nock("http://unipept.ugent.be")
+
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/goterms", {
@@ -244,8 +261,8 @@ export default class Setup {
                 ]
             })
             .reply(200, goterms1);
-        
-        const goterms2Scope = nock("http://unipept.ugent.be")
+
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/goterms", {
@@ -353,8 +370,8 @@ export default class Setup {
                 ]
             })
             .reply(200, goterms2);
-    
-        const ecnumbersScope = nock("http://unipept.ugent.be")
+
+        nock("http://unipept.ugent.be")
             .defaultReplyHeaders({ "access-control-allow-origin": "*" })
             .persist()
             .post("/private_api/ecnumbers", {

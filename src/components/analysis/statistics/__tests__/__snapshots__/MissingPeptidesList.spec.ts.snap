@@ -15,7 +15,7 @@ LGLVAVSR"
 
 exports[`MissingPeptidesList correctly renders all peptides 1`] = `
 "<div>
-        Sorry, we didn't manage to find 10 of your 
+        Sorry, we didn't manage to find 10 of your
         peptides. You can BLAST them by clicking the links or copy them by using the button below.
     </div>"
 `;
