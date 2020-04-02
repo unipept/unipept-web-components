@@ -5,7 +5,7 @@ import Vuex from "vuex";
 import LoadSampleDatasetCard from "./../LoadSampleDatasetCard.vue";
 import Setup from "@/test/Setup";
 import { sleep, waitForPromises, waitForElement, waitForCondition } from "@/test/Utils";
-import * as expectedSampleData from "@/test/resources/sampledata.json";
+import * as expectedSampleData from "@/test/api/resources/unipept/sampledata.json";
 import SampleAssayCollection from "@/business/entities/sample/SampleAssayCollection";
 import SampleAssay from "@/business/entities/sample/SampleAssay";
 

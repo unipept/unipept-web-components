@@ -10,6 +10,7 @@ import { CountTable } from "@/business/counts/CountTable";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+import { PeptideDataResponse } from "@/business/communication/peptides/PeptideDataResponse";
 
 const counts = new Map([
     ["AAAAA", 1],
@@ -25,7 +26,11 @@ describe("Pept2DataCommunicator", () => {
     beforeEach(() => {
         const setup = new Setup();
         setup.setupFetch();
-        NetworkConfiguration.BASE_URL = "http://unipept.ugent.be"
+        NetworkConfiguration.BASE_URL = "http://unipept.ugent.be";
+
+        // Reset Pept2DataCommunicator state
+        Pept2DataCommunicator["configurationToResponses"] = new Map<string, Map<string, PeptideDataResponse>>();
+        Pept2DataCommunicator["configurationToProcessed"] = new Map<string, Set<Peptide>>();
     })
 
     it("correctly computes the PeptideTrust for a list of peptides", async(done) => {
@@ -87,16 +92,26 @@ describe("Pept2DataCommunicator", () => {
         // Now, we construct a larger count table in which the peptides from the smaller set also occur. We expect the
         // communicator to only request the peptides that haven't been processed before. We do this by setting up a
         // Nock-interceptor that only reacts to the subset of peptides that haven't been processed before.
-        const environment = setupNock(["FATSDLNDLYR", "ELASLHGTK"], JSON.stringify({
-            peptides: [FATSDLNDLYR]
-        }));
+        let interceptorCalled = false;
+
+        nock("http://unipept.ugent.be")
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
+            .post("/mpa/pept2data", {
+                "peptides": ["FATSDLNDLYR", "ELASLHGTK"],
+                "equate_il": true,
+                "missed": false
+            })
+            .reply((uri, requestBody) => {
+                interceptorCalled = true;
+                return [200, {
+                    peptides: [FATSDLNDLYR]
+                }]
+            });
 
         const largeCountTable = new CountTable<Peptide>(counts);
-
         await Pept2DataCommunicator.process(largeCountTable, searchConfig);
 
-        expect(environment.isDone()).toBeTruthy();
-
+        expect(interceptorCalled).toBeTruthy();
         done();
     });
 
@@ -131,7 +146,6 @@ describe("Pept2DataCommunicator", () => {
 function setupNock(peptides: Peptide[], reply: string): Scope {
     return nock("http://unipept.ugent.be")
         .defaultReplyHeaders({ "access-control-allow-origin": "*" })
-        .persist()
         .post("/mpa/pept2data", {
             "peptides": peptides,
             "equate_il": true,

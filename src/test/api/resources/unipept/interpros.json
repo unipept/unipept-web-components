@@ -1,0 +1,692 @@
+[
+  {
+    "code": "IPR000180",
+    "category": "Active_site",
+    "name": "Membrane dipeptidase, active site"
+  },
+  {
+    "code": "IPR018114",
+    "category": "Active_site",
+    "name": "Serine proteases, trypsin family, histidine active site"
+  },
+  {
+    "code": "IPR033116",
+    "category": "Active_site",
+    "name": "Serine proteases, trypsin family, serine active site"
+  },
+  {
+    "code": "IPR033524",
+    "category": "Active_site",
+    "name": "Leu/Phe/Val dehydrogenases active site"
+  },
+  {
+    "code": "IPR013516",
+    "category": "Binding_site",
+    "name": "Phytochrome chromophore binding site"
+  },
+  {
+    "code": "IPR015887",
+    "category": "Binding_site",
+    "name": "DNA glycosylase/AP lyase, zinc finger domain, DNA-binding site"
+  },
+  {
+    "code": "IPR001131",
+    "category": "Conserved_site",
+    "name": "Peptidase M24B, X-Pro dipeptidase/aminopeptidase P, conserved site"
+  },
+  {
+    "code": "IPR001331",
+    "category": "Conserved_site",
+    "name": "Guanine-nucleotide dissociation stimulator, CDC24, conserved site"
+  },
+  {
+    "code": "IPR004027",
+    "category": "Conserved_site",
+    "name": "SEC-C motif"
+  },
+  {
+    "code": "IPR015994",
+    "category": "Conserved_site",
+    "name": "Phosphoenolpyruvate carboxykinase (ATP), conserved site"
+  },
+  {
+    "code": "IPR017871",
+    "category": "Conserved_site",
+    "name": "ABC transporter, conserved site"
+  },
+  {
+    "code": "IPR017983",
+    "category": "Conserved_site",
+    "name": "GPCR, family 2, secretin-like, conserved site"
+  },
+  {
+    "code": "IPR018369",
+    "category": "Conserved_site",
+    "name": "Chaperonin GroES, conserved site"
+  },
+  {
+    "code": "IPR020937",
+    "category": "Conserved_site",
+    "name": "SecA conserved site"
+  },
+  {
+    "code": "IPR023795",
+    "category": "Conserved_site",
+    "name": "Serpin, conserved site"
+  },
+  {
+    "code": "IPR031157",
+    "category": "Conserved_site",
+    "name": "Tr-type G domain, conserved site"
+  },
+  {
+    "code": "IPR033749",
+    "category": "Conserved_site",
+    "name": "Polyprenyl synthetase, conserved site"
+  },
+  {
+    "code": "IPR000014",
+    "category": "Domain",
+    "name": "PAS domain"
+  },
+  {
+    "code": "IPR000214",
+    "category": "Domain",
+    "name": "Zinc finger, DNA glycosylase/AP lyase-type"
+  },
+  {
+    "code": "IPR000219",
+    "category": "Domain",
+    "name": "Dbl homology (DH) domain"
+  },
+  {
+    "code": "IPR000587",
+    "category": "Domain",
+    "name": "Creatinase, N-terminal"
+  },
+  {
+    "code": "IPR000722",
+    "category": "Domain",
+    "name": "RNA polymerase, alpha subunit"
+  },
+  {
+    "code": "IPR000795",
+    "category": "Domain",
+    "name": "Transcription factor, GTP-binding domain"
+  },
+  {
+    "code": "IPR000834",
+    "category": "Domain",
+    "name": "Peptidase M14, carboxypeptidase A"
+  },
+  {
+    "code": "IPR000994",
+    "category": "Domain",
+    "name": "Peptidase M24"
+  },
+  {
+    "code": "IPR001079",
+    "category": "Domain",
+    "name": "Galectin, carbohydrate recognition domain"
+  },
+  {
+    "code": "IPR001254",
+    "category": "Domain",
+    "name": "Serine proteases, trypsin domain"
+  },
+  {
+    "code": "IPR001279",
+    "category": "Domain",
+    "name": "Metallo-beta-lactamase"
+  },
+  {
+    "code": "IPR001650",
+    "category": "Domain",
+    "name": "Helicase, C-terminal"
+  },
+  {
+    "code": "IPR001750",
+    "category": "Domain",
+    "name": "NADH:quinone oxidoreductase/Mrp antiporter, membrane subunit"
+  },
+  {
+    "code": "IPR001879",
+    "category": "Domain",
+    "name": "GPCR, family 2, extracellular hormone receptor domain"
+  },
+  {
+    "code": "IPR002938",
+    "category": "Domain",
+    "name": "FAD-binding domain"
+  },
+  {
+    "code": "IPR003018",
+    "category": "Domain",
+    "name": "GAF domain"
+  },
+  {
+    "code": "IPR003146",
+    "category": "Domain",
+    "name": "Carboxypeptidase, activation peptide"
+  },
+  {
+    "code": "IPR003439",
+    "category": "Domain",
+    "name": "ABC transporter-like"
+  },
+  {
+    "code": "IPR003593",
+    "category": "Domain",
+    "name": "AAA+ ATPase domain"
+  },
+  {
+    "code": "IPR003594",
+    "category": "Domain",
+    "name": "Histidine kinase/HSP90-like ATPase"
+  },
+  {
+    "code": "IPR003661",
+    "category": "Domain",
+    "name": "Signal transduction histidine kinase, dimerisation/phosphoacceptor domain"
+  },
+  {
+    "code": "IPR004015",
+    "category": "Domain",
+    "name": "SKI-interacting protein SKIP, SNW domain"
+  },
+  {
+    "code": "IPR004160",
+    "category": "Domain",
+    "name": "Translation elongation factor EFTu/EF1A, C-terminal"
+  },
+  {
+    "code": "IPR004161",
+    "category": "Domain",
+    "name": "Translation elongation factor EFTu-like, domain 2"
+  },
+  {
+    "code": "IPR004568",
+    "category": "Domain",
+    "name": "Phosphopantetheine-protein transferase domain"
+  },
+  {
+    "code": "IPR005225",
+    "category": "Domain",
+    "name": "Small GTP-binding protein domain"
+  },
+  {
+    "code": "IPR005467",
+    "category": "Domain",
+    "name": "Histidine kinase domain"
+  },
+  {
+    "code": "IPR006096",
+    "category": "Domain",
+    "name": "Glutamate/phenylalanine/leucine/valine dehydrogenase, C-terminal"
+  },
+  {
+    "code": "IPR006097",
+    "category": "Domain",
+    "name": "Glutamate/phenylalanine/leucine/valine dehydrogenase, dimerisation domain"
+  },
+  {
+    "code": "IPR006592",
+    "category": "Domain",
+    "name": "RNA polymerase, N-terminal"
+  },
+  {
+    "code": "IPR007066",
+    "category": "Domain",
+    "name": "RNA polymerase Rpb1, domain 3"
+  },
+  {
+    "code": "IPR007080",
+    "category": "Domain",
+    "name": "RNA polymerase Rpb1, domain 1"
+  },
+  {
+    "code": "IPR007081",
+    "category": "Domain",
+    "name": "RNA polymerase Rpb1, domain 5"
+  },
+  {
+    "code": "IPR007083",
+    "category": "Domain",
+    "name": "RNA polymerase Rpb1, domain 4"
+  },
+  {
+    "code": "IPR008278",
+    "category": "Domain",
+    "name": "4'-phosphopantetheinyl transferase domain"
+  },
+  {
+    "code": "IPR010663",
+    "category": "Domain",
+    "name": "Zinc finger, FPG/IleRS-type"
+  },
+  {
+    "code": "IPR011115",
+    "category": "Domain",
+    "name": "SecA DEAD-like, N-terminal"
+  },
+  {
+    "code": "IPR011116",
+    "category": "Domain",
+    "name": "SecA Wing/Scaffold"
+  },
+  {
+    "code": "IPR011130",
+    "category": "Domain",
+    "name": "SecA, preprotein cross-linking domain"
+  },
+  {
+    "code": "IPR012319",
+    "category": "Domain",
+    "name": "Formamidopyrimidine-DNA glycosylase, catalytic domain"
+  },
+  {
+    "code": "IPR013515",
+    "category": "Domain",
+    "name": "Phytochrome, central region"
+  },
+  {
+    "code": "IPR013654",
+    "category": "Domain",
+    "name": "PAS fold-2"
+  },
+  {
+    "code": "IPR013767",
+    "category": "Domain",
+    "name": "PAS fold"
+  },
+  {
+    "code": "IPR014018",
+    "category": "Domain",
+    "name": "SecA motor DEAD"
+  },
+  {
+    "code": "IPR015886",
+    "category": "Domain",
+    "name": "DNA glycosylase/AP lyase, H2TH DNA-binding"
+  },
+  {
+    "code": "IPR016132",
+    "category": "Domain",
+    "name": "Phytochrome chromophore attachment domain"
+  },
+  {
+    "code": "IPR017981",
+    "category": "Domain",
+    "name": "GPCR, family 2-like"
+  },
+  {
+    "code": "IPR022712",
+    "category": "Domain",
+    "name": "Beta-Casp domain"
+  },
+  {
+    "code": "IPR023796",
+    "category": "Domain",
+    "name": "Serpin domain"
+  },
+  {
+    "code": "IPR031329",
+    "category": "Domain",
+    "name": "Neutral/alkaline non-lysosomal ceramidase, N-terminal"
+  },
+  {
+    "code": "IPR031331",
+    "category": "Domain",
+    "name": "Neutral/alkaline non-lysosomal ceramidase, C-terminal"
+  },
+  {
+    "code": "IPR032416",
+    "category": "Domain",
+    "name": "Peptidase M24, C-terminal domain"
+  },
+  {
+    "code": "IPR033720",
+    "category": "Domain",
+    "name": "Elongation factor Tu, domain 2"
+  },
+  {
+    "code": "IPR033740",
+    "category": "Domain",
+    "name": "Aminopeptidase P"
+  },
+  {
+    "code": "IPR033922",
+    "category": "Domain",
+    "name": "NAD(P) binding domain of glutamate dehydrogenase"
+  },
+  {
+    "code": "IPR041709",
+    "category": "Domain",
+    "name": "Elongation factor Tu (EF-Tu), GTP-binding domain"
+  },
+  {
+    "code": "IPR000092",
+    "category": "Family",
+    "name": "Polyprenyl synthetase"
+  },
+  {
+    "code": "IPR000131",
+    "category": "Family",
+    "name": "ATP synthase, F1 complex, gamma subunit"
+  },
+  {
+    "code": "IPR000185",
+    "category": "Family",
+    "name": "Protein translocase subunit SecA"
+  },
+  {
+    "code": "IPR000215",
+    "category": "Family",
+    "name": "Serpin family"
+  },
+  {
+    "code": "IPR000832",
+    "category": "Family",
+    "name": "GPCR, family 2, secretin-like"
+  },
+  {
+    "code": "IPR001272",
+    "category": "Family",
+    "name": "Phosphoenolpyruvate carboxykinase, ATP-utilising"
+  },
+  {
+    "code": "IPR001294",
+    "category": "Family",
+    "name": "Phytochrome"
+  },
+  {
+    "code": "IPR001314",
+    "category": "Family",
+    "name": "Peptidase S1A, chymotrypsin family"
+  },
+  {
+    "code": "IPR002582",
+    "category": "Family",
+    "name": "Holo-[acyl carrier protein] synthase"
+  },
+  {
+    "code": "IPR004541",
+    "category": "Family",
+    "name": "Translation elongation factor EFTu/EF1A, bacterial/organelle"
+  },
+  {
+    "code": "IPR006095",
+    "category": "Family",
+    "name": "Glutamate/phenylalanine/leucine/valine dehydrogenase"
+  },
+  {
+    "code": "IPR006823",
+    "category": "Family",
+    "name": "Neutral/alkaline nonlysosomal ceramidase"
+  },
+  {
+    "code": "IPR008257",
+    "category": "Family",
+    "name": "Peptidase M19"
+  },
+  {
+    "code": "IPR010096",
+    "category": "Family",
+    "name": "NAD(P)H-quinone oxidoreductase, subunit N/subunit 2"
+  },
+  {
+    "code": "IPR012129",
+    "category": "Family",
+    "name": "Phytochrome A/B/C/D/E"
+  },
+  {
+    "code": "IPR012754",
+    "category": "Family",
+    "name": "DNA-directed RNA polymerase, subunit beta-prime"
+  },
+  {
+    "code": "IPR012755",
+    "category": "Family",
+    "name": "DNA-directed RNA polymerase, subunit gamma"
+  },
+  {
+    "code": "IPR012756",
+    "category": "Family",
+    "name": "DNA-directed RNA polymerase, subunit beta''"
+  },
+  {
+    "code": "IPR014362",
+    "category": "Family",
+    "name": "Glutamate dehydrogenase"
+  },
+  {
+    "code": "IPR015533",
+    "category": "Family",
+    "name": "Galectin-4/6"
+  },
+  {
+    "code": "IPR017862",
+    "category": "Family",
+    "name": "SKI-interacting protein, SKIP"
+  },
+  {
+    "code": "IPR017882",
+    "category": "Family",
+    "name": "Zinc import ATP-binding protein ZnuC"
+  },
+  {
+    "code": "IPR020629",
+    "category": "Family",
+    "name": "Formamidopyrimidine-DNA glycosylase"
+  },
+  {
+    "code": "IPR020818",
+    "category": "Family",
+    "name": "GroES chaperonin family"
+  },
+  {
+    "code": "IPR027074",
+    "category": "Family",
+    "name": "Integrator complex subunit 9"
+  },
+  {
+    "code": "IPR028536",
+    "category": "Family",
+    "name": "Dipeptidase 1"
+  },
+  {
+    "code": "IPR034678",
+    "category": "Family",
+    "name": "DNA-directed RNA polymerase subunit RpoC1"
+  },
+  {
+    "code": "IPR039917",
+    "category": "Family",
+    "name": "Rho guanine nucleotide exchange factor 17"
+  },
+  {
+    "code": "IPR039919",
+    "category": "Family",
+    "name": "Rho guanine nucleotide exchange factor 10/17"
+  },
+  {
+    "code": "IPR008210",
+    "category": "Homologous_superfamily",
+    "name": "Phosphoenolpyruvate carboxykinase, N-terminal"
+  },
+  {
+    "code": "IPR008949",
+    "category": "Homologous_superfamily",
+    "name": "Isoprenoid synthase domain superfamily"
+  },
+  {
+    "code": "IPR009000",
+    "category": "Homologous_superfamily",
+    "name": "Translation protein, beta-barrel domain superfamily"
+  },
+  {
+    "code": "IPR009001",
+    "category": "Homologous_superfamily",
+    "name": "Translation elongation factor EF1A/initiation factor IF2gamma, C-terminal"
+  },
+  {
+    "code": "IPR009003",
+    "category": "Homologous_superfamily",
+    "name": "Peptidase S1, PA clan"
+  },
+  {
+    "code": "IPR010979",
+    "category": "Homologous_superfamily",
+    "name": "Ribosomal protein S13-like, H2TH"
+  },
+  {
+    "code": "IPR011032",
+    "category": "Homologous_superfamily",
+    "name": "GroES-like superfamily"
+  },
+  {
+    "code": "IPR011047",
+    "category": "Homologous_superfamily",
+    "name": "Quinoprotein alcohol dehydrogenase-like superfamily"
+  },
+  {
+    "code": "IPR011054",
+    "category": "Homologous_superfamily",
+    "name": "Rudiment single hybrid motif"
+  },
+  {
+    "code": "IPR013035",
+    "category": "Homologous_superfamily",
+    "name": "Phosphoenolpyruvate carboxykinase, C-terminal"
+  },
+  {
+    "code": "IPR013320",
+    "category": "Homologous_superfamily",
+    "name": "Concanavalin A-like lectin/glucanase domain superfamily"
+  },
+  {
+    "code": "IPR027417",
+    "category": "Homologous_superfamily",
+    "name": "P-loop containing nucleoside triphosphate hydrolase"
+  },
+  {
+    "code": "IPR029016",
+    "category": "Homologous_superfamily",
+    "name": "GAF-like domain superfamily"
+  },
+  {
+    "code": "IPR029149",
+    "category": "Homologous_superfamily",
+    "name": "Creatinase/Aminopeptidase P/Spt16, N-terminal"
+  },
+  {
+    "code": "IPR032466",
+    "category": "Homologous_superfamily",
+    "name": "Metal-dependent hydrolase"
+  },
+  {
+    "code": "IPR035899",
+    "category": "Homologous_superfamily",
+    "name": "Dbl homology (DH) domain superfamily"
+  },
+  {
+    "code": "IPR035937",
+    "category": "Homologous_superfamily",
+    "name": "MutM-like, N-terminal"
+  },
+  {
+    "code": "IPR035965",
+    "category": "Homologous_superfamily",
+    "name": "PAS domain superfamily"
+  },
+  {
+    "code": "IPR035968",
+    "category": "Homologous_superfamily",
+    "name": "ATP synthase, F1 complex, gamma subunit superfamily"
+  },
+  {
+    "code": "IPR036005",
+    "category": "Homologous_superfamily",
+    "name": "Creatinase/aminopeptidase-like"
+  },
+  {
+    "code": "IPR036186",
+    "category": "Homologous_superfamily",
+    "name": "Serpin superfamily"
+  },
+  {
+    "code": "IPR036188",
+    "category": "Homologous_superfamily",
+    "name": "FAD/NAD(P)-binding domain superfamily"
+  },
+  {
+    "code": "IPR036266",
+    "category": "Homologous_superfamily",
+    "name": "SecA, Wing/Scaffold superfamily"
+  },
+  {
+    "code": "IPR036291",
+    "category": "Homologous_superfamily",
+    "name": "NAD(P)-binding domain superfamily"
+  },
+  {
+    "code": "IPR036445",
+    "category": "Homologous_superfamily",
+    "name": "GPCR family 2, extracellular hormone receptor domain superfamily"
+  },
+  {
+    "code": "IPR036670",
+    "category": "Homologous_superfamily",
+    "name": "SecA, preprotein cross-linking domain superfamily"
+  },
+  {
+    "code": "IPR036866",
+    "category": "Homologous_superfamily",
+    "name": "Ribonuclease Z/Hydroxyacylglutathione hydrolase-like"
+  },
+  {
+    "code": "IPR036890",
+    "category": "Homologous_superfamily",
+    "name": "Histidine kinase/HSP90-like ATPase superfamily"
+  },
+  {
+    "code": "IPR036990",
+    "category": "Homologous_superfamily",
+    "name": "Metallocarboxypeptidase-like, propeptide"
+  },
+  {
+    "code": "IPR037124",
+    "category": "Homologous_superfamily",
+    "name": "GroES chaperonin superfamily"
+  },
+  {
+    "code": "IPR037143",
+    "category": "Homologous_superfamily",
+    "name": "4'-phosphopantetheinyl transferase domain superfamily"
+  },
+  {
+    "code": "IPR038120",
+    "category": "Homologous_superfamily",
+    "name": "RNA polymerase Rpb1, funnel domain superfamily"
+  },
+  {
+    "code": "IPR038445",
+    "category": "Homologous_superfamily",
+    "name": "Neutral ceramidase, C-terminal domain superfamily"
+  },
+  {
+    "code": "IPR042102",
+    "category": "Homologous_superfamily",
+    "name": "RNA polymerase Rpb1, domain 3 superfamily"
+  },
+  {
+    "code": "IPR042178",
+    "category": "Homologous_superfamily",
+    "name": "Serpin superfamily, domain 1"
+  },
+  {
+    "code": "IPR042185",
+    "category": "Homologous_superfamily",
+    "name": "Serpin superfamily, domain 2"
+  }
+]

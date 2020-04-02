@@ -14,13 +14,13 @@ export default class PrideCommunicator {
         }
 
         let peptides: string[] = [];
-        const datasetSize: number = await NetworkUtils.get(this.PRIDE_COUNT_ENDPOINT + id);
+        const datasetSize: number = await NetworkUtils.get(PrideCommunicator.PRIDE_COUNT_ENDPOINT + id);
 
         const urls: string[] = [];
         let page: number;
 
         for (page = 0; page * this.PRIDE_BATCH_SIZE < datasetSize; page++) {
-            urls.push("https://www.ebi.ac.uk/pride/ws/archive/peptide/list/assay/" + id + "?show=" + this.PRIDE_BATCH_SIZE + "&page=" + page);
+            urls.push(PrideCommunicator.PRIDE_LIST_ENDPOINT + id + "?show=" + this.PRIDE_BATCH_SIZE + "&page=" + page);
         }
 
         page = 0;
