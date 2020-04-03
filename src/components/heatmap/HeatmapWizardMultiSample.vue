@@ -157,7 +157,7 @@ export default class HeatmapWizardMultiSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c),
             ontologyProcessor: new NcbiOntologyProcessor(),
-            categories: Object.values(NcbiRank).map(StringUtils.capitalize),
+            categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
             categoryTitle: "Rank"
         },
@@ -166,7 +166,7 @@ export default class HeatmapWizardMultiSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new GoCountTableProcessor(p, c),
             ontologyProcessor: new GoOntologyProcessor(),
-            categories: Object.values(GoNamespace).map(StringUtils.capitalize),
+            categories: Object.values(GoNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
         },
@@ -175,7 +175,7 @@ export default class HeatmapWizardMultiSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new EcCountTableProcessor(p, c),
             ontologyProcessor: new EcOntologyProcessor(),
-            categories: Object.values(EcNamespace).map(StringUtils.capitalize),
+            categories: Object.values(EcNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
         },
@@ -184,7 +184,7 @@ export default class HeatmapWizardMultiSample extends Vue {
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new InterproCountTableProcessor(p, c),
             ontologyProcessor: new InterproOntologyProcessor(),
-            categories: Object.values(InterproNamespace).map(StringUtils.capitalize),
+            categories: Object.values(InterproNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
         }
