@@ -57,7 +57,6 @@ export default abstract class FunctionalCountTableProcessor<
         }
     }
 
-
     /**
      * @return A trust-object that describes how many of the given peptides are in fact associated with at least one
      * annotation.
@@ -83,10 +82,10 @@ export default abstract class FunctionalCountTableProcessor<
 
         await Pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
-        // First we count the amount of peptides per unique GoCode. Afterwards, we can fetch definitions for all these
+        // First we count the amount of peptides per unique code. Afterwards, we can fetch definitions for all these
         // terms and split them on namespace.
         const countsPerCode = new Map<OntologyId, number>();
-        // Keeps track of how many peptides are associated with at least one GO-term
+        // Keeps track of how many peptides are associated with at least one annotation
         let annotatedCount = 0;
 
         this.item2Peptides = new Map<OntologyId, Peptide[]>();
@@ -118,7 +117,7 @@ export default abstract class FunctionalCountTableProcessor<
             }
 
             if (uniqueTerms.length > 0) {
-                annotatedCount++;
+                annotatedCount += peptideCount;
             }
         }
 

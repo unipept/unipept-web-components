@@ -15,7 +15,11 @@ export class CountTable<OntologyId> {
     }
 
     getCounts(id: OntologyId): number {
-        return this.counts.get(id);
+        const result = this.counts.get(id);
+        if (!result) {
+            return 0;
+        }
+        return result;
     }
 
     /**
