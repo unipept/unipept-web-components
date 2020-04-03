@@ -1,4 +1,3 @@
-import ProteomicsAssay from "./../../entities/assay/ProteomicsAssay";
 import ProgressListener from "./../../progress/ProgressListener";
 import NetworkUtils from "./../NetworkUtils";
 import { Peptide } from "./../../ontology/raw/Peptide";
