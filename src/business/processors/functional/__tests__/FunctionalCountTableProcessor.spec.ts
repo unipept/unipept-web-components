@@ -109,5 +109,5 @@ describe("FunctionalCountTableProcessor", () => {
         expect(mapping.get("EC:1.1.1.1")).toBeFalsy();
 
         done();
-    });F
+    });
 });
