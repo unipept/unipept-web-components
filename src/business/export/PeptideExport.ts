@@ -112,7 +112,7 @@ export default class PeptideExport {
 
                     row.push(
                         goTerms
-                            .map(a => `${a[0].substr(3)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.fa.counts.GO)})`)
+                            .map(a => `${a[0]} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.fa.counts.GO)})`)
                             .join(secondarySeparator)
                     );
 
@@ -153,7 +153,12 @@ export default class PeptideExport {
     ): [string, number][] {
         return (Object.entries(pept2DataResponse.fa.data) as [string, any][] as [string, number][])
             .filter(filterCondition)
-            .sort((a, b) => b[1] - a[1])
+            .sort((a, b) => {
+                if (b[1] === a[1]) {
+                    return a[0] < b[0] ? -1 : 1;
+                }
+                return b[1] - a[1]
+            })
             .slice(0, 3);
     }
 
