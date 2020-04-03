@@ -136,6 +136,7 @@ export default abstract class FunctionalCountTableProcessor<
         // Add each definition to the count table of it's specific namespace.
         for (const [term, counts] of countsPerCode) {
             const definition: DefinitionType = ontology.getDefinition(term);
+
             if (definition) {
                 const nsMap = tablePerNamespace.get(definition.namespace);
                 nsMap.set(term, counts);

@@ -1,8 +1,8 @@
-import { Ontology } from "./Ontology";
+import { Ontology, OntologyIdType } from "./Ontology";
 import Definition from "./Definition";
 import { CountTable } from "./../counts/CountTable";
 
-export default interface OntologyProcessor<OntologyId, DefinitionType extends Definition> {
+export default interface OntologyProcessor<OntologyId extends OntologyIdType, DefinitionType extends Definition> {
     /**
      * Asynchronously fetches all ontology definitions for a specific count table. All unique id's that are present in
      * this count table are looked up and processed.

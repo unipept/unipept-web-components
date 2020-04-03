@@ -3,8 +3,9 @@ import { GoCode } from "./../../../ontology/functional/go/GoDefinition";
 import NetworkUtils from "./../../NetworkUtils";
 import NetworkConfiguration from "./../../NetworkConfiguration";
 import { EcCode } from "./../../../ontology/functional/ec/EcDefinition";
+import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
 
-export default class GoResponseCommunicator {
+export default class GoResponseCommunicator implements FunctionalResponseCommunicator<GoCode, GoResponse>{
     private static goCodeToResponseMap = new Map<GoCode, GoResponse>();
     private static codesProcessed = new Set<GoCode>();
     private static inProgress: Promise<void>;
@@ -12,18 +13,18 @@ export default class GoResponseCommunicator {
     public static readonly GO_BATCH_SIZE: number = 100;
     public static readonly GO_ENDPOINT: string = "/private_api/goterms";
 
-    public static async process(codes: GoCode[]): Promise<void> {
-        if (this.inProgress) {
-            await this.inProgress;
+    public async process(codes: GoCode[]): Promise<void> {
+        if (GoResponseCommunicator.inProgress) {
+            await GoResponseCommunicator.inProgress;
         }
 
-        this.inProgress = this.doProcess(codes);
-        await this.inProgress;
-        this.inProgress = undefined;
+        GoResponseCommunicator.inProgress = GoResponseCommunicator.doProcess(codes);
+        await GoResponseCommunicator.inProgress;
+        GoResponseCommunicator.inProgress = undefined;
     }
 
-    public static getResponse(code: GoCode): GoResponse | undefined {
-        return this.goCodeToResponseMap.get(code);
+    public getResponse(code: GoCode): GoResponse | undefined {
+        return GoResponseCommunicator.goCodeToResponseMap.get(code);
     }
 
     private static async doProcess(codes: EcCode[]) {

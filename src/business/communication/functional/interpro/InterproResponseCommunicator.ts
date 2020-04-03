@@ -2,8 +2,9 @@ import { InterproCode } from "./../../../ontology/functional/interpro/InterproDe
 import InterproResponse from "./InterproResponse";
 import NetworkUtils from "./../../NetworkUtils";
 import NetworkConfiguration from "./../../NetworkConfiguration";
+import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
 
-export default class InterproResponseCommunicator {
+export default class InterproResponseCommunicator implements FunctionalResponseCommunicator<InterproCode, InterproResponse>{
     private static interproCodeToResponseMap = new Map<InterproCode, InterproResponse>();
     private static codesProcessed = new Set<InterproCode>();
     private static inProgress: Promise<void>;
@@ -11,18 +12,18 @@ export default class InterproResponseCommunicator {
     public static readonly INTERPRO_BATCH_SIZE: number = 100;
     public static readonly INTERPRO_ENDPOINT: string = "/private_api/interpros";
 
-    public static async process(codes: InterproCode[]): Promise<void> {
-        if (this.inProgress) {
-            await this.inProgress;
+    public async process(codes: InterproCode[]): Promise<void> {
+        if (InterproResponseCommunicator.inProgress) {
+            await InterproResponseCommunicator.inProgress;
         }
 
-        this.inProgress = this.doProcess(codes);
-        await this.inProgress;
-        this.inProgress = undefined;
+        InterproResponseCommunicator.inProgress = InterproResponseCommunicator.doProcess(codes);
+        await InterproResponseCommunicator.inProgress;
+        InterproResponseCommunicator.inProgress = undefined;
     }
 
-    public static getResponse(code: InterproCode): InterproResponse | undefined {
-        return this.interproCodeToResponseMap.get(code);
+    public getResponse(code: InterproCode): InterproResponse | undefined {
+        return InterproResponseCommunicator.interproCodeToResponseMap.get(code);
     }
 
     private static async doProcess(codes: InterproCode[]): Promise<void> {

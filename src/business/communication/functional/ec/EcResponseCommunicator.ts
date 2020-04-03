@@ -2,8 +2,9 @@ import { EcCode } from "./../../../ontology/functional/ec/EcDefinition";
 import { EcResponse } from "./EcResponse";
 import NetworkConfiguration from "./../../NetworkConfiguration";
 import NetworkUtils from "./../../NetworkUtils";
+import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
 
-export default class EcResponseCommunicator {
+export default class EcResponseCommunicator implements FunctionalResponseCommunicator<EcCode, EcResponse>{
     private static ecCodeToResponseMap = new Map<EcCode, EcResponse>();
     private static codesProcessed = new Set<EcCode>();
     private static inProgress: Promise<void>;
@@ -11,18 +12,18 @@ export default class EcResponseCommunicator {
     public static readonly EC_BATCH_SIZE: number = 100;
     public static readonly EC_ENDPOINT: string = "/private_api/ecnumbers";
 
-    public static async process(codes: EcCode[]): Promise<void> {
-        if (this.inProgress) {
-            await this.inProgress;
+    public async process(codes: EcCode[]): Promise<void> {
+        if (EcResponseCommunicator.inProgress) {
+            await EcResponseCommunicator.inProgress;
         }
 
-        this.inProgress = this.doProcess(codes);
-        await this.inProgress;
-        this.inProgress = undefined;
+        EcResponseCommunicator.inProgress = EcResponseCommunicator.doProcess(codes);
+        await EcResponseCommunicator.inProgress;
+        EcResponseCommunicator.inProgress = undefined;
     }
 
-    public static getResponse(code: EcCode): EcResponse {
-        return this.ecCodeToResponseMap.get(code);
+    public getResponse(code: EcCode): EcResponse {
+        return EcResponseCommunicator.ecCodeToResponseMap.get(code);
     }
 
     private static async doProcess(codes: EcCode[]): Promise<void> {

@@ -5,7 +5,7 @@ import { GoNamespace } from "./..//ontology/functional/go/GoNamespace";
 import Pept2DataCommunicator from "./../communication/peptides/Pept2DataCommunicator";
 import SearchConfiguration from "./../configuration/SearchConfiguration";
 import NcbiTaxon, { NcbiId } from "./../ontology/taxonomic/ncbi/NcbiTaxon";
-import { Ontology } from "./../ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../ontology/Ontology";
 import LcaCountTableProcessor from "./../processors/taxonomic/ncbi/LcaCountTableProcessor";
 import NcbiOntologyProcessor from "./../ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import GoCountTableProcessor from "./../processors/functional/go/GoCountTableProcessor";
@@ -196,7 +196,7 @@ export default class PeptideExport {
         return await ncbiOntologyProcessor.getOntology(lcaCountTable);
     }
 
-    private static async computeFunctionalOntology<OntologyId, OntologyDefinition extends FunctionalDefinition>(
+    private static async computeFunctionalOntology<OntologyId extends OntologyIdType, OntologyDefinition extends FunctionalDefinition>(
         countProcessor: FunctionalCountTableProcessor<OntologyId, OntologyDefinition>,
         ontologyProcessor: OntologyProcessor<OntologyId, OntologyDefinition>
     ): Promise<Ontology<OntologyId, OntologyDefinition>> {
