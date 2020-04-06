@@ -33,6 +33,6 @@ export default class UnipeptApiDataSource {
     }
 
     public getInterproEntriesResponse(interproIds: string[]): {code: string, category: string, name: string}[] {
-        return (interpros as {code: string, category: string, name: string}[]).filter(ipr => interproIds.indexOf(ipr.code));
+        return (interpros as {code: string, category: string, name: string}[]).filter(ipr => interproIds.indexOf(ipr.code) !== -1);
     }
 }

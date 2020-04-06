@@ -1,9 +1,9 @@
-import { Ontology, OntologyIdType } from "@/business/ontology/Ontology";
-import OntologyProcessor from "@/business/ontology/OntologyProcessor";
-import { CountTable } from "@/business/counts/CountTable";
-import FunctionalDefinition from "@/business/ontology/functional/FunctionalDefinition";
-import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
-import FunctionalResponse from "@/business/communication/functional/FunctionalResponse";
+import { Ontology, OntologyIdType } from "./../Ontology";
+import OntologyProcessor from "./../OntologyProcessor";
+import { CountTable } from "./../../counts/CountTable";
+import FunctionalDefinition from "./FunctionalDefinition";
+import FunctionalResponseCommunicator from "./../../communication/functional/FunctionalResponseCommunicator";
+import FunctionalResponse from "./../../communication/functional/FunctionalResponse";
 
 export default abstract class FunctionalOntologyProcessor<
     OntologyId extends OntologyIdType,
@@ -15,7 +15,7 @@ export default abstract class FunctionalOntologyProcessor<
     }
 
     public async getOntologyByIds(ids: OntologyId[]): Promise<Ontology<OntologyId, DefinitionType>> {
-        const communicator =  this.getCommunicator();
+        const communicator = this.getCommunicator();
         await communicator.process(ids);
 
         const definitions = new Map<OntologyId, DefinitionType>();
