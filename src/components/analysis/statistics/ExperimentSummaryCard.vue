@@ -230,7 +230,7 @@ export default class ExperimentSummaryCard extends Vue {
                 separator,
                 functionalSeparator
             );
-            await NetworkUtils.downloadDataByForm(csv, `${this.activeAssay.getName()}_mpa_result.csv`, "text/csv");
+            await NetworkUtils.downloadDataByForm(csv, `${this.activeAssay.getName()}_mpa.csv`, "text/csv");
             this.exportLoading = false;
         }
     }
