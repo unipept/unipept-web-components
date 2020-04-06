@@ -25,7 +25,6 @@
     "crypto-js": "^3.1.9-1",
     "d3": "^5.11.0",
     "d3-selection": "^1.4.0",
-    "electron": "^7.1.4",
     "html-to-image-no-fonts": "^0.1.2",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.4.1",
@@ -48,7 +47,7 @@
     "@mdi/font": "^4.1.95",
     "@types/d3": "^5.7.2",
     "@types/d3-selection": "^1.4.1",
-    "@types/jest": "^24.9.1",
+    "@types/jest": "^25.2.1",
     "@types/jquery": "^3.3.31",
     "@vue/cli-plugin-babel": "^4.2.3",
     "@vue/cli-plugin-eslint": "^4.2.3",
@@ -59,7 +58,7 @@
     "@vue/test-utils": "^1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^25.1.0",
+    "babel-jest": "^25.2.6",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.2.0",
     "eslint": "^6.8.0",
@@ -67,7 +66,7 @@
     "fibers": "^4.0.1",
     "file-loader": "^4.2.0",
     "flush-promises": "^1.0.2",
-    "jest": "^25.1.0",
+    "jest": "^25.2.6",
     "jsdom-worker-fix": "^0.1.8",
     "less-loader": "^5.0.0",
     "nock": "^11.4.0",
@@ -76,7 +75,7 @@
     "sass": "^1.17.4",
     "sass-loader": "^7.1.0",
     "svg-inline-loader": "^0.8.0",
-    "ts-jest": "^25.0.0",
+    "ts-jest": "^25.3.1",
     "typescript": "^3.8.3",
     "vue-cli-plugin-styleguidist": "^4.2.0",
     "vue-cli-plugin-vuetify": "^0.6.3",
@@ -111,6 +110,11 @@
     "testEnvironment": "jsdom",
     "setupFilesAfterEnv": [
       "./src/test/init.js"
+    ],
+    "collectCoverageFrom": [
+      "src/business/**/*.{ts,vue}",
+      "src/components/**/*.{ts,vue}",
+      ",!/node_modules/"
     ]
   }
 }
