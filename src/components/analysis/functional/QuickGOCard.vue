@@ -1,11 +1,11 @@
 <template>
     <div style="height: 100%;">
-        <img v-if="items" style="max-width: 100%; max-height: 300px; position: relative; top: 50%; left: 50%; transform: translate(-50%, -50%); cursor: pointer;" :src="getQuickGoSmallUrl()" class="quickGoThumb" @click="showModal = !showModal">
+        <img v-if="items" :src="getQuickGoSmallUrl()" class="quickGoThumb" @click="showModal = !showModal">
         <v-dialog v-if="items" v-model="showModal" max-width="90%">
             <v-card>
                 <v-card-title>QuickGo biological process</v-card-title>
                 <v-card-text v-if="top5 && top5.length > 0">
-                    This chart shows the relationship between the {{ top5.length }} most occurring GO terms: 
+                    This chart shows the relationship between the {{ top5.length }} most occurring GO terms:
                     {{ top5Sentence }}.
                     <br/>
                     <a @click="openInBrowser(quickGOChartURL(top5.map(x => x.code), true))">
@@ -27,19 +27,15 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import GoTerm from "./../../../logic/functional-annotations/GoTerm";
-import FaSortSettings from "../../tables/FaSortSettings";
-import { GoNameSpace } from "./../../../logic/functional-annotations/GoNameSpace";
 import Utils from "./../../custom/Utils";
+import GoDefinition from "./../../../business/ontology/functional/go/GoDefinition";
 
 @Component
 export default class QuickGOCard extends Vue {
     @Prop({ required: true })
-    private items: GoTerm[];
-    @Prop({ required: true })
-    private sortSettings: FaSortSettings;
+    private items: GoDefinition[];
 
-    private top5: GoTerm[] = null;
+    private top5: GoDefinition[] = null;
     private top5Sentence: string = "";
 
     private showModal: boolean = false;
@@ -54,7 +50,7 @@ export default class QuickGOCard extends Vue {
             this.top5 = this.items.slice(0, 5);
 
             if (this.top5.length > 0) {
-                const top5WithNames = this.top5.map(x => `${x.name} (${this.sortSettings.format(x)})`);
+                const top5WithNames = this.top5.map(x => `${x.name}`);
                 this.top5Sentence = top5WithNames.slice(0, -1).join(", ") + (this.top5.length > 1 ? " and " : "") + top5WithNames[top5WithNames.length - 1];
             }
         }
@@ -86,5 +82,13 @@ export default class QuickGOCard extends Vue {
 </script>
 
 <style>
-
+    .quickGoThumb {
+        max-width: 100%;
+        max-height: 300px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+    }
 </style>

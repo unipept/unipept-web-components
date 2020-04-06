@@ -1,8 +1,8 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!this.dataRepository">
-                <span class="waiting" v-if="this.analysisInProgress">
+            <div v-if="!peptideCountTable">
+                <span class="waiting" v-if="isLoading">
                     <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                 </span>
                 <span v-else class="placeholder-text">
@@ -10,16 +10,23 @@
                 </span>
             </div>
             <div v-else>
-                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
+                <filter-functional-annotations-dropdown v-model="percentSettings">
+                </filter-functional-annotations-dropdown>
                 <span>This panel shows the Interpro entries that were matched to your peptides. </span>
                 <span v-html="interproTrustLine"></span>
                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                <v-select :items="interproNamespaces" label="Category" v-model="selectedNameSpaceModel"></v-select>
-                <interpro-amount-table 
-                    :loading="calculationsInProgress" 
-                    :dataRepository="dataRepository" 
-                    :items="interproItems" 
-                    :searchSettings="sortSettings">
+                <v-select :items="namespaceValues" label="Category" v-model="selectedNamespace"></v-select>
+                <interpro-amount-table
+                    v-if="selectedItem"
+                    :loading="isLoading"
+                    :interpro-count-table="selectedItem.countTable"
+                    :interpro-peptide-mapping="selectedItem.peptideMapping"
+                    :interpro-ontology="selectedItem.ontology"
+                    :relative-counts="relativeCounts"
+                    :search-configuration="searchConfiguration"
+                    :tree="tree"
+                    :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                    :show-percentage="showPercentage">
                 </interpro-amount-table>
             </div>
         </v-card-text>
@@ -31,11 +38,22 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
-import InterproDataSource from "../../../logic/data-source/InterproDataSource";
-import { InterproNameSpace, convertStringToInterproNameSpace } from "../../../logic/functional-annotations/InterproNameSpace";
-import InterproEntry from "../../../logic/functional-annotations/InterproEntry";
 import InterproAmountTable from "./../../tables/InterproAmountTable.vue";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
+import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
+import { CountTable } from "./../../../business/counts/CountTable";
+import {
+    convertStringToInterproNamespace,
+    InterproNamespace
+} from "./../../../business/ontology/functional/interpro/InterproNamespace";
+import InterproDefinition, { InterproCode } from "./../../../business/ontology/functional/interpro/InterproDefinition";
+import { Ontology } from "./../../../business/ontology/Ontology";
+import InterproCountTableProcessor from "./../../../business/processors/functional/interpro/InterproCountTableProcessor";
+import InterproOntologyProcessor from "./../../../business/ontology/functional/interpro/InterproOntologyProcessor";
+import StringUtils from "./../../../business/misc/StringUtils";
+import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
@@ -43,57 +61,104 @@ import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDr
         FilterFunctionalAnnotationsDropdown
     },
     computed: {
-        selectedNameSpace: {
-            get(): InterproNameSpace | null {
-                if (this.selectedInterproNameSpaceModel === "all") {
-                    return null;
-                } else {
-                    return convertStringToInterproNameSpace(this.selectedNameSpaceModel);
-                }
+        selectedItem: {
+            get(): {
+                countTable: CountTable<InterproCode>,
+                peptideMapping: Map<InterproCode, Peptide[]>,
+                definitions: InterproDefinition[],
+                title: string,
+                ontology: Ontology<InterproCode, InterproDefinition>
+                } {
+                const i = this.namespaceValues.indexOf(this.selectedNamespace);
+                return this.items[i];
+            }
+        },
+        isLoading: {
+            get(): boolean {
+                return this.calculationsInProgress || this.loading;
             }
         }
     }
 })
 export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) {
-    private interproNamespaces: string[] = ["all"].concat(Object.values(InterproNameSpace));
-    private selectedNameSpaceModel: string = "all";
-    private interproItems: InterproEntry[] = [];
+    @Prop({ required: true })
+    private peptideCountTable: CountTable<Peptide>;
+    @Prop({ required: true })
+    private searchConfiguration: SearchConfiguration;
+    @Prop({ required: false, default: false })
+    private loading: boolean;
+    @Prop({ required: true })
+    private relativeCounts: number;
+    @Prop( { required: false, default: false })
+    private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
+
+    private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace));
+    private selectedNamespace: string = "all";
+    private items: {
+        countTable: CountTable<InterproCode>,
+        peptideMapping: Map<InterproCode, Peptide[]>,
+        definitions: InterproDefinition[],
+        title: string,
+        ontology: Ontology<InterproCode, InterproDefinition>
+    }[] = [];
+
     private interproTrustLine: string = "";
     private calculationsInProgress: boolean = false;
 
     mounted() {
+        for (let ns of this.namespaceValues) {
+            this.items.push({
+                countTable: undefined,
+                peptideMapping: undefined,
+                definitions: [],
+                title: StringUtils.stringTitleize(ns.toString()),
+                ontology: undefined
+            });
+        }
+
         this.recompute();
     }
 
-    @Watch("selectedNameSpaceModel")
-    private async onNameSpaceChanged() {
-        this.recompute();
+    @Watch("selectedNamespace")
+    private async onNamespaceChanged() {
+        await this.recompute();
     }
 
+    @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
     public async recompute(): Promise<void> {
         this.calculationsInProgress = true;
-        if (this.dataRepository) {
-            const percent: number = parseInt(this.percentSettings);
-            const interproSource: InterproDataSource = await this.dataRepository.createInterproDataSource();
-            const sequences: string[] = await this.getSequences();
-
-            this.interproItems = await interproSource.getInterproEntries(
-                // @ts-ignore
-                this.selectedNameSpace, 
-                percent, 
-                sequences
+        if (this.peptideCountTable && this.searchConfiguration) {
+            const percentage = parseInt(this.percentSettings);
+            const interproProcessor = new InterproCountTableProcessor(
+                this.peptideCountTable,
+                this.searchConfiguration,
+                percentage
             );
-            this.interproTrustLine = this.computeTrustLine(await interproSource.getTrust(
-                // @ts-ignore
-                this.selectedNameSpace,
-                percent,
-                sequences
-            ), "Interpro entry");
+
+            for (let i = 0; i < this.namespaceValues.length; i++) {
+                const namespace: InterproNamespace = convertStringToInterproNamespace(this.namespaceValues[i]);
+
+                this.items[i].countTable = await interproProcessor.getCountTable(namespace);
+                this.items[i].peptideMapping = await interproProcessor.getAnnotationPeptideMapping();
+
+                const ontologyProcessor = new InterproOntologyProcessor();
+                this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
+
+                this.items[i].definitions.length = 0;
+                this.items[i].definitions.push(
+                    ...this.items[i].countTable.getOntologyIds().map(id => this.items[i].ontology.getDefinition(id))
+                );
+            }
+
+            this.interproTrustLine = this.computeTrustLine(await interproProcessor.getTrust(), "Interpro-entries");
         }
         this.calculationsInProgress = false;
     }
-
-
 }
 </script>
 

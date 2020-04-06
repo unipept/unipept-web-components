@@ -20,6 +20,7 @@ module.exports = {
     "no-inner-declarations": "off",
     "brace-style": ["error", "1tbs"],
     "keyword-spacing": "error",
+    "no-case-declarations": "off"
   },
   parserOptions: {
     "parser": "@typescript-eslint/parser",

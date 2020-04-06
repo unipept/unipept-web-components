@@ -8,7 +8,7 @@
                 <v-menu>
                     <template v-slot:activator="{ on }">
                         <v-btn fab x-small v-on="on" :elevation="0">
-                            <v-icon>mdi-settings</v-icon>
+                            <v-icon>mdi-cog-outline</v-icon>
                         </v-btn>
                     </template>
                     <v-list>
@@ -34,21 +34,19 @@
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import Tree from "../../logic/data-management/Tree";
 import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import DataRepository from "../../logic/data-source/DataRepository";
+import Tree from "./../../business/ontology/taxonomic/Tree";
 
 @Component
 export default class SunburstVisualization extends mixins(VisualizationMixin) {
     // Make field non-reactive by not setting it here, but only after created has been called for the first time.
     sunburst!: any;
 
-    @Prop({ default: false }) 
+    @Prop({ default: false })
     private fullScreen: false;
     @Prop({ required: true })
-    private dataRepository: DataRepository;
+    private tree: Tree;
     @Prop({ required: false, default: false })
     private autoResize: boolean;
     @Prop({ required: false, default: 740 })
@@ -64,30 +62,31 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         this.initTree();
     }
 
-    @Watch("dataRepository") onDataRepositoryChanged() {
-        this.initTree();
+    @Watch("tree")
+    private async onTreeChanged() {
+        await this.initTree();
     }
-    
-    @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
+
+    @Watch("fullScreen")
+    private onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
         this.sunburst.setFullScreen(newFullScreen)
     }
 
-    @Watch("isFixedColors") onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
+    @Watch("isFixedColors")
+    private onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
         this.sunburst.settings.useFixedColors = newFixedColors;
         this.sunburst.redrawColors();
     }
 
-    reset() {
+    public reset() {
         if (this.sunburst) {
             this.sunburst.reset();
         }
     }
 
     private async initTree() {
-        if (this.dataRepository != null) {
-            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-            let tree: Tree = await taxaDataSource.getTree();
-            const data = JSON.stringify(tree.getRoot());
+        if (this.tree != null) {
+            const data = JSON.stringify(this.tree.getRoot());
 
             // @ts-ignore
             this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
@@ -132,5 +131,5 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
     #sunburstWrapper > .unipept-sunburst > svg {
         max-height: 800px;
-    } 
+    }
 </style>

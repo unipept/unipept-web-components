@@ -1,11 +1,13 @@
 <template>
-    <amount-table 
-        :items="items" 
-        :loading="loading" 
-        annotation-name="Entry" 
-        :searchSettings="searchSettings" 
-        :taxaRetriever="taxaRetriever" 
-        :summaryRetriever="summaryRetriever">
+    <amount-table
+        :items="items"
+        :loading="isLoading"
+        annotation-name="Interpro entry"
+        :search-configuration="searchConfiguration"
+        :item-to-peptides-mapping="interproPeptideMapping"
+        :show-percentage="showPercentage"
+        :tree="tree"
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
     </amount-table>
 </template>
 
@@ -14,49 +16,93 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
-import DataRepository from "../../logic/data-source/DataRepository";
-import GoDataSource from "../../logic/data-source/GoDataSource";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import Treeview from "../visualizations/treeview.vue";
-import AmountTable from "./AmountTable.vue";
-import { downloadDataByForm, logToGoogle } from "../../logic/utils";
-import { GoNameSpace } from "../../logic/functional-annotations/GoNameSpace";
-import FaSortSettings from "./FaSortSettings";
-import { Node } from "../../logic/data-management/Node";
-import FAElement from "../../logic/functional-annotations/FAElement";
-import InterproEntry from "../../logic/functional-annotations/InterproEntry";
-import InterproDataSource from "../../logic/data-source/InterproDataSource";
+import InterproDefinition, { InterproCode } from "./../../business/ontology/functional/interpro/InterproDefinition";
+import { CountTable } from "./../../business/counts/CountTable";
+import { Peptide } from "./../../business/ontology/raw/Peptide";
+import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
+import AmountTable from "./../tables/AmountTable.vue";
+import TableItem from "./../tables/TableItem";
+import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
+import { Ontology } from "./../../business/ontology/Ontology";
+import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
         AmountTable
+    },
+    computed: {
+        isLoading: {
+            get(): boolean {
+                return this.isComputing || this.loading;
+            }
+        }
     }
 })
 export default class GoAmountTable extends Vue {
     @Prop({ required: true })
-    private items: InterproEntry[]
+    private interproCountTable: CountTable<InterproCode>;
     @Prop({ required: true })
-    private searchSettings: FaSortSettings;
-    // The sample that should be summarized in this AmountTable
+    private interproOntology: Ontology<InterproCode, InterproDefinition>;
+    /**
+     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
+     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
+     * relative values will be shown (by dividing every count by x).
+     */
+    @Prop({ required: true })
+    private relativeCounts: number;
+
+    @Prop({ required: false })
+    private interproPeptideMapping: Map<InterproCode, Peptide[]>;
     @Prop({ required: false, default: false })
     private loading: boolean;
-    @Prop({ required: true })
-    private dataRepository: DataRepository;
+    @Prop({ required: false })
+    private searchConfiguration: SearchConfiguration;
+    /**
+     * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
+     */
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
 
-    private async taxaRetriever(entry: InterproEntry): Promise<Node> {
-        if (this.dataRepository) {
-            const taxaDataSource: TaxaDataSource =  await this.dataRepository.createTaxaDataSource()
-            const interproSource: InterproDataSource = await this.dataRepository.createInterproDataSource();
-            return await taxaDataSource.getTreeByPeptides(interproSource.getPeptidesByInterproEntry(entry));
-        }
+    private items: TableItem[] = [];
+    private isComputing: boolean = false;
+
+    public async mounted() {
+        await this.onInputsChanged();
     }
 
-    private async summaryRetriever(entry: InterproEntry): Promise<string[][]> {
-        if (this.dataRepository) {
-            const interproSource: InterproDataSource = await this.dataRepository.createInterproDataSource();
-            return interproSource.getInterproSummary(entry);
+    @Watch("interproCountTable")
+    @Watch("interproOntology")
+    @Watch("relativeCounts")
+    private async onInputsChanged() {
+        this.isComputing = true;
+
+        if (this.interproCountTable && this.interproOntology) {
+            const newItems: TableItem[] = [];
+            for (const interproCode of this.interproCountTable.getOntologyIds()) {
+                const definition: InterproDefinition = this.interproOntology.getDefinition(interproCode);
+                const currentCount = this.interproCountTable.getCounts(interproCode);
+
+                if (definition) {
+                    newItems.push(new TableItem(
+                        currentCount,
+                        currentCount / this.relativeCounts,
+                        definition.name,
+                        definition.code,
+                        definition
+                    ));
+                }
+            }
+
+            this.items.length = 0;
+            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
         }
-        return [];
+
+        this.isComputing = false;
     }
 }
 </script>

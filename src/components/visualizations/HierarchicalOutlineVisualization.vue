@@ -1,13 +1,13 @@
 <template>
     <div>
-        <v-text-field 
-            style="margin-bottom: -26px;" 
-            name="tree_search" 
-            id="tree_search" 
-            outlined 
-            single-line 
-            label="Search for an organism" 
-            append-icon="mdi-magnify" 
+        <v-text-field
+            style="margin-bottom: -26px;"
+            name="tree_search"
+            id="tree_search"
+            outlined
+            single-line
+            label="Search for an organism"
+            append-icon="mdi-magnify"
             v-model="searchTerm">
         </v-text-field>
         <div id="searchtree" class="treeView multi"></div>
@@ -24,11 +24,8 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import Assay from "../../logic/data-management/assay/Assay";
-import Tree from "../../logic/data-management/Tree";
-import { constructSearchtree } from "../../logic/data-management/SearchTree";
-import TaxaDataSource from "../../logic/data-source/TaxaDataSource";
-import DataRepository from "../../logic/data-source/DataRepository";
+import Tree from "./../../business/ontology/taxonomic/Tree";
+import { constructSearchtree } from "./SearchTree";
 
 @Component({
     components: {},
@@ -41,9 +38,8 @@ import DataRepository from "../../logic/data-source/DataRepository";
     }
 })
 export default class HierarchicalOutlineVisualization extends Vue {
-    @Prop({ required: true }) 
-    private dataRepository: DataRepository;
-    
+    @Prop({ required: true })
+    private tree: Tree;
     private searchTerm: string = "";
     private searchTree!: any;
 
@@ -52,12 +48,7 @@ export default class HierarchicalOutlineVisualization extends Vue {
         this.initSearchTree();
     }
 
-    @Watch("dataRepository") 
-    private onDataRepositoryChanged() {
-        this.initSearchTree();
-    }
-
-    @Watch("searchTerm") 
+    @Watch("searchTerm")
     private onActiveSearchTermChanged(newSearchTerm: string) {
         if (this.searchTree && newSearchTerm !== "") {
             this.searchTree.search(newSearchTerm);
@@ -69,11 +60,10 @@ export default class HierarchicalOutlineVisualization extends Vue {
         this.searchTerm = newSearchTerm;
     }
 
+    @Watch("tree")
     private async initSearchTree() {
-        if (this.dataRepository != null) {
-            let taxaDataSource: TaxaDataSource = await this.dataRepository.createTaxaDataSource();
-            let tree: Tree = await taxaDataSource.getTree();
-            this.searchTree = constructSearchtree(tree, this.$store.getters.searchSettings.il, () => {});
+        if (this.tree) {
+            this.searchTree = constructSearchtree(this.tree, this.$store.getters.searchSettings.il, () => {});
         }
     }
 }

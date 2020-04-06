@@ -1,8 +1,8 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!dataRepository">
-                <span class="ec-waiting" v-if="analysisInProgress">
+            <div v-if="!peptideCountTable">
+                <span class="ec-waiting" v-if="isLoading">
                     <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                 </span>
                 <span v-else class="placeholder-text">
@@ -10,17 +10,40 @@
                 </span>
             </div>
             <div v-else>
-                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
+                <filter-functional-annotations-dropdown v-model="percentSettings">
+                </filter-functional-annotations-dropdown>
                 <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
                 <span v-html="trustLine"></span>
                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
-                <ec-amount-table :loading="calculationsInProgress" :dataRepository="dataRepository" :items="items" :searchSettings="sortSettings"></ec-amount-table>
+                <ec-amount-table
+                    :loading="isLoading"
+                    :ec-count-table="ecCountTable"
+                    :ec-peptide-mapping="ecPeptideMapping"
+                    :ec-ontology="ecOntology"
+                    :search-configuration="searchConfiguration"
+                    :relative-counts="relativeCounts"
+                    :tree="tree"
+                    :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                    :show-percentage="showPercentage">
+                </ec-amount-table>
                 <v-card outlined v-if="ecTree">
-                    <v-btn small depressed class="item-treeview-dl-btn" @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
+                    <v-btn
+                        small
+                        depressed
+                        class="item-treeview-dl-btn"
+                        @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
                         <v-icon>mdi-download</v-icon>
                         Save as image
                     </v-btn>
-                    <treeview id="ec-treeview" :data="ecTree" :autoResize="true" :height="300" :width="800" :tooltip="ecTreeTooltip" :enableAutoExpand="true"></treeview>
+                    <treeview
+                        id="ec-treeview"
+                        :data="ecTree"
+                        :autoResize="true"
+                        :height="300"
+                        :width="800"
+                        :tooltip="ecTreeTooltip"
+                        :enableAutoExpand="true">
+                    </treeview>
                 </v-card>
             </div>
         </v-card-text>
@@ -32,26 +55,59 @@ import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import Component, { mixins } from "vue-class-component";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 import EcAmountTable from "../../tables/EcAmountTable.vue";
-import EcDataSource from "../../../logic/data-source/EcDataSource";
-import EcNumber from "../../../logic/functional-annotations/EcNumber";
 import TreeViewNode from "../../visualizations/TreeViewNode";
 import Treeview from "../../visualizations/Treeview.vue";
+import { Prop, Watch } from "vue-property-decorator";
+import EcDefinition, { EcCode } from "./../../../business/ontology/functional/ec/EcDefinition";
+import { CountTable } from "./../../../business/counts/CountTable";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
+import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
+import EcCountTableProcessor from "./../../../business/processors/functional/ec/EcCountTableProcessor";
+import { Ontology } from "./../../../business/ontology/Ontology";
+import EcOntologyProcessor from "./../../../business/ontology/functional/ec/EcOntologyProcessor";
+import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
         FilterFunctionalAnnotationsDropdown,
         EcAmountTable,
         Treeview
+    },
+    computed: {
+        isLoading: {
+            get(): boolean {
+                return this.calculationsInProgress || this.loading;
+            }
+        }
     }
 })
 export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
+    @Prop({ required: true })
+    private peptideCountTable: CountTable<Peptide>;
+    @Prop({ required: true })
+    private searchConfiguration: SearchConfiguration;
+    @Prop({ required: false, default: false })
+    private loading: boolean;
+    @Prop({ required: true })
+    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
+
+    private ecCountTable: CountTable<EcCode> = null;
+    private ecPeptideMapping: Map<EcCode, Peptide[]> = null;
+    private ecOntology: Ontology<EcCode, EcDefinition> = null;
+
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
-    private items: EcNumber[] = [];
     private ecTree: TreeViewNode = null;
 
-    mounted() {
-        this.recompute();
+    public async mounted() {
+        await this.recompute();
     }
 
     private ecTreeTooltip: (d: any) => string = (d: any) => {
@@ -66,7 +122,7 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
             if (d.data.self_count == d.data.count) {
                 tip += " <strong>all specifically</strong> for this number";
             } else {
-                tip += ` <strong>${d.data.self_count} specificly</strong> for this number`;
+                tip += ` <strong>${d.data.self_count} specifically</strong> for this number`;
             }
         }
 
@@ -74,18 +130,103 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
         return tip;
     };
 
-    public async recompute() {
+    @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
+    private async recompute() {
         this.calculationsInProgress = true;
-        if (this.dataRepository) {
-            const ecSource: EcDataSource = await this.dataRepository.createEcDataSource();
-            const percent = parseInt(this.percentSettings);
-            const sequences: string[] = await this.getSequences();
+        if (this.peptideCountTable) {
+            const percentage = parseInt(this.percentSettings);
+            const ecCountTableProcessor = new EcCountTableProcessor(
+                this.peptideCountTable,
+                this.searchConfiguration,
+                percentage
+            );
+            this.ecCountTable = await ecCountTableProcessor.getCountTable();
+            this.ecPeptideMapping = await ecCountTableProcessor.getAnnotationPeptideMapping();
 
-            this.items = await ecSource.getEcNumbers(null, percent, sequences);
-            this.trustLine = this.computeTrustLine(await ecSource.getTrust(null, percent, sequences), "EC number");
-            this.ecTree = await ecSource.getEcTree(null, percent, sequences);
+            const ontologyProcessor = new EcOntologyProcessor();
+            this.ecOntology = await ontologyProcessor.getOntology(this.ecCountTable);
+
+            this.ecTree = await this.computeEcTree(this.ecCountTable, this.ecOntology);
+            this.trustLine = this.computeTrustLine(await ecCountTableProcessor.getTrust(), "EC number");
         }
         this.calculationsInProgress = false;
+    }
+
+    private async computeEcTree(
+        ecCountTable: CountTable<EcCode>,
+        ecOntology: Ontology<EcCode, EcDefinition>
+    ): Promise<TreeViewNode> {
+        const codeNodeMap = new Map<EcCode, TreeViewNode>();
+
+        codeNodeMap.set("-.-.-.-", {
+            id: 0,
+            name: "-.-.-.-",
+            children: [],
+            data: {
+                self_count: 0,
+                count: 0,
+                data: {
+                    sequences: Object.create(null),
+                    self_sequences: Object.create(null),
+                },
+            },
+        });
+
+        const getOrNew = (key) => {
+            if (!codeNodeMap.has(key)) {
+                codeNodeMap.set(key, {
+                    id: key.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
+                    name: key.split(".").filter((x) => x !== "-").join("."),
+                    children: [],
+                    data: {
+                        self_count: 0,
+                        count: 0,
+                        data: {
+                            code: key,
+                            value: 0,
+                            sequences: Object.create(null),
+                            self_sequences: Object.create(null),
+                        }
+                    },
+                });
+                const ancestors = EcDefinition.computeAncestors(key, true);
+                getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
+            }
+            return codeNodeMap.get(key);
+        };
+
+        const sortedEcs = ecCountTable.getOntologyIds()
+            .map(id => ecOntology.getDefinition(id))
+            .sort((a: EcDefinition, b: EcDefinition) => a.level - b.level);
+
+        for (const ecDef of sortedEcs) {
+            const toInsert = {
+                id: ecDef.code.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
+                name: ecDef.code.split(".").filter((x) => x !== "-").join("."),
+                children: [],
+                data: {
+                    self_count: ecCountTable.getCounts(ecDef.code),
+                    count: ecCountTable.getCounts(ecDef.code),
+                    data: ecDef,
+                },
+            };
+
+            codeNodeMap.set(ecDef.code, toInsert);
+
+            const ancestors = EcDefinition.computeAncestors(ecDef.code, true);
+            getOrNew(ancestors[0]).children.push(toInsert);
+            for (const a of ancestors) {
+                getOrNew(a).data.count += toInsert.data.count;
+            }
+        }
+
+        // Order the nodes by their id (order by EC number)
+        for (const val of codeNodeMap.values()) {
+            val.children.sort((a, b) => a.id.localeCompare(b.id));
+        }
+
+        return codeNodeMap.get("-.-.-.-");
     }
 }
 </script>

@@ -6,8 +6,8 @@ import LoadLocalDatasetCard from "./../LoadLocalDatasetCard.vue";
 import Setup from "@/test/Setup";
 import Mock from "@/test/Mock";
 import { sleep, waitForPromises, waitForElement, waitForCondition } from "@/test/Utils";
-import Assay from "@/logic/data-management/assay/Assay";
 import { CombinedVueInstance } from "vue/types/vue";
+import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
 
 
 Vue.use(Vuetify);
@@ -36,7 +36,7 @@ describe("LoadLocalDatasetCard", () => {
                 storedAssays: []
             }
         });
-       
+
         await waitForElement(wrapper, "#empty-dataset-placeholder");
         expect(wrapper.find("#empty-dataset-placeholder").html()).toMatchSnapshot();
         done();
@@ -69,7 +69,7 @@ describe("LoadLocalDatasetCard", () => {
 
         // Make sure that the destroy-assay event is fired
         expect(wrapper.emitted("destroy-assay")).toBeTruthy();
-        
+
         done();
     });
 
@@ -86,7 +86,7 @@ describe("LoadLocalDatasetCard", () => {
 
         // Make sure that the destroy-assay event is fired
         expect(wrapper.emitted("destroy-assay")).toBeFalsy();
-        
+
         done();
     });
 
@@ -110,7 +110,7 @@ const mountWithAssay = async function(store, vuetify): Promise<Wrapper<CombinedV
     setup.setUpPrideNock();
 
     const mock: Mock = new Mock();
-    const assay: Assay = await mock.mockInitializedAssay();
+    const assay: ProteomicsAssay = await mock.mockRealisticAssay();
 
     return mount(LoadLocalDatasetCard, {
         store,

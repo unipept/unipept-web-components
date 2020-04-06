@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RowNormalizer does not crash on all-zero grids 1`] = `
+Array [
+  Array [
+    0,
+    0,
+    0,
+    0,
+  ],
+  Array [
+    0,
+    0,
+    0,
+    0,
+  ],
+  Array [
+    0,
+    0,
+    0,
+    0,
+  ],
+]
+`;
+
+exports[`RowNormalizer normalizes a complete grid correctly 1`] = `
+Array [
+  Array [
+    1,
+    1,
+    0.3333333333333333,
+    0,
+  ],
+  Array [
+    0.5,
+    1,
+    0.5,
+    0,
+  ],
+  Array [
+    1,
+    0.75,
+    0,
+    1,
+  ],
+]
+`;
+
+exports[`RowNormalizer normalizes a grid with negative values correctly 1`] = `
+Array [
+  Array [
+    1,
+    1,
+    0,
+    0.5,
+  ],
+  Array [
+    0,
+    1,
+    0.6666666666666666,
+    0.3333333333333333,
+  ],
+  Array [
+    0,
+    0.875,
+    0.5,
+    1,
+  ],
+]
+`;

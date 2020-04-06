@@ -82,6 +82,7 @@ export default class SearchSetingsForm extends Vue {
     }
 
     @Watch("filterDuplicates") onFilterDuplicatesChanged() {
+
         this.filterDuplicatesData = this.filterDuplicates;
     }
 

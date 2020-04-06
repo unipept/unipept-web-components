@@ -1,3 +1,10 @@
+/**
+ * Simple mock implementation for LocalStorage in modern browsers. Each of the functions here can be inspected by Jest.
+ * All operations that can be performed on the local storage are supported. Instead of storing data persistent, all
+ * data written is stored in memory.
+ *
+ * @author Pieter Verschaffelt
+ */
 export default class LocalStorageMock {
     store = {};
 

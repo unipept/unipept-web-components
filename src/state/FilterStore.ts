@@ -1,20 +1,20 @@
 import { ActionContext, ActionTree, GetterTree, MutationTree } from "vuex";
-import MPAConfig from "../logic/data-management/MPAConfig";
+import SearchConfiguration from "./../business/configuration/SearchConfiguration";
 
 export interface FilterState {
-    searchSettings: MPAConfig,
+    searchSettings: SearchConfiguration,
     selectedTerm: string,
     selectedTaxonId: number,
 }
 
 const mpaState: FilterState = {
-    searchSettings: { il: true, dupes: true, missed: false },
+    searchSettings: { equateIl: true, filterDuplicates: true, enableMissingCleavageHandling: false },
     selectedTerm: "Organism",
     selectedTaxonId: -1,
 };
 
 const mpaGetters: GetterTree<FilterState, any> = {
-    searchSettings(state: FilterState): MPAConfig {
+    searchSettings(state: FilterState): SearchConfiguration {
         return state.searchSettings;
     },
     getSelectedTerm(state: FilterState): string {
@@ -26,7 +26,7 @@ const mpaGetters: GetterTree<FilterState, any> = {
 };
 
 const mpaMutations: MutationTree<FilterState> = {
-    SET_SEARCH_SETTINGS(state: FilterState, searchSettings: MPAConfig): void {
+    SET_SEARCH_SETTINGS(state: FilterState, searchSettings: SearchConfiguration): void {
         state.searchSettings = searchSettings;
     },
     SET_SELECTED_TERM(state: FilterState, value: string): void {
@@ -38,7 +38,7 @@ const mpaMutations: MutationTree<FilterState> = {
 };
 
 const mpaActions: ActionTree<FilterState, any> = {
-    setSearchSettings(store: ActionContext<FilterState, any>, searchSettings: MPAConfig): void {
+    setSearchSettings(store: ActionContext<FilterState, any>, searchSettings: SearchConfiguration): void {
         store.commit("SET_SEARCH_SETTINGS", searchSettings);
     },
     setSelectedTerm(store: ActionContext<FilterState, any>, term: string): void {

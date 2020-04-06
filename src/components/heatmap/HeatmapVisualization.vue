@@ -9,15 +9,13 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { Heatmap, HeatmapSettings } from "unipept-heatmap";
-    
+
 import VisualizationMixin from "../visualizations/VisualizationMixin.vue";
-import Tree from "../../logic/data-management/Tree";
-import { Node } from "../../logic/data-management/Node";
 import { HeatmapData, HeatmapElement, HeatmapValue } from "unipept-heatmap/src/heatmap/input";
 
 @Component
 export default class HeatmapVisualization extends mixins(VisualizationMixin) {
-    @Prop({ default: false }) 
+    @Prop({ default: false })
     private fullScreen: false;
     @Prop({ required: true })
     private data: HeatmapData;

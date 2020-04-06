@@ -1,0 +1,14 @@
+{
+  "sequence": "FATSDLNDLYR",
+  "lca": 23,
+  "lineage": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+  "fa": {
+    "counts": {
+      "all": 0,
+      "EC": 0,
+      "GO": 0,
+      "IPR": 0
+    }
+  },
+  "data": {}
+}

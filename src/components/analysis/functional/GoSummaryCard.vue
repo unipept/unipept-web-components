@@ -1,8 +1,8 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!dataRepository" class="mpa-unavailable go">
-                <div v-if="analysisInProgress">
+            <div v-if="!this.peptideCountTable" class="mpa-unavailable go">
+                <div v-if="isLoading">
                     <h2>Biological Process</h2>
                     <span class="go-waiting">
                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
@@ -16,29 +16,33 @@
                         <v-progress-circular :size="50" :width="5" color="primary" indeterminate></v-progress-circular>
                     </span>
                 </div>
-                <div v-else class="placeholder-text">
-                    Please select at least one dataset for analysis.
-                </div>
             </div>
             <div v-else>
-                <filter-functional-annotations-dropdown v-model="percentSettings"></filter-functional-annotations-dropdown>
+                <filter-functional-annotations-dropdown v-model="percentSettings">
+                </filter-functional-annotations-dropdown>
                 <span>This panel shows the Gene Ontology annotations that were matched to your peptides. </span>
                 <span v-html="trustLine"></span>
                 <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
                 <div v-for="(namespace, idx) of namespaces" v-bind:key="namespace" style="margin-top: 16px;" class="go-table-container">
-                    <h2>{{ items[idx].title }}</h2>
-                    <v-row>
+                    <h2 v-if="items[idx]">{{ items[idx].title }}</h2>
+                    <v-row v-if="items[idx]">
                         <v-col :cols="9">
-                            <go-amount-table 
-                                :loading="calculationsInProgress" 
-                                :dataRepository="dataRepository" 
-                                :items="items[idx].goTerms" 
-                                :namespace="namespace" 
-                                :searchSettings="sortSettings">
+                            <go-amount-table
+                                :loading="isLoading"
+                                :namespace="namespace"
+                                :go-count-table="items[idx].countTable"
+                                :go-peptide-mapping="items[idx].peptideMapping"
+                                :go-ontology="items[idx].ontology"
+                                :relative-counts="relativeCounts"
+                                :search-configuration="searchConfiguration"
+                                :show-percentage="showPercentage"
+                                :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                                :tree="tree">
                             </go-amount-table>
                         </v-col>
                         <v-col :cols="3">
-                            <quick-go-card :sort-settings="sortSettings" :items="items[idx].goTerms"></quick-go-card>
+                            <quick-go-card :items="items[idx].definitions">
+                            </quick-go-card>
                         </v-col>
                     </v-row>
                 </div>
@@ -55,49 +59,102 @@ import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 import GoAmountTable from "../../tables/GoAmountTable.vue";
 import QuickGoCard from "./QuickGOCard.vue";
-import { GoNameSpace } from "../../../logic/functional-annotations/GoNameSpace";
-import GoTerm from "../../../logic/functional-annotations/GoTerm";
-import GoDataSource from "../../../logic/data-source/GoDataSource";
-import { numberToPercent, stringTitleize } from "../../../logic/utils";
+import { CountTable } from "./../../../business/counts/CountTable";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
+import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
+import GoCountTableProcessor from "./../../../business/processors/functional/go/GoCountTableProcessor";
+import GoDefinition, { GoCode } from "./../../../business/ontology/functional/go/GoDefinition";
+import { GoNamespace } from "./../../../business/ontology/functional/go/GoNamespace";
+import StringUtils from "./../../../business/misc/StringUtils";
+import { Ontology } from "./../../../business/ontology/Ontology";
+import GoOntologyProcessor from "./../../../business/ontology/functional/go/GoOntologyProcessor";
+import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import Tree from "./../../../business/ontology/taxonomic/Tree";
 
 @Component({
     components: {
         FilterFunctionalAnnotationsDropdown,
         GoAmountTable,
         QuickGoCard
+    },
+    computed: {
+        isLoading: {
+            get(): boolean {
+                return this.calculationsInProgress || this.loading;
+            }
+        }
     }
 })
 export default class GoSummaryCard extends mixins(FunctionalSummaryMixin) {
-    private namespaces: GoNameSpace[] = Object.values(GoNameSpace).sort();
-    private items: {goTerms: GoTerm[], title: string}[] = [];
+    @Prop({ required: true })
+    private peptideCountTable: CountTable<Peptide>;
+    @Prop({ required: true })
+    private searchConfiguration: SearchConfiguration;
+    @Prop({ required: false, default: false })
+    private loading: boolean;
+    @Prop({ required: true })
+    private relativeCounts: number;
+    @Prop({ required: false, default: false })
+    private showPercentage: boolean;
+    @Prop({ required: false })
+    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
+    @Prop({ required: false })
+    protected tree: Tree;
+
+    private namespaces: GoNamespace[] = Object.values(GoNamespace).sort();
+    private items: {
+        countTable: CountTable<GoCode>,
+        peptideMapping: Map<GoCode, Peptide[]>,
+        definitions: GoDefinition[],
+        title: string,
+        ontology: Ontology<GoCode, GoDefinition>
+    }[] = [];
+
     private trustLine: string = "";
     private calculationsInProgress: boolean = false;
 
     mounted() {
         for (let ns of this.namespaces) {
             this.items.push({
-                goTerms: [],
-                title: stringTitleize(ns.toString())
+                countTable: undefined,
+                peptideMapping: undefined,
+                definitions: [],
+                title: StringUtils.stringTitleize(ns.toString()),
+                ontology: undefined
             });
         }
 
         this.recompute();
     }
 
+    @Watch("peptideCountTable")
+    @Watch("searchConfiguration")
+    @Watch("percentSettings")
     public async recompute() {
         this.calculationsInProgress = true;
-        if (this.dataRepository) {
-            const goSource: GoDataSource = await this.dataRepository.createGoDataSource();
-            const percent = parseInt(this.percentSettings);
-            const sequences = await this.getSequences();
+        if (this.peptideCountTable) {
+            const percentage = parseInt(this.percentSettings);
+            const goCountTableProcessor = new GoCountTableProcessor(
+                this.peptideCountTable,
+                this.searchConfiguration,
+                percentage
+            );
 
-            // recalculate go-data for those sequences
             for (let i = 0; i < this.namespaces.length; i++) {
-                let namespace: GoNameSpace = this.namespaces[i];
-                this.items[i].goTerms = await goSource.getGoTerms(namespace, percent, sequences);
+                const namespace: GoNamespace = this.namespaces[i];
+                this.items[i].countTable = await goCountTableProcessor.getCountTable(namespace);
+                this.items[i].peptideMapping = await goCountTableProcessor.getAnnotationPeptideMapping();
+
+                const ontologyProcessor = new GoOntologyProcessor();
+                this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
+
+                this.items[i].definitions.length = 0;
+                this.items[i].definitions.push(
+                    ...this.items[i].countTable.getOntologyIds().map(id => this.items[i].ontology.getDefinition(id))
+                );
             }
 
-            this.trustLine = this.computeTrustLine(await goSource.getTrust(null, percent, sequences), "GO term");
+            this.trustLine = this.computeTrustLine(await goCountTableProcessor.getTrust(), "GO-terms");
         }
         this.calculationsInProgress = false;
     }

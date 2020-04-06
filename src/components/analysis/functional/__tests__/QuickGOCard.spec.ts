@@ -1,10 +1,9 @@
-import { shallowMount, createLocalVue } from "@vue/test-utils"
+import { createLocalVue, shallowMount } from "@vue/test-utils"
 import QuickGOCard from "./../QuickGOCard.vue";
 import Vue from "vue"
 import Vuetify from "vuetify"
-import GoTerm from "../../../../logic/functional-annotations/GoTerm";
-import { GoNameSpace } from "../../../../logic/functional-annotations/GoNameSpace";
-import FaSortSettings from "../../../tables/FaSortSettings";
+import GoDefinition from "@/business/ontology/functional/go/GoDefinition";
+import { GoNamespace } from "@/business/ontology/functional/go/GoNamespace";
 
 Vue.use(Vuetify);
 
@@ -33,25 +32,28 @@ describe("QuickGOSummaryCard", () => {
     });
 
     it("renders valid GO-terms correctly", () => {
-        let goTerms: GoTerm[] = [];
-        goTerms.push(new GoTerm("GO:0006412", "translation", GoNameSpace.BiologicalProcess, 157, 0.13, []));
-        goTerms.push(new GoTerm("GO:0043312", "neutrophil degranulation", GoNameSpace.BiologicalProcess, 100, 0.09, []));
-        goTerms.push(new GoTerm("GO:0042026", "protein refolding", GoNameSpace.BiologicalProcess, 73, 0.06, []));
-
-        let sortSettings: FaSortSettings = new FaSortSettings(
-            (x: GoTerm) => x.toString(),
-            "popularity",
-            "fractionOfPepts",
-            "Peptides",
-            (a, b) => b["popularity"] - a["popularity"]
-        );
+        let goTerms: GoDefinition[] = [];
+        goTerms.push(new GoDefinition(
+            "GO:0006412",
+            "translation",
+            GoNamespace.BiologicalProcess
+        ));
+        goTerms.push(new GoDefinition(
+            "GO:0043312",
+            "neutrophil degranulation",
+            GoNamespace.BiologicalProcess
+        ));
+        goTerms.push(new GoDefinition(
+            "GO:0042026",
+            "protein refolding",
+            GoNamespace.BiologicalProcess
+        ));
 
         const wrapper = shallowMount(QuickGOCard, {
             localVue,
             vuetify,
             propsData: {
                 items: goTerms,
-                sortSettings: sortSettings
             }
         });
 

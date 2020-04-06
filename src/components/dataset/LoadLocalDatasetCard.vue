@@ -1,5 +1,5 @@
-<docs>
-The `LoadLocalDatasetCard` displays a list of all assays that are persistently stored on the user's local computer. The 
+ <docs>
+The `LoadLocalDatasetCard` displays a list of all assays that are persistently stored on the user's local computer. The
 component provides him with the option to select one of these assays for analysis.
 </docs>
 
@@ -29,7 +29,7 @@ component provides him with the option to select one of these assays for analysi
 
                     <v-list-item-action>
                         <v-list-item-action-text>
-                            {{ dataset.getDateFormatted() }}
+                            {{ dataset.getDate().toLocaleDateString() }}
                         </v-list-item-action-text>
                         <tooltip message="Delete this sample from local storage.">
                             <v-btn class="remove-assay-button" icon text @click="removeAssay(dataset)" v-on:click.stop>
@@ -57,10 +57,10 @@ component provides him with the option to select one of these assays for analysi
                     Cancel
                 </v-btn>
 
-                <v-btn 
-                    class="confirmation-ok-button" 
-                    color="primary" 
-                    text 
+                <v-btn
+                    class="confirmation-ok-button"
+                    color="primary"
+                    text
                     @click="confirmAssayDeletion(markedForDeletion)">
                     OK
                 </v-btn>
@@ -73,10 +73,10 @@ component provides him with the option to select one of these assays for analysi
 <script lang="ts">
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component"
-import Assay from "../../logic/data-management/assay/Assay";
 import { Prop, Watch } from "vue-property-decorator";
 import Tooltip from "../custom/Tooltip.vue";
 import DatasetMixin from "./DatasetMixin.vue";
+import Assay from "./../../business/entities/assay/Assay";
 
 @Component({
     components: {
@@ -96,7 +96,7 @@ import DatasetMixin from "./DatasetMixin.vue";
 })
 export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
     /**
-     * All datasets that are stored in persistent storage (and have already been loaded into memory). The user is able 
+     * All datasets that are stored in persistent storage (and have already been loaded into memory). The user is able
      * to chose each any one of these items and start an analysis.
      */
     @Prop({ required: true })

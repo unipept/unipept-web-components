@@ -1,15 +1,25 @@
-import MetaProteomicsAssay from "@/logic/data-management/assay/MetaProteomicsAssay";
-import { StorageType } from "@/logic/data-management/StorageType";
-import Assay from "@/logic/data-management/assay/Assay";
-import DataRepository from "@/logic/data-source/DataRepository";
-import { PeptideContainer } from "@/logic/data-management";
-import MpaAnalysisManager from "@/logic/data-management/MpaAnalysisManager";
-import MPAConfig from "@/logic/data-management/MPAConfig";
 import Setup from "./Setup";
-import StorageWriter from "@/logic/data-management/visitors/storage/StorageWriter";
+import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
+import SearchConfiguration from "@/business/configuration/SearchConfiguration";
+import { CountTable } from "@/business/counts/CountTable";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import PeptideCountTableProcessor from "@/business/processors/raw/PeptideCountTableProcessor";
+import Tree from "@/business/ontology/taxonomic/Tree";
+import NcbiTaxon, { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
+import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCountTableProcessor";
+import { Ontology } from "@/business/ontology/Ontology";
+import NcbiOntologyProcessor from "@/business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 
 export default class Mock {
-    public mockAssay(): Assay {
+    /**
+     * Mocks an assay that contains real-world data, which could mainly be used for assessing the correctness of GUI
+     * components. All calls to the Unipept-API that are required to process this assay will also be intercepted after
+     * calling this function!
+     */
+    public mockRealisticAssay(): ProteomicsAssay {
+        const setup = new Setup();
+        setup.setupUnipeptNock();
+
         let sequences: string[] = [
             "YVVIQPGVK",
             "SGIAPFYSDKYAK",
@@ -38,45 +48,39 @@ export default class Mock {
             "AVGFGGDFDGVPR"
         ]
 
-        let output: MetaProteomicsAssay = new MetaProteomicsAssay(
-            "1", 
-            StorageType.LocalStorage, 
-            "Sample X", 
+        let output: ProteomicsAssay = new ProteomicsAssay(
+            [],
+            "1",
+            new SearchConfiguration(),
+            sequences,
+            "Sample X",
             new Date("2019-10-21")
         );
 
-        let peptideContainer: PeptideContainer = new PeptideContainer(sequences);
-        output.peptideContainer = peptideContainer;
-
-        let storageWriter: StorageWriter = new StorageWriter();
-        storageWriter.visitMetaProteomicsAssay(output);
-        
         return output;
     }
 
-    public mockMPAConfig(): MPAConfig {
-        return {
-            il: true,
-            dupes: true,
-            missed: false
-        }
+    /**
+     * Mock a fully computed peptide count table that's derived from a valid assay filled with real-world data.
+     */
+    public async mockRealisticPeptideCountTable(): Promise<CountTable<Peptide>> {
+        const assay = this.mockRealisticAssay();
+        const countTableProcessor = new PeptideCountTableProcessor();
+        return await countTableProcessor.getPeptideCountTable(assay.getPeptides(), new SearchConfiguration());
     }
 
-    public async mockDataRepository(): Promise<DataRepository> {
-        let setup: Setup = new Setup();
-        setup.setupAll();
-        let assay: Assay = this.mockAssay();
-        let manager: MpaAnalysisManager = new MpaAnalysisManager();
-        await manager.processDataset(assay, this.mockMPAConfig(), "http://unipept.ugent.be");
-        return assay.dataRepository;
+    public async mockRealisticLcaCountTable(): Promise<CountTable<NcbiId>> {
+        const lcaCountTableProcessor = new LcaCountTableProcessor(await this.mockRealisticPeptideCountTable(), new SearchConfiguration());
+        return await lcaCountTableProcessor.getCountTable();
     }
 
-    public async mockInitializedAssay(): Promise<Assay> {
-        let setup: Setup = new Setup();
-        setup.setupAll();
-        let assay: Assay = this.mockAssay();
-        let manager: MpaAnalysisManager = new MpaAnalysisManager();
-        await manager.processDataset(assay, this.mockMPAConfig(), "http://unipept.ugent.be");
-        return assay;
+    public async mockRealisticNcbiOntology(): Promise<Ontology<NcbiId, NcbiTaxon>> {
+        const lcaCounts = await this.mockRealisticLcaCountTable();
+        const ontologyProcessor = new NcbiOntologyProcessor();
+        return await ontologyProcessor.getOntology(lcaCounts);
+    }
+
+    public async mockRealisticTree(): Promise<Tree> {
+        return new Tree(await this.mockRealisticLcaCountTable(), await this.mockRealisticNcbiOntology());
     }
 }
