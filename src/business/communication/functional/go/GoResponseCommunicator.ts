@@ -3,7 +3,7 @@ import { GoCode } from "./../../../ontology/functional/go/GoDefinition";
 import NetworkUtils from "./../../NetworkUtils";
 import NetworkConfiguration from "./../../NetworkConfiguration";
 import { EcCode } from "./../../../ontology/functional/ec/EcDefinition";
-import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
+import FunctionalResponseCommunicator from "./../../../communication/functional/FunctionalResponseCommunicator";
 
 export default class GoResponseCommunicator implements FunctionalResponseCommunicator<GoCode, GoResponse>{
     private static goCodeToResponseMap = new Map<GoCode, GoResponse>();

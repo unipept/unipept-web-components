@@ -2,7 +2,7 @@ import { EcCode } from "./../../../ontology/functional/ec/EcDefinition";
 import { EcResponse } from "./EcResponse";
 import NetworkConfiguration from "./../../NetworkConfiguration";
 import NetworkUtils from "./../../NetworkUtils";
-import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
+import FunctionalResponseCommunicator from "./../../../communication/functional/FunctionalResponseCommunicator";
 
 export default class EcResponseCommunicator implements FunctionalResponseCommunicator<EcCode, EcResponse>{
     private static ecCodeToResponseMap = new Map<EcCode, EcResponse>();

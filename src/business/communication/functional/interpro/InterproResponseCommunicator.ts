@@ -2,7 +2,7 @@ import { InterproCode } from "./../../../ontology/functional/interpro/InterproDe
 import InterproResponse from "./InterproResponse";
 import NetworkUtils from "./../../NetworkUtils";
 import NetworkConfiguration from "./../../NetworkConfiguration";
-import FunctionalResponseCommunicator from "@/business/communication/functional/FunctionalResponseCommunicator";
+import FunctionalResponseCommunicator from "./../../../communication/functional/FunctionalResponseCommunicator";
 
 export default class InterproResponseCommunicator implements FunctionalResponseCommunicator<InterproCode, InterproResponse>{
     private static interproCodeToResponseMap = new Map<InterproCode, InterproResponse>();
