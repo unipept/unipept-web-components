@@ -52,6 +52,9 @@ change the currently active search settings and redo the analysis of all selecte
                             <v-list-item @click="downloadCsv(';', ',')">
                                 <v-list-item-title>Semi-colon-separated (Europe)</v-list-item-title>
                             </v-list-item>
+                            <v-list-item @click="downloadCsv('\t', ';')">
+                                <v-list-item-title>Tab-separated</v-list-item-title>
+                            </v-list-item>
                         </v-list>
                     </v-menu>
                 </tooltip>
