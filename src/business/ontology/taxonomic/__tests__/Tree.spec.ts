@@ -8,6 +8,8 @@ describe("Tree", () => {
         setup.setupAll();
     });
 
+    // TODO: also add a manually drawn test that can easily be reproduced and tested on paper.
+
     it("correctly constructs a tree from real-world data", async() => {
         const mock = new Mock();
 
