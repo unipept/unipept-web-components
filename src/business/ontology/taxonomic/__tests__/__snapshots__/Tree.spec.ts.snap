@@ -1,0 +1,2401 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tree correctly constructs a tree from real-world data. 1`] = `
+Tree {
+  "nodes": Map {
+    2 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [],
+                          "data": Object {
+                            "count": 1,
+                            "self_count": 1,
+                          },
+                          "id": 816,
+                          "name": "Bacteroides",
+                          "rank": "genus",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 1,
+                        "self_count": 0,
+                      },
+                      "id": 815,
+                      "name": "Bacteroidaceae",
+                      "rank": "family",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 1,
+                    "self_count": 0,
+                  },
+                  "id": 171549,
+                  "name": "Bacteroidales",
+                  "rank": "order",
+                },
+              ],
+              "data": Object {
+                "count": 1,
+                "self_count": 0,
+              },
+              "id": 200643,
+              "name": "Bacteroidia",
+              "rank": "class",
+            },
+          ],
+          "data": Object {
+            "count": 2,
+            "self_count": 1,
+          },
+          "id": 976,
+          "name": "Bacteroidetes",
+          "rank": "phylum",
+        },
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [],
+                  "data": Object {
+                    "count": 1,
+                    "self_count": 1,
+                  },
+                  "id": 186802,
+                  "name": "Clostridiales",
+                  "rank": "order",
+                },
+              ],
+              "data": Object {
+                "count": 1,
+                "self_count": 0,
+              },
+              "id": 186801,
+              "name": "Clostridia",
+              "rank": "class",
+            },
+          ],
+          "data": Object {
+            "count": 1,
+            "self_count": 0,
+          },
+          "id": 1239,
+          "name": "Firmicutes",
+          "rank": "phylum",
+        },
+      ],
+      "data": Object {
+        "count": 4,
+        "self_count": 1,
+      },
+      "id": 2,
+      "name": "Bacteria",
+      "rank": "superkingdom",
+    },
+    1239 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [],
+              "data": Object {
+                "count": 1,
+                "self_count": 1,
+              },
+              "id": 186802,
+              "name": "Clostridiales",
+              "rank": "order",
+            },
+          ],
+          "data": Object {
+            "count": 1,
+            "self_count": 0,
+          },
+          "id": 186801,
+          "name": "Clostridia",
+          "rank": "class",
+        },
+      ],
+      "data": Object {
+        "count": 1,
+        "self_count": 0,
+      },
+      "id": 1239,
+      "name": "Firmicutes",
+      "rank": "phylum",
+    },
+    186801 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [],
+          "data": Object {
+            "count": 1,
+            "self_count": 1,
+          },
+          "id": 186802,
+          "name": "Clostridiales",
+          "rank": "order",
+        },
+      ],
+      "data": Object {
+        "count": 1,
+        "self_count": 0,
+      },
+      "id": 186801,
+      "name": "Clostridia",
+      "rank": "class",
+    },
+    186802 => TreeNode {
+      "children": Array [],
+      "data": Object {
+        "count": 1,
+        "self_count": 1,
+      },
+      "id": 186802,
+      "name": "Clostridiales",
+      "rank": "order",
+    },
+    976 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [],
+                      "data": Object {
+                        "count": 1,
+                        "self_count": 1,
+                      },
+                      "id": 816,
+                      "name": "Bacteroides",
+                      "rank": "genus",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 1,
+                    "self_count": 0,
+                  },
+                  "id": 815,
+                  "name": "Bacteroidaceae",
+                  "rank": "family",
+                },
+              ],
+              "data": Object {
+                "count": 1,
+                "self_count": 0,
+              },
+              "id": 171549,
+              "name": "Bacteroidales",
+              "rank": "order",
+            },
+          ],
+          "data": Object {
+            "count": 1,
+            "self_count": 0,
+          },
+          "id": 200643,
+          "name": "Bacteroidia",
+          "rank": "class",
+        },
+      ],
+      "data": Object {
+        "count": 2,
+        "self_count": 1,
+      },
+      "id": 976,
+      "name": "Bacteroidetes",
+      "rank": "phylum",
+    },
+    200643 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [],
+                  "data": Object {
+                    "count": 1,
+                    "self_count": 1,
+                  },
+                  "id": 816,
+                  "name": "Bacteroides",
+                  "rank": "genus",
+                },
+              ],
+              "data": Object {
+                "count": 1,
+                "self_count": 0,
+              },
+              "id": 815,
+              "name": "Bacteroidaceae",
+              "rank": "family",
+            },
+          ],
+          "data": Object {
+            "count": 1,
+            "self_count": 0,
+          },
+          "id": 171549,
+          "name": "Bacteroidales",
+          "rank": "order",
+        },
+      ],
+      "data": Object {
+        "count": 1,
+        "self_count": 0,
+      },
+      "id": 200643,
+      "name": "Bacteroidia",
+      "rank": "class",
+    },
+    171549 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [],
+              "data": Object {
+                "count": 1,
+                "self_count": 1,
+              },
+              "id": 816,
+              "name": "Bacteroides",
+              "rank": "genus",
+            },
+          ],
+          "data": Object {
+            "count": 1,
+            "self_count": 0,
+          },
+          "id": 815,
+          "name": "Bacteroidaceae",
+          "rank": "family",
+        },
+      ],
+      "data": Object {
+        "count": 1,
+        "self_count": 0,
+      },
+      "id": 171549,
+      "name": "Bacteroidales",
+      "rank": "order",
+    },
+    815 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [],
+          "data": Object {
+            "count": 1,
+            "self_count": 1,
+          },
+          "id": 816,
+          "name": "Bacteroides",
+          "rank": "genus",
+        },
+      ],
+      "data": Object {
+        "count": 1,
+        "self_count": 0,
+      },
+      "id": 815,
+      "name": "Bacteroidaceae",
+      "rank": "family",
+    },
+    816 => TreeNode {
+      "children": Array [],
+      "data": Object {
+        "count": 1,
+        "self_count": 1,
+      },
+      "id": 816,
+      "name": "Bacteroides",
+      "rank": "genus",
+    },
+    2759 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [
+                                                TreeNode {
+                                                  "children": Array [
+                                                    TreeNode {
+                                                      "children": Array [
+                                                        TreeNode {
+                                                          "children": Array [
+                                                            TreeNode {
+                                                              "children": Array [
+                                                                TreeNode {
+                                                                  "children": Array [],
+                                                                  "data": Object {
+                                                                    "count": 7,
+                                                                    "self_count": 7,
+                                                                  },
+                                                                  "id": 9606,
+                                                                  "name": "Homo sapiens",
+                                                                  "rank": "species",
+                                                                },
+                                                              ],
+                                                              "data": Object {
+                                                                "count": 7,
+                                                                "self_count": 0,
+                                                              },
+                                                              "id": 9605,
+                                                              "name": "Homo",
+                                                              "rank": "genus",
+                                                            },
+                                                          ],
+                                                          "data": Object {
+                                                            "count": 7,
+                                                            "self_count": 0,
+                                                          },
+                                                          "id": 207598,
+                                                          "name": "Homininae",
+                                                          "rank": "subfamily",
+                                                        },
+                                                      ],
+                                                      "data": Object {
+                                                        "count": 8,
+                                                        "self_count": 1,
+                                                      },
+                                                      "id": 9604,
+                                                      "name": "Hominidae",
+                                                      "rank": "family",
+                                                    },
+                                                  ],
+                                                  "data": Object {
+                                                    "count": 8,
+                                                    "self_count": 0,
+                                                  },
+                                                  "id": 314295,
+                                                  "name": "Hominoidea",
+                                                  "rank": "superfamily",
+                                                },
+                                              ],
+                                              "data": Object {
+                                                "count": 8,
+                                                "self_count": 0,
+                                              },
+                                              "id": 9526,
+                                              "name": "Catarrhini",
+                                              "rank": "parvorder",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 8,
+                                            "self_count": 0,
+                                          },
+                                          "id": 314293,
+                                          "name": "Simiiformes",
+                                          "rank": "infraorder",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 8,
+                                        "self_count": 0,
+                                      },
+                                      "id": 376913,
+                                      "name": "Haplorrhini",
+                                      "rank": "suborder",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 0,
+                                  },
+                                  "id": 9443,
+                                  "name": "Primates",
+                                  "rank": "order",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 314146,
+                              "name": "Euarchontoglires",
+                              "rank": "superorder",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 40674,
+                          "name": "Mammalia",
+                          "rank": "class",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 8287,
+                      "name": "Sarcopterygii",
+                      "rank": "superclass",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 89593,
+                  "name": "Craniata",
+                  "rank": "subphylum",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 7711,
+              "name": "Chordata",
+              "rank": "phylum",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 33208,
+          "name": "Metazoa",
+          "rank": "kingdom",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 2759,
+      "name": "Eukaryota",
+      "rank": "superkingdom",
+    },
+    33208 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [
+                                                TreeNode {
+                                                  "children": Array [
+                                                    TreeNode {
+                                                      "children": Array [
+                                                        TreeNode {
+                                                          "children": Array [
+                                                            TreeNode {
+                                                              "children": Array [],
+                                                              "data": Object {
+                                                                "count": 7,
+                                                                "self_count": 7,
+                                                              },
+                                                              "id": 9606,
+                                                              "name": "Homo sapiens",
+                                                              "rank": "species",
+                                                            },
+                                                          ],
+                                                          "data": Object {
+                                                            "count": 7,
+                                                            "self_count": 0,
+                                                          },
+                                                          "id": 9605,
+                                                          "name": "Homo",
+                                                          "rank": "genus",
+                                                        },
+                                                      ],
+                                                      "data": Object {
+                                                        "count": 7,
+                                                        "self_count": 0,
+                                                      },
+                                                      "id": 207598,
+                                                      "name": "Homininae",
+                                                      "rank": "subfamily",
+                                                    },
+                                                  ],
+                                                  "data": Object {
+                                                    "count": 8,
+                                                    "self_count": 1,
+                                                  },
+                                                  "id": 9604,
+                                                  "name": "Hominidae",
+                                                  "rank": "family",
+                                                },
+                                              ],
+                                              "data": Object {
+                                                "count": 8,
+                                                "self_count": 0,
+                                              },
+                                              "id": 314295,
+                                              "name": "Hominoidea",
+                                              "rank": "superfamily",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 8,
+                                            "self_count": 0,
+                                          },
+                                          "id": 9526,
+                                          "name": "Catarrhini",
+                                          "rank": "parvorder",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 8,
+                                        "self_count": 0,
+                                      },
+                                      "id": 314293,
+                                      "name": "Simiiformes",
+                                      "rank": "infraorder",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 0,
+                                  },
+                                  "id": 376913,
+                                  "name": "Haplorrhini",
+                                  "rank": "suborder",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 9443,
+                              "name": "Primates",
+                              "rank": "order",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 314146,
+                          "name": "Euarchontoglires",
+                          "rank": "superorder",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 40674,
+                      "name": "Mammalia",
+                      "rank": "class",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 8287,
+                  "name": "Sarcopterygii",
+                  "rank": "superclass",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 89593,
+              "name": "Craniata",
+              "rank": "subphylum",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 7711,
+          "name": "Chordata",
+          "rank": "phylum",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 33208,
+      "name": "Metazoa",
+      "rank": "kingdom",
+    },
+    7711 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [
+                                                TreeNode {
+                                                  "children": Array [
+                                                    TreeNode {
+                                                      "children": Array [
+                                                        TreeNode {
+                                                          "children": Array [],
+                                                          "data": Object {
+                                                            "count": 7,
+                                                            "self_count": 7,
+                                                          },
+                                                          "id": 9606,
+                                                          "name": "Homo sapiens",
+                                                          "rank": "species",
+                                                        },
+                                                      ],
+                                                      "data": Object {
+                                                        "count": 7,
+                                                        "self_count": 0,
+                                                      },
+                                                      "id": 9605,
+                                                      "name": "Homo",
+                                                      "rank": "genus",
+                                                    },
+                                                  ],
+                                                  "data": Object {
+                                                    "count": 7,
+                                                    "self_count": 0,
+                                                  },
+                                                  "id": 207598,
+                                                  "name": "Homininae",
+                                                  "rank": "subfamily",
+                                                },
+                                              ],
+                                              "data": Object {
+                                                "count": 8,
+                                                "self_count": 1,
+                                              },
+                                              "id": 9604,
+                                              "name": "Hominidae",
+                                              "rank": "family",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 8,
+                                            "self_count": 0,
+                                          },
+                                          "id": 314295,
+                                          "name": "Hominoidea",
+                                          "rank": "superfamily",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 8,
+                                        "self_count": 0,
+                                      },
+                                      "id": 9526,
+                                      "name": "Catarrhini",
+                                      "rank": "parvorder",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 0,
+                                  },
+                                  "id": 314293,
+                                  "name": "Simiiformes",
+                                  "rank": "infraorder",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 376913,
+                              "name": "Haplorrhini",
+                              "rank": "suborder",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 9443,
+                          "name": "Primates",
+                          "rank": "order",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 314146,
+                      "name": "Euarchontoglires",
+                      "rank": "superorder",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 40674,
+                  "name": "Mammalia",
+                  "rank": "class",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 8287,
+              "name": "Sarcopterygii",
+              "rank": "superclass",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 89593,
+          "name": "Craniata",
+          "rank": "subphylum",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 7711,
+      "name": "Chordata",
+      "rank": "phylum",
+    },
+    89593 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [
+                                                TreeNode {
+                                                  "children": Array [
+                                                    TreeNode {
+                                                      "children": Array [],
+                                                      "data": Object {
+                                                        "count": 7,
+                                                        "self_count": 7,
+                                                      },
+                                                      "id": 9606,
+                                                      "name": "Homo sapiens",
+                                                      "rank": "species",
+                                                    },
+                                                  ],
+                                                  "data": Object {
+                                                    "count": 7,
+                                                    "self_count": 0,
+                                                  },
+                                                  "id": 9605,
+                                                  "name": "Homo",
+                                                  "rank": "genus",
+                                                },
+                                              ],
+                                              "data": Object {
+                                                "count": 7,
+                                                "self_count": 0,
+                                              },
+                                              "id": 207598,
+                                              "name": "Homininae",
+                                              "rank": "subfamily",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 8,
+                                            "self_count": 1,
+                                          },
+                                          "id": 9604,
+                                          "name": "Hominidae",
+                                          "rank": "family",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 8,
+                                        "self_count": 0,
+                                      },
+                                      "id": 314295,
+                                      "name": "Hominoidea",
+                                      "rank": "superfamily",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 0,
+                                  },
+                                  "id": 9526,
+                                  "name": "Catarrhini",
+                                  "rank": "parvorder",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 314293,
+                              "name": "Simiiformes",
+                              "rank": "infraorder",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 376913,
+                          "name": "Haplorrhini",
+                          "rank": "suborder",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 9443,
+                      "name": "Primates",
+                      "rank": "order",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 314146,
+                  "name": "Euarchontoglires",
+                  "rank": "superorder",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 40674,
+              "name": "Mammalia",
+              "rank": "class",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 8287,
+          "name": "Sarcopterygii",
+          "rank": "superclass",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 89593,
+      "name": "Craniata",
+      "rank": "subphylum",
+    },
+    8287 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [
+                                                TreeNode {
+                                                  "children": Array [],
+                                                  "data": Object {
+                                                    "count": 7,
+                                                    "self_count": 7,
+                                                  },
+                                                  "id": 9606,
+                                                  "name": "Homo sapiens",
+                                                  "rank": "species",
+                                                },
+                                              ],
+                                              "data": Object {
+                                                "count": 7,
+                                                "self_count": 0,
+                                              },
+                                              "id": 9605,
+                                              "name": "Homo",
+                                              "rank": "genus",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 7,
+                                            "self_count": 0,
+                                          },
+                                          "id": 207598,
+                                          "name": "Homininae",
+                                          "rank": "subfamily",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 8,
+                                        "self_count": 1,
+                                      },
+                                      "id": 9604,
+                                      "name": "Hominidae",
+                                      "rank": "family",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 0,
+                                  },
+                                  "id": 314295,
+                                  "name": "Hominoidea",
+                                  "rank": "superfamily",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 9526,
+                              "name": "Catarrhini",
+                              "rank": "parvorder",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 314293,
+                          "name": "Simiiformes",
+                          "rank": "infraorder",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 376913,
+                      "name": "Haplorrhini",
+                      "rank": "suborder",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 9443,
+                  "name": "Primates",
+                  "rank": "order",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 314146,
+              "name": "Euarchontoglires",
+              "rank": "superorder",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 40674,
+          "name": "Mammalia",
+          "rank": "class",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 8287,
+      "name": "Sarcopterygii",
+      "rank": "superclass",
+    },
+    40674 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [],
+                                              "data": Object {
+                                                "count": 7,
+                                                "self_count": 7,
+                                              },
+                                              "id": 9606,
+                                              "name": "Homo sapiens",
+                                              "rank": "species",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 7,
+                                            "self_count": 0,
+                                          },
+                                          "id": 9605,
+                                          "name": "Homo",
+                                          "rank": "genus",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 7,
+                                        "self_count": 0,
+                                      },
+                                      "id": 207598,
+                                      "name": "Homininae",
+                                      "rank": "subfamily",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 1,
+                                  },
+                                  "id": 9604,
+                                  "name": "Hominidae",
+                                  "rank": "family",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 314295,
+                              "name": "Hominoidea",
+                              "rank": "superfamily",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 9526,
+                          "name": "Catarrhini",
+                          "rank": "parvorder",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 314293,
+                      "name": "Simiiformes",
+                      "rank": "infraorder",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 376913,
+                  "name": "Haplorrhini",
+                  "rank": "suborder",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 9443,
+              "name": "Primates",
+              "rank": "order",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 314146,
+          "name": "Euarchontoglires",
+          "rank": "superorder",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 40674,
+      "name": "Mammalia",
+      "rank": "class",
+    },
+    314146 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [],
+                                          "data": Object {
+                                            "count": 7,
+                                            "self_count": 7,
+                                          },
+                                          "id": 9606,
+                                          "name": "Homo sapiens",
+                                          "rank": "species",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 7,
+                                        "self_count": 0,
+                                      },
+                                      "id": 9605,
+                                      "name": "Homo",
+                                      "rank": "genus",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 7,
+                                    "self_count": 0,
+                                  },
+                                  "id": 207598,
+                                  "name": "Homininae",
+                                  "rank": "subfamily",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 1,
+                              },
+                              "id": 9604,
+                              "name": "Hominidae",
+                              "rank": "family",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 314295,
+                          "name": "Hominoidea",
+                          "rank": "superfamily",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 9526,
+                      "name": "Catarrhini",
+                      "rank": "parvorder",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 314293,
+                  "name": "Simiiformes",
+                  "rank": "infraorder",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 376913,
+              "name": "Haplorrhini",
+              "rank": "suborder",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 9443,
+          "name": "Primates",
+          "rank": "order",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 314146,
+      "name": "Euarchontoglires",
+      "rank": "superorder",
+    },
+    9443 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [],
+                                      "data": Object {
+                                        "count": 7,
+                                        "self_count": 7,
+                                      },
+                                      "id": 9606,
+                                      "name": "Homo sapiens",
+                                      "rank": "species",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 7,
+                                    "self_count": 0,
+                                  },
+                                  "id": 9605,
+                                  "name": "Homo",
+                                  "rank": "genus",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 7,
+                                "self_count": 0,
+                              },
+                              "id": 207598,
+                              "name": "Homininae",
+                              "rank": "subfamily",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 1,
+                          },
+                          "id": 9604,
+                          "name": "Hominidae",
+                          "rank": "family",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 314295,
+                      "name": "Hominoidea",
+                      "rank": "superfamily",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 9526,
+                  "name": "Catarrhini",
+                  "rank": "parvorder",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 314293,
+              "name": "Simiiformes",
+              "rank": "infraorder",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 376913,
+          "name": "Haplorrhini",
+          "rank": "suborder",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 9443,
+      "name": "Primates",
+      "rank": "order",
+    },
+    376913 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [],
+                                  "data": Object {
+                                    "count": 7,
+                                    "self_count": 7,
+                                  },
+                                  "id": 9606,
+                                  "name": "Homo sapiens",
+                                  "rank": "species",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 7,
+                                "self_count": 0,
+                              },
+                              "id": 9605,
+                              "name": "Homo",
+                              "rank": "genus",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 7,
+                            "self_count": 0,
+                          },
+                          "id": 207598,
+                          "name": "Homininae",
+                          "rank": "subfamily",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 1,
+                      },
+                      "id": 9604,
+                      "name": "Hominidae",
+                      "rank": "family",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 314295,
+                  "name": "Hominoidea",
+                  "rank": "superfamily",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 9526,
+              "name": "Catarrhini",
+              "rank": "parvorder",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 314293,
+          "name": "Simiiformes",
+          "rank": "infraorder",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 376913,
+      "name": "Haplorrhini",
+      "rank": "suborder",
+    },
+    314293 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [],
+                              "data": Object {
+                                "count": 7,
+                                "self_count": 7,
+                              },
+                              "id": 9606,
+                              "name": "Homo sapiens",
+                              "rank": "species",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 7,
+                            "self_count": 0,
+                          },
+                          "id": 9605,
+                          "name": "Homo",
+                          "rank": "genus",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 7,
+                        "self_count": 0,
+                      },
+                      "id": 207598,
+                      "name": "Homininae",
+                      "rank": "subfamily",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 1,
+                  },
+                  "id": 9604,
+                  "name": "Hominidae",
+                  "rank": "family",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 314295,
+              "name": "Hominoidea",
+              "rank": "superfamily",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 9526,
+          "name": "Catarrhini",
+          "rank": "parvorder",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 314293,
+      "name": "Simiiformes",
+      "rank": "infraorder",
+    },
+    9526 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [],
+                          "data": Object {
+                            "count": 7,
+                            "self_count": 7,
+                          },
+                          "id": 9606,
+                          "name": "Homo sapiens",
+                          "rank": "species",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 7,
+                        "self_count": 0,
+                      },
+                      "id": 9605,
+                      "name": "Homo",
+                      "rank": "genus",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 7,
+                    "self_count": 0,
+                  },
+                  "id": 207598,
+                  "name": "Homininae",
+                  "rank": "subfamily",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 1,
+              },
+              "id": 9604,
+              "name": "Hominidae",
+              "rank": "family",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 314295,
+          "name": "Hominoidea",
+          "rank": "superfamily",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 9526,
+      "name": "Catarrhini",
+      "rank": "parvorder",
+    },
+    314295 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [],
+                      "data": Object {
+                        "count": 7,
+                        "self_count": 7,
+                      },
+                      "id": 9606,
+                      "name": "Homo sapiens",
+                      "rank": "species",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 7,
+                    "self_count": 0,
+                  },
+                  "id": 9605,
+                  "name": "Homo",
+                  "rank": "genus",
+                },
+              ],
+              "data": Object {
+                "count": 7,
+                "self_count": 0,
+              },
+              "id": 207598,
+              "name": "Homininae",
+              "rank": "subfamily",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 1,
+          },
+          "id": 9604,
+          "name": "Hominidae",
+          "rank": "family",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 0,
+      },
+      "id": 314295,
+      "name": "Hominoidea",
+      "rank": "superfamily",
+    },
+    9604 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [],
+                  "data": Object {
+                    "count": 7,
+                    "self_count": 7,
+                  },
+                  "id": 9606,
+                  "name": "Homo sapiens",
+                  "rank": "species",
+                },
+              ],
+              "data": Object {
+                "count": 7,
+                "self_count": 0,
+              },
+              "id": 9605,
+              "name": "Homo",
+              "rank": "genus",
+            },
+          ],
+          "data": Object {
+            "count": 7,
+            "self_count": 0,
+          },
+          "id": 207598,
+          "name": "Homininae",
+          "rank": "subfamily",
+        },
+      ],
+      "data": Object {
+        "count": 8,
+        "self_count": 1,
+      },
+      "id": 9604,
+      "name": "Hominidae",
+      "rank": "family",
+    },
+    207598 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [],
+              "data": Object {
+                "count": 7,
+                "self_count": 7,
+              },
+              "id": 9606,
+              "name": "Homo sapiens",
+              "rank": "species",
+            },
+          ],
+          "data": Object {
+            "count": 7,
+            "self_count": 0,
+          },
+          "id": 9605,
+          "name": "Homo",
+          "rank": "genus",
+        },
+      ],
+      "data": Object {
+        "count": 7,
+        "self_count": 0,
+      },
+      "id": 207598,
+      "name": "Homininae",
+      "rank": "subfamily",
+    },
+    9605 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [],
+          "data": Object {
+            "count": 7,
+            "self_count": 7,
+          },
+          "id": 9606,
+          "name": "Homo sapiens",
+          "rank": "species",
+        },
+      ],
+      "data": Object {
+        "count": 7,
+        "self_count": 0,
+      },
+      "id": 9605,
+      "name": "Homo",
+      "rank": "genus",
+    },
+    9606 => TreeNode {
+      "children": Array [],
+      "data": Object {
+        "count": 7,
+        "self_count": 7,
+      },
+      "id": 9606,
+      "name": "Homo sapiens",
+      "rank": "species",
+    },
+    -1 => TreeNode {
+      "children": Array [
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [],
+                              "data": Object {
+                                "count": 1,
+                                "self_count": 1,
+                              },
+                              "id": 816,
+                              "name": "Bacteroides",
+                              "rank": "genus",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 1,
+                            "self_count": 0,
+                          },
+                          "id": 815,
+                          "name": "Bacteroidaceae",
+                          "rank": "family",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 1,
+                        "self_count": 0,
+                      },
+                      "id": 171549,
+                      "name": "Bacteroidales",
+                      "rank": "order",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 1,
+                    "self_count": 0,
+                  },
+                  "id": 200643,
+                  "name": "Bacteroidia",
+                  "rank": "class",
+                },
+              ],
+              "data": Object {
+                "count": 2,
+                "self_count": 1,
+              },
+              "id": 976,
+              "name": "Bacteroidetes",
+              "rank": "phylum",
+            },
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [],
+                      "data": Object {
+                        "count": 1,
+                        "self_count": 1,
+                      },
+                      "id": 186802,
+                      "name": "Clostridiales",
+                      "rank": "order",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 1,
+                    "self_count": 0,
+                  },
+                  "id": 186801,
+                  "name": "Clostridia",
+                  "rank": "class",
+                },
+              ],
+              "data": Object {
+                "count": 1,
+                "self_count": 0,
+              },
+              "id": 1239,
+              "name": "Firmicutes",
+              "rank": "phylum",
+            },
+          ],
+          "data": Object {
+            "count": 4,
+            "self_count": 1,
+          },
+          "id": 2,
+          "name": "Bacteria",
+          "rank": "superkingdom",
+        },
+        TreeNode {
+          "children": Array [
+            TreeNode {
+              "children": Array [
+                TreeNode {
+                  "children": Array [
+                    TreeNode {
+                      "children": Array [
+                        TreeNode {
+                          "children": Array [
+                            TreeNode {
+                              "children": Array [
+                                TreeNode {
+                                  "children": Array [
+                                    TreeNode {
+                                      "children": Array [
+                                        TreeNode {
+                                          "children": Array [
+                                            TreeNode {
+                                              "children": Array [
+                                                TreeNode {
+                                                  "children": Array [
+                                                    TreeNode {
+                                                      "children": Array [
+                                                        TreeNode {
+                                                          "children": Array [
+                                                            TreeNode {
+                                                              "children": Array [
+                                                                TreeNode {
+                                                                  "children": Array [
+                                                                    TreeNode {
+                                                                      "children": Array [],
+                                                                      "data": Object {
+                                                                        "count": 7,
+                                                                        "self_count": 7,
+                                                                      },
+                                                                      "id": 9606,
+                                                                      "name": "Homo sapiens",
+                                                                      "rank": "species",
+                                                                    },
+                                                                  ],
+                                                                  "data": Object {
+                                                                    "count": 7,
+                                                                    "self_count": 0,
+                                                                  },
+                                                                  "id": 9605,
+                                                                  "name": "Homo",
+                                                                  "rank": "genus",
+                                                                },
+                                                              ],
+                                                              "data": Object {
+                                                                "count": 7,
+                                                                "self_count": 0,
+                                                              },
+                                                              "id": 207598,
+                                                              "name": "Homininae",
+                                                              "rank": "subfamily",
+                                                            },
+                                                          ],
+                                                          "data": Object {
+                                                            "count": 8,
+                                                            "self_count": 1,
+                                                          },
+                                                          "id": 9604,
+                                                          "name": "Hominidae",
+                                                          "rank": "family",
+                                                        },
+                                                      ],
+                                                      "data": Object {
+                                                        "count": 8,
+                                                        "self_count": 0,
+                                                      },
+                                                      "id": 314295,
+                                                      "name": "Hominoidea",
+                                                      "rank": "superfamily",
+                                                    },
+                                                  ],
+                                                  "data": Object {
+                                                    "count": 8,
+                                                    "self_count": 0,
+                                                  },
+                                                  "id": 9526,
+                                                  "name": "Catarrhini",
+                                                  "rank": "parvorder",
+                                                },
+                                              ],
+                                              "data": Object {
+                                                "count": 8,
+                                                "self_count": 0,
+                                              },
+                                              "id": 314293,
+                                              "name": "Simiiformes",
+                                              "rank": "infraorder",
+                                            },
+                                          ],
+                                          "data": Object {
+                                            "count": 8,
+                                            "self_count": 0,
+                                          },
+                                          "id": 376913,
+                                          "name": "Haplorrhini",
+                                          "rank": "suborder",
+                                        },
+                                      ],
+                                      "data": Object {
+                                        "count": 8,
+                                        "self_count": 0,
+                                      },
+                                      "id": 9443,
+                                      "name": "Primates",
+                                      "rank": "order",
+                                    },
+                                  ],
+                                  "data": Object {
+                                    "count": 8,
+                                    "self_count": 0,
+                                  },
+                                  "id": 314146,
+                                  "name": "Euarchontoglires",
+                                  "rank": "superorder",
+                                },
+                              ],
+                              "data": Object {
+                                "count": 8,
+                                "self_count": 0,
+                              },
+                              "id": 40674,
+                              "name": "Mammalia",
+                              "rank": "class",
+                            },
+                          ],
+                          "data": Object {
+                            "count": 8,
+                            "self_count": 0,
+                          },
+                          "id": 8287,
+                          "name": "Sarcopterygii",
+                          "rank": "superclass",
+                        },
+                      ],
+                      "data": Object {
+                        "count": 8,
+                        "self_count": 0,
+                      },
+                      "id": 89593,
+                      "name": "Craniata",
+                      "rank": "subphylum",
+                    },
+                  ],
+                  "data": Object {
+                    "count": 8,
+                    "self_count": 0,
+                  },
+                  "id": 7711,
+                  "name": "Chordata",
+                  "rank": "phylum",
+                },
+              ],
+              "data": Object {
+                "count": 8,
+                "self_count": 0,
+              },
+              "id": 33208,
+              "name": "Metazoa",
+              "rank": "kingdom",
+            },
+          ],
+          "data": Object {
+            "count": 8,
+            "self_count": 0,
+          },
+          "id": 2759,
+          "name": "Eukaryota",
+          "rank": "superkingdom",
+        },
+      ],
+      "data": Object {
+        "count": 15,
+        "self_count": 3,
+      },
+      "id": -1,
+      "name": "Organism",
+      "rank": "no rank",
+    },
+  },
+  "root": TreeNode {
+    "children": Array [
+      TreeNode {
+        "children": Array [
+          TreeNode {
+            "children": Array [
+              TreeNode {
+                "children": Array [
+                  TreeNode {
+                    "children": Array [
+                      TreeNode {
+                        "children": Array [
+                          TreeNode {
+                            "children": Array [],
+                            "data": Object {
+                              "count": 1,
+                              "self_count": 1,
+                            },
+                            "id": 816,
+                            "name": "Bacteroides",
+                            "rank": "genus",
+                          },
+                        ],
+                        "data": Object {
+                          "count": 1,
+                          "self_count": 0,
+                        },
+                        "id": 815,
+                        "name": "Bacteroidaceae",
+                        "rank": "family",
+                      },
+                    ],
+                    "data": Object {
+                      "count": 1,
+                      "self_count": 0,
+                    },
+                    "id": 171549,
+                    "name": "Bacteroidales",
+                    "rank": "order",
+                  },
+                ],
+                "data": Object {
+                  "count": 1,
+                  "self_count": 0,
+                },
+                "id": 200643,
+                "name": "Bacteroidia",
+                "rank": "class",
+              },
+            ],
+            "data": Object {
+              "count": 2,
+              "self_count": 1,
+            },
+            "id": 976,
+            "name": "Bacteroidetes",
+            "rank": "phylum",
+          },
+          TreeNode {
+            "children": Array [
+              TreeNode {
+                "children": Array [
+                  TreeNode {
+                    "children": Array [],
+                    "data": Object {
+                      "count": 1,
+                      "self_count": 1,
+                    },
+                    "id": 186802,
+                    "name": "Clostridiales",
+                    "rank": "order",
+                  },
+                ],
+                "data": Object {
+                  "count": 1,
+                  "self_count": 0,
+                },
+                "id": 186801,
+                "name": "Clostridia",
+                "rank": "class",
+              },
+            ],
+            "data": Object {
+              "count": 1,
+              "self_count": 0,
+            },
+            "id": 1239,
+            "name": "Firmicutes",
+            "rank": "phylum",
+          },
+        ],
+        "data": Object {
+          "count": 4,
+          "self_count": 1,
+        },
+        "id": 2,
+        "name": "Bacteria",
+        "rank": "superkingdom",
+      },
+      TreeNode {
+        "children": Array [
+          TreeNode {
+            "children": Array [
+              TreeNode {
+                "children": Array [
+                  TreeNode {
+                    "children": Array [
+                      TreeNode {
+                        "children": Array [
+                          TreeNode {
+                            "children": Array [
+                              TreeNode {
+                                "children": Array [
+                                  TreeNode {
+                                    "children": Array [
+                                      TreeNode {
+                                        "children": Array [
+                                          TreeNode {
+                                            "children": Array [
+                                              TreeNode {
+                                                "children": Array [
+                                                  TreeNode {
+                                                    "children": Array [
+                                                      TreeNode {
+                                                        "children": Array [
+                                                          TreeNode {
+                                                            "children": Array [
+                                                              TreeNode {
+                                                                "children": Array [
+                                                                  TreeNode {
+                                                                    "children": Array [],
+                                                                    "data": Object {
+                                                                      "count": 7,
+                                                                      "self_count": 7,
+                                                                    },
+                                                                    "id": 9606,
+                                                                    "name": "Homo sapiens",
+                                                                    "rank": "species",
+                                                                  },
+                                                                ],
+                                                                "data": Object {
+                                                                  "count": 7,
+                                                                  "self_count": 0,
+                                                                },
+                                                                "id": 9605,
+                                                                "name": "Homo",
+                                                                "rank": "genus",
+                                                              },
+                                                            ],
+                                                            "data": Object {
+                                                              "count": 7,
+                                                              "self_count": 0,
+                                                            },
+                                                            "id": 207598,
+                                                            "name": "Homininae",
+                                                            "rank": "subfamily",
+                                                          },
+                                                        ],
+                                                        "data": Object {
+                                                          "count": 8,
+                                                          "self_count": 1,
+                                                        },
+                                                        "id": 9604,
+                                                        "name": "Hominidae",
+                                                        "rank": "family",
+                                                      },
+                                                    ],
+                                                    "data": Object {
+                                                      "count": 8,
+                                                      "self_count": 0,
+                                                    },
+                                                    "id": 314295,
+                                                    "name": "Hominoidea",
+                                                    "rank": "superfamily",
+                                                  },
+                                                ],
+                                                "data": Object {
+                                                  "count": 8,
+                                                  "self_count": 0,
+                                                },
+                                                "id": 9526,
+                                                "name": "Catarrhini",
+                                                "rank": "parvorder",
+                                              },
+                                            ],
+                                            "data": Object {
+                                              "count": 8,
+                                              "self_count": 0,
+                                            },
+                                            "id": 314293,
+                                            "name": "Simiiformes",
+                                            "rank": "infraorder",
+                                          },
+                                        ],
+                                        "data": Object {
+                                          "count": 8,
+                                          "self_count": 0,
+                                        },
+                                        "id": 376913,
+                                        "name": "Haplorrhini",
+                                        "rank": "suborder",
+                                      },
+                                    ],
+                                    "data": Object {
+                                      "count": 8,
+                                      "self_count": 0,
+                                    },
+                                    "id": 9443,
+                                    "name": "Primates",
+                                    "rank": "order",
+                                  },
+                                ],
+                                "data": Object {
+                                  "count": 8,
+                                  "self_count": 0,
+                                },
+                                "id": 314146,
+                                "name": "Euarchontoglires",
+                                "rank": "superorder",
+                              },
+                            ],
+                            "data": Object {
+                              "count": 8,
+                              "self_count": 0,
+                            },
+                            "id": 40674,
+                            "name": "Mammalia",
+                            "rank": "class",
+                          },
+                        ],
+                        "data": Object {
+                          "count": 8,
+                          "self_count": 0,
+                        },
+                        "id": 8287,
+                        "name": "Sarcopterygii",
+                        "rank": "superclass",
+                      },
+                    ],
+                    "data": Object {
+                      "count": 8,
+                      "self_count": 0,
+                    },
+                    "id": 89593,
+                    "name": "Craniata",
+                    "rank": "subphylum",
+                  },
+                ],
+                "data": Object {
+                  "count": 8,
+                  "self_count": 0,
+                },
+                "id": 7711,
+                "name": "Chordata",
+                "rank": "phylum",
+              },
+            ],
+            "data": Object {
+              "count": 8,
+              "self_count": 0,
+            },
+            "id": 33208,
+            "name": "Metazoa",
+            "rank": "kingdom",
+          },
+        ],
+        "data": Object {
+          "count": 8,
+          "self_count": 0,
+        },
+        "id": 2759,
+        "name": "Eukaryota",
+        "rank": "superkingdom",
+      },
+    ],
+    "data": Object {
+      "count": 15,
+      "self_count": 3,
+    },
+    "id": -1,
+    "name": "Organism",
+    "rank": "no rank",
+  },
+  "taxa": Array [
+    2,
+    1239,
+    186801,
+    186802,
+    976,
+    200643,
+    171549,
+    815,
+    816,
+    2759,
+    33208,
+    7711,
+    89593,
+    8287,
+    40674,
+    314146,
+    9443,
+    376913,
+    314293,
+    9526,
+    314295,
+    9604,
+    207598,
+    9605,
+    9606,
+  ],
+}
+`;
