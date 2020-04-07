@@ -47,7 +47,7 @@
                     {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
             </template>
-            <template v-slot:Name="{ item }">
+            <template v-slot:item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
                 </span>

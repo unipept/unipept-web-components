@@ -42,7 +42,9 @@ export default class NcbiResponseCommunicator {
             for (const term of res) {
                 if (!this.idToResponseMap.has(term.id)) {
                     this.idToResponseMap.set(term.id, term);
-                    term.lineage.map(l => lineagesToProcess.add(l));
+                    // Some id's are negative due to erroneous classification in the NCBI taxonomy. These taxon id's do
+                    // need to be retrieved however!
+                    term.lineage.map(l => lineagesToProcess.add(l != -1 ? Math.abs(l) : null));
                 }
             }
         }

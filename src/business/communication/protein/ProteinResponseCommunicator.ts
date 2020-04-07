@@ -1,5 +1,5 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
-import ProteinResponse from "./../protein/ProteinResponse";
+import ProteinResponse from "./ProteinResponse";
 import NetworkUtils from "./../NetworkUtils";
 import NetworkConfiguration from "./../NetworkConfiguration";
 
