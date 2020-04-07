@@ -59,7 +59,9 @@
                                         {{ definition.code.substr(3) }} - {{ definition.name }} - {{ definition.namespace }}
                                     </v-list-item-title>
                                     <v-list-item-subtitle>
-                                        Assigned to x of x matched proteins with an EC annotation.
+                                        Assigned to {{ peptideData.fa.data[definition.code] }} of
+                                        {{ peptideData.fa.counts.EC }} matched proteins with an EC annotation
+                                        ({{ percentageForAnnotation(definition.code, "EC") }}).
                                     </v-list-item-subtitle>
                                 </v-list-item-content>
                             </v-list-item>
@@ -72,20 +74,24 @@
                                         {{ definition.code }} - {{ definition.name }} - {{ definition.namespace }}
                                     </v-list-item-title>
                                     <v-list-item-subtitle>
-                                        Assigned to x of x matched proteins with a GO annotation.
+                                        Assigned to {{ peptideData.fa.data[definition.code] }} of
+                                        {{ peptideData.fa.counts.GO }} matched proteins with a GO annotation
+                                        ({{ percentageForAnnotation(definition.code, "GO") }}).
                                     </v-list-item-subtitle>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
                         <v-subheader>InterPro entries</v-subheader>
                         <v-list-item-group>
-                            <v-list-item v-for="definition of item.functionalAnnotations.go" :key="definition.code">
+                            <v-list-item v-for="definition of item.functionalAnnotations.interpro" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
                                         {{ definition.code.substr(4) }} - {{ definition.name }} - {{ definition.namespace }}
                                     </v-list-item-title>
                                     <v-list-item-subtitle>
-                                        Assigned to x of x matched proteins with an InterPro annotation.
+                                        Assigned to {{ peptideData.fa.data[definition.code] }} of
+                                        {{ peptideData.fa.counts.IPR }} matched proteins with an InterPro annotation
+                                        ({{ percentageForAnnotation(definition.code, "IPR") }}).
                                     </v-list-item-subtitle>
                                 </v-list-item-content>
                             </v-list-item>
@@ -113,6 +119,12 @@ import InterproOntologyProcessor from "./../../business/ontology/functional/inte
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
+import Pept2DataCommunicator from "./../../business/communication/peptides/Pept2DataCommunicator";
+import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
+import { PeptideDataResponse } from "./../../business/communication/peptides/PeptideDataResponse";
+import { CountTable } from "./../../business/counts/CountTable";
+import StringUtils from "./../../business/misc/StringUtils";
+import { OntologyIdType } from "./../../business/ontology/Ontology";
 
 type MatchedProtein = {
     uniprotAccessionId: UniprotAccessionId,
@@ -164,6 +176,7 @@ export default class MatchedProteinsTable extends Vue {
     private loading: boolean = false;
 
     private filter: string = "";
+    private peptideData: PeptideDataResponse;
 
     private mounted() {
         this.onInputsChanged();
@@ -193,6 +206,14 @@ export default class MatchedProteinsTable extends Vue {
                 acc[3].push(current.organism);
                 return acc;
             }, [[], [], [], []]);
+
+            const searchConfig = new SearchConfiguration(this.equateIl, false, false);
+
+            await Pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
+            this.peptideData = Pept2DataCommunicator.getPeptideResponse(
+                this.peptide,
+                searchConfig
+            );
 
             const ecOntologyProcessor = new EcOntologyProcessor();
             const goOntologyProcessor = new GoOntologyProcessor();
@@ -237,6 +258,19 @@ export default class MatchedProteinsTable extends Vue {
         NetworkUtils.openInBrowser(
             `https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/Search?apply_action=GO&exact_match=exact_match%22&search_key=${accessionId}`
         )
+    }
+
+    /**
+     * Returns how many of the total peptides of a specific annotation type (e.g. EC, GO or IPR) is annotated with a
+     * concrete annotation (e.g. GO:005782).
+     *
+     * @param annotationCode The concrete annotation for which the annotation percentage should be computed.
+     * @param annotationType The type of annotation that was given. Must be one of GO, EC, IPR.
+     */
+    private percentageForAnnotation(annotationCode: OntologyIdType, annotationType: ("GO" | "EC" | "IPR")) {
+        return StringUtils.numberToPercent(
+            this.peptideData.fa.data[annotationCode] / this.peptideData.fa.counts[annotationType]
+        );
     }
 }
 </script>
