@@ -40,19 +40,16 @@
                     </v-list>
                 </v-menu>
             </template>
-            <template v-slot:item.functionalAnnotations="{ item }">
-                <functional-annotations-tooltip :annotations="item.functionalAnnotations">
-                </functional-annotations-tooltip>
-            </template>
             <template v-slot:expanded-item="{ headers, item }">
                 <td :colspan="headers.length" style="padding-top: 12px; padding-bottom: 12px;">
                     <v-list
                         two-line
                         subheader
                         dense
-                        disabled>
+                        disabled
+                        v-if="peptideData">
                         <v-subheader>Enzyme Commission numbers</v-subheader>
-                        <v-list-item-group>
+                        <v-list-item-group class="ec-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.ec" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
@@ -67,7 +64,7 @@
                             </v-list-item>
                         </v-list-item-group>
                         <v-subheader>Gene Ontology terms</v-subheader>
-                        <v-list-item-group>
+                        <v-list-item-group class="go-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.go" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
@@ -82,7 +79,7 @@
                             </v-list-item>
                         </v-list-item-group>
                         <v-subheader>InterPro entries</v-subheader>
-                        <v-list-item-group>
+                        <v-list-item-group class="interpro-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.interpro" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
@@ -97,6 +94,11 @@
                             </v-list-item>
                         </v-list-item-group>
                     </v-list>
+                    <div v-else class="no-peptide-data-alert">
+                        <v-alert dense text type="error">
+                            No data associated with the requested peptide was found!
+                        </v-alert>
+                    </div>
                 </td>
             </template>
         </v-data-table>
@@ -233,9 +235,9 @@ export default class MatchedProteinsTable extends Vue {
                     name: p.name,
                     organism: organism ? organism.name : "",
                     functionalAnnotations: {
-                        go: p.goTerms.map(term => goOntology.getDefinition(term)),
-                        ec: p.ecNumbers.map(n => ecOntology.getDefinition("EC:" + n)),
-                        interpro: p.interproEntries.map(i => interproOntology.getDefinition("IPR:" + i))
+                        go: p.goTerms.map(term => goOntology.getDefinition(term)).filter(e => e),
+                        ec: p.ecNumbers.map(n => ecOntology.getDefinition("EC:" + n)).filter(e => e),
+                        interpro: p.interproEntries.map(i => interproOntology.getDefinition("IPR:" + i)).filter(e => e)
                     }
                 }
             }));
@@ -276,11 +278,7 @@ export default class MatchedProteinsTable extends Vue {
 </script>
 
 <style scoped>
-    .annotation-secondary-title {
-        font-weight: bold;
-    }
-
-    .annotation-list {
-        list-style-type: none;
+    .no-peptide-data-alert .v-alert {
+        margin-bottom: 0 !important;
     }
 </style>
