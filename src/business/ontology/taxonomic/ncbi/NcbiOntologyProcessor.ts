@@ -25,15 +25,18 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
                     apiResponse.lineage
                 ));
 
-                for (const lineageId of apiResponse.lineage.filter(t => t !== null)) {
+                for (let lineageId of apiResponse.lineage.filter(t => t !== null && t !== -1)) {
+                    lineageId = Math.abs(lineageId);
                     const apiResponse = NcbiResponseCommunicator.getResponse(lineageId);
 
-                    definitions.set(lineageId, new NcbiTaxon(
-                        apiResponse.id,
-                        apiResponse.name,
-                        apiResponse.rank,
-                        apiResponse.lineage
-                    ));
+                    if (apiResponse) {
+                        definitions.set(lineageId, new NcbiTaxon(
+                            apiResponse.id,
+                            apiResponse.name,
+                            apiResponse.rank,
+                            apiResponse.lineage
+                        ));
+                    }
                 }
             }
         }
