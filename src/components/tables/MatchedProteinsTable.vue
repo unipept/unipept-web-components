@@ -5,24 +5,96 @@
 </docs>
 
 <template>
-    <div>
-        <p>DIT IS DE TITEL!!</p>
+    <v-card>
+        <v-card-title>
+            <v-text-field v-model="filter" append-icon="search" label="Filter" single-line hide-details>
+            </v-text-field>
+        </v-card-title>
         <v-data-table
             :headers="headers"
             :items="items"
-            item-key="uniprotAccessionId">
+            item-key="uniprotAccessionId"
+            :search="filter"
+            :custom-filter="filterByValue"
+            show-expand>
             <template v-slot:item.uniprotAccessionId="{ item }">
                 <v-menu offset-y>
                     <template v-slot:activator="{ on }">
                         <v-btn color="white" v-on="on">
-                            {{ item.uniprotAccessionId }}
+                            <span style="width: 80px">
+                                {{ item.uniprotAccessionId }}
+                            </span>
                             <v-icon>mdi-chevron-down</v-icon>
                         </v-btn>
                     </template>
+                    <v-list>
+                        <v-list-item @click="openInUniProt(item.uniprotAccessionId)">
+                            <v-list-item-title>UniProt</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="openInPride(item.uniprotAccessionId)">
+                            <v-list-item-title>PRIDE</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item @click="openInPeptideAtlas(item.uniprotAccessionId)">
+                            <v-list-item-title>PeptideAtlas</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
                 </v-menu>
             </template>
+            <template v-slot:item.functionalAnnotations="{ item }">
+                <functional-annotations-tooltip :annotations="item.functionalAnnotations">
+                </functional-annotations-tooltip>
+            </template>
+            <template v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length" style="padding-top: 12px; padding-bottom: 12px;">
+                    <v-list
+                        two-line
+                        subheader
+                        dense
+                        disabled>
+                        <v-subheader>Enzyme Commission numbers</v-subheader>
+                        <v-list-item-group>
+                            <v-list-item v-for="definition of item.functionalAnnotations.ec" :key="definition.code">
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ definition.code.substr(3) }} - {{ definition.name }} - {{ definition.namespace }}
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        Assigned to x of x matched proteins with an EC annotation.
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list-item-group>
+                        <v-subheader>Gene Ontology terms</v-subheader>
+                        <v-list-item-group>
+                            <v-list-item v-for="definition of item.functionalAnnotations.go" :key="definition.code">
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ definition.code }} - {{ definition.name }} - {{ definition.namespace }}
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        Assigned to x of x matched proteins with a GO annotation.
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list-item-group>
+                        <v-subheader>InterPro entries</v-subheader>
+                        <v-list-item-group>
+                            <v-list-item v-for="definition of item.functionalAnnotations.go" :key="definition.code">
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ definition.code.substr(4) }} - {{ definition.name }} - {{ definition.namespace }}
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        Assigned to x of x matched proteins with an InterPro annotation.
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list-item-group>
+                    </v-list>
+                </td>
+            </template>
         </v-data-table>
-    </div>
+    </v-card>
 </template>
 
 <script lang="ts">
@@ -40,6 +112,7 @@ import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntol
 import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import NetworkUtils from "./../../business/communication/NetworkUtils";
 
 type MatchedProtein = {
     uniprotAccessionId: UniprotAccessionId,
@@ -51,7 +124,6 @@ type MatchedProtein = {
         interpro: InterproDefinition[]
     }
 }
-
 @Component
 export default class MatchedProteinsTable extends Vue {
     /**
@@ -66,34 +138,44 @@ export default class MatchedProteinsTable extends Vue {
         {
             text: "UniProt ID",
             align: "start",
-            filterable: false,
-            value: "uniprotAccessionId"
+            value: "uniprotAccessionId",
+            width: "15%"
         },
         {
             text: "Name",
             align: "start",
-            filterable: true,
-            value: "name"
+            value: "name",
+            width: "40%"
         },
         {
             text: "Organism",
             align: "start",
-            filterable: true,
-            value: "organism"
+            value: "organism",
+            width: "40%"
         },
         {
-            text: "Functional annotations",
-            align: "start",
-            filterable: true,
-            value: "functionalAnnotations"
-        }
+            text: "",
+            value: "data-table-expand",
+            width: "5%"
+        },
     ];
 
     private items: MatchedProtein[] = [];
     private loading: boolean = false;
 
+    private filter: string = "";
+
     private mounted() {
         this.onInputsChanged();
+    }
+
+    private filterByValue(value, search, item) {
+        if (!item || !search) {
+            return true;
+        }
+
+        // TODO: This might need some optimizing if it turns out to be slow for large sets of proteins.
+        return JSON.stringify(item).toLowerCase().indexOf(search.toLowerCase()) >= 0;
     }
 
     @Watch("peptide")
@@ -105,9 +187,9 @@ export default class MatchedProteinsTable extends Vue {
             const proteins = await proteinProcessor.getProteinsByPeptide(this.peptide, this.equateIl);
 
             const [ecNumbers, goTerms, interproEntries, organisms] = proteins.reduce((acc: [EcCode[], GoCode[], InterproCode[], NcbiId[]], current: ProteinDefinition) => {
-                acc[0].push(...current.ecNumbers);
+                acc[0].push(...current.ecNumbers.map(e => "EC:" + e));
                 acc[1].push(...current.goTerms);
-                acc[2].push(...current.interproEntries);
+                acc[2].push(...current.interproEntries.map(e => "IPR:" + e));
                 acc[3].push(current.organism);
                 return acc;
             }, [[], [], [], []]);
@@ -131,8 +213,8 @@ export default class MatchedProteinsTable extends Vue {
                     organism: organism ? organism.name : "",
                     functionalAnnotations: {
                         go: p.goTerms.map(term => goOntology.getDefinition(term)),
-                        ec: p.ecNumbers.map(n => ecOntology.getDefinition(n)),
-                        interpro: p.interproEntries.map(i => interproOntology.getDefinition(i))
+                        ec: p.ecNumbers.map(n => ecOntology.getDefinition("EC:" + n)),
+                        interpro: p.interproEntries.map(i => interproOntology.getDefinition("IPR:" + i))
                     }
                 }
             }));
@@ -140,9 +222,31 @@ export default class MatchedProteinsTable extends Vue {
             this.loading = false;
         }
     }
+
+    private openInUniProt(accessionId: string): void {
+        NetworkUtils.openInBrowser(`https://www.uniprot.org/uniprot/${accessionId}`);
+    }
+
+    private openInPride(accessionId: string): void {
+        NetworkUtils.openInBrowser(
+            `https://www.ebi.ac.uk/pride/searchSummary.do?queryTypeSelected=identification%20accession%20number&identificationAccessionNumber=${accessionId}`
+        );
+    }
+
+    private openInPeptideAtlas(accessionId: string): void {
+        NetworkUtils.openInBrowser(
+            `https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/Search?apply_action=GO&exact_match=exact_match%22&search_key=${accessionId}`
+        )
+    }
 }
 </script>
 
 <style scoped>
+    .annotation-secondary-title {
+        font-weight: bold;
+    }
 
+    .annotation-list {
+        list-style-type: none;
+    }
 </style>
