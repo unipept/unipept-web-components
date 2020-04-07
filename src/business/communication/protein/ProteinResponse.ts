@@ -1,8 +1,8 @@
-import { UniprotAccessionId } from "@/business/ontology/protein/ProteinDefinition";
-import { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
-import { EcCode } from "@/business/ontology/functional/ec/EcDefinition";
-import { GoCode } from "@/business/ontology/functional/go/GoDefinition";
-import { InterproCode } from "@/business/ontology/functional/interpro/InterproDefinition";
+import { NcbiId } from "./../../ontology/taxonomic/ncbi/NcbiTaxon";
+import { EcCode } from "./../../ontology/functional/ec/EcDefinition";
+import { GoCode } from "./../../ontology/functional/go/GoDefinition";
+import { InterproCode } from "./../../ontology/functional/interpro/InterproDefinition";
+import { UniprotAccessionId } from "./../../ontology/protein/ProteinDefinition";
 
 export default interface ProteinResponse {
     uniprotAccessionId: UniprotAccessionId,

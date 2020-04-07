@@ -4,6 +4,9 @@ import sampledata from "./resources/unipept/sampledata.json";
 import taxa from "./resources/unipept/taxa.json";
 import pept2data from "./resources/unipept/pept2data.json";
 import interpros from "./resources/unipept/interpros.json";
+import proteins from "./resources/unipept/proteins.json";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import ProteinResponse from "@/business/communication/protein/ProteinResponse";
 
 /**
  * This class is some sort of simple database that can be used to query for specific EC-numbers or GO-terms. This
@@ -34,5 +37,14 @@ export default class UnipeptApiDataSource {
 
     public getInterproEntriesResponse(interproIds: string[]): {code: string, category: string, name: string}[] {
         return (interpros as {code: string, category: string, name: string}[]).filter(ipr => interproIds.indexOf(ipr.code) !== -1);
+    }
+
+    public getProteins(peptide: Peptide): ProteinResponse {
+        const result = (proteins as unknown as { peptide: Peptide, result: ProteinResponse }[]).find(p => p.peptide === peptide);
+        if (result) {
+            return result.result;
+        } else {
+            return undefined;
+        }
     }
 }

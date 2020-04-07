@@ -21,7 +21,6 @@ export default class ProteinProcessor {
             response.ecNumbers,
             response.goTerms,
             response.interproEntries
-        )
-        );
+        ));
     }
 }

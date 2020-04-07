@@ -1,0 +1,202 @@
+[
+  {
+    "peptide": "AALTER",
+    "result": [
+      {
+        "uniprotAccessionId": "Q9C7G1",
+        "name": "U-box domain-containing protein 45",
+        "organism": 3702,
+        "ecNumbers": [
+          "2.3.2.27"
+        ],
+        "goTerms": [
+          "GO:0005737",
+          "GO:0005634",
+          "GO:0070696",
+          "GO:0004842",
+          "GO:0016567"
+        ],
+        "interproEntries": [
+          "IPR011989",
+          "IPR016024",
+          "IPR000225",
+          "IPR003613",
+          "IPR013083"
+        ]
+      },
+      {
+        "uniprotAccessionId": "P14565",
+        "name": "DNA helicase I",
+        "organism": 83333,
+        "ecNumbers": [
+          "5.6.2.1",
+          "3.6.4.12"
+        ],
+        "goTerms": [
+          "GO:0005737",
+          "GO:0005524",
+          "GO:0003677",
+          "GO:0003678",
+          "GO:0003917",
+          "GO:0046872",
+          "GO:0000746",
+          "GO:0008152"
+        ],
+        "interproEntries": [
+          "IPR014059",
+          "IPR014129",
+          "IPR009767",
+          "IPR027417",
+          "IPR040668",
+          "IPR040987",
+          "IPR014862"
+        ]
+      },
+      {
+        "uniprotAccessionId": "Q05858",
+        "name": "Formin",
+        "organism": 9031,
+        "ecNumbers": [],
+        "goTerms": [
+          "GO:0005884",
+          "GO:0005737",
+          "GO:0005789",
+          "GO:0005634",
+          "GO:0008017",
+          "GO:0045010",
+          "GO:0007275"
+        ],
+        "interproEntries": [
+          "IPR015425",
+          "IPR042201",
+          "IPR001265"
+        ]
+      },
+      {
+        "uniprotAccessionId": "P78330",
+        "name": "Phosphoserine phosphatase",
+        "organism": 9606,
+        "ecNumbers": [
+          "3.1.3.3"
+        ],
+        "goTerms": [
+          "GO:0005737",
+          "GO:0005829",
+          "GO:0043005",
+          "GO:0005509",
+          "GO:0000287",
+          "GO:0016791",
+          "GO:0004647",
+          "GO:0042803",
+          "GO:0016311",
+          "GO:0001701",
+          "GO:0006564",
+          "GO:0006563",
+          "GO:0009612",
+          "GO:0031667",
+          "GO:0033574"
+        ],
+        "interproEntries": [
+          "IPR036412",
+          "IPR023214",
+          "IPR023190"
+        ]
+      },
+      {
+        "uniprotAccessionId": "A6W6A1",
+        "name": "Hydroxyethylthiazole kinase",
+        "organism": 266940,
+        "ecNumbers": [
+          "2.7.1.50"
+        ],
+        "goTerms": [
+          "GO:0005524",
+          "GO:0004417",
+          "GO:0000287",
+          "GO:0009228",
+          "GO:0009229"
+        ],
+        "interproEntries": [
+          "IPR000417",
+          "IPR029056"
+        ]
+      },
+      {
+        "uniprotAccessionId": "Q8YWF0",
+        "name": "UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase",
+        "organism": 103690,
+        "ecNumbers": [
+          "6.3.2.13"
+        ],
+        "goTerms": [
+          "GO:0005737",
+          "GO:0005524",
+          "GO:0000287",
+          "GO:0008765",
+          "GO:0007049",
+          "GO:0051301",
+          "GO:0071555",
+          "GO:0009252",
+          "GO:0008360"
+        ],
+        "interproEntries": [
+          "IPR036565",
+          "IPR004101",
+          "IPR036615",
+          "IPR013221",
+          "IPR000713",
+          "IPR035911",
+          "IPR005761"
+        ]
+      },
+      {
+        "uniprotAccessionId": "Q5RB83",
+        "name": "Phosphoserine phosphatase",
+        "organism": 9601,
+        "ecNumbers": [
+          "3.1.3.3"
+        ],
+        "goTerms": [
+          "GO:0005509",
+          "GO:0000287",
+          "GO:0004647",
+          "GO:0006564",
+          "GO:0006563"
+        ],
+        "interproEntries": [
+          "IPR036412",
+          "IPR023214",
+          "IPR023190"
+        ]
+      },
+      {
+        "uniprotAccessionId": "Q3ME15",
+        "name": "UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase",
+        "organism": 240292,
+        "ecNumbers": [
+          "6.3.2.13"
+        ],
+        "goTerms": [
+          "GO:0005737",
+          "GO:0005524",
+          "GO:0000287",
+          "GO:0008765",
+          "GO:0007049",
+          "GO:0051301",
+          "GO:0071555",
+          "GO:0009252",
+          "GO:0008360"
+        ],
+        "interproEntries": [
+          "IPR036565",
+          "IPR004101",
+          "IPR036615",
+          "IPR013221",
+          "IPR000713",
+          "IPR035911",
+          "IPR005761"
+        ]
+      }
+    ]
+  }
+]

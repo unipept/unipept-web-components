@@ -1,7 +1,7 @@
-import { Peptide } from "@/business/ontology/raw/Peptide";
-import ProteinResponse from "@/business/communication/protein/ProteinResponse";
-import NetworkUtils from "@/business/communication/NetworkUtils";
-import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
+import { Peptide } from "./../../ontology/raw/Peptide";
+import ProteinResponse from "./../protein/ProteinResponse";
+import NetworkUtils from "./../NetworkUtils";
+import NetworkConfiguration from "./../NetworkConfiguration";
 
 export default class ProteinResponseCommunicator {
     public static readonly PROTEIN_ENDPOINT: string = "/private_api/proteins";
