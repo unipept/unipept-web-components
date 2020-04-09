@@ -70,7 +70,7 @@
                 </v-tooltip>
             </template>
             <template v-slot:item.data-table-expand="{ item }">
-                <v-btn icon :disabled="item.totalAnnotations === 0" @click="toggleExpanded(item)">
+                <v-btn class="v-data-table__expand-icon" icon :disabled="item.totalAnnotations === 0" @click="toggleExpanded(item)">
                     <v-icon v-if="expanded.findIndex(i => i.uniprotAccessionId === item.uniprotAccessionId) !== -1">mdi-chevron-up</v-icon>
                     <v-icon v-else>mdi-chevron-down</v-icon>
                 </v-btn>
