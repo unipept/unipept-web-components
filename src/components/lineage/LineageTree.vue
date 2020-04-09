@@ -1,7 +1,11 @@
 <template>
     <v-card>
         <v-card-text>
-            <treeview-visualization :tree="tree"></treeview-visualization>
+            <span>
+                This interactive tree bundles the complete taxonomic lineages of all UniProt entries whose protein
+                sequence contains the tryptic peptide.
+            </span>
+            <treeview-visualization :tree="tree" :height="400"></treeview-visualization>
         </v-card-text>
     </v-card>
 </template>
@@ -28,7 +32,7 @@ export default class LineageTree extends Vue {
     @Prop({ required: true })
     private equateIl: boolean;
 
-    private tree: Tree;
+    private tree: Tree = null;
 
     private loading: boolean = false;
 
@@ -64,6 +68,8 @@ export default class LineageTree extends Vue {
 }
 </script>
 
-<style scoped>
-
+<style>
+    .v-card__text span {
+        color: #555555;
+    }
 </style>
