@@ -105,5 +105,13 @@ export default class Setup {
             .reply((uri, body) => {
                 return [200, dataSource.getInterproEntriesResponse(body["interpros"])];
             });
+
+        nock(baseUrl)
+            .defaultReplyHeaders({ "access-control-allow-origin": "*" })
+            .persist()
+            .post("/private_api/proteins", () => true)
+            .reply((uri, body) => {
+                return [200, dataSource.getProteins(body["peptide"])];
+            });
     }
 }
