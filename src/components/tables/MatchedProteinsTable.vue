@@ -16,11 +16,12 @@
             item-key="uniprotAccessionId"
             :search="filter"
             :custom-filter="filterByValue"
+            :expanded.sync="expanded"
             show-expand>
             <template v-slot:item.uniprotAccessionId="{ item }">
                 <v-menu offset-y>
                     <template v-slot:activator="{ on }">
-                        <v-btn color="white" v-on="on">
+                        <v-btn v-on="on" text>
                             <span style="width: 80px">
                                 {{ item.uniprotAccessionId }}
                             </span>
@@ -40,6 +41,40 @@
                     </v-list>
                 </v-menu>
             </template>
+            <template v-slot:item.fa="{ item }">
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-avatar v-on="on" size="30" color="indigo" v-if="item.functionalAnnotations.ec.length > 0">
+                            <span class="white--text headline" style="font-size: 14px !important;">EC</span>
+                        </v-avatar>
+                    </template>
+                    <span>This protein is annotated with {{ item.functionalAnnotations.ec.length }} EC-numbers.</span>
+                </v-tooltip>
+
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-avatar v-on="on" size="30" color="amber" v-if="item.functionalAnnotations.go.length > 0">
+                            <span class="dark--text headline" style="font-size: 14px !important;">GO</span>
+                        </v-avatar>
+                    </template>
+                    <span>This protein is annotated with {{ item.functionalAnnotations.go.length }} GO-terms.</span>
+                </v-tooltip>
+
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-avatar v-on="on" size="30" color="red" v-if="item.functionalAnnotations.interpro.length > 0">
+                            <span class="white--text headline" style="font-size: 14px !important;">IPR</span>
+                        </v-avatar>
+                    </template>
+                    <span>This protein is annotated with {{ item.functionalAnnotations.interpro.length }} InterPro-entries.</span>
+                </v-tooltip>
+            </template>
+            <template v-slot:item.data-table-expand="{ item }">
+                <v-btn icon :disabled="item.totalAnnotations === 0" @click="toggleExpanded(item)">
+                    <v-icon v-if="expanded.findIndex(i => i.uniprotAccessionId === item.uniprotAccessionId) !== -1">mdi-chevron-up</v-icon>
+                    <v-icon v-else>mdi-chevron-down</v-icon>
+                </v-btn>
+            </template>
             <template v-slot:expanded-item="{ headers, item }">
                 <td :colspan="headers.length" style="padding-top: 12px; padding-bottom: 12px;">
                     <v-list
@@ -48,7 +83,9 @@
                         dense
                         disabled
                         v-if="peptideData">
-                        <v-subheader>Enzyme Commission numbers</v-subheader>
+                        <v-subheader>
+                            Enzyme Commission numbers
+                        </v-subheader>
                         <v-list-item-group class="ec-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.ec" :key="definition.code">
                                 <v-list-item-content>
@@ -136,7 +173,8 @@ type MatchedProtein = {
         go: GoDefinition[],
         ec: EcDefinition[],
         interpro: InterproDefinition[]
-    }
+    },
+    totalAnnotations: number
 }
 @Component
 export default class MatchedProteinsTable extends Vue {
@@ -159,13 +197,20 @@ export default class MatchedProteinsTable extends Vue {
             text: "Name",
             align: "start",
             value: "name",
-            width: "40%"
+            width: "34%"
         },
         {
             text: "Organism",
             align: "start",
             value: "organism",
-            width: "40%"
+            width: "30%"
+        },
+        {
+            text: "Annotations",
+            align: "start",
+            value: "fa",
+            width: "16%",
+            sortable: false
         },
         {
             text: "",
@@ -179,6 +224,8 @@ export default class MatchedProteinsTable extends Vue {
 
     private filter: string = "";
     private peptideData: PeptideDataResponse;
+
+    private expanded = [];
 
     private mounted() {
         this.onInputsChanged();
@@ -230,19 +277,34 @@ export default class MatchedProteinsTable extends Vue {
             this.items.length = 0;
             this.items.push(...proteins.map(p => {
                 const organism = ncbiOntology.getDefinition(p.organism);
+
+                const goTerms = p.goTerms.map(term => goOntology.getDefinition(term)).filter(e => e);
+                const ecTerms = p.ecNumbers.map(n => ecOntology.getDefinition("EC:" + n)).filter(e => e);
+                const iprTerms = p.interproEntries.map(i => interproOntology.getDefinition("IPR:" + i)).filter(e => e);
+
                 return {
                     uniprotAccessionId: p.uniprotAccessionId,
                     name: p.name,
                     organism: organism ? organism.name : "",
                     functionalAnnotations: {
-                        go: p.goTerms.map(term => goOntology.getDefinition(term)).filter(e => e),
-                        ec: p.ecNumbers.map(n => ecOntology.getDefinition("EC:" + n)).filter(e => e),
-                        interpro: p.interproEntries.map(i => interproOntology.getDefinition("IPR:" + i)).filter(e => e)
-                    }
+                        go: goTerms,
+                        ec: ecTerms,
+                        interpro: iprTerms
+                    },
+                    totalAnnotations: goTerms.length + ecTerms.length + iprTerms.length
                 }
             }));
 
             this.loading = false;
+        }
+    }
+
+    private toggleExpanded(item) {
+        const idx: number = this.expanded.findIndex(i => i.uniprotAccessionId === item.uniprotAccessionId);
+        if (idx >= 0) {
+            this.expanded.splice(idx, 1);
+        } else {
+            this.expanded.push(item);
         }
     }
 
