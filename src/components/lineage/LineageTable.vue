@@ -1,34 +1,44 @@
 <template>
     <div class="lineage-table">
-        <v-simple-table dense>
-            <template v-slot:default>
-                <thead>
-                <tr>
-                    <th style="width: 200px;">Organism</th>
-                    <th v-for="rank in taxonRanks" style="width: 120px;" class="text-left" :key="rank">{{ rank }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="organism in organisms" :key="organism.definition.id">
-                        <td style="width: 200px;" class="font-small font-weight-bold">{{ organism.definition.name }}</td>
-                        <td
-                            style="width: 120px;"
-                            v-for="l in organism.lineage"
-                            :key="l ? l.id : -1"
-                            :class="[ l ? getColour(l.name) : '' ]">
-                            <a
-                                class="font-small font-weight-regular font-text no-link-colour"
-                                v-if="l"
-                                :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id">
-                                {{ l.name }}
-                            </a>
-                            <span v-else>
+        <v-card>
+            <v-card-text>
+                <p>
+                    This table shows the complete taxonomic lineages of all taxa associated with the UniProt entries whose
+                    protein sequence contains the tryptic peptide. The first column contains the taxon name extracted from the
+                    UniProt entry, followed by columns representing taxonomic ranks ordered from superkingdom on the left to
+                    forma on the right.
+                </p>
+                <v-simple-table dense>
+                    <template v-slot:default>
+                        <thead>
+                        <tr>
+                            <th style="width: 200px;">Organism</th>
+                            <th v-for="rank in taxonRanks" style="width: 120px;" class="text-left" :key="rank">{{ rank }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="organism in organisms" :key="organism.definition.id">
+                            <td style="width: 200px;" class="font-small font-weight-bold">{{ organism.definition.name }}</td>
+                            <td
+                                    style="width: 120px;"
+                                    v-for="l in organism.lineage"
+                                    :key="l ? l.id : -1"
+                                    :class="[ l ? getColour(l.name) : '' ]">
+                                <a
+                                        class="font-small font-weight-regular font-text no-link-colour"
+                                        v-if="l"
+                                        :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id">
+                                    {{ l.name }}
+                                </a>
+                                <span v-else>
                             </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </template>
-        </v-simple-table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </template>
+                </v-simple-table>
+            </v-card-text>
+        </v-card>
     </div>
 </template>
 
