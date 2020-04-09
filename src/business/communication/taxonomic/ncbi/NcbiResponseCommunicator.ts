@@ -42,12 +42,12 @@ export default class NcbiResponseCommunicator {
             for (const term of res) {
                 if (!this.idToResponseMap.has(term.id)) {
                     this.idToResponseMap.set(term.id, term);
-                    term.lineage.map(l => lineagesToProcess.add(l));
+                    term.lineage.map(l => lineagesToProcess.add(Math.abs(l)));
                 }
             }
         }
 
-        const lineages = [...lineagesToProcess].filter(c => c && !this.idsProcessed.has(c));
+        const lineages = [...lineagesToProcess].filter(c => c && c !== -1 && !this.idsProcessed.has(c));
 
         for (let i = 0; i < lineages.length; i += this.NCBI_BATCH_SIZE) {
             const data = JSON.stringify({
