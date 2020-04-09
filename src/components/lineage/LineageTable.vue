@@ -20,14 +20,14 @@
                         <tr v-for="organism in organisms" :key="organism.definition.id">
                             <td style="width: 200px;" class="font-small font-weight-bold">{{ organism.definition.name }}</td>
                             <td
-                                    style="width: 120px;"
-                                    v-for="l in organism.lineage"
-                                    :key="l ? l.id : -1"
-                                    :class="[ l ? getColour(l.name) : '' ]">
+                                style="width: 120px;"
+                                v-for="l in organism.lineage"
+                                :key="l ? l.id : generateId()"
+                                :class="[ l ? getColour(l.name) : '' ]">
                                 <a
-                                        class="font-small font-weight-regular font-text no-link-colour"
-                                        v-if="l"
-                                        :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id">
+                                    class="font-small font-weight-regular font-text no-link-colour"
+                                    v-if="l"
+                                    :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id">
                                     {{ l.name }}
                                 </a>
                                 <span v-else>
@@ -52,6 +52,7 @@ import NcbiTaxon, { NcbiId } from "./../../business/ontology/taxonomic/ncbi/Ncbi
 import ProteinProcessor from "./../../business/processors/protein/ProteinProcessor";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import { Ontology } from "./../../business/ontology/Ontology";
+import { v4 as uuidv4 } from "uuid";
 
 @Component
 export default class LineageTable extends Vue {
@@ -108,6 +109,10 @@ export default class LineageTable extends Vue {
         }
 
         return this.usedColours.get(name);
+    }
+
+    private generateId(): string {
+        return uuidv4();
     }
 }
 </script>
