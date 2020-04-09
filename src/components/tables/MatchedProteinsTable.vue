@@ -19,54 +19,70 @@
             :expanded.sync="expanded"
             show-expand>
             <template v-slot:item.uniprotAccessionId="{ item }">
-                <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" text>
-                            <span style="width: 80px">
-                                {{ item.uniprotAccessionId }}
-                            </span>
-                            <v-icon>mdi-chevron-down</v-icon>
-                        </v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item @click="openInUniProt(item.uniprotAccessionId)">
-                            <v-list-item-title>UniProt</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="openInPride(item.uniprotAccessionId)">
-                            <v-list-item-title>PRIDE</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="openInPeptideAtlas(item.uniprotAccessionId)">
-                            <v-list-item-title>PeptideAtlas</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+                <span style="position: relative; top: 4px;">{{ item.uniprotAccessionId }}</span>
+                <v-btn icon small style="float: right;">
+                    <v-icon small>mdi-open-in-new</v-icon>
+                </v-btn>
             </template>
             <template v-slot:item.fa="{ item }">
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-avatar v-on="on" size="30" color="indigo" v-if="item.functionalAnnotations.ec.length > 0">
+                        <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.ec.length > 0 ? 'indigo' : 'indigo lighten-4'">
                             <span class="white--text headline" style="font-size: 14px !important;">EC</span>
                         </v-avatar>
                     </template>
-                    <span>This protein is annotated with {{ item.functionalAnnotations.ec.length }} EC-numbers.</span>
+                    <span v-if="item.functionalAnnotations.ec.length >= 0">
+                        This protein is annotated with
+                        <span class="font-weight-bold" v-if="item.functionalAnnotations.ec.length === 1">
+                            {{ item.functionalAnnotations.ec.length }} EC-number.
+                        </span>
+                        <span class="font-weight-bold" v-else>
+                            {{ item.functionalAnnotations.ec.length }} EC-numbers.
+                        </span>
+                    </span>
+                    <span v-else>
+                        This protein is not annotated with EC-numbers.
+                    </span>
                 </v-tooltip>
 
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-avatar v-on="on" size="30" color="amber" v-if="item.functionalAnnotations.go.length > 0">
-                            <span class="dark--text headline" style="font-size: 14px !important;">GO</span>
+                        <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.go.length > 0 ? 'amber' : 'amber lighten-4'">
+                            <span :class="[item.functionalAnnotations.go.length > 0 ? 'dark--text' : 'gray--text', 'headline']" style="font-size: 14px !important;">GO</span>
                         </v-avatar>
                     </template>
-                    <span>This protein is annotated with {{ item.functionalAnnotations.go.length }} GO-terms.</span>
+                    <span v-if="item.functionalAnnotations.go.length >= 0">
+                        This protein is annotated with
+                        <span class="font-weight-bold" v-if="item.functionalAnnotations.go.length === 1">
+                            {{ item.functionalAnnotations.go.length }} GO-term.
+                        </span>
+                        <span class="font-weight-bold" v-else>
+                            {{ item.functionalAnnotations.go.length }} GO-terms.
+                        </span>
+                    </span>
+                    <span v-else>
+                        This protein is not annotated with GO-terms.
+                    </span>
                 </v-tooltip>
 
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-avatar v-on="on" size="30" color="red" v-if="item.functionalAnnotations.interpro.length > 0">
+                        <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.interpro.length > 0 ? 'red' : 'red lighten-4'">
                             <span class="white--text headline" style="font-size: 14px !important;">IPR</span>
                         </v-avatar>
                     </template>
-                    <span>This protein is annotated with {{ item.functionalAnnotations.interpro.length }} InterPro-entries.</span>
+                    <span v-if="item.functionalAnnotations.interpro.length >= 0">
+                        This protein is annotated with
+                        <span class="font-weight-bold" v-if="item.functionalAnnotations.interpro.length === 1">
+                            {{ item.functionalAnnotations.interpro.length }} InterPro-entries.
+                        </span>
+                        <span class="font-weight-bold" v-else>
+                            {{ item.functionalAnnotations.interpro.length }} InterPro-entries.
+                        </span>
+                    </span>
+                    <span v-else>
+                        This protein is not annotated with InterPro-entries.
+                    </span>
                 </v-tooltip>
             </template>
             <template v-slot:item.data-table-expand="{ item }">
@@ -191,7 +207,7 @@ export default class MatchedProteinsTable extends Vue {
             text: "UniProt ID",
             align: "start",
             value: "uniprotAccessionId",
-            width: "15%"
+            width: "13%"
         },
         {
             text: "Name",
@@ -203,7 +219,7 @@ export default class MatchedProteinsTable extends Vue {
             text: "Organism",
             align: "start",
             value: "organism",
-            width: "30%"
+            width: "32%"
         },
         {
             text: "Annotations",
@@ -342,5 +358,9 @@ export default class MatchedProteinsTable extends Vue {
 <style scoped>
     .no-peptide-data-alert .v-alert {
         margin-bottom: 0 !important;
+    }
+
+    .gray--text {
+        color: rgba(0, 0, 0, 0.2);
     }
 </style>
