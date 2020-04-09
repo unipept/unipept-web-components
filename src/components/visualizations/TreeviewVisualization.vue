@@ -52,6 +52,8 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     private width: number;
     @Prop({ required: false, default: 600 })
     private height: number;
+    @Prop({ required: false, default: null })
+    private tooltip: (d: any) => string;
 
 
     private colors: (d: any) => string = (d: any) => {
@@ -65,9 +67,11 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
 
     private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);
     private data: TreeNode = null;
-    private tooltip: (d: any) => string = tooltipContent;
 
     mounted() {
+        if (!this.tooltip) {
+            this.tooltip = tooltipContent;
+        }
         this.initTreeview();
     }
 

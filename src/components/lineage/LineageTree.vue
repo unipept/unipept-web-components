@@ -5,7 +5,7 @@
                 This interactive tree bundles the complete taxonomic lineages of all UniProt entries whose protein
                 sequence contains the tryptic peptide.
             </span>
-            <treeview-visualization :tree="tree" :height="400"></treeview-visualization>
+            <treeview-visualization :tree="tree" :height="400" :tooltip="tooltipContent"></treeview-visualization>
         </v-card-text>
     </v-card>
 </template>
@@ -64,6 +64,12 @@ export default class LineageTree extends Vue {
 
             this.loading = false;
         }
+    }
+
+    private tooltipContent(d: any): string {
+        return "<b>" + d.name + "</b> (" + d.rank + ")<br/>" +
+            (!d.data.count ? "0" : d.data.count) +
+            (d.data.count && d.data.count === 1 ? " match" : " matches");
     }
 }
 </script>
