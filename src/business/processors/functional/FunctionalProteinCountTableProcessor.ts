@@ -16,9 +16,10 @@ export default abstract class FunctionalProteinCountTableProcessor<
     private generalCountTable: CountTable<OntologyId>;
     private trust: FunctionalTrust;
 
-    public constructor(
+    protected constructor(
         public readonly peptide: Peptide,
-        public readonly equateIl: boolean
+        public readonly equateIl: boolean,
+        protected readonly itemPrefix: string = ""
     ) {}
 
     public async getCountTable(namespace?: FunctionalNamespace): Promise<CountTable<OntologyId>> {
@@ -50,7 +51,7 @@ export default abstract class FunctionalProteinCountTableProcessor<
             const annotations = this.getAnnotationsFromProtein(p);
             if (annotations && annotations.length > 0) {
                 annotatedCount++;
-                acc.push(...annotations);
+                acc.push(...annotations.map(e => this.itemPrefix + e));
             }
             return acc;
         }, []);

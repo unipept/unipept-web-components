@@ -31,7 +31,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import GoAmountTable from "./../../tables/GoAmountTable.vue"
-import QuickGoCard from "./QuickGOCard.vue";
+import QuickGoCard from "./QuickGoCard.vue";
 import GoDefinition, { GoCode } from "./../../../business/ontology/functional/go/GoDefinition";
 import { CountTable } from "./../../../business/counts/CountTable";
 import { Ontology } from "./../../../business/ontology/Ontology";

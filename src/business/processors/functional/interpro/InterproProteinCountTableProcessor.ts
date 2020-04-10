@@ -5,10 +5,18 @@ import ProteinDefinition from "./../../../ontology/protein/ProteinDefinition";
 import { FunctionalNamespace } from "./../../../ontology/functional/FunctionalNamespace";
 import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../../ontology/Ontology";
-import { InterproNamespace } from "@/business/ontology/functional/interpro/InterproNamespace";
-import InterproOntologyProcessor from "@/business/ontology/functional/interpro/InterproOntologyProcessor";
+import { InterproNamespace } from "./../../../ontology/functional/interpro/InterproNamespace";
+import InterproOntologyProcessor from "./../../..//ontology/functional/interpro/InterproOntologyProcessor";
+import { Peptide } from "./../../..//ontology/raw/Peptide";
 
 export default class InterproProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<InterproCode, InterproDefinition> {
+    constructor(
+        peptide: Peptide,
+        equateIl: boolean,
+    ) {
+        super(peptide, equateIl, "IPR:")
+    }
+
     protected getAnnotationsFromProtein(p: ProteinDefinition): InterproCode[] {
         return p.interproEntries;
     }

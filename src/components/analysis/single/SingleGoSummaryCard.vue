@@ -103,6 +103,7 @@ export default class SingleGoSummaryCard extends Vue {
         if (this.peptide) {
             this.loading = true;
 
+            console.log("blabla");
             const goProteinProcessor = new GoProteinCountTableProcessor(this.peptide, this.equateIl);
 
             for (let i = 0; i < this.namespaces.length; i++) {
@@ -117,8 +118,6 @@ export default class SingleGoSummaryCard extends Vue {
                     ...this.items[i].countTable.getOntologyIds().map(id => this.items[i].ontology.getDefinition(id))
                 );
             }
-
-            console.log(this.items);
 
             this.trust = await goProteinProcessor.getTrust();
             this.trustLine = FunctionalUtils.computeTrustLine(this.trust, "GO-term", "protein");

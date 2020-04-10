@@ -125,7 +125,7 @@
                     </div>
                 </v-tab-item>
                 <v-tab-item>
-                    <ec-summary-card
+                    <multi-ec-summary-card
                         v-if="filteredCountTable"
                         ref="ecSummaryCard"
                         :peptide-count-table="filteredCountTable"
@@ -134,7 +134,7 @@
                         :show-percentage="showPercentage"
                         :tree="tree"
                         :taxa-to-peptides-mapping="taxaToPeptidesMapping">
-                    </ec-summary-card>
+                    </multi-ec-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                         </v-progress-circular>
@@ -181,7 +181,7 @@ import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDr
 
 import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue";
 import CardHeader from "../../custom/CardHeader.vue";
-import QuickGoCard from "./QuickGOCard.vue";
+import QuickGoCard from "./QuickGoCard.vue";
 
 import ImageDownloadModal from "../../utils/ImageDownloadModal.vue";
 
@@ -198,9 +198,11 @@ import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/N
 import Tree from "./../../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../../business/ontology/taxonomic/TreeNode";
 import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
+import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 
 @Component({
     components: {
+        MultiEcSummaryCard,
         MultiGoSummaryCard,
         CardHeader,
         IndeterminateProgressBar,

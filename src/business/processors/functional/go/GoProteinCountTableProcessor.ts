@@ -6,8 +6,16 @@ import FunctionalProteinCountTableProcessor from "./../FunctionalProteinCountTab
 import ProteinDefinition from "./../../../ontology/protein/ProteinDefinition";
 import { FunctionalNamespace } from "./../../../ontology/functional/FunctionalNamespace";
 import { Ontology } from "./../../../ontology/Ontology";
+import { Peptide } from "./../../../ontology/raw/Peptide";
 
 export default class GoProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<GoCode, GoDefinition>{
+    constructor(
+        peptide: Peptide,
+        equateIl: boolean
+    ) {
+        super(peptide, equateIl)
+    }
+
     protected getAnnotationsFromProtein(p: ProteinDefinition): GoCode[] {
         return p.goTerms;
     }
