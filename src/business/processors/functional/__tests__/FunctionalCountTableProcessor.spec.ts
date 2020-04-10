@@ -42,15 +42,15 @@ describe("FunctionalCountTableProcessor", () => {
 
         let trust = await ecCountProcessor.getTrust();
         // Only 3 out of the 4 peptides are annotated with at least one EC-number.
-        expect(trust.annotatedPeptides).toBe(3);
+        expect(trust.annotatedItems).toBe(3);
         // We did look up 4 peptides
-        expect(trust.totalAmountOfPeptides).toBe(4);
+        expect(trust.totalAmountOfItems).toBe(4);
 
         ecCountProcessor = new EcCountTableProcessor(multiCountTable, new SearchConfiguration(true, false, false), 0);
 
         trust = await ecCountProcessor.getTrust();
-        expect(trust.annotatedPeptides).toBe(6);
-        expect(trust.totalAmountOfPeptides).toBe(7);
+        expect(trust.annotatedItems).toBe(6);
+        expect(trust.totalAmountOfItems).toBe(7);
 
         done();
     });

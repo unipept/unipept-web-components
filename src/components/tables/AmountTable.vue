@@ -9,7 +9,7 @@
             :show-expand="itemToPeptidesMapping"
             :expanded.sync="expandedItemsList">
             <template v-slot:top>
-                <v-tooltip :open-delay=1000 bottom>
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-icon @click="saveTableAsCsv()" class="table-to-csv-button" v-on="on">mdi-download</v-icon>
                     </template>
@@ -100,6 +100,13 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
         tableHeaders: function() {
             const headers = [
                 {
+                    text: "",
+                    align: "left",
+                    value: "",
+                    width: "5%",
+                    sortable: false
+                },
+                {
                     text: this.countName + (this.showPercentage ? " %" : ""),
                     align: "left",
                     value: "count",
@@ -108,7 +115,7 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
                     text: this.annotationName,
                     align: "left",
                     value: "code",
-                    width: this.itemsToPeptideMapping ? "30%" : "35%"
+                    width: this.itemsToPeptideMapping ? "25%" : "30%"
                 }, {
                     text: "Name",
                     align: "left",

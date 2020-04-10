@@ -109,7 +109,7 @@ export default class MultiGoSummaryCard extends Vue {
         ontology: Ontology<GoCode, GoDefinition>
     }[] = [];
 
-    mounted() {
+    created() {
         for (let ns of this.namespaces) {
             this.items.push({
                 countTable: undefined,
@@ -150,7 +150,7 @@ export default class MultiGoSummaryCard extends Vue {
                 );
             }
 
-            this.trustLine = FunctionalUtils.computeTrustLine(await goCountTableProcessor.getTrust(), "GO-terms");
+            this.trustLine = FunctionalUtils.computeTrustLine(await goCountTableProcessor.getTrust(), "GO-term", "peptide");
         }
         this.calculationsInProgress = false;
     }
