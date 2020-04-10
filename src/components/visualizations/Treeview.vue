@@ -19,7 +19,7 @@ export default class Treeview extends Vue {
     @Prop({ required: false, default: 50 })
     private height: number;
     @Prop()
-    private tooltip: (d: any) => string; 
+    private tooltip: (d: any) => string;
     @Prop({ default: false })
     private enableAutoExpand: number | boolean;
     @Prop()
