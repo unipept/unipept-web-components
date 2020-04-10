@@ -104,7 +104,7 @@
             </v-alert>
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
-                    <go-summary-card
+                    <multi-go-summary-card
                         v-if="filteredCountTable"
                         ref="goSummaryCard"
                         :peptide-count-table="filteredCountTable"
@@ -113,7 +113,7 @@
                         :show-percentage="showPercentage"
                         :tree="tree"
                         :taxa-to-peptides-mapping="taxaToPeptidesMapping">
-                    </go-summary-card>
+                    </multi-go-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                         </v-progress-circular>
@@ -197,9 +197,11 @@ import PeptideCountTableProcessor from "./../../../business/processors/raw/Pepti
 import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../../business/ontology/taxonomic/TreeNode";
+import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 
 @Component({
     components: {
+        MultiGoSummaryCard,
         CardHeader,
         IndeterminateProgressBar,
         FilterFunctionalAnnotationsDropdown,
