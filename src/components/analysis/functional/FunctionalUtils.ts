@@ -14,9 +14,11 @@ export class FunctionalUtils {
         if (trust.annotatedItems === 0) {
             return `<strong>No ${countKind}</strong> has a ${faKind} assigned to it. `;
         } else if (trust.annotatedItems === trust.totalAmountOfItems) {
-            return `<strong>All ${countKind}s</strong> ${trust.annotatedItems <= 5 ? `(only ${trust.annotatedItems})` : ""} have at least one ${faKind} assigned to them. `;
+            return `<strong>All ${countKind}s</strong> have at least one ${faKind} assigned to them. `;
         } else if (trust.annotatedItems === 1) {
             return `Only <strong>one ${countKind}</strong> (${StringUtils.numberToPercent(trust.annotatedItems / trust.totalAmountOfItems)}) has at least one ${faKind} assigned to it. `;
+        } else {
+            return `<strong>${trust.annotatedItems} ${countKind}s</strong> (${StringUtils.numberToPercent(trust.annotatedItems / trust.totalAmountOfItems)}) have at least one ${faKind} assigned to them. `;
         }
     }
 }
