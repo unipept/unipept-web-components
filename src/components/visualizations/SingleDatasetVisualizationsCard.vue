@@ -308,8 +308,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         this.exitFullScreen();
         const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
-        // @ts-ignore
-        logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
+        AnalyticsUtil.logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
         if (this.tabs[this.tab] === "Sunburst") {
             d3.selectAll(".toHide").attr("class", "arc hidden");
             await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
