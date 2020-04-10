@@ -49,11 +49,10 @@ export default abstract class FunctionalProteinCountTableProcessor<
         const items = proteins.reduce((acc, p) => {
             const annotations = this.getAnnotationsFromProtein(p);
             if (annotations && annotations.length > 0) {
-                acc.push(...annotations);
-                return acc;
-            } else {
                 annotatedCount++;
+                acc.push(...annotations);
             }
+            return acc;
         }, []);
 
         const countsPerCode = new Map<OntologyId, number>();

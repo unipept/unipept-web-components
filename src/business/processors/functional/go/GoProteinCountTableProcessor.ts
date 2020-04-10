@@ -20,5 +20,4 @@ export default class GoProteinCountTableProcessor extends FunctionalProteinCount
         const ontologyProcessor = new GoOntologyProcessor();
         return await ontologyProcessor.getOntology(countTable);
     }
-
 }
