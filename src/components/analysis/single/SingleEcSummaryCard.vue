@@ -60,12 +60,8 @@ export default class SingleEcSummaryCard extends Vue {
             const ecProteinProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl);
             this.countTable = await ecProteinProcessor.getCountTable();
 
-            console.log(this.countTable);
-
             const ontologyProcessor = new EcOntologyProcessor();
             this.ontology = await ontologyProcessor.getOntology(this.countTable);
-
-            console.log(this.ontology);
 
             this.trust = await ecProteinProcessor.getTrust();
             this.trustLine = FunctionalUtils.computeTrustLine(this.trust, "EC-number", "protein");

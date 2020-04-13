@@ -67,7 +67,7 @@ export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) 
     private interproOntology: (ns: string) => Promise<Ontology<InterproCode, InterproDefinition>>;
     @Prop({ required: false })
     private interproPeptideMapping: Map<InterproCode, Peptide[]>;
-    @Prop({ required: true })
+    @Prop({ required: false })
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: false, default: false })
     private loading: boolean;
