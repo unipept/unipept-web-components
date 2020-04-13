@@ -31,7 +31,7 @@ import Utils from "./../../custom/Utils";
 import GoDefinition from "./../../../business/ontology/functional/go/GoDefinition";
 
 @Component
-export default class QuickGOCard extends Vue {
+export default class QuickGoCard extends Vue {
     @Prop({ required: true })
     private items: GoDefinition[];
 

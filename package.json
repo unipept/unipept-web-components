@@ -105,7 +105,8 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
-      "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
+      "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor",
+      "html-to-image-no-fonts": "<rootDir>/src/test/mocks/HtmlToImage"
     },
     "testEnvironment": "jsdom",
     "setupFilesAfterEnv": [

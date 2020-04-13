@@ -162,5 +162,33 @@
   {
     "code": "7.1.1.-",
     "name": "Hydron translocation or charge separation linked to oxidoreductase reactions"
+  },
+  {
+    "code": "2.3.-.-",
+    "name": "Acyltransferases"
+  },
+  {
+    "code": "2.3.2.-",
+    "name": "Aminoacyltransferases"
+  },
+  {
+    "code": "2.3.2.27",
+    "name": "RING-type E3 ubiquitin transferase"
+  },
+  {
+    "code": "5.-.-.-",
+    "name": "Isomerases"
+  },
+  {
+    "code": "5.6.-.-",
+    "name": "Isomerases altering macromolecular conformation"
+  },
+  {
+    "code": "5.6.2.-",
+    "name": "Enzymes altering nucleic acid conformation"
+  },
+  {
+    "code": "5.6.2.1",
+    "name": "DNA topoisomerase"
   }
 ]

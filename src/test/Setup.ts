@@ -5,6 +5,7 @@ import ClipboardMock from "./ClipboardMock";
 import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
 import UnipeptApiDataSource from "@/test/api/UnipeptApiDataSource";
 const fetchPolyfill = require("whatwg-fetch")
+import $ from "@/test/mocks/jQuery";
 
 export default class Setup {
     public setupAll() {
@@ -13,6 +14,7 @@ export default class Setup {
         this.setupUnipeptNock();
         this.setUpPrideNock();
         this.setupClipboard();
+        this.setupJQuery();
     }
 
     public setupLocalStorage() {
@@ -21,6 +23,11 @@ export default class Setup {
 
     public setupFetch() {
         globalThis.fetch = fetchPolyfill.fetch;
+    }
+
+    public setupJQuery() {
+        // @ts-ignore
+        globalThis["$"] = $;
     }
 
     public setupClipboard() {

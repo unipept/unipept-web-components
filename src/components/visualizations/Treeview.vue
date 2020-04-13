@@ -88,9 +88,11 @@ export default class Treeview extends Vue {
                 this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
 
                 if (this.autoResize) {
-                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
-                    svgEl.setAttribute("height", "100%")
-                    svgEl.setAttribute("width", "100%")
+                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg");
+                    if (svgEl) {
+                        svgEl.setAttribute("height", "100%");
+                        svgEl.setAttribute("width", "100%");
+                    }
                 }
             }
 
