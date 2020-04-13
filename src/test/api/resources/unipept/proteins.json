@@ -414,5 +414,114 @@
         ]
       }
     ]
+  },
+  {
+    "peptide": "YVVLQPGVK",
+    "result": [
+      {
+        "uniprotAccessionId": "Q5L898",
+        "name": "DNA-directed RNA polymerase subunit beta'",
+        "organism": 272559,
+        "ecNumbers": [
+          "2.7.7.6"
+        ],
+        "goTerms": [
+          "GO:0003677",
+          "GO:0003899",
+          "GO:0000287",
+          "GO:0008270",
+          "GO:0006351"
+        ],
+        "interproEntries": [
+          "IPR012754",
+          "IPR000722",
+          "IPR006592",
+          "IPR007080",
+          "IPR007066",
+          "IPR042102",
+          "IPR007083",
+          "IPR007081",
+          "IPR038120"
+        ]
+      },
+      {
+        "uniprotAccessionId": "Q64NJ8",
+        "name": "DNA-directed RNA polymerase subunit beta'",
+        "organism": 295405,
+        "ecNumbers": [
+          "2.7.7.6"
+        ],
+        "goTerms": [
+          "GO:0003677",
+          "GO:0003899",
+          "GO:0000287",
+          "GO:0008270",
+          "GO:0006351"
+        ],
+        "interproEntries": [
+          "IPR012754",
+          "IPR000722",
+          "IPR006592",
+          "IPR007080",
+          "IPR007066",
+          "IPR042102",
+          "IPR007083",
+          "IPR007081",
+          "IPR038120"
+        ]
+      },
+      {
+        "uniprotAccessionId": "Q8A470",
+        "name": "DNA-directed RNA polymerase subunit beta'",
+        "organism": 226186,
+        "ecNumbers": [
+          "2.7.7.6"
+        ],
+        "goTerms": [
+          "GO:0003677",
+          "GO:0003899",
+          "GO:0000287",
+          "GO:0008270",
+          "GO:0006351"
+        ],
+        "interproEntries": [
+          "IPR012754",
+          "IPR000722",
+          "IPR006592",
+          "IPR007080",
+          "IPR007066",
+          "IPR042102",
+          "IPR007083",
+          "IPR007081",
+          "IPR038120"
+        ]
+      },
+      {
+        "uniprotAccessionId": "A6KYK2",
+        "name": "DNA-directed RNA polymerase subunit beta'",
+        "organism": 435590,
+        "ecNumbers": [
+          "2.7.7.6"
+        ],
+        "goTerms": [
+          "GO:0003677",
+          "GO:0003899",
+          "GO:0000287",
+          "GO:0008270",
+          "GO:0006351"
+        ],
+        "interproEntries": [
+          "IPR012754",
+          "IPR000722",
+          "IPR006592",
+          "IPR007080",
+          "IPR007066",
+          "IPR042102",
+          "IPR007083",
+          "IPR007081",
+          "IPR038120"
+        ]
+      }
+    ]
   }
 ]
