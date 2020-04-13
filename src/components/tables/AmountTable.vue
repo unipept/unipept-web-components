@@ -4,7 +4,7 @@
             :headers="tableHeaders"
             :loading="loading"
             :items="items"
-            :items-per-page="5"
+            :items-per-page="rowsPerPage"
             item-key="code"
             :show-expand="itemToPeptidesMapping"
             :expanded.sync="expandedItemsList">
@@ -170,6 +170,8 @@ export default class AmountTable extends Vue {
     protected loading: boolean;
     @Prop({ required: false, default: false })
     protected showPercentage: boolean;
+    @Prop({ required: false, default: 5 })
+    private rowsPerPage: number;
 
     protected treeAvailable = new Map<TableItem, TreeNode>();
 

@@ -10,7 +10,7 @@
         :relative-counts="trust ? trust.totalAmountOfItems : 1"
         :show-percentage="false">
         <template v-slot:analysis-header>
-            <span v-html="trustLine"></span>
+            <span v-html="trustLine" class="interpro-trust"></span>
         </template>
     </interpro-summary-card>
 </template>
@@ -96,7 +96,7 @@ export default class SingleInterproSummaryCard extends Vue {
             this.trustLine = FunctionalUtils.computeTrustLine(
                 this.trust,
                 "InterPro-entry",
-                "peptide"
+                "protein"
             );
 
             this.loading = false;
