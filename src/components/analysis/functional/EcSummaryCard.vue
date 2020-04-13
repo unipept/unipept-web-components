@@ -189,6 +189,8 @@ export default class EcSummaryCard extends Vue {
 
         const sortedEcs = ecCountTable.getOntologyIds()
             .map(id => ecOntology.getDefinition(id))
+            // Only retain valid definitions
+            .filter(def => def)
             .sort((a: EcDefinition, b: EcDefinition) => a.level - b.level);
 
         for (const ecDef of sortedEcs) {

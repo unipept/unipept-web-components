@@ -73,8 +73,6 @@ export default class MultiEcSummaryCard extends Vue {
     @Watch("searchConfiguration")
     private async recompute() {
         this.calculationsInProgress = true;
-        console.log("peptide count table");
-        console.log(this.peptideCountTable);
         if (this.peptideCountTable) {
             const percentage = parseInt(this.percentSettings);
             const ecCountTableProcessor = new EcCountTableProcessor(
@@ -95,7 +93,6 @@ export default class MultiEcSummaryCard extends Vue {
                 "peptide"
             );
 
-            console.log(this.ecCountTable);
         }
         this.calculationsInProgress = false;
     }

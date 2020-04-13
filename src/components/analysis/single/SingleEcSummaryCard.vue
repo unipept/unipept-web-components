@@ -7,12 +7,13 @@
 <template>
     <ec-summary-card
         :loading="loading"
+        :analysis-in-progress="true"
         :ec-count-table="countTable"
         :ec-ontology="ontology"
         :relative-counts="trust ? trust.totalAmountOfItems : 1"
         :show-percentage="false">
         <template v-slot:analysis-header>
-            <span v-html="trustLine"></span>
+            <span v-html="trustLine" class="ec-trust"></span>
         </template>
     </ec-summary-card>
 </template>

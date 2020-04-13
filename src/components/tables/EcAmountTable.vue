@@ -85,17 +85,19 @@ export default class EcAmountTable extends Vue {
                 const definition: EcDefinition = this.ecOntology.getDefinition(ecCode);
                 const currentCount = this.ecCountTable.getCounts(ecCode);
 
-                return new TableItem(
-                    currentCount,
-                    currentCount / this.relativeCounts,
-                    definition.name,
-                    definition.code,
-                    definition
-                );
+                if (definition) {
+                    return new TableItem(
+                        currentCount,
+                        currentCount / this.relativeCounts,
+                        definition.name,
+                        definition.code,
+                        definition
+                    );
+                }
             });
 
             this.items.length = 0;
-            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
+            this.items.push(...newItems.filter(i => i).sort((a: TableItem, b: TableItem) => b.count - a.count));
 
             this.computeInProgress = false;
         }
