@@ -29,6 +29,7 @@
                                     v-if="l"
                                     :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id">
                                     {{ l.name }}
+                                    <v-icon x-small>mdi-open-in-new</v-icon>
                                 </a>
                                 <span v-else>
                             </span>
@@ -120,6 +121,10 @@ export default class LineageTable extends Vue {
 <style>
     .lineage-table .no-link-colour {
         color: rgba(0, 0, 0, 0.87);
+    }
+
+    .lineage-table .no-link-colour:hover {
+        text-decoration: none;
     }
 
     .lineage-table .font-small {
