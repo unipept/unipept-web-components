@@ -33,7 +33,7 @@ describe("SingleInterproSummaryCard", () => {
         });
 
         // Wait for the table to be rendered.
-        await waitForCondition(() => wrapper.findAll(".tr").length > 1);
+        await waitForCondition(() => wrapper.findAll("tr").length > 1);
 
         // We sort the proteins by code, to make the test deterministic
         const sortButton = wrapper.findAll("th").filter(w => w.html().includes("Interpro entry")).at(0);
@@ -64,7 +64,7 @@ describe("SingleInterproSummaryCard", () => {
         });
 
         // Wait for the table to be rendered.
-        await waitForCondition(() => wrapper.findAll(".tr").length > 1);
+        await waitForCondition(() => wrapper.findAll("tr").length > 1);
 
         expect(wrapper.find(".interpro-trust").html()).toMatchSnapshot();
     });

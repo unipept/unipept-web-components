@@ -6,7 +6,7 @@
 <template>
     <go-summary-card :loading="peptide === ''">
         <template v-slot:analysis-header>
-            <span v-html="trustLine"></span>
+            <span v-html="trustLine" class="go-trust"></span>
         </template>
         <template v-slot:content-biological-process>
             <go-summary
@@ -103,7 +103,6 @@ export default class SingleGoSummaryCard extends Vue {
         if (this.peptide) {
             this.loading = true;
 
-            console.log("blabla");
             const goProteinProcessor = new GoProteinCountTableProcessor(this.peptide, this.equateIl);
 
             for (let i = 0; i < this.namespaces.length; i++) {

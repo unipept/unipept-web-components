@@ -1028,5 +1028,65 @@
     "code": "GO:2001234",
     "name": "negative regulation of apoptotic signaling pathway",
     "namespace": "biological process"
+  },
+  {
+    "code": "GO:0000746",
+    "name": "conjugation",
+    "namespace": "biological process"
+  },
+  {
+    "code": "GO:0003677",
+    "name": "DNA binding",
+    "namespace": "molecular function"
+  },
+  {
+    "code": "GO:0003678",
+    "name": "DNA helicase activity",
+    "namespace": "molecular function"
+  },
+  {
+    "code": "GO:0003917",
+    "name": "DNA topoisomerase type I (single strand cut, ATP-independent) activity",
+    "namespace": "molecular function"
+  },
+  {
+    "code": "GO:0004842",
+    "name": "ubiquitin-protein transferase activity",
+    "namespace": "molecular function"
+  },
+  {
+    "code": "GO:0005524",
+    "name": "ATP binding",
+    "namespace": "molecular function"
+  },
+  {
+    "code": "GO:0005634",
+    "name": "nucleus",
+    "namespace": "cellular component"
+  },
+  {
+    "code": "GO:0005737",
+    "name": "cytoplasm",
+    "namespace": "cellular component"
+  },
+  {
+    "code": "GO:0008152",
+    "name": "metabolic process",
+    "namespace": "biological process"
+  },
+  {
+    "code": "GO:0016567",
+    "name": "protein ubiquitination",
+    "namespace": "biological process"
+  },
+  {
+    "code": "GO:0046872",
+    "name": "metal ion binding",
+    "namespace": "molecular function"
+  },
+  {
+    "code": "GO:0070696",
+    "name": "transmembrane receptor protein serine/threonine kinase binding",
+    "namespace": "molecular function"
   }
 ]
