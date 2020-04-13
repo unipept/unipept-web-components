@@ -21,16 +21,22 @@
             <v-tab>
                 EC numbers
             </v-tab>
+            <v-tab>
+                Interpro
+            </v-tab>
         </v-tabs>
         <v-tabs-items v-model="currentTab">
             <v-tab-item>
-
+                <matched-proteins-table :peptide="peptide" :equate-il="equateIl"></matched-proteins-table>
             </v-tab-item>
             <v-tab-item>
                 <lineage-tree :peptide="peptide" :equate-il="equateIl"></lineage-tree>
             </v-tab-item>
             <v-tab-item>
                 <lineage-table :peptide="peptide" :equate-il="equateIl"></lineage-table>
+            </v-tab-item>
+            <v-tab-item>
+
             </v-tab-item>
             <v-tab-item>
 
@@ -49,9 +55,11 @@ import { Prop } from "vue-property-decorator";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import LineageTree from "./../../lineage/LineageTree.vue"
 import LineageTable from "./../../lineage/LineageTable.vue";
+import MatchedProteinsTable from "./../../tables/MatchedProteinsTable.vue";
 
 @Component({
     components: {
+        MatchedProteinsTable,
         LineageTree,
         LineageTable
     }
