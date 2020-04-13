@@ -1,27 +1,26 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!peptideCountTable">
-                <span class="waiting" v-if="isLoading">
-                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                </span>
-                <span v-else class="placeholder-text">
+            <div v-if="!analysisInProgress">
+                <span class="placeholder-text">
                     Please select at least one dataset for analysis.
                 </span>
             </div>
+            <div v-else-if="loading">
+                <span class="waiting">
+                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
+                </span>
+            </div>
             <div v-else>
-                <filter-functional-annotations-dropdown v-model="percentSettings">
-                </filter-functional-annotations-dropdown>
-                <span>This panel shows the Interpro entries that were matched to your peptides. </span>
-                <span v-html="interproTrustLine"></span>
-                <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
+                <slot name="analysis-header"></slot>
+
                 <v-select :items="namespaceValues" label="Category" v-model="selectedNamespace"></v-select>
                 <interpro-amount-table
-                    v-if="selectedItem"
-                    :loading="isLoading"
-                    :interpro-count-table="selectedItem.countTable"
-                    :interpro-peptide-mapping="selectedItem.peptideMapping"
-                    :interpro-ontology="selectedItem.ontology"
+                    v-if="countTable"
+                    :loading="loading"
+                    :interpro-count-table="countTable"
+                    :interpro-peptide-mapping="interproPeptideMapping"
+                    :interpro-ontology="ontology"
                     :relative-counts="relativeCounts"
                     :search-configuration="searchConfiguration"
                     :tree="tree"
@@ -59,34 +58,21 @@ import Tree from "./../../../business/ontology/taxonomic/Tree";
     components: {
         InterproAmountTable,
         FilterFunctionalAnnotationsDropdown
-    },
-    computed: {
-        selectedItem: {
-            get(): {
-                countTable: CountTable<InterproCode>,
-                peptideMapping: Map<InterproCode, Peptide[]>,
-                definitions: InterproDefinition[],
-                title: string,
-                ontology: Ontology<InterproCode, InterproDefinition>
-                } {
-                const i = this.namespaceValues.indexOf(this.selectedNamespace);
-                return this.items[i];
-            }
-        },
-        isLoading: {
-            get(): boolean {
-                return this.calculationsInProgress || this.loading;
-            }
-        }
     }
 })
 export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) {
     @Prop({ required: true })
-    private peptideCountTable: CountTable<Peptide>;
+    private interproCountTable: (ns: string) => Promise<CountTable<InterproCode>>;
+    @Prop({ required: true })
+    private interproOntology: (ns: string) => Promise<Ontology<InterproCode, InterproDefinition>>;
+    @Prop({ required: false })
+    private interproPeptideMapping: Map<InterproCode, Peptide[]>;
     @Prop({ required: true })
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: false, default: false })
     private loading: boolean;
+    @Prop({ required: false, default: true })
+    private analysisInProgress: boolean;
     @Prop({ required: true })
     private relativeCounts: number;
     @Prop( { required: false, default: false })
@@ -98,66 +84,19 @@ export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) 
 
     private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace));
     private selectedNamespace: string = "all";
-    private items: {
-        countTable: CountTable<InterproCode>,
-        peptideMapping: Map<InterproCode, Peptide[]>,
-        definitions: InterproDefinition[],
-        title: string,
-        ontology: Ontology<InterproCode, InterproDefinition>
-    }[] = [];
 
-    private interproTrustLine: string = "";
-    private calculationsInProgress: boolean = false;
+    private countTable: CountTable<InterproCode> = null;
+    private ontology: Ontology<InterproCode, InterproDefinition> = null;
 
     mounted() {
-        for (let ns of this.namespaceValues) {
-            this.items.push({
-                countTable: undefined,
-                peptideMapping: undefined,
-                definitions: [],
-                title: StringUtils.stringTitleize(ns.toString()),
-                ontology: undefined
-            });
-        }
-
-        this.recompute();
+        this.onNamespaceChanged();
     }
 
     @Watch("selectedNamespace")
+    @Watch("loading")
     private async onNamespaceChanged() {
-        await this.recompute();
-    }
-
-    @Watch("peptideCountTable")
-    @Watch("searchConfiguration")
-    public async recompute(): Promise<void> {
-        this.calculationsInProgress = true;
-        if (this.peptideCountTable && this.searchConfiguration) {
-            const percentage = parseInt(this.percentSettings);
-            const interproProcessor = new InterproCountTableProcessor(
-                this.peptideCountTable,
-                this.searchConfiguration,
-                percentage
-            );
-
-            for (let i = 0; i < this.namespaceValues.length; i++) {
-                const namespace: InterproNamespace = convertStringToInterproNamespace(this.namespaceValues[i]);
-
-                this.items[i].countTable = await interproProcessor.getCountTable(namespace);
-                this.items[i].peptideMapping = await interproProcessor.getAnnotationPeptideMapping();
-
-                const ontologyProcessor = new InterproOntologyProcessor();
-                this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
-
-                this.items[i].definitions.length = 0;
-                this.items[i].definitions.push(
-                    ...this.items[i].countTable.getOntologyIds().map(id => this.items[i].ontology.getDefinition(id))
-                );
-            }
-
-            this.interproTrustLine = this.computeTrustLine(await interproProcessor.getTrust(), "Interpro-entries");
-        }
-        this.calculationsInProgress = false;
+        this.countTable = await this.interproCountTable(this.selectedNamespace);
+        this.ontology = await this.interproOntology(this.selectedNamespace);
     }
 }
 </script>

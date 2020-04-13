@@ -1,18 +1,19 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!ecCountTable">
-                <span class="ec-waiting" v-if="loading">
-                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                </span>
-                <span v-else class="placeholder-text">
+            <div v-if="!analysisInProgress">
+                <span class="placeholder-text">
                     Please select at least one dataset for analysis.
+                </span>
+            </div>
+            <div v-else-if="loading">
+                <span class="ec-waiting">
+                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
                 </span>
             </div>
             <div v-else>
                 <slot name="analysis-header"></slot>
 
-                <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
                 <ec-amount-table
                     :loading="isLoading"
                     :ec-count-table="ecCountTable"
@@ -95,6 +96,8 @@ export default class EcSummaryCard extends Vue {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: false, default: false })
     private loading: boolean;
+    @Prop({ required: false, default: true })
+    private analysisInProgress: boolean;
     @Prop({ required: true })
     private relativeCounts: number;
     @Prop({ required: false, default: false })

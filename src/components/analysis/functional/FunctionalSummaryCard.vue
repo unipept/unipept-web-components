@@ -146,7 +146,7 @@
                     </div>
                 </v-tab-item>
                 <v-tab-item>
-                    <interpro-summary-card
+                    <multi-interpro-summary-card
                         v-if="filteredCountTable"
                         ref="interproSummaryCard"
                         :peptide-count-table="filteredCountTable"
@@ -155,7 +155,7 @@
                         :show-percentage="showPercentage"
                         :tree="tree"
                         :taxa-to-peptides-mapping="taxaToPeptidesMapping">
-                    </interpro-summary-card>
+                    </multi-interpro-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                         </v-progress-circular>
@@ -185,9 +185,6 @@ import QuickGoCard from "./QuickGoCard.vue";
 
 import ImageDownloadModal from "../../utils/ImageDownloadModal.vue";
 
-import GoSummaryCard from "./GoSummaryCard.vue";
-import EcSummaryCard from "./EcSummaryCard.vue";
-import InterproSummaryCard from "./InterproSummaryCard.vue";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
@@ -199,27 +196,26 @@ import Tree from "./../../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../../business/ontology/taxonomic/TreeNode";
 import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
+import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
 
 @Component({
     components: {
         MultiEcSummaryCard,
         MultiGoSummaryCard,
+        MultiInterproSummaryCard,
         CardHeader,
         IndeterminateProgressBar,
         FilterFunctionalAnnotationsDropdown,
         QuickGoCard,
         ImageDownloadModal,
-        GoSummaryCard,
-        EcSummaryCard,
-        InterproSummaryCard
     }
 })
 export default class FunctionalSummaryCard extends Vue {
     $refs!: {
         imageDownloadModal: ImageDownloadModal,
-        goSummaryCard: GoSummaryCard,
-        ecSummaryCard: EcSummaryCard,
-        interproSummaryCard: InterproSummaryCard
+        goSummaryCard: MultiGoSummaryCard,
+        ecSummaryCard: MultiEcSummaryCard,
+        interproSummaryCard: MultiInterproSummaryCard
     }
 
     @Prop({ required: true })

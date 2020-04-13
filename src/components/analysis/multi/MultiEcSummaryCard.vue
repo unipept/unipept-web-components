@@ -8,12 +8,14 @@
         :search-configuration="searchConfiguration"
         :tree="tree"
         :loading="calculationsInProgress"
+        :analysis-in-progress="peptideCountTable"
         :relative-counts="relativeCounts">
         <template v-slot:analysis-header>
             <filter-functional-annotations-dropdown v-model="percentSettings">
             </filter-functional-annotations-dropdown>
             <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
             <span v-html="trustLine"></span>
+            <span>Click on a row in the table to see a taxonomy tree that highlights occurrences.</span>
         </template>
     </ec-summary-card>
 </template>
