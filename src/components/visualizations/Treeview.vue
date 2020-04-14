@@ -1,5 +1,10 @@
 <template>
-    <div class="treeview-container" v-once ref="visualization"></div>
+    <div>
+        <div v-if="loading" class="d-flex justify-center mb-5">
+            <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
+        </div>
+        <div class="treeview-container" v-once ref="visualization"></div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -18,6 +23,8 @@ export default class Treeview extends Vue {
     private width: number;
     @Prop({ required: false, default: 50 })
     private height: number;
+    @Prop({ required: false, default: false })
+    private loading: boolean;
     @Prop()
     private tooltip: (d: any) => string;
     @Prop({ default: false })
@@ -60,6 +67,7 @@ export default class Treeview extends Vue {
         }
     }
 
+    @Watch("loading")
     @Watch("data")
     @Watch("width")
     @Watch("height")
@@ -71,7 +79,7 @@ export default class Treeview extends Vue {
     @Watch("linkStrokeColor")
     @Watch("nodeStrokeColor")
     private async initVisualization() {
-        if (this.data) {
+        if (this.data && !this.loading) {
             let settings = {
                 width: this.width,
                 height: this.height,
@@ -83,21 +91,18 @@ export default class Treeview extends Vue {
                 if (this[funcName]) {
                     settings[settingsName] = this[funcName];
                 }
-
-                // @ts-ignore
-                this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
-
-                if (this.autoResize) {
-                    let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg");
-                    if (svgEl) {
-                        svgEl.setAttribute("height", "100%");
-                        svgEl.setAttribute("width", "100%");
-                    }
-                }
             }
 
             // @ts-ignore
             this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
+
+            if (this.autoResize) {
+                let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg");
+                if (svgEl) {
+                    svgEl.setAttribute("height", "100%");
+                    svgEl.setAttribute("width", "100%");
+                }
+            }
         }
     }
 }

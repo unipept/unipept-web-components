@@ -17,6 +17,7 @@
             :search="filter"
             :custom-filter="filterByValue"
             :expanded.sync="expanded"
+            :loading="loading"
             show-expand>
             <template v-slot:item.uniprotAccessionId="{ item }">
                 <span style="position: relative; top: 4px;">{{ item.uniprotAccessionId }}</span>
@@ -99,10 +100,12 @@
                         dense
                         disabled
                         v-if="peptideData">
-                        <v-subheader>
+                        <v-subheader v-if="item.functionalAnnotations.ec && item.functionalAnnotations.ec.length > 0">
                             Enzyme Commission numbers
                         </v-subheader>
-                        <v-list-item-group class="ec-list-group">
+                        <v-list-item-group
+                            v-if="item.functionalAnnotations.ec && item.functionalAnnotations.ec.length > 0"
+                            class="ec-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.ec" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
@@ -116,8 +119,12 @@
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
-                        <v-subheader>Gene Ontology terms</v-subheader>
-                        <v-list-item-group class="go-list-group">
+                        <v-subheader v-if="item.functionalAnnotations.go && item.functionalAnnotations.go.length > 0">
+                            Gene Ontology terms
+                        </v-subheader>
+                        <v-list-item-group
+                            v-if="item.functionalAnnotations.go && item.functionalAnnotations.go.length > 0"
+                            class="go-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.go" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
@@ -131,8 +138,13 @@
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
-                        <v-subheader>InterPro entries</v-subheader>
-                        <v-list-item-group class="interpro-list-group">
+                        <v-subheader
+                            v-if="item.functionalAnnotations.interpro && item.functionalAnnotations.interpro.length > 0">
+                            InterPro entries
+                        </v-subheader>
+                        <v-list-item-group
+                            v-if="item.functionalAnnotations.interpro && item.functionalAnnotations.interpro.length > 0"
+                            class="interpro-list-group">
                             <v-list-item v-for="definition of item.functionalAnnotations.interpro" :key="definition.code">
                                 <v-list-item-content>
                                     <v-list-item-title>
@@ -207,19 +219,19 @@ export default class MatchedProteinsTable extends Vue {
             text: "UniProt ID",
             align: "start",
             value: "uniprotAccessionId",
-            width: "13%"
+            width: "17%"
         },
         {
             text: "Name",
             align: "start",
             value: "name",
-            width: "34%"
+            width: "32%"
         },
         {
             text: "Organism",
             align: "start",
             value: "organism",
-            width: "32%"
+            width: "30%"
         },
         {
             text: "Annotations",

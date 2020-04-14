@@ -6,16 +6,11 @@
                     Please select at least one dataset for analysis.
                 </span>
             </div>
-            <div v-else-if="loading">
-                <span class="ec-waiting">
-                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                </span>
-            </div>
             <div v-else>
                 <slot name="analysis-header"></slot>
 
                 <ec-amount-table
-                    :loading="isLoading"
+                    :loading="loading"
                     :ec-count-table="ecCountTable"
                     :ec-peptide-mapping="ecPeptideMapping"
                     :ec-ontology="ecOntology"
@@ -25,17 +20,19 @@
                     :taxa-to-peptides-mapping="taxaToPeptidesMapping"
                     :show-percentage="showPercentage">
                 </ec-amount-table>
-                <v-card outlined v-if="ecTree">
+                <v-card outlined>
                     <v-btn
                         small
                         depressed
                         class="item-treeview-dl-btn"
+                        :disabled="loading"
                         @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
                         <v-icon>mdi-download</v-icon>
                         Save as image
                     </v-btn>
                     <treeview
                         id="ec-treeview"
+                        :loading="loading"
                         :data="ecTree"
                         :autoResize="true"
                         :height="300"

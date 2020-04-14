@@ -6,17 +6,12 @@
                     Please select at least one dataset for analysis.
                 </span>
             </div>
-            <div v-else-if="loading">
-                <span class="waiting">
-                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                </span>
-            </div>
             <div v-else>
                 <slot name="analysis-header"></slot>
 
                 <v-select :items="namespaceValues" label="Category" v-model="selectedNamespace"></v-select>
+
                 <interpro-amount-table
-                    v-if="countTable"
                     :loading="loading"
                     :interpro-count-table="countTable"
                     :interpro-peptide-mapping="interproPeptideMapping"
