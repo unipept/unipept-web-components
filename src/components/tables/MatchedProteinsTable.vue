@@ -19,11 +19,13 @@
             :expanded.sync="expanded"
             :loading="loading"
             show-expand>
-            <template v-slot:item.uniprotAccessionId="{ item }">
-                <span style="position: relative; top: 4px;">{{ item.uniprotAccessionId }}</span>
-                <v-btn icon small style="float: right;">
-                    <v-icon small>mdi-open-in-new</v-icon>
-                </v-btn>
+            <template v-slot:item.uniprotAccessionId="{ item }" >
+                <span @click="openInUniProt(item.uniprotAccessionId)" style="cursor: pointer;">
+                    <span style="position: relative; top: 4px;">{{ item.uniprotAccessionId }}</span>
+                    <v-btn icon small style="float: right;">
+                        <v-icon small>mdi-open-in-new</v-icon>
+                    </v-btn>
+                </span>
             </template>
             <template v-slot:item.fa="{ item }">
                 <v-tooltip top>
@@ -264,8 +266,12 @@ export default class MatchedProteinsTable extends Vue {
             return true;
         }
 
-        // TODO: This might need some optimizing if it turns out to be slow for large sets of proteins.
-        return JSON.stringify(item).toLowerCase().indexOf(search.toLowerCase()) >= 0;
+        return item.name.includes(search) ||
+            item.uniprotAccessionId.includes(search) ||
+            item.organism.includes(search) ||
+            item.functionalAnnotations.go.some(e => e.name.includes(search) || e.code.includes(search)) ||
+            item.functionalAnnotations.interpro.some(e => e.name.includes(search) || e.code.includes(search)) ||
+            item.functionalAnnotations.ec.some(e => e.name.includes(search) || e.code.includes(search));
     }
 
     @Watch("peptide")

@@ -11,36 +11,36 @@
                     UniProt entry, followed by columns representing taxonomic ranks ordered from superkingdom on the left to
                     forma on the right.
                 </p>
-                <v-simple-table dense>
-                    <template v-slot:default>
-                        <thead>
-                        <tr>
-                            <th style="width: 200px;">Organism</th>
-                            <th v-for="rank in taxonRanks" style="width: 120px;" class="text-left" :key="rank">{{ rank }}</th>
-                        </tr>
-                        </thead>
+                <v-data-table
+                    dense
+                    :items="organisms"
+                    :headers="headers"
+                    :loading="loading"
+                    :footer-props="{
+                        'items-per-page-options': [10, 20, 50, 100, -1]
+                    }">
+                    <template v-slot:body="{ items }">
                         <tbody>
-                        <tr v-for="organism in organisms" :key="organism.definition.id">
-                            <td style="width: 200px;" class="font-small font-weight-bold">{{ organism.definition.name }}</td>
-                            <td
-                                style="width: 120px;"
-                                v-for="l in organism.lineage"
-                                :key="l ? l.id : generateId()"
-                                :class="[ l ? getColour(l.name) : '' ]">
-                                <a
-                                    class="font-small font-weight-regular font-text no-link-colour"
-                                    v-if="l"
-                                    :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id">
-                                    {{ l.name }}
-                                    <v-icon x-small>mdi-open-in-new</v-icon>
-                                </a>
-                                <span v-else>
-                            </span>
-                            </td>
-                        </tr>
+                            <tr v-for="item in items" :key="item.name">
+                                <td>
+                                    <span class="font-small font-weight-bold">{{ item.definition.name }}</span>
+                                </td>
+                                <td v-for="l in item.lineage"
+                                    :key="l ? l.id : generateId()"
+                                    :class="[ l ? getColour(l.name) : '' ]">
+                                    <a
+                                        class="font-small font-weight-regular font-text no-link-colour"
+                                        v-if="l"
+                                        :href="'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=' + l.id"
+                                        target="_blank">
+                                        {{ l.name }}
+                                        <v-icon x-small>mdi-open-in-new</v-icon>
+                                    </a>
+                                </td>
+                            </tr>
                         </tbody>
                     </template>
-                </v-simple-table>
+                </v-data-table>
             </v-card-text>
         </v-card>
     </div>
@@ -58,7 +58,29 @@ import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/Ncbi
 import { Ontology } from "./../../business/ontology/Ontology";
 import { v4 as uuidv4 } from "uuid";
 
-@Component
+@Component({
+    computed: {
+        headers: {
+            get() {
+                const headers = [{
+                    text: "Organism",
+                    value: "name",
+                    width: "200px"
+                }];
+
+                headers.push(...Object.values(NcbiRank).map(v => {
+                    return {
+                        text: v,
+                        value: "lineage" + v,
+                        width: "150px"
+                    }
+                }));
+
+                return headers;
+            }
+        }
+    }
+})
 export default class LineageTable extends Vue {
     @Prop({ required: true })
     private peptide: Peptide;
