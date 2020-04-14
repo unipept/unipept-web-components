@@ -125,6 +125,9 @@ export default class SinglePeptideSummary extends Vue {
     }
 
     private toPercentage(n: number): string {
+        if (Number.isNaN(n)) {
+            n = 0;
+        }
         return StringUtils.numberToPercent(n);
     }
 }
