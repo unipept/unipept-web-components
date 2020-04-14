@@ -6,12 +6,12 @@
  */
 export default class FunctionalTrust {
     /**
-     * @param annotatedPeptides How many of the peptides that were looked up are, in-fact, associated with at least one
-     * of the items in the resulting count table?
-     * @param totalAmountOfPeptides How many peptides were looked up in total?
+     * @param annotatedItems How many of the items (e.g. peptides) that were looked up are, in-fact, associated with
+     * at least one of the items in the resulting count table?
+     * @param totalAmountOfItems How many items were looked up in total?
      */
     constructor(
-        public readonly annotatedPeptides,
-        public readonly totalAmountOfPeptides,
+        public readonly annotatedItems,
+        public readonly totalAmountOfItems,
     ) {}
 }

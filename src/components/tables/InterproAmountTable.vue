@@ -2,6 +2,7 @@
     <amount-table
         :items="items"
         :loading="isLoading"
+        :rows-per-page="10"
         annotation-name="Interpro entry"
         :search-configuration="searchConfiguration"
         :item-to-peptides-mapping="interproPeptideMapping"

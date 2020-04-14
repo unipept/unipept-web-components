@@ -131,8 +131,6 @@ export default abstract class FunctionalCountTableProcessor<
             tablePerNamespace.set(ns, new Map<OntologyId, number>());
         }
 
-        const generalCounts = new Map<OntologyId, number>();
-
         // Add each definition to the count table of it's specific namespace.
         for (const [term, counts] of countsPerCode) {
             const definition: DefinitionType = ontology.getDefinition(term);
@@ -140,7 +138,6 @@ export default abstract class FunctionalCountTableProcessor<
             if (definition) {
                 const nsMap = tablePerNamespace.get(definition.namespace);
                 nsMap.set(term, counts);
-                generalCounts.set(term, counts);
             }
         }
 
@@ -148,7 +145,7 @@ export default abstract class FunctionalCountTableProcessor<
         for (const [ns, table] of tablePerNamespace) {
             this.countTables.set(ns, new CountTable<OntologyId>(table));
         }
-        this.generalCountTable = new CountTable<OntologyId>(generalCounts);
+        this.generalCountTable = new CountTable<OntologyId>(countsPerCode);
 
         this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
     }
