@@ -36,13 +36,13 @@
                 <lineage-table :peptide="peptide" :equate-il="equateIl"></lineage-table>
             </v-tab-item>
             <v-tab-item>
-
+                <single-go-summary-card :peptide="peptide" :equate-il="equateIl"></single-go-summary-card>
             </v-tab-item>
             <v-tab-item>
-
+                <single-ec-summary-card :peptide="peptide" :equate-il="equateIl"></single-ec-summary-card>
             </v-tab-item>
             <v-tab-item>
-
+                <single-interpro-summary-card :peptide="peptide" :equate-il="equateIl"></single-interpro-summary-card>
             </v-tab-item>
         </v-tabs-items>
     </v-card>
@@ -56,9 +56,15 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import LineageTree from "./../../lineage/LineageTree.vue"
 import LineageTable from "./../../lineage/LineageTable.vue";
 import MatchedProteinsTable from "./../../tables/MatchedProteinsTable.vue";
+import SingleGoSummaryCard from "@/components/analysis/single/SingleGoSummaryCard.vue";
+import SingleEcSummaryCard from "@/components/analysis/single/SingleEcSummaryCard.vue";
+import SingleInterproSummaryCard from "@/components/analysis/single/SingleInterproSummaryCard.vue";
 
 @Component({
     components: {
+        SingleInterproSummaryCard,
+        SingleEcSummaryCard,
+        SingleGoSummaryCard,
         MatchedProteinsTable,
         LineageTree,
         LineageTable
