@@ -688,5 +688,45 @@
     "code": "IPR042185",
     "category": "Homologous_superfamily",
     "name": "Serpin superfamily, domain 2"
+  },
+  {
+    "code": "IPR003613",
+    "category": "Domain",
+    "name": "U box domain"
+  },
+  {
+    "code": "IPR009767",
+    "category": "Domain",
+    "name": "DNA helicase, TraI type"
+  },
+  {
+    "code": "IPR014059",
+    "category": "Domain",
+    "name": "Conjugative relaxase, N-terminal"
+  },
+  {
+    "code": "IPR014129",
+    "category": "Family",
+    "name": "Conjugative transfer relaxase protein TraI"
+  },
+  {
+    "code": "IPR011989",
+    "category": "Homologous_superfamily",
+    "name": "Armadillo-like helical"
+  },
+  {
+    "code": "IPR013083",
+    "category": "Homologous_superfamily",
+    "name": "Zinc finger, RING/FYVE/PHD-type"
+  },
+  {
+    "code": "IPR016024",
+    "category": "Homologous_superfamily",
+    "name": "Armadillo-type fold"
+  },
+  {
+    "code": "IPR000225",
+    "category": "Repeat",
+    "name": "Armadillo"
   }
 ]

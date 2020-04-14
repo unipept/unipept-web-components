@@ -17,16 +17,16 @@ export default class FunctionalSummaryMixin extends Vue {
      * @return
      */
     protected computeTrustLine(trust: FunctionalTrust, kind: string): string {
-        if (trust.annotatedPeptides === 0) {
+        if (trust.annotatedItems === 0) {
             return `<strong>No peptide</strong> has a ${kind} assigned to it. `;
         }
-        if (trust.annotatedPeptides === trust.totalAmountOfPeptides) {
-            return `<strong>All peptides</strong> ${trust.annotatedPeptides <= 5 ? `(only ${trust.annotatedPeptides})` : ""} have at least one ${kind} assigned to them. `;
+        if (trust.annotatedItems === trust.totalAmountOfItems) {
+            return `<strong>All peptides</strong> ${trust.annotatedItems <= 5 ? `(only ${trust.annotatedItems})` : ""} have at least one ${kind} assigned to them. `;
         }
-        if (trust.annotatedPeptides === 1) {
-            return `Only <strong>one peptide</strong> (${StringUtils.numberToPercent(trust.annotatedPeptides / trust.totalAmountOfPeptides)}) has at least one ${kind} assigned to it. `;
+        if (trust.annotatedItems === 1) {
+            return `Only <strong>one peptide</strong> (${StringUtils.numberToPercent(trust.annotatedItems / trust.totalAmountOfItems)}) has at least one ${kind} assigned to it. `;
         }
-        return `<strong>${trust.annotatedPeptides}</strong> (${StringUtils.numberToPercent(trust.annotatedPeptides / trust.totalAmountOfPeptides)}) have at least one ${kind} assigned to them. `;
+        return `<strong>${trust.annotatedItems}</strong> (${StringUtils.numberToPercent(trust.annotatedItems / trust.totalAmountOfItems)}) have at least one ${kind} assigned to them. `;
     }
 }
 </script>
