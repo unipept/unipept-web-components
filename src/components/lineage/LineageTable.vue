@@ -1,7 +1,10 @@
 <template>
     <div class="lineage-table">
         <v-card>
-            <v-card-text>
+            <v-card-text v-if="loading" class="d-flex justify-center">
+                <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
+            </v-card-text>
+            <v-card-text v-else>
                 <p>
                     This table shows the complete taxonomic lineages of all taxa associated with the UniProt entries whose
                     protein sequence contains the tryptic peptide. The first column contains the taxon name extracted from the

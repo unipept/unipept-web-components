@@ -219,19 +219,19 @@ export default class MatchedProteinsTable extends Vue {
             text: "UniProt ID",
             align: "start",
             value: "uniprotAccessionId",
-            width: "13%"
+            width: "17%"
         },
         {
             text: "Name",
             align: "start",
             value: "name",
-            width: "34%"
+            width: "32%"
         },
         {
             text: "Organism",
             align: "start",
             value: "organism",
-            width: "32%"
+            width: "30%"
         },
         {
             text: "Annotations",
