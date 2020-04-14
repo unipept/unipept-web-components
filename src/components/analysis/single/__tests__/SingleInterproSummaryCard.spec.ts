@@ -63,8 +63,10 @@ describe("SingleInterproSummaryCard", () => {
             sync: false
         });
 
+        await wrapper.vm.$nextTick();
+
         // Wait for the table to be rendered.
-        await waitForCondition(() => wrapper.findAll("tr").length > 1);
+        await waitForCondition(() => wrapper.find(".interpro-trust").exists() && wrapper.find(".interpro-trust").html().includes("have at least"));
 
         expect(wrapper.find(".interpro-trust").html()).toMatchSnapshot();
     });
