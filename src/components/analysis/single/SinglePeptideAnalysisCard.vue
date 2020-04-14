@@ -56,9 +56,9 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import LineageTree from "./../../lineage/LineageTree.vue"
 import LineageTable from "./../../lineage/LineageTable.vue";
 import MatchedProteinsTable from "./../../tables/MatchedProteinsTable.vue";
-import SingleGoSummaryCard from "@/components/analysis/single/SingleGoSummaryCard.vue";
-import SingleEcSummaryCard from "@/components/analysis/single/SingleEcSummaryCard.vue";
-import SingleInterproSummaryCard from "@/components/analysis/single/SingleInterproSummaryCard.vue";
+import SingleGoSummaryCard from "./SingleGoSummaryCard.vue";
+import SingleEcSummaryCard from "./SingleEcSummaryCard.vue";
+import SingleInterproSummaryCard from "./SingleInterproSummaryCard.vue";
 
 @Component({
     components: {
