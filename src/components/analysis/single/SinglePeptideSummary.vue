@@ -18,14 +18,19 @@
                 </div>
                 <div>
                     The <span class="font-weight-bold">common lineage</span> for all these proteins is:
-                    <span v-for="[idx, node] of commonLineage.entries()" :key="idx">
-                        <a v-if="node" :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${node.id}`">
-                            {{ node.name }}
-                        </a>
-                        <span v-else>
-                            Unknown
+                    <span v-if="commonLineage.length > 0">
+                        <span v-for="[idx, node] of commonLineage.entries()" :key="idx">
+                            <a v-if="node" :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${node.id}`">
+                                {{ node.name }}
+                            </a>
+                            <span v-else>
+                                Unknown
+                            </span>
+                            <span v-if="idx + 1 < commonLineage.length"> > </span>
                         </span>
-                        <span v-if="idx + 1 < commonLineage.length"> > </span>
+                    </span>
+                    <span v-else>
+                        root
                     </span>
                 </div>
             </v-col>
@@ -118,7 +123,7 @@ export default class SinglePeptideSummary extends Vue {
             this.lca = ontology.getDefinition(lca);
 
             this.commonLineage.length = 0;
-            this.commonLineage.push(...commonLineage.map(c => ontology.getDefinition(c)))
+            this.commonLineage.push(...commonLineage.map(c => ontology.getDefinition(c)));
 
             this.loading = false;
         }
