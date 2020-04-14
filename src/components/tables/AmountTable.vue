@@ -8,10 +8,10 @@
             item-key="code"
             :show-expand="itemToPeptidesMapping"
             :expanded.sync="expandedItemsList">
-            <template v-slot:top>
-                <v-tooltip bottom>
+            <template v-slot:header.action>
+                <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon @click="saveTableAsCsv()" class="table-to-csv-button" v-on="on">mdi-download</v-icon>
+                        <v-icon @click="saveTableAsCsv()" v-on="on">mdi-download</v-icon>
                     </template>
                     <span>Download table as CSV</span>
                 </v-tooltip>
@@ -40,7 +40,7 @@
                     </div>
                 </td>
             </template>
-            <template v-slot:[`item.count`]="{ item }">
+            <template v-slot:item.count="{ item }">
                 <div :style="{
                         padding: '12px',
                         background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
@@ -53,12 +53,20 @@
                      {{ item.name }}
                 </span>
             </template>
+            <template v-slot:item.code="{ item }">
+                <a :href="`https://www.uniprot.org/uniprot/?query=${ item.code }`" target="_blank" class="font-regular">
+                    {{ item.code }}
+                    <v-icon x-small>mdi-open-in-new</v-icon>
+                </a>
+            </template>
             <template v-slot:item.action="{ item }">
-                <v-tooltip :open-delay=1000 bottom>
+                <v-tooltip top v-if="itemToPeptidesMapping">
                     <template v-slot:activator="{ on }">
-                        <v-icon @click="saveSummaryAsCsv(item)" class="row-to-csv-button" v-on="on">
-                            mdi-download
-                        </v-icon>
+                        <v-btn icon @click="saveSummaryAsCsv(item)" v-on="on">
+                            <v-icon>
+                                mdi-download
+                            </v-icon>
+                        </v-btn>
                     </template>
                     <span>Download CSV summary of the filtered functional annotation</span>
                 </v-tooltip>
@@ -100,38 +108,28 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
         tableHeaders: function() {
             const headers = [
                 {
-                    text: "",
-                    align: "left",
-                    value: "",
-                    width: "5%",
-                    sortable: false
-                },
-                {
                     text: this.countName + (this.showPercentage ? " %" : ""),
-                    align: "left",
+                    align: "start",
                     value: "count",
                     width: "20%"
                 }, {
                     text: this.annotationName,
-                    align: "left",
+                    align: "start",
                     value: "code",
                     width: this.itemsToPeptideMapping ? "25%" : "30%"
                 }, {
                     text: "Name",
-                    align: "left",
+                    align: "start",
                     value: "name",
                     width: this.itemsToPeptideMapping ? "30%" : "45%"
+                }, {
+                    text: "",
+                    align: "center",
+                    value: "action",
+                    width: "5%",
+                    sortable: false
                 }
             ];
-
-            if (this.itemsToPeptideMapping) {
-                headers.push({
-                    text: "Actions",
-                    align: "center",
-                    width: "15%",
-                    value: "action"
-                });
-            }
 
             return headers;
         }
