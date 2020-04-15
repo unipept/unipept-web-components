@@ -6,7 +6,7 @@ import pept2data from "./resources/unipept/pept2data.json";
 import interpros from "./resources/unipept/interpros.json";
 import proteins from "./resources/unipept/proteins.json";
 import { Peptide } from "@/business/ontology/raw/Peptide";
-import ProteinResponse from "@/business/communication/protein/ProteinResponse";
+import { ProteinResponse } from "@/business/communication/protein/ProteinResponse";
 
 /**
  * This class is some sort of simple database that can be used to query for specific EC-numbers or GO-terms. This

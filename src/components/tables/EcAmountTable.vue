@@ -7,7 +7,8 @@
         :item-to-peptides-mapping="ecPeptideMapping"
         :tree="tree"
         :taxa-to-peptides-mapping="taxaToPeptidesMapping"
-        :show-percentage="showPercentage">
+        :show-percentage="showPercentage"
+        :external-url-constructor="getUrl">
     </amount-table>
 </template>
 
@@ -85,20 +86,26 @@ export default class EcAmountTable extends Vue {
                 const definition: EcDefinition = this.ecOntology.getDefinition(ecCode);
                 const currentCount = this.ecCountTable.getCounts(ecCode);
 
-                return new TableItem(
-                    currentCount,
-                    currentCount / this.relativeCounts,
-                    definition.name,
-                    definition.code,
-                    definition
-                );
+                if (definition) {
+                    return new TableItem(
+                        currentCount,
+                        currentCount / this.relativeCounts,
+                        definition.name,
+                        definition.code,
+                        definition
+                    );
+                }
             });
 
             this.items.length = 0;
-            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
+            this.items.push(...newItems.filter(i => i).sort((a: TableItem, b: TableItem) => b.count - a.count));
 
             this.computeInProgress = false;
         }
+    }
+
+    private getUrl(code: string): string {
+        return `https://www.uniprot.org/uniprot/?query=${code}`
     }
 }
 </script>
