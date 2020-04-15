@@ -7,7 +7,8 @@
         :item-to-peptides-mapping="ecPeptideMapping"
         :tree="tree"
         :taxa-to-peptides-mapping="taxaToPeptidesMapping"
-        :show-percentage="showPercentage">
+        :show-percentage="showPercentage"
+        :external-url-constructor="getUrl">
     </amount-table>
 </template>
 
@@ -101,6 +102,10 @@ export default class EcAmountTable extends Vue {
 
             this.computeInProgress = false;
         }
+    }
+
+    private getUrl(code: string): string {
+        return `https://www.uniprot.org/uniprot/?query=${code}`
     }
 }
 </script>

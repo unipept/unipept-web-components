@@ -8,7 +8,9 @@
         :item-to-peptides-mapping="interproPeptideMapping"
         :show-percentage="showPercentage"
         :tree="tree"
-        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+        :external-url-constructor="getUrl"
+        :show-namespace="true">
     </amount-table>
 </template>
 
@@ -104,6 +106,10 @@ export default class GoAmountTable extends Vue {
         }
 
         this.isComputing = false;
+    }
+
+    private getUrl(code: string): string {
+        return `https://www.ebi.ac.uk/interpro/search/text/${code.substr(4)}/#table`;
     }
 }
 </script>

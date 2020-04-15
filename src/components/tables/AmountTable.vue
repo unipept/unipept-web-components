@@ -54,7 +54,7 @@
                 </span>
             </template>
             <template v-slot:item.code="{ item }">
-                <a :href="`https://www.uniprot.org/uniprot/?query=${ item.code }`" target="_blank" class="font-regular">
+                <a :href="externalUrlConstructor(item.code)" target="_blank" class="font-regular">
                     {{ item.code }}
                     <v-icon x-small>mdi-open-in-new</v-icon>
                 </a>
@@ -116,12 +116,12 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
                     text: this.annotationName,
                     align: "start",
                     value: "code",
-                    width: this.itemsToPeptideMapping ? "25%" : "30%"
+                    width: "30%"
                 }, {
                     text: "Name",
                     align: "start",
                     value: "name",
-                    width: this.itemsToPeptideMapping ? "30%" : "45%"
+                    width: "45%"
                 }, {
                     text: "",
                     align: "center",
@@ -130,6 +130,17 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
                     sortable: false
                 }
             ];
+
+            if (this.showNamespace) {
+                headers.splice(3, 0, {
+                    text: "Namespace",
+                    align: "start",
+                    value: "definition.namespace",
+                    width: "20%"
+                });
+            }
+
+            console.log(JSON.stringify(headers));
 
             return headers;
         }
@@ -144,6 +155,8 @@ export default class AmountTable extends Vue {
     protected items: TableItem[];
     @Prop({ required: true })
     protected annotationName: string;
+    @Prop({ required: true })
+    private externalUrlConstructor: (code: string) => string;
 
     /**
      * What items are displayed as counts? (e.g. peptides, proteins, ...)
@@ -152,6 +165,8 @@ export default class AmountTable extends Vue {
     protected countName: string;
     @Prop({ required: false })
     protected namespace: string;
+    @Prop({ required: false, default: false })
+    private showNamespace: boolean;
     @Prop({ required: false })
     protected searchConfiguration: SearchConfiguration;
     @Prop({ required: false })
