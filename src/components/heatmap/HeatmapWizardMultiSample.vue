@@ -14,7 +14,7 @@ import {NormalizationType} from "./NormalizationType";
         <v-stepper-items>
             <v-stepper-content step="1">
                 <p>Please select type of data that should be compared between samples.</p>
-                <v-select :items="Array.from(dataSources.keys())" v-model="dataSource" label="Datasource"></v-select>
+                <v-select :items="dataSources" v-model="dataSource" label="Datasource"></v-select>
                 <div>
                     <multi-assay-data-source
                         :items="sourceMetadata[selectedIndex].items"
@@ -297,46 +297,46 @@ export default class HeatmapWizardMultiSample extends Vue {
     }
 
     private async computeHeatmapAndProceed() {
-        // let newHash = sha256(this.normalizer + this.dataSource + this.selectedItems.toString()).toString();
-        //
-        // if (newHash === this.previouslyComputed) {
-        //     return;
-        // }
-        //
-        // this.previouslyComputed = newHash;
-        //
-        // // Go the next step in the wizard.
-        // this.currentStep = 3;
-        //
-        // let rows: HeatmapElement[] = [];
-        // let cols: HeatmapElement[] = [];
-        //
-        // let grid: number[][] = [];
-        //
-        // for (let i = 0; i < this.selectedItems.length; i++) {
-        //     let item: Element = this.selectedItems[i];
-        //     rows.push({ id: i.toString(), name: item.name });
-        // }
-        //
-        // for (let i = 0; i < this.$store.getters.getSelectedAssays.length; i++) {
-        //     let item: Assay = this.$store.getters.getSelectedAssays[i];
-        //     cols.push({ id: i.toString(), name: item.getName() });
-        // }
-        //
-        // for (let item of this.selectedItems) {
-        //     let gridRow: number[] = [];
-        //     for (let container of this.$store.getters.getSelectedAssays) {
-        //         let value: number = (await item.getAffectedPeptides(container.dataRepository)).length;
-        //         gridRow.push(value);
-        //     }
-        //     grid.push(gridRow);
-        // }
-        //
-        // this.heatmapData = {
-        //     rows: rows,
-        //     columns: cols,
-        //     values: this.heatmapConfiguration.normalizer.normalize(grid)
-        // };
+        let newHash = sha256(this.normalizer + this.dataSource + this.selectedItems.toString()).toString();
+
+        if (newHash === this.previouslyComputed) {
+            return;
+        }
+
+        this.previouslyComputed = newHash;
+
+        // Go the next step in the wizard.
+        this.currentStep = 3;
+
+        let rows: HeatmapElement[] = [];
+        let cols: HeatmapElement[] = [];
+
+        let grid: number[][] = [];
+
+        for (let i = 0; i < this.selectedItems.length; i++) {
+            let item: MultiAssayDataSourceItem = this.selectedItems[i];
+            rows.push({ id: i.toString(), name: item.name });
+        }
+
+        for (let i = 0; i < this.assays.length; i++) {
+            let item: ProteomicsAssay = this.assays[i];
+            cols.push({ id: i.toString(), name: item.getName() });
+        }
+
+        for (let item of this.selectedItems) {
+            let gridRow: number[] = [];
+            for (let assay of this.assays) {
+                const values: number = item.countPerAssayId.get(assay.id);
+                gridRow.push(values ? values : 0);
+            }
+            grid.push(gridRow);
+        }
+
+        this.heatmapData = {
+            rows: rows,
+            columns: cols,
+            values: this.normalizationTypes.get(this.normalizer).factory().normalize(grid)
+        };
     }
 }
 </script>

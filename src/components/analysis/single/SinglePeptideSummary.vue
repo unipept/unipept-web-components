@@ -12,7 +12,7 @@
                 <div class="headline">Biodiversity</div>
                 <div v-if="lca">
                     The <span class="font-weight-bold">lowest common ancestor</span> is
-                    <a :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${lca.id}`">
+                    <a :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${lca.id}`" target="_blank">
                         {{ lca.name }}
                     </a> ({{ lca.rank }}).
                 </div>
@@ -20,7 +20,7 @@
                     The <span class="font-weight-bold">common lineage</span> for all these proteins is:
                     <span v-if="commonLineage.length > 0">
                         <span v-for="[idx, node] of commonLineage.entries()" :key="idx">
-                            <a v-if="node" :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${node.id}`">
+                            <a v-if="node" :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${node.id}`" target="_blank">
                                 {{ node.name }}
                             </a>
                             <span v-else>
