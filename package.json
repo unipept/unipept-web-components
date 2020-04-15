@@ -1,6 +1,6 @@
 {
   "name": "unipept-web-components",
-  "version": "0.2.0",
+  "version": "0.3.0-beta.3",
   "private": false,
   "typings": "src/",
   "scripts": {
@@ -105,7 +105,8 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
-      "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor"
+      "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor",
+      "html-to-image-no-fonts": "<rootDir>/src/test/mocks/HtmlToImage"
     },
     "testEnvironment": "jsdom",
     "setupFilesAfterEnv": [

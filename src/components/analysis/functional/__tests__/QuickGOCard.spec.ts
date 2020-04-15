@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount } from "@vue/test-utils"
-import QuickGOCard from "./../QuickGOCard.vue";
+import QuickGoCard from "./../QuickGoCard.vue";
 import Vue from "vue"
 import Vuetify from "vuetify"
 import GoDefinition from "@/business/ontology/functional/go/GoDefinition";
@@ -9,7 +9,7 @@ Vue.use(Vuetify);
 
 const localVue = createLocalVue();
 
-describe("QuickGOSummaryCard", () => {
+describe("QuickGoCard", () => {
     let vuetify;
 
     beforeEach(() => {
@@ -17,7 +17,7 @@ describe("QuickGOSummaryCard", () => {
     });
 
     it("renders a placeholder when no GO-terms are found", () => {
-        const wrapper = shallowMount(QuickGOCard, {
+        const wrapper = shallowMount(QuickGoCard, {
             localVue,
             vuetify,
             propsData: {
@@ -49,7 +49,7 @@ describe("QuickGOSummaryCard", () => {
             GoNamespace.BiologicalProcess
         ));
 
-        const wrapper = shallowMount(QuickGOCard, {
+        const wrapper = shallowMount(QuickGoCard, {
             localVue,
             vuetify,
             propsData: {

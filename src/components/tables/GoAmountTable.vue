@@ -8,7 +8,8 @@
         :item-to-peptides-mapping="goPeptideMapping"
         :show-percentage="showPercentage"
         :tree="tree"
-        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+        :external-url-constructor="getUrl">
     </amount-table>
 </template>
 
@@ -106,6 +107,10 @@ export default class GoAmountTable extends Vue {
         }
 
         this.isComputing = false;
+    }
+
+    private getUrl(code: string): string {
+        return `http://amigo.geneontology.org/amigo/search/ontology?q=${code}`;
     }
 }
 </script>

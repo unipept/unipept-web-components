@@ -1,22 +1,16 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!peptideCountTable">
-                <span class="ec-waiting" v-if="isLoading">
-                    <v-progress-circular :size="70" :width="7" color="primary" indeterminate></v-progress-circular>
-                </span>
-                <span v-else class="placeholder-text">
+            <div v-if="!analysisInProgress">
+                <span class="placeholder-text">
                     Please select at least one dataset for analysis.
                 </span>
             </div>
             <div v-else>
-                <filter-functional-annotations-dropdown v-model="percentSettings">
-                </filter-functional-annotations-dropdown>
-                <span>This panel shows the Enzyme Commission numbers that were matched to your peptides. </span>
-                <span v-html="trustLine"></span>
-                <span>Click on a row in a table to see a taxonomy tree that highlights occurrences.</span>
+                <slot name="analysis-header"></slot>
+
                 <ec-amount-table
-                    :loading="isLoading"
+                    :loading="loading"
                     :ec-count-table="ecCountTable"
                     :ec-peptide-mapping="ecPeptideMapping"
                     :ec-ontology="ecOntology"
@@ -26,17 +20,19 @@
                     :taxa-to-peptides-mapping="taxaToPeptidesMapping"
                     :show-percentage="showPercentage">
                 </ec-amount-table>
-                <v-card outlined v-if="ecTree">
+                <v-card outlined>
                     <v-btn
                         small
                         depressed
                         class="item-treeview-dl-btn"
+                        :disabled="loading"
                         @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
                         <v-icon>mdi-download</v-icon>
                         Save as image
                     </v-btn>
                     <treeview
                         id="ec-treeview"
+                        :loading="loading"
                         :data="ecTree"
                         :autoResize="true"
                         :height="300"
@@ -45,12 +41,14 @@
                         :enableAutoExpand="true">
                     </treeview>
                 </v-card>
+                <image-download-modal ref="imageDownloadModal"></image-download-modal>
             </div>
         </v-card-text>
     </v-card>
 </template>
 
 <script lang="ts">
+import Vue from "vue";
 import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import Component, { mixins } from "vue-class-component";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
@@ -67,9 +65,11 @@ import { Ontology } from "./../../../business/ontology/Ontology";
 import EcOntologyProcessor from "./../../../business/ontology/functional/ec/EcOntologyProcessor";
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
+import ImageDownloadModal from "./../../utils/ImageDownloadModal.vue";
 
 @Component({
     components: {
+        ImageDownloadModal,
         FilterFunctionalAnnotationsDropdown,
         EcAmountTable,
         Treeview
@@ -82,13 +82,19 @@ import Tree from "./../../../business/ontology/taxonomic/Tree";
         }
     }
 })
-export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
+export default class EcSummaryCard extends Vue {
     @Prop({ required: true })
-    private peptideCountTable: CountTable<Peptide>;
+    private ecCountTable: CountTable<Peptide>;
     @Prop({ required: true })
+    private ecOntology: Ontology<EcCode, EcDefinition>;
+    @Prop({ required: false })
+    private ecPeptideMapping: Map<EcCode, Peptide[]>;
+    @Prop({ required: false })
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: false, default: false })
     private loading: boolean;
+    @Prop({ required: false, default: true })
+    private analysisInProgress: boolean;
     @Prop({ required: true })
     private relativeCounts: number;
     @Prop({ required: false, default: false })
@@ -98,11 +104,6 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
     @Prop({ required: false })
     protected tree: Tree;
 
-    private ecCountTable: CountTable<EcCode> = null;
-    private ecPeptideMapping: Map<EcCode, Peptide[]> = null;
-    private ecOntology: Ontology<EcCode, EcDefinition> = null;
-
-    private trustLine: string = "";
     private calculationsInProgress: boolean = false;
     private ecTree: TreeViewNode = null;
 
@@ -130,25 +131,12 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
         return tip;
     };
 
-    @Watch("peptideCountTable")
-    @Watch("searchConfiguration")
+    @Watch("ecCountTable")
+    @Watch("ecOntology")
     private async recompute() {
         this.calculationsInProgress = true;
-        if (this.peptideCountTable) {
-            const percentage = parseInt(this.percentSettings);
-            const ecCountTableProcessor = new EcCountTableProcessor(
-                this.peptideCountTable,
-                this.searchConfiguration,
-                percentage
-            );
-            this.ecCountTable = await ecCountTableProcessor.getCountTable();
-            this.ecPeptideMapping = await ecCountTableProcessor.getAnnotationPeptideMapping();
-
-            const ontologyProcessor = new EcOntologyProcessor();
-            this.ecOntology = await ontologyProcessor.getOntology(this.ecCountTable);
-
+        if (this.ecCountTable && this.ecOntology) {
             this.ecTree = await this.computeEcTree(this.ecCountTable, this.ecOntology);
-            this.trustLine = this.computeTrustLine(await ecCountTableProcessor.getTrust(), "EC number");
         }
         this.calculationsInProgress = false;
     }
@@ -198,6 +186,8 @@ export default class EcSummaryCard extends mixins(FunctionalSummaryMixin) {
 
         const sortedEcs = ecCountTable.getOntologyIds()
             .map(id => ecOntology.getDefinition(id))
+            // Only retain valid definitions
+            .filter(def => def)
             .sort((a: EcDefinition, b: EcDefinition) => a.level - b.level);
 
         for (const ecDef of sortedEcs) {

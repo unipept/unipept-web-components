@@ -10,6 +10,9 @@
             </v-card-text>
         </v-card>
         <v-card v-else>
+            <v-btn icon @click="downloadDialogOpen = false" class="float-right">
+                <v-icon>mdi-close</v-icon>
+            </v-btn>
             <img v-if="!svgDownload" :src="pngDataURL" style="max-width: 800px;" />
             <v-img v-else class="white--text align-end" :src="pngDataURL" />
             <v-card-actions class="justify-center">

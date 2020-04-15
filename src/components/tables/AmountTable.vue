@@ -4,19 +4,20 @@
             :headers="tableHeaders"
             :loading="loading"
             :items="items"
-            :items-per-page="5"
+            :items-per-page="rowsPerPage"
             item-key="code"
-            show-expand
+            :show-expand="itemToPeptidesMapping"
             :expanded.sync="expandedItemsList">
-            <template v-slot:top>
-                <v-tooltip :open-delay=1000 bottom>
+            <template v-slot:header.action>
+                <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon @click="saveTableAsCsv()" class="table-to-csv-button" v-on="on">mdi-download</v-icon>
+                        <v-icon @click="saveTableAsCsv()" v-on="on">mdi-download</v-icon>
                     </template>
                     <span>Download table as CSV</span>
                 </v-tooltip>
             </template>
-            <template v-slot:expanded-item="{ headers, item }">
+            <!-- We can only process the tree when a mapping between items and peptides is given -->
+            <template v-slot:expanded-item="{ headers, item }" v-if="this.itemToPeptidesMapping">
                 <td class="item-treeview" :colspan="headers.length">
                     <div v-if="tree && (treeAvailable.get(item) || computeTree(item))">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
@@ -39,7 +40,7 @@
                     </div>
                 </td>
             </template>
-            <template v-slot:[`item.count`]="{ item }">
+            <template v-slot:item.count="{ item }">
                 <div :style="{
                         padding: '12px',
                         background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
@@ -47,17 +48,25 @@
                     {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
             </template>
-            <template v-slot:Name="{ item }">
+            <template v-slot:item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
                 </span>
             </template>
+            <template v-slot:item.code="{ item }">
+                <a :href="externalUrlConstructor(item.code)" target="_blank" class="font-regular">
+                    {{ item.code }}
+                    <v-icon x-small>mdi-open-in-new</v-icon>
+                </a>
+            </template>
             <template v-slot:item.action="{ item }">
-                <v-tooltip :open-delay=1000 bottom>
+                <v-tooltip top v-if="itemToPeptidesMapping">
                     <template v-slot:activator="{ on }">
-                        <v-icon @click="saveSummaryAsCsv(item)" class="row-to-csv-button" v-on="on">
-                            mdi-download
-                        </v-icon>
+                        <v-btn icon @click="saveSummaryAsCsv(item)" v-on="on">
+                            <v-icon>
+                                mdi-download
+                            </v-icon>
+                        </v-btn>
                     </template>
                     <span>Download CSV summary of the filtered functional annotation</span>
                 </v-tooltip>
@@ -97,28 +106,43 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
     computed:
     {
         tableHeaders: function() {
-            return [{
-                text: "Peptides" + (this.showPercentage ? " %" : ""),
-                align: "left",
-                value: "count",
-                width: "20%"
-            }, {
-                text: this.annotationName,
-                align: "left",
-                value: "code",
-                width: "30%"
-            }, {
-                text: "Name",
-                align: "left",
-                value: "name",
-                width: "40%"
-            }, {
-                text: "Actions",
-                align: "center",
-                width: "15%",
-                sortable: false,
-                value: "action"
-            }]
+            const headers = [
+                {
+                    text: this.countName + (this.showPercentage ? " %" : ""),
+                    align: "start",
+                    value: "count",
+                    width: "20%"
+                }, {
+                    text: this.annotationName,
+                    align: "start",
+                    value: "code",
+                    width: "30%"
+                }, {
+                    text: "Name",
+                    align: "start",
+                    value: "name",
+                    width: "45%"
+                }, {
+                    text: "",
+                    align: "center",
+                    value: "action",
+                    width: "5%",
+                    sortable: false
+                }
+            ];
+
+            if (this.showNamespace) {
+                headers.splice(3, 0, {
+                    text: "Namespace",
+                    align: "start",
+                    value: "definition.namespace",
+                    width: "20%"
+                });
+            }
+
+            console.log(JSON.stringify(headers));
+
+            return headers;
         }
     }
 })
@@ -131,13 +155,26 @@ export default class AmountTable extends Vue {
     protected items: TableItem[];
     @Prop({ required: true })
     protected annotationName: string;
+    @Prop({ required: true })
+    private externalUrlConstructor: (code: string) => string;
 
+    /**
+     * What items are displayed as counts? (e.g. peptides, proteins, ...)
+     */
+    @Prop({ required: false, default: "Peptides" })
+    protected countName: string;
     @Prop({ required: false })
     protected namespace: string;
+    @Prop({ required: false, default: false })
+    private showNamespace: boolean;
     @Prop({ required: false })
     protected searchConfiguration: SearchConfiguration;
     @Prop({ required: false })
     protected tree: Tree;
+    /**
+     * A map that returns for a given annotation all peptides associated with this annotation. If this map is not
+     * given, then no TreeView will be rendered and no expandable rows will be present.
+     */
     @Prop({ required: false })
     protected itemToPeptidesMapping: Map<string, Peptide[]>;
     @Prop({ required: false })
@@ -146,6 +183,8 @@ export default class AmountTable extends Vue {
     protected loading: boolean;
     @Prop({ required: false, default: false })
     protected showPercentage: boolean;
+    @Prop({ required: false, default: 5 })
+    private rowsPerPage: number;
 
     protected treeAvailable = new Map<TableItem, TreeNode>();
 

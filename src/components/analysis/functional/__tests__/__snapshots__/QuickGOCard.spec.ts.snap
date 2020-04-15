@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QuickGOSummaryCard renders a placeholder when no GO-terms are found 1`] = `
+exports[`QuickGoCard renders a placeholder when no GO-terms are found 1`] = `
 "<v-card-text-stub>
                 No GO terms for this domain were found.
             </v-card-text-stub>"
 `;
 
-exports[`QuickGOSummaryCard renders valid GO-terms correctly 1`] = `
+exports[`QuickGoCard renders valid GO-terms correctly 1`] = `
 "<v-card-text-stub>
                 This chart shows the relationship between the 3 most occurring GO terms:
                 translation, neutrophil degranulation and protein refolding.
