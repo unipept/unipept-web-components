@@ -7,7 +7,7 @@ exports[`SinglePeptideSummary correctly shows a complete summary for one peptide
         UniProt entries with a lowest common ancestor of
         <span class=\\"font-weight-bold\\">root</span></div> <div class=\\"row\\"><div class=\\"col col-6\\"><div class=\\"headline\\">Biodiversity</div> <div>
                 The <span class=\\"font-weight-bold\\">lowest common ancestor</span> is
-                <a href=\\"https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=1\\">
+                <a href=\\"https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=1\\" target=\\"_blank\\">
                     root
                 </a> (no rank).
             </div> <div>
