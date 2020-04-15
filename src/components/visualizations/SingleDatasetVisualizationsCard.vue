@@ -148,6 +148,7 @@
                             <hierarchical-outline-visualization
                                 v-if="tree"
                                 :tree="tree"
+                                :search-configuration="searchConfiguration"
                                 v-on:update-selected-term="onUpdateSelectedTerm"
                                 v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                             </hierarchical-outline-visualization>
@@ -275,7 +276,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             const taxaOntologyProcessor = new NcbiOntologyProcessor();
             const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
 
-            this.tree = new Tree(taxaCounts, taxaOntology);
+            this.tree = new Tree(taxaCounts, taxaOntology, await taxaCountProcessor.getAnnotationPeptideMapping());
         }
     }
 

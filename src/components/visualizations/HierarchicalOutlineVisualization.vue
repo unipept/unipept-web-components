@@ -26,6 +26,7 @@ import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import { constructSearchtree } from "./SearchTree";
+import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 
 @Component({
     components: {},
@@ -40,6 +41,8 @@ import { constructSearchtree } from "./SearchTree";
 export default class HierarchicalOutlineVisualization extends Vue {
     @Prop({ required: true })
     private tree: Tree;
+    @Prop({ required: false, default: new SearchConfiguration() })
+    private searchConfiguration: SearchConfiguration;
     private searchTerm: string = "";
     private searchTree!: any;
 
@@ -63,7 +66,7 @@ export default class HierarchicalOutlineVisualization extends Vue {
     @Watch("tree")
     private async initSearchTree() {
         if (this.tree) {
-            this.searchTree = constructSearchtree(this.tree, this.$store.getters.searchSettings.il, () => {});
+            this.searchTree = constructSearchtree(this.tree, this.searchConfiguration.equateIl, () => {});
         }
     }
 }
