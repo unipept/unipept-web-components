@@ -16,7 +16,7 @@ import {NormalizationType} from "./NormalizationType";
         <v-stepper-items>
             <v-stepper-content step="1">
                 <p>Please select the items that should be visualised on the horizontal axis of the heatmap.</p>
-                <v-select :items="dataSources" v-model="horizontalDataSource" label="Horizontal datasource">
+                <v-select :items="dataSources" v-model="horizontalDataSource" label="Horizontal datasource" class="flex-grow-0">
                 </v-select>
                 <div>
                     <single-assay-data-source
@@ -28,11 +28,12 @@ import {NormalizationType} from "./NormalizationType";
                         v-on:selected-items="updateHorizontalItems">
                     </single-assay-data-source>
                 </div>
+                <v-spacer></v-spacer>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
             <v-stepper-content step="2">
                 <p>Please select the items that should be visualised on the vertical axis of the heatmap.</p>
-                <v-select :items="dataSources" v-model="verticalDataSource" label="Vertical datasource">
+                <v-select :items="dataSources" v-model="verticalDataSource" label="Vertical datasource" class="flex-grow-0">
                 </v-select>
                 <div>
                     <single-assay-data-source
@@ -44,6 +45,7 @@ import {NormalizationType} from "./NormalizationType";
                         v-on:selected-items="updateVerticalItems">
                     </single-assay-data-source>
                 </div>
+                <v-spacer></v-spacer>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
             <v-stepper-content step="3">
