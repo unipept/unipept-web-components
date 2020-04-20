@@ -270,12 +270,10 @@ export default class HeatmapWizardMultiSample extends Vue {
                 let name: string = "";
 
                 if (definition) {
-                    if (definition instanceof FunctionalDefinition) {
-                        category = definition.namespace;
-                    }
-
                     if (definition instanceof NcbiTaxon) {
                         category = definition.rank;
+                    } else {
+                        category = (definition as FunctionalDefinition).namespace;
                     }
                     name = definition.name;
                 }
