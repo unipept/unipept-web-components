@@ -72,7 +72,7 @@ export default class DataSource extends Vue {
             if (this.selectedCategory === "All") {
                 this.visibleItems.push(...this.items);
             } else {
-                this.visibleItems.push(...this.items.filter(i => i.category === this.selectedCategory));
+                this.visibleItems.push(...this.items.filter(i => i.category.toLowerCase() === this.selectedCategory.toLowerCase()));
             }
         }
     }

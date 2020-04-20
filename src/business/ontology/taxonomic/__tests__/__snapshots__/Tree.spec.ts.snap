@@ -2397,5 +2397,6 @@ Tree {
     9605,
     9606,
   ],
+  "taxaToPeptidesMapping": undefined,
 }
 `;

@@ -265,12 +265,10 @@ export default class HeatmapWizardSingleSample extends Vue {
                 const definition = ontology.getDefinition(id);
                 let category: string = "";
 
-                if (definition instanceof FunctionalDefinition) {
-                    category = definition.namespace;
-                }
-
                 if (definition instanceof NcbiTaxon) {
                     category = definition.rank;
+                } else {
+                    category = (definition as FunctionalDefinition).namespace;
                 }
 
                 return new SingleAssayDataSourceItem(definition.name, id, countTable.getCounts(id), StringUtils.stringTitleize(category), peptideMapping.get(id))
