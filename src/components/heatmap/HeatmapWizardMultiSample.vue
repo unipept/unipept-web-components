@@ -14,7 +14,7 @@ import {NormalizationType} from "./NormalizationType";
         <v-stepper-items>
             <v-stepper-content step="1">
                 <p>Please select type of data that should be compared between samples.</p>
-                <v-select :items="dataSources" v-model="dataSource" label="Datasource"></v-select>
+                <v-select :items="dataSources" v-model="dataSource" label="Datasource" class="flex-grow-0"></v-select>
                 <div>
                     <multi-assay-data-source
                         :items="sourceMetadata[selectedIndex].items"
@@ -25,6 +25,7 @@ import {NormalizationType} from "./NormalizationType";
                         v-on:selected-items="updateSelectedItems">
                     </multi-assay-data-source>
                 </div>
+                <v-spacer></v-spacer>
                 <v-btn class="continue-button" color="primary" @click="currentStep++">Continue</v-btn>
             </v-stepper-content>
             <v-stepper-content step="2">
