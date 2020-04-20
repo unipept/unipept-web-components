@@ -140,8 +140,6 @@ import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
                 });
             }
 
-            console.log(JSON.stringify(headers));
-
             return headers;
         }
     }
