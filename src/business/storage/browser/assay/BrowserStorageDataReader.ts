@@ -15,6 +15,8 @@ export default class BrowserStorageDataReader extends BrowserAssayVisitor {
         const parsedPeptides = JSON.parse(peptidesSerialized);
         mpAssay.setPeptides(parsedPeptides.peptides);
 
+        console.log(mpAssay);
+
         return;
     }
 }
