@@ -6,7 +6,7 @@
             :items="items"
             :items-per-page="rowsPerPage"
             item-key="code"
-            :show-expand="itemToPeptidesMapping"
+            :show-expand="itemToPeptidesMapping == null"
             :expanded.sync="expandedItemsList">
             <template v-slot:header.action>
                 <v-tooltip top>

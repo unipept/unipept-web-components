@@ -47,7 +47,7 @@ export default class QuickGoCard extends Vue {
     @Watch("items")
     private initialize() {
         if (this.items) {
-            this.top5 = this.items.slice(0, 5);
+            this.top5 = this.items.filter(x => x).slice(0, 5);
 
             if (this.top5.length > 0) {
                 const top5WithNames = this.top5.map(x => `${x.name}`);
@@ -57,7 +57,7 @@ export default class QuickGoCard extends Vue {
     }
 
     private getQuickGoSmallUrl(): string {
-        const top5: string[] = this.items.slice(0, 5).map(x => x.code);
+        const top5: string[] = this.items.filter(x => x).slice(0, 5).map(x => x.code);
 
         if (top5.length > 0) {
             return this.quickGOChartURL(top5, false);
