@@ -39,4 +39,8 @@ export default class AllNormalizer implements Normalizer {
 
         return output;
     }
+
+    public toString(): string {
+        return "AllNormalizer";
+    }
 }
