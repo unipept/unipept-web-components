@@ -100,7 +100,22 @@ export default class ImageDownloadModal extends Vue {
     async svg2pngDataURL(svgSelector: string) : Promise<string> {
         const el = $(svgSelector).get(0);
 
-        const canvas = new OffscreenCanvas(el.clientWidth, el.clientHeight);
+        let canvas;
+
+        if (window.OffscreenCanvas) {
+            canvas = new OffscreenCanvas(el.clientWidth, el.clientHeight);
+        } else {
+            const cnvs = document.createElement("canvas");
+            cnvs.width = el.clientWidth;
+            cnvs.height = el.clientHeight;
+
+            cnvs["convertToBlob"] = async() => {
+                return new Promise(resolve => {
+                    cnvs.toBlob(resolve);
+                });
+            };
+            canvas = cnvs;
+        }
 
         // automatically size canvas to svg element and render
         const canvgInstance = await Canvg.from(canvas.getContext("2d"), el.outerHTML, presets.offscreen());
