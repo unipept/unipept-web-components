@@ -17,7 +17,8 @@ export default class InterproCountTableProcessor extends FunctionalCountTablePro
             peptideCountTable,
             configuration,
             percentage,
-            item => item.fa.counts.IPR, "IPR:"
+            "IPR",
+            "IPR:"
         );
     }
 

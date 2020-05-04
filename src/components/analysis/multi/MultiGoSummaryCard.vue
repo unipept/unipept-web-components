@@ -23,6 +23,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :loading="calculationsInProgress"
                 :tree="tree">
             </go-summary>
         </template>
@@ -36,6 +37,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :loading="calculationsInProgress"
                 :tree="tree">
             </go-summary>
         </template>
@@ -49,6 +51,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :loading="calculationsInProgress"
                 :tree="tree">
             </go-summary>
         </template>

@@ -8,7 +8,6 @@ import ProgressListener from "./../../progress/ProgressListener";
 import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
 import NetworkConfiguration from "./../NetworkConfiguration";
 import PeptideTrust from "./../../processors/raw/PeptideTrust";
-import Queue from "./../../support/synchronization/Queue";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -90,7 +89,6 @@ export default class Pept2DataCommunicator {
                     for (const pep of peptides) {
                         processedSet.add(pep);
                     }
-                    console.log(processedSet);
 
                     resolve();
                 } else if (message.type === "error") {
@@ -99,8 +97,11 @@ export default class Pept2DataCommunicator {
             });
         });
 
-        await this.inProgress;
-        this.inProgress = undefined;
+        try {
+            await this.inProgress;
+        } finally {
+            this.inProgress = undefined;
+        }
     }
 
     public static async getPeptideTrust(
@@ -139,6 +140,11 @@ export default class Pept2DataCommunicator {
             return undefined;
         }
         return responseMap.get(peptide);
+    }
+
+    public static getPeptideResponseMap(configuration: SearchConfiguration): Map<Peptide, PeptideDataResponse> {
+        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
+        return Pept2DataCommunicator.configurationToResponses.get(configString);
     }
 
     private static getUnprocessedPeptides(peptides: Peptide[], configuration: SearchConfiguration): Peptide[] {
