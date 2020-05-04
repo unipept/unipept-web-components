@@ -39,7 +39,7 @@ export default class Pept2DataCommunicator {
         progressListener?: ProgressListener
     ): Promise<void> {
         const peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
-        const spawnedProcess = await spawn(new Worker("./Pept2Data.worker"));
+        const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
 
         const obs: Observable<{ type: string, value: any }> = spawnedProcess(
             peptides,

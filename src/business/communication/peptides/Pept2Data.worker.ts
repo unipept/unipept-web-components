@@ -1,15 +1,15 @@
+import { expose } from "threads/worker";
 import { Observable } from "observable-fns"
+import { Peptide } from "./../../ontology/raw/Peptide";
+import SearchConfiguration from "./../../configuration/SearchConfiguration";
 
 const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
 
-/**
- * @param {Peptide[]} peptides
- * @param {SearchConfiguration} config
- * @param {string} baseUrl
- * @returns {Promise<Map<Peptide, PeptideDataResponse>>}
- */
-export default function process(peptides, config, baseUrl) {
+expose(process)
+
+export default function process(peptides: Peptide[], config: SearchConfiguration, baseUrl: string): Observable<{ type: string, value: any }> {
+    // @ts-ignore
     return new Observable(async(observer) => {
         try {
             // Maps each peptide onto the response it received from the Unipept API.
@@ -27,7 +27,7 @@ export default function process(peptides, config, baseUrl) {
                     missed: config.enableMissingCleavageHandling
                 });
 
-                const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data);
+                const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
 
                 res.peptides.forEach(p => {
                     responses.set(p.sequence, p);
@@ -56,7 +56,6 @@ export default function process(peptides, config, baseUrl) {
             })
         }
     });
-
 }
 
 async function postJSON(url, data) {
@@ -70,8 +69,9 @@ async function postJSON(url, data) {
     });
 
     if (!result.ok) {
-        throw "Network request failed: " + result.error();
+        throw "Network request failed.";
     }
 
     return result.json();
 }
+
