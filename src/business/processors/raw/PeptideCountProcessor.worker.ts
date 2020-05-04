@@ -2,7 +2,7 @@ import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import { expose } from "threads/worker";
 
-expose(process)
+expose(process);
 
 function process(peptides: Peptide[], searchConfiguration: SearchConfiguration): Map<Peptide, number> {
     peptides = filter(peptides, searchConfiguration);

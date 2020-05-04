@@ -8,6 +8,7 @@ import ProgressListener from "./../../progress/ProgressListener";
 import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
 import NetworkConfiguration from "./../NetworkConfiguration";
 import PeptideTrust from "./../../processors/raw/PeptideTrust";
+import Queue from "./../../support/synchronization/Queue";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -19,6 +20,7 @@ export default class Pept2DataCommunicator {
     private static configurationToResponses = new Map<string, Map<string, PeptideDataResponse>>();
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
+    private static processing: boolean = false;
     private static inProgress: Promise<void>;
 
     /**
@@ -38,20 +40,31 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
     ): Promise<void> {
-        const peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
-        const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
+        while (this.inProgress) {
+            await this.inProgress;
+        }
 
-        const obs: Observable<{ type: string, value: any }> = spawnedProcess(
-            peptides,
-            {
-                equateIl: configuration.equateIl,
-                filterDuplicates: configuration.filterDuplicates,
-                enableMissingCleavageHandling: configuration.enableMissingCleavageHandling
-            },
-            NetworkConfiguration.BASE_URL
-        );
+        this.inProgress = new Promise<void>(async(resolve, reject) => {
+            let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
-        await new Promise<void>((resolve, reject) => {
+            if (!peptides || peptides.length === 0) {
+                resolve();
+                return;
+            }
+
+            const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
+
+            const obs: Observable<{ type: string, value: any }> = spawnedProcess(
+                peptides,
+                {
+                    equateIl: configuration.equateIl,
+                    filterDuplicates: configuration.filterDuplicates,
+                    enableMissingCleavageHandling: configuration.enableMissingCleavageHandling
+                },
+                NetworkConfiguration.BASE_URL
+            );
+
+
             obs.subscribe(message => {
                 if (message.type === "progress") {
                     if (progressListener) {
@@ -61,29 +74,33 @@ export default class Pept2DataCommunicator {
                     const resultMap = message.value;
                     const config = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
 
-                    if (!this.configurationToResponses.has(config)) {
-                        this.configurationToResponses.set(config, new Map());
+                    if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
+                        Pept2DataCommunicator.configurationToResponses.set(config, new Map());
                     }
-                    const configMap = this.configurationToResponses.get(config);
+                    const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
 
                     for (const [pep, response] of resultMap) {
                         configMap.set(pep, response);
                     }
 
-                    if (!this.configurationToProcessed.has(config)) {
-                        this.configurationToProcessed.set(config, new Set());
+                    if (!Pept2DataCommunicator.configurationToProcessed.has(config)) {
+                        Pept2DataCommunicator.configurationToProcessed.set(config, new Set());
                     }
-                    const processedSet = this.configurationToProcessed.get(config);
+                    const processedSet = Pept2DataCommunicator.configurationToProcessed.get(config);
                     for (const pep of peptides) {
                         processedSet.add(pep);
                     }
+                    console.log(processedSet);
 
                     resolve();
                 } else if (message.type === "error") {
                     reject(new NetworkCommunicationException(message.value));
                 }
             });
-        })
+        });
+
+        await this.inProgress;
+        this.inProgress = undefined;
     }
 
     public static async getPeptideTrust(
