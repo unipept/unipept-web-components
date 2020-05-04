@@ -1,3 +1,5 @@
+import { Observable } from "observable-fns"
+
 const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
 
@@ -5,32 +7,56 @@ const PEPTDATA_ENDPOINT = "/mpa/pept2data";
  * @param {Peptide[]} peptides
  * @param {SearchConfiguration} config
  * @param {string} baseUrl
- * @param setProgress
  * @returns {Promise<Map<Peptide, PeptideDataResponse>>}
  */
-export default async function process(peptides, config, baseUrl, setProgress) {
-    // Maps each peptide onto the response it received from the Unipept API.
-    const responses = new Map();
+export default function process(peptides, config, baseUrl) {
+    return new Observable(async(observer) => {
+        try {
+            // Maps each peptide onto the response it received from the Unipept API.
+            const responses = new Map();
 
-    setProgress(0.0);
-    for (let i = 0; i < peptides.length; i += PEPTDATA_BATCH_SIZE) {
-        const data = JSON.stringify({
-            peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
-            equate_il: config.equateIl,
-            missed: config.enableMissingCleavageHandling
-        });
+            observer.next({
+                type: "progress",
+                value: 0.0
+            });
 
-        const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data);
+            for (let i = 0; i < peptides.length; i += PEPTDATA_BATCH_SIZE) {
+                const data = JSON.stringify({
+                    peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
+                    equate_il: config.equateIl,
+                    missed: config.enableMissingCleavageHandling
+                });
 
-        res.peptides.forEach(p => {
-            responses.set(p.sequence, p);
-        })
+                const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data);
 
-        setProgress((i + PEPTDATA_BATCH_SIZE) / peptides.length);
-    }
+                res.peptides.forEach(p => {
+                    responses.set(p.sequence, p);
+                })
 
-    setProgress(1);
-    return responses;
+                observer.next({
+                    type: "progress",
+                    value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
+                });
+            }
+
+            observer.next({
+                type: "progress",
+                value: 1
+            });
+
+            observer.next({
+                type: "result",
+                value: responses
+            });
+            observer.complete();
+        } catch (err) {
+            observer.next({
+                type: "error",
+                value: "Could not communicate with external endpoint."
+            })
+        }
+    });
+
 }
 
 async function postJSON(url, data) {
