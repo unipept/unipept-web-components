@@ -2,11 +2,11 @@ import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import { CountTable } from "./../../../counts/CountTable";
 import { PeptideDataResponse } from "./../../../communication/peptides/PeptideDataResponse";
-import { expose } from "threads/worker";
+import { expose } from "threads";
 
 expose(compute);
 
-function compute(
+export default function compute(
     peptideCountTable: CountTable<Peptide>,
     peptideToResponseMap: Map<Peptide, PeptideDataResponse>
 ) {

@@ -6,7 +6,7 @@ import { expose } from "threads/worker";
 
 expose(compute);
 
-async function compute(
+export default async function compute(
     peptideCountTable: CountTable<Peptide>,
     peptideToResponseMap: Map<Peptide, PeptideDataResponse>,
     percentage: number,

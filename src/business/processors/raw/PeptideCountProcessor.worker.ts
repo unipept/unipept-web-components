@@ -4,7 +4,7 @@ import { expose } from "threads/worker";
 
 expose(process);
 
-function process(peptides: Peptide[], searchConfiguration: SearchConfiguration): Map<Peptide, number> {
+export default function process(peptides: Peptide[], searchConfiguration: SearchConfiguration): Map<Peptide, number> {
     peptides = filter(peptides, searchConfiguration);
     const peptideCounts = new Map<Peptide, number>();
     for (const peptide of peptides) {

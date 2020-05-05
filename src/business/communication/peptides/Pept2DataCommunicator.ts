@@ -41,6 +41,9 @@ export default class Pept2DataCommunicator {
     ): Promise<void> {
         const unprocessed = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
         if (!unprocessed || unprocessed.length === 0) {
+            if (progressListener) {
+                progressListener.onProgressUpdate(1.0);
+            }
             return;
         }
 
@@ -52,6 +55,9 @@ export default class Pept2DataCommunicator {
             let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
             if (!peptides || peptides.length === 0) {
+                if (progressListener) {
+                    progressListener.onProgressUpdate(1.0);
+                }
                 resolve();
                 return;
             }

@@ -3,6 +3,7 @@ import { CountTable } from "@/business/counts/CountTable";
 import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
+import flushPromises from "flush-promises";
 
 const counts = new Map([
     ["YVVLQPGVK", 1],
@@ -32,6 +33,8 @@ describe("LcaCountTableProcessor", () => {
     it("correctly computes counts", async(done) => {
         let lcaProcessor = new LcaCountTableProcessor(countTable, new SearchConfiguration(false, false, false));
         let lcaTable = await lcaProcessor.getCountTable();
+
+        await flushPromises();
 
         expect(lcaTable.getOntologyIds().sort()).toEqual([1, 816, 9606]);
 

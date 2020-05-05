@@ -1,4 +1,4 @@
-import { expose } from "threads/worker";
+import { expose } from "threads";
 import { Observable } from "observable-fns"
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";

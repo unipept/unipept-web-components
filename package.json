@@ -68,6 +68,7 @@
     "fibers": "^4.0.1",
     "file-loader": "^4.2.0",
     "flush-promises": "^1.0.2",
+    "glob": "^7.1.6",
     "jest": "^25.2.6",
     "jsdom-worker-fix": "^0.1.8",
     "less-loader": "^5.0.0",
@@ -107,6 +108,7 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
+      "threads": "<rootDir>/src/test/mocks/MockThreads",
       "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor",
       "html-to-image-no-fonts": "<rootDir>/src/test/mocks/HtmlToImage"
     },
