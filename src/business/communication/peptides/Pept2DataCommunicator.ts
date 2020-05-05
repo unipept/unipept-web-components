@@ -74,15 +74,17 @@ export default class Pept2DataCommunicator {
                 NetworkConfiguration.BASE_URL
             );
 
+            let previousProgress: number = 0;
 
             obs.subscribe(message => {
                 if (message.type === "progress") {
-                    if (progressListener) {
+                    if (progressListener && message.value > previousProgress) {
+                        previousProgress = message.value;
                         progressListener.onProgressUpdate(message.value);
                     }
                 } else if (message.type === "result") {
                     const resultMap = message.value;
-                    const config = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
+                    const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
 
                     if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
                         Pept2DataCommunicator.configurationToResponses.set(config, new Map());
@@ -120,7 +122,7 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration
     ): Promise<PeptideTrust> {
         await this.process(countTable, configuration);
-        const responseMap = this.configurationToResponses.get(JSON.stringify(configuration) + NetworkConfiguration.BASE_URL);
+        const responseMap = this.configurationToResponses.get(configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL);
 
         let matchedPeptides: number = 0;
         let missedPeptides: Peptide[] = [];
@@ -145,7 +147,7 @@ export default class Pept2DataCommunicator {
      * @return The data that was retrieved through Unipept's API if the peptide is known. Returns undefined otherwise.
      */
     public static getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideDataResponse {
-        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
+        const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         const responseMap = this.configurationToResponses.get(configString);
         if (!responseMap) {
             return undefined;
@@ -154,12 +156,12 @@ export default class Pept2DataCommunicator {
     }
 
     public static getPeptideResponseMap(configuration: SearchConfiguration): Map<Peptide, PeptideDataResponse> {
-        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
+        const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         return Pept2DataCommunicator.configurationToResponses.get(configString);
     }
 
     private static getUnprocessedPeptides(peptides: Peptide[], configuration: SearchConfiguration): Peptide[] {
-        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
+        const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         if (!this.configurationToProcessed.has(configString)) {
             return peptides;
         }

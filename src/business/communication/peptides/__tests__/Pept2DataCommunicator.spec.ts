@@ -127,8 +127,10 @@ describe("Pept2DataCommunicator", () => {
             peptides: [AAAAA, AALTER, FATSDLNDLYR]
         }));
 
+        // Only the missing cleavage handling is considered when caching the results, since this is the only parameter
+        // that's passed on to the server.
         const searchConfig1 = new SearchConfiguration(true, true, false);
-        const searchConfig2 = new SearchConfiguration(false, false, false);
+        const searchConfig2 = new SearchConfiguration(true, true, true);
 
         await Pept2DataCommunicator.process(countTable, searchConfig1);
 
