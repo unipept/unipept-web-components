@@ -14,13 +14,17 @@ export default class GoResponseCommunicator implements FunctionalResponseCommuni
     public static readonly GO_ENDPOINT: string = "/private_api/goterms";
 
     public async process(codes: GoCode[]): Promise<void> {
-        if (GoResponseCommunicator.inProgress) {
+        while (GoResponseCommunicator.inProgress) {
             await GoResponseCommunicator.inProgress;
         }
 
         GoResponseCommunicator.inProgress = GoResponseCommunicator.doProcess(codes);
-        await GoResponseCommunicator.inProgress;
-        GoResponseCommunicator.inProgress = undefined;
+
+        try {
+            await GoResponseCommunicator.inProgress;
+        } finally {
+            GoResponseCommunicator.inProgress = undefined;
+        }
     }
 
     public getResponse(code: GoCode): GoResponse | undefined {

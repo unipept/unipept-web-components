@@ -13,13 +13,17 @@ export default class EcResponseCommunicator implements FunctionalResponseCommuni
     public static readonly EC_ENDPOINT: string = "/private_api/ecnumbers";
 
     public async process(codes: EcCode[]): Promise<void> {
-        if (EcResponseCommunicator.inProgress) {
+        while (EcResponseCommunicator.inProgress) {
             await EcResponseCommunicator.inProgress;
         }
 
         EcResponseCommunicator.inProgress = EcResponseCommunicator.doProcess(codes);
-        await EcResponseCommunicator.inProgress;
-        EcResponseCommunicator.inProgress = undefined;
+
+        try {
+            await EcResponseCommunicator.inProgress;
+        } finally {
+            EcResponseCommunicator.inProgress = undefined;
+        }
     }
 
     public getResponse(code: EcCode): EcResponse {

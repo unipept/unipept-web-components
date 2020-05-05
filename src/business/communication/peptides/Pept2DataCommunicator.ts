@@ -39,6 +39,11 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
     ): Promise<void> {
+        const unprocessed = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
+        if (!unprocessed || unprocessed.length === 0) {
+            return;
+        }
+
         while (this.inProgress) {
             await this.inProgress;
         }

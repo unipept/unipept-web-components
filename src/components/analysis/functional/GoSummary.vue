@@ -98,8 +98,8 @@ export default class GoSummary extends Vue {
     @Watch("goCountTable")
     @Watch("goOntology")
     private onInputsChanged() {
+        this.definitions.splice(0, this.definitions.length);
         if (this.goCountTable && this.goOntology) {
-            this.definitions.length = 0;
             this.definitions.push(...this.goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id)));
         }
     }

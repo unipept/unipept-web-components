@@ -1,10 +1,21 @@
 <template>
-    <div>
+    <div v-if="active">
         <div v-if="loading" class="d-flex justify-center mb-5">
             <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
         </div>
         <div class="treeview-container" v-once ref="visualization"></div>
     </div>
+    <v-container fluid v-else class="error-container mt-2">
+        <div class="network-error">
+            <v-icon x-large>
+                mdi-alert-circle-outline
+            </v-icon>
+            <p>
+                You're trying to visualise a very large sample. This will work in most cases, but it could take
+                some time to render. Are you sure you want to <a @click="initVisualization()">continue</a>?
+            </p>
+        </div>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -51,6 +62,8 @@ export default class Treeview extends Vue {
 
     private treeview!: any;
 
+    private active: boolean = true;
+
     mounted() {
         this.initVisualization();
     }
@@ -67,8 +80,22 @@ export default class Treeview extends Vue {
         }
     }
 
-    @Watch("loading")
     @Watch("data")
+    private async onDataChanged() {
+        if (this.data) {
+            if (this.getAmountOfNodes(this.data) > 600) {
+                this.active = false;
+            } else {
+                await this.initVisualization();
+            }
+        }
+    }
+
+    private getAmountOfNodes(tree: TreeViewNode): number {
+        return tree.children.reduce((acc, child) => acc + this.getAmountOfNodes(child), 0) + tree.children.length;
+    }
+
+    @Watch("loading")
     @Watch("width")
     @Watch("height")
     @Watch("tooltip")
@@ -80,6 +107,10 @@ export default class Treeview extends Vue {
     @Watch("nodeStrokeColor")
     private async initVisualization() {
         if (this.data && !this.loading) {
+            this.active = true;
+
+            await this.$nextTick();
+
             let settings = {
                 width: this.width,
                 height: this.height,

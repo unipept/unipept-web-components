@@ -1,5 +1,5 @@
 <template>
-    <div id="sunburstWrapper" ref="sunburstWrapper">
+    <div id="sunburstWrapper" ref="sunburstWrapper" v-if="active">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
@@ -28,6 +28,17 @@
         </h2>
         <div v-once ref="visualization"></div>
     </div>
+    <v-container fluid v-else class="error-container mt-2">
+        <div class="network-error">
+            <v-icon x-large>
+                mdi-alert-circle-outline
+            </v-icon>
+            <p>
+                You're trying to visualise a very large sample. This will work in most cases, but it could take
+                some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
+            </p>
+        </div>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -57,6 +68,9 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
     private radius: number;
 
     private isFixedColors: boolean = false;
+    // If we notice that a very large Tree is passed to this component, it will automatically be disabled and requires
+    // the users permission to start loading the visualisation.
+    private active: boolean = true;
 
     mounted() {
         this.initTree();
@@ -86,24 +100,36 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
     private async initTree() {
         if (this.tree != null) {
-            const data = JSON.stringify(this.tree.getRoot());
-
-            // @ts-ignore
-            this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-                width: this.width,
-                height: this.height,
-                radius: this.radius,
-                getTooltip: tooltipContent,
-                getTitleText: d => `${d.name} (${d.rank})`,
-                rerootCallback: d => this.search(d.id, d.name, 1000),
-                useFixedColors: this.isFixedColors
-            });
-
-            if (this.autoResize) {
-                let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
-                svgEl.setAttribute("height", "100%")
-                svgEl.setAttribute("width", "100%")
+            if (this.tree.nodes.size > 600) {
+                this.active = false;
+            } else {
+                await this.showVisualization();
             }
+        }
+    }
+
+    private async showVisualization() {
+        this.active = true;
+
+        await this.$nextTick();
+
+        const data = JSON.stringify(this.tree.getRoot());
+
+        // @ts-ignore
+        this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
+            width: this.width,
+            height: this.height,
+            radius: this.radius,
+            getTooltip: tooltipContent,
+            getTitleText: d => `${d.name} (${d.rank})`,
+            rerootCallback: d => this.search(d.id, d.name, 1000),
+            useFixedColors: this.isFixedColors
+        });
+
+        if (this.autoResize) {
+            let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
+            svgEl.setAttribute("height", "100%")
+            svgEl.setAttribute("width", "100%")
         }
     }
 }

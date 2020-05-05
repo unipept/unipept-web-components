@@ -1,13 +1,13 @@
 <template>
     <div id="treeviewWrapper" ref="treeviewWrapper" style="height: 100%;">
-        <h2>
+        <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="download()" :elevation="0"><v-icon>mdi-download</v-icon></v-btn>
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
             <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
         </h2>
-        <treeview ref="treeview" :data="data" :autoResize="this.autoResize" :width="this.width" :height="this.height" :enableAutoExpand="true" :tooltip="tooltip" :colors="colors" :rerootCallback="rerootCallback"></treeview>
+        <treeview ref="treeview" :data="data" :autoResize="this.autoResize" :width="this.width" :height="this.height" :enableAutoExpand="true" :tooltip="tooltipFunction" :colors="colors" :rerootCallback="rerootCallback"></treeview>
         <image-download-modal ref="imageDownloadModal" />
     </div>
 </template>
@@ -41,7 +41,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
 
     @Prop({ required: true })
     private tree: Tree;
-    @Prop({ required: true })
+    @Prop({ required: false, default: "Multi peptide" })
     private analysisType: "Multi peptide" | "Single peptide";
 
     @Prop({ default: false })
@@ -55,7 +55,6 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     @Prop({ required: false, default: null })
     private tooltip: (d: any) => string;
 
-
     private colors: (d: any) => string = (d: any) => {
         if (d.name === "Bacteria") return "#1565C0"; // blue
         if (d.name === "Archaea") return "#FF8F00"; // orange
@@ -67,11 +66,10 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
 
     private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);
     private data: TreeNode = null;
+    private tooltipFunction: (d: any) => string = null;
 
     mounted() {
-        if (!this.tooltip) {
-            this.tooltip = tooltipContent;
-        }
+        this.tooltipFunction = this.tooltip || tooltipContent;
         this.initTreeview();
     }
 

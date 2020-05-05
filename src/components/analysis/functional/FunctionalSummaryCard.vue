@@ -9,7 +9,7 @@
                     EC Numbers
                 </v-tab>
                 <v-tab>
-                    Interpro Entries
+                    InterPro
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
@@ -275,6 +275,10 @@ export default class FunctionalSummaryCard extends Vue {
     @Watch("searchConfiguration")
     private async redoCalculations() {
         this.faCalculationsInProgress = true;
+
+        this.filteredCountTable = null;
+        this.relativeCounts = 0;
+
         if (this.peptideCountTable && this.searchConfiguration) {
             if (this.taxonId === -1) {
                 this.filteredCountTable = this.peptideCountTable;
