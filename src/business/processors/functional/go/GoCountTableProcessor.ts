@@ -25,7 +25,7 @@ export default class GoCountTableProcessor extends FunctionalCountTableProcessor
         readonly configuration: SearchConfiguration,
         readonly percentage: number = 50
     ) {
-        super(peptideCountTable, configuration, percentage, item => item.fa.counts.GO, "GO:");
+        super(peptideCountTable, configuration, percentage, "GO", "GO:");
     }
 
     protected async getOntology(countTable: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {

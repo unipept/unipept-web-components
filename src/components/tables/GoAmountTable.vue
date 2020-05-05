@@ -83,6 +83,7 @@ export default class GoAmountTable extends Vue {
     @Watch("goOntology")
     private onInputsChanged() {
         this.isComputing = true;
+        this.items.length = 0;
 
         if (this.goCountTable && this.goOntology) {
             const newItems: TableItem[] = [];
@@ -102,7 +103,6 @@ export default class GoAmountTable extends Vue {
                 }
             }
 
-            this.items.length = 0;
             this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
         }
 

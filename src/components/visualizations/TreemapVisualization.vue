@@ -1,5 +1,5 @@
 <template>
-    <div id="treemapWrapper" ref="treemapWrapper" style="height: 100%;">
+    <div id="treemapWrapper" ref="treemapWrapper" style="height: 100%;" v-if="active">
         <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
@@ -8,6 +8,17 @@
         </h2>
         <div v-once ref="visualization"></div>
     </div>
+    <v-container fluid v-else class="error-container mt-2">
+        <div class="network-error">
+            <v-icon x-large>
+                mdi-alert-circle-outline
+            </v-icon>
+            <p>
+                You're trying to visualise a very large sample. This will work in most cases, but it could take
+                some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
+            </p>
+        </div>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -35,6 +46,8 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
     @Prop({ required: false, default: 28 })
     private levels: number;
 
+    private active: boolean = true;
+
     mounted() {
         this.initTreeMap();
     }
@@ -53,20 +66,31 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
     @Watch("tree")
     private async initTreeMap() {
         if (this.tree != null) {
-            const data = JSON.stringify(this.tree.getRoot());
-
-            // @ts-ignore
-            this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
-                width: this.width === -1 ? (this.$refs.treemapWrapper as Element).clientWidth : this.width,
-                height: this.height,
-                levels: this.levels,
-                getBreadcrumbTooltip: d => d.rank,
-                getTooltip: tooltipContent,
-                getLabel: d => `${d.name} (${d.data.self_count}/${d.data.count})`,
-                getLevel: d => Object.values(NcbiRank).indexOf(d.rank),
-                rerootCallback: d => this.search(d.id, d.name, 1000)
-            });
+            if (this.tree.nodes.size > 600) {
+                this.active = false;
+            } else {
+                await this.showVisualization();
+            }
         }
+    }
+
+    private async showVisualization() {
+        this.active = true;
+
+        await this.$nextTick();
+        const data = JSON.stringify(this.tree.getRoot());
+
+        // @ts-ignore
+        this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
+            width: this.width === -1 ? (this.$refs.treemapWrapper as Element).clientWidth : this.width,
+            height: this.height,
+            levels: this.levels,
+            getBreadcrumbTooltip: d => d.rank,
+            getTooltip: tooltipContent,
+            getLabel: d => `${d.name} (${d.data.self_count}/${d.data.count})`,
+            getLevel: d => Object.values(NcbiRank).indexOf(d.rank),
+            rerootCallback: d => this.search(d.id, d.name, 1000)
+        });
     }
 }
 </script>

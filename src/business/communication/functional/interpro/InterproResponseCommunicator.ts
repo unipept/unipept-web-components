@@ -13,13 +13,17 @@ export default class InterproResponseCommunicator implements FunctionalResponseC
     public static readonly INTERPRO_ENDPOINT: string = "/private_api/interpros";
 
     public async process(codes: InterproCode[]): Promise<void> {
-        if (InterproResponseCommunicator.inProgress) {
+        while (InterproResponseCommunicator.inProgress) {
             await InterproResponseCommunicator.inProgress;
         }
 
         InterproResponseCommunicator.inProgress = InterproResponseCommunicator.doProcess(codes);
-        await InterproResponseCommunicator.inProgress;
-        InterproResponseCommunicator.inProgress = undefined;
+
+        try {
+            await InterproResponseCommunicator.inProgress;
+        } finally {
+            InterproResponseCommunicator.inProgress = undefined;
+        }
     }
 
     public getResponse(code: InterproCode): InterproResponse | undefined {

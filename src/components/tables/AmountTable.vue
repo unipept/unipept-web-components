@@ -6,7 +6,7 @@
             :items="items"
             :items-per-page="rowsPerPage"
             item-key="code"
-            :show-expand="itemToPeptidesMapping"
+            :show-expand="itemToPeptidesMapping !== null"
             :expanded.sync="expandedItemsList">
             <template v-slot:header.action>
                 <v-tooltip top>
@@ -17,7 +17,7 @@
                 </v-tooltip>
             </template>
             <!-- We can only process the tree when a mapping between items and peptides is given -->
-            <template v-slot:expanded-item="{ headers, item }" v-if="this.itemToPeptidesMapping">
+            <template v-slot:expanded-item="{ headers, item }" v-if="itemToPeptidesMapping">
                 <td class="item-treeview" :colspan="headers.length">
                     <div v-if="tree && (treeAvailable.get(item) || computeTree(item))">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">

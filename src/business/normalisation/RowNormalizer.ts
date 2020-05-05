@@ -29,4 +29,8 @@ export default class RowNormalizer implements Normalizer {
         }
         return output;
     }
+
+    public toString(): string {
+        return "RowNormalizer";
+    }
 }

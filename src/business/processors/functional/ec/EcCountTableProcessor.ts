@@ -23,7 +23,7 @@ export default class EcCountTableProcessor extends FunctionalCountTableProcessor
             peptideCountTable,
             configuration,
             percentage,
-            item => item.fa.counts.EC,
+            "EC",
             "EC:"
         )
     }

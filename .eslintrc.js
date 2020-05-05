@@ -20,10 +20,11 @@ module.exports = {
     "no-inner-declarations": "off",
     "brace-style": ["error", "1tbs"],
     "keyword-spacing": "error",
-    "no-case-declarations": "off"
+    "no-case-declarations": "off",
+    "no-async-promise-executor": "off"
   },
   parserOptions: {
     "parser": "@typescript-eslint/parser",
-    "ecmaVersion": 6,
+    "ecmaVersion": 6
   }
 }

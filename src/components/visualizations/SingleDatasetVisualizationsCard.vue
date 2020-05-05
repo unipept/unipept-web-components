@@ -270,6 +270,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     @Watch("peptideCountTable")
     private async onPeptideCountTableChanged() {
         if (this.peptideCountTable) {
+            this.tree = null;
             const taxaCountProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
             const taxaCounts = await taxaCountProcessor.getCountTable();
 

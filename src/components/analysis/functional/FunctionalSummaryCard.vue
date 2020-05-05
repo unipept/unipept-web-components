@@ -9,7 +9,7 @@
                     EC Numbers
                 </v-tab>
                 <v-tab>
-                    Interpro Entries
+                    InterPro
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
@@ -115,13 +115,17 @@
                         :taxa-to-peptides-mapping="taxaToPeptidesMapping">
                     </multi-go-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                        </v-progress-circular>
+                        <v-card-text class="d-flex justify-center">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
+                        </v-card-text>
                     </div>
                     <div v-else>
-                        <div class="placeholder-text">
-                            {{ placeholderText }}
-                        </div>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
                     </div>
                 </v-tab-item>
                 <v-tab-item>
@@ -136,13 +140,17 @@
                         :taxa-to-peptides-mapping="taxaToPeptidesMapping">
                     </multi-ec-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                        </v-progress-circular>
+                        <v-card-text class="d-flex justify-center">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
+                        </v-card-text>
                     </div>
                     <div v-else>
-                        <div class="placeholder-text">
-                            {{ placeholderText }}
-                        </div>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
                     </div>
                 </v-tab-item>
                 <v-tab-item>
@@ -156,14 +164,18 @@
                         :tree="tree"
                         :taxa-to-peptides-mapping="taxaToPeptidesMapping">
                     </multi-interpro-summary-card>
-                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                        </v-progress-circular>
+                    <div v-else-if="this.analysisInProgress">
+                        <v-card-text class="d-flex justify-center">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
+                        </v-card-text>
                     </div>
                     <div v-else>
-                        <div class="placeholder-text">
-                            {{ placeholderText }}
-                        </div>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
                     </div>
                 </v-tab-item>
             </v-tabs-items>
@@ -263,6 +275,10 @@ export default class FunctionalSummaryCard extends Vue {
     @Watch("searchConfiguration")
     private async redoCalculations() {
         this.faCalculationsInProgress = true;
+
+        this.filteredCountTable = null;
+        this.relativeCounts = 0;
+
         if (this.peptideCountTable && this.searchConfiguration) {
             if (this.taxonId === -1) {
                 this.filteredCountTable = this.peptideCountTable;

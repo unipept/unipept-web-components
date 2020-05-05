@@ -41,4 +41,8 @@ export default class ColumnNormalizer implements Normalizer {
 
         return output;
     }
+
+    public toString(): string {
+        return "ColumnNormalizer";
+    }
 }

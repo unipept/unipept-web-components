@@ -41,7 +41,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx", "src/logic/functional-annotations/FunctionalAnnotations.js", "src/logic/functional-annotations/old-goterms.js", "src/logic/functional-annotations/ecnumbers.js", "src/logic/data-management/worker.js", "src/logic/data-management/searchtree.js", "src/logic/data-management/newworker.js"
+    "tests/**/*.tsx"
   ],
   "exclude": [
     "node_modules"

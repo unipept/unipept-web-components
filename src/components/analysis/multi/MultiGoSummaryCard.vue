@@ -23,6 +23,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :loading="calculationsInProgress"
                 :tree="tree">
             </go-summary>
         </template>
@@ -36,6 +37,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :loading="calculationsInProgress"
                 :tree="tree">
             </go-summary>
         </template>
@@ -49,6 +51,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :loading="calculationsInProgress"
                 :tree="tree">
             </go-summary>
         </template>
@@ -104,7 +107,6 @@ export default class MultiGoSummaryCard extends Vue {
     private items: {
         countTable: CountTable<GoCode>,
         peptideMapping: Map<GoCode, Peptide[]>,
-        definitions: GoDefinition[],
         title: string,
         ontology: Ontology<GoCode, GoDefinition>
     }[] = [];
@@ -112,14 +114,12 @@ export default class MultiGoSummaryCard extends Vue {
     created() {
         for (let ns of this.namespaces) {
             this.items.push({
-                countTable: undefined,
-                peptideMapping: undefined,
-                definitions: [],
+                countTable: null,
+                peptideMapping: null,
                 title: StringUtils.stringTitleize(ns.toString()),
-                ontology: undefined
+                ontology: null
             });
         }
-
         this.recompute();
     }
 
@@ -128,6 +128,12 @@ export default class MultiGoSummaryCard extends Vue {
     @Watch("percentSettings")
     public async recompute() {
         this.calculationsInProgress = true;
+        for (let item of this.items) {
+            item.countTable = null;
+            item.peptideMapping = null;
+            item.ontology = null;
+        }
+
         if (this.peptideCountTable) {
             const percentage = parseInt(this.percentSettings);
             const goCountTableProcessor = new GoCountTableProcessor(
@@ -143,11 +149,6 @@ export default class MultiGoSummaryCard extends Vue {
 
                 const ontologyProcessor = new GoOntologyProcessor();
                 this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
-
-                this.items[i].definitions.length = 0;
-                this.items[i].definitions.push(
-                    ...this.items[i].countTable.getOntologyIds().map(id => this.items[i].ontology.getDefinition(id))
-                );
             }
 
             this.trustLine = FunctionalUtils.computeTrustLine(await goCountTableProcessor.getTrust(), "GO-term", "peptide");

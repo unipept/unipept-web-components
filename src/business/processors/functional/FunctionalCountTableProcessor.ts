@@ -3,14 +3,14 @@ import { Peptide } from "./../../ontology/raw/Peptide";
 import FunctionalTrust from "./FunctionalTrust";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import Pept2DataCommunicator from "./../../communication/peptides/Pept2DataCommunicator";
-import { PeptideDataResponse } from "./../../communication/peptides/PeptideDataResponse";
-import { Ontology } from "./../../ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
 import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
 import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
 import ProteomicsCountTableProcessor from "./../ProteomicsCountTableProcessor";
+import { spawn, Worker } from "threads";
 
 export default abstract class FunctionalCountTableProcessor<
-    OntologyId,
+    OntologyId extends OntologyIdType,
     DefinitionType extends FunctionalDefinition
 > implements ProteomicsCountTableProcessor<OntologyId> {
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
@@ -23,8 +23,8 @@ export default abstract class FunctionalCountTableProcessor<
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
      * @param configuration The search configuration that should be applied while processing the peptides.
      * @param percentage Threshold for determining if a functional annotation should be included in the output or not.
-     * @param peptideData2ProteinCount Function that extracts the amount of proteins annotated with the given
-     * functional annotation from a PeptideDataResponse.
+     * @param peptideData2ProteinCount Property of the PeptideDataResponse object that can be used to extract protein
+     * count.
      * @param termPrefix With which string is every functional annotation of the desired type prefixed in the results
      * returned by the Unipept API?
      */
@@ -32,7 +32,7 @@ export default abstract class FunctionalCountTableProcessor<
         protected readonly peptideCountTable: CountTable<Peptide>,
         protected readonly configuration: SearchConfiguration,
         protected readonly percentage: number = 50,
-        private readonly peptideData2ProteinCount: (x: PeptideDataResponse) => number,
+        private readonly peptideData2ProteinCount: string,
         private readonly termPrefix: string
     ) {}
 
@@ -82,44 +82,16 @@ export default abstract class FunctionalCountTableProcessor<
 
         await Pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
-        // First we count the amount of peptides per unique code. Afterwards, we can fetch definitions for all these
-        // terms and split them on namespace.
-        const countsPerCode = new Map<OntologyId, number>();
-        // Keeps track of how many peptides are associated with at least one annotation
-        let annotatedCount = 0;
+        const worker = await spawn(new Worker("./FunctionalCountTableProcessor.worker.ts"));
+        let [countsPerCode, item2Peptides, annotatedCount] = await worker(
+            this.peptideCountTable,
+            Pept2DataCommunicator.getPeptideResponseMap(this.configuration),
+            this.percentage,
+            this.termPrefix,
+            this.peptideData2ProteinCount
+        );
 
-        this.item2Peptides = new Map<OntologyId, Peptide[]>();
-
-        for (const peptide of this.peptideCountTable.getOntologyIds()) {
-            const peptideCount = this.peptideCountTable.getCounts(peptide);
-            const peptideData = Pept2DataCommunicator.getPeptideResponse(peptide, this.configuration);
-
-            if (!peptideData) {
-                continue;
-            }
-
-            const proteinCount = this.peptideData2ProteinCount(peptideData);
-
-            const uniqueTerms: OntologyId[] = Object.keys(peptideData.fa.data).filter(
-                code => code.startsWith(this.termPrefix)
-            ) as unknown as OntologyId[];
-
-            for (const term of uniqueTerms) {
-                const proteinCountOfTerm: number = peptideData.fa.data[term];
-                if ((proteinCountOfTerm / proteinCount) * 100 > this.percentage) {
-                    countsPerCode.set(term, (countsPerCode.get(term) || 0) + peptideCount);
-                }
-
-                if (!this.item2Peptides.has(term)) {
-                    this.item2Peptides.set(term, []);
-                }
-                this.item2Peptides.get(term).push(peptide);
-            }
-
-            if (uniqueTerms.length > 0) {
-                annotatedCount += peptideCount;
-            }
-        }
+        this.item2Peptides = item2Peptides;
 
         // Now fetch all definitions for the terms that we just processed
         const ontology = await this.getOntology(new CountTable<OntologyId>(countsPerCode));

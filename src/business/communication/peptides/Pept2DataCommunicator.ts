@@ -2,7 +2,8 @@ import { PeptideDataResponse } from "./PeptideDataResponse";
 import { CountTable } from "./../../counts/CountTable";
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import Worker from "worker-loader!./Pept2Data.worker.js";
+import { spawn, Worker } from "threads";
+import { Observable } from "observable-fns";
 import ProgressListener from "./../../progress/ProgressListener";
 import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
 import NetworkConfiguration from "./../NetworkConfiguration";
@@ -18,6 +19,7 @@ export default class Pept2DataCommunicator {
     private static configurationToResponses = new Map<string, Map<string, PeptideDataResponse>>();
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
+    private static processing: boolean = false;
     private static inProgress: Promise<void>;
 
     /**
@@ -29,72 +31,80 @@ export default class Pept2DataCommunicator {
      * must be looked up. Only peptides that were not processed before, will be processed.
      * @param configuration Search settings that should be used while looking up the peptides.
      * @param progressListener Listener that will be updated with current progress of resolving this
+     * @throws NetworkCommunicationException If something goes wrong while communicating with the Unipept API (e.g.
+     * server is unreachable, http 500 error, ...)
      */
     public static async process(
         countTable: CountTable<Peptide>,
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
     ): Promise<void> {
-        if (this.inProgress) {
-            try {
-                await this.inProgress;
-            } catch (err) {
-                // Ignore errors here, to avoid them being thrown more than once...
+        const unprocessed = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
+        if (!unprocessed || unprocessed.length === 0) {
+            if (progressListener) {
+                progressListener.onProgressUpdate(1.0);
             }
+            return;
         }
 
-        const peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
+        while (this.inProgress) {
+            await this.inProgress;
+        }
 
-        this.inProgress = new Promise<void>((resolve, reject) => {
-            const worker = new Worker();
-            const config = JSON.stringify(configuration);
+        this.inProgress = new Promise<void>(async(resolve, reject) => {
+            let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
-            worker.onmessage = (event) => {
-                switch (event.data.type) {
-                case "progress":
+            if (!peptides || peptides.length === 0) {
+                if (progressListener) {
+                    progressListener.onProgressUpdate(1.0);
+                }
+                resolve();
+                return;
+            }
+
+            const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
+
+            const obs: Observable<{ type: string, value: any }> = spawnedProcess(
+                peptides,
+                {
+                    equateIl: configuration.equateIl,
+                    filterDuplicates: configuration.filterDuplicates,
+                    enableMissingCleavageHandling: configuration.enableMissingCleavageHandling
+                },
+                NetworkConfiguration.BASE_URL
+            );
+
+
+            obs.subscribe(message => {
+                if (message.type === "progress") {
                     if (progressListener) {
-                        progressListener.onProgressUpdate(event.data.value);
+                        progressListener.onProgressUpdate(message.value);
                     }
-                    break;
-                case "result":
-                    // Set all data values that we received from the worker.
-                    const resultMap: Map<Peptide, PeptideDataResponse> = event.data.value;
+                } else if (message.type === "result") {
+                    const resultMap = message.value;
+                    const config = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
 
-                    if (!this.configurationToResponses.has(config)) {
-                        this.configurationToResponses.set(config, new Map());
+                    if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
+                        Pept2DataCommunicator.configurationToResponses.set(config, new Map());
                     }
-                    const configMap = this.configurationToResponses.get(config);
+                    const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
 
                     for (const [pep, response] of resultMap) {
                         configMap.set(pep, response);
                     }
 
-                    if (!this.configurationToProcessed.has(config)) {
-                        this.configurationToProcessed.set(config, new Set());
+                    if (!Pept2DataCommunicator.configurationToProcessed.has(config)) {
+                        Pept2DataCommunicator.configurationToProcessed.set(config, new Set());
                     }
-                    const processedSet = this.configurationToProcessed.get(config);
+                    const processedSet = Pept2DataCommunicator.configurationToProcessed.get(config);
                     for (const pep of peptides) {
                         processedSet.add(pep);
                     }
 
-                    // We're done. Resolve this promise.
                     resolve();
-                    break;
-                case "error":
-                    // An error occurred during communication with Unipept's API in the worker.
-                    reject(new NetworkCommunicationException(event.data.value));
-                    break;
+                } else if (message.type === "error") {
+                    reject(new NetworkCommunicationException(message.value));
                 }
-            }
-
-            worker.postMessage({
-                peptides: peptides,
-                config: {
-                    equateIl: configuration.equateIl,
-                    filterDuplicates: configuration.filterDuplicates,
-                    enableMissingCleavageHandling: configuration.enableMissingCleavageHandling
-                },
-                baseUrl: NetworkConfiguration.BASE_URL
             });
         });
 
@@ -110,7 +120,7 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration
     ): Promise<PeptideTrust> {
         await this.process(countTable, configuration);
-        const responseMap = this.configurationToResponses.get(JSON.stringify(configuration));
+        const responseMap = this.configurationToResponses.get(JSON.stringify(configuration) + NetworkConfiguration.BASE_URL);
 
         let matchedPeptides: number = 0;
         let missedPeptides: Peptide[] = [];
@@ -135,7 +145,7 @@ export default class Pept2DataCommunicator {
      * @return The data that was retrieved through Unipept's API if the peptide is known. Returns undefined otherwise.
      */
     public static getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideDataResponse {
-        const configString = JSON.stringify(configuration);
+        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
         const responseMap = this.configurationToResponses.get(configString);
         if (!responseMap) {
             return undefined;
@@ -143,8 +153,13 @@ export default class Pept2DataCommunicator {
         return responseMap.get(peptide);
     }
 
+    public static getPeptideResponseMap(configuration: SearchConfiguration): Map<Peptide, PeptideDataResponse> {
+        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
+        return Pept2DataCommunicator.configurationToResponses.get(configString);
+    }
+
     private static getUnprocessedPeptides(peptides: Peptide[], configuration: SearchConfiguration): Peptide[] {
-        const configString = JSON.stringify(configuration);
+        const configString = JSON.stringify(configuration) + NetworkConfiguration.BASE_URL;
         if (!this.configurationToProcessed.has(configString)) {
             return peptides;
         }

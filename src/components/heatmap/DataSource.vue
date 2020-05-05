@@ -79,7 +79,7 @@ export default class DataSource extends Vue {
 
     @Watch("items")
     private onItemsChanged() {
-        this.selectedItems.length = 0;
+        this.selectedItems.splice(0, this.selectedItems.length);
     }
 
     @Watch("selectedItems")

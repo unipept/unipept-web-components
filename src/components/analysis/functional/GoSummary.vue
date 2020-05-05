@@ -89,7 +89,7 @@ export default class GoSummary extends Vue {
     private loading: boolean;
 
     // A list of all GO-terms that should be displayed in this component.
-    private definitions: GoDefinition[];
+    private definitions: GoDefinition[] = [];
 
     private mounted() {
         this.onInputsChanged();
@@ -98,8 +98,9 @@ export default class GoSummary extends Vue {
     @Watch("goCountTable")
     @Watch("goOntology")
     private onInputsChanged() {
+        this.definitions.splice(0, this.definitions.length);
         if (this.goCountTable && this.goOntology) {
-            this.definitions = this.goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id));
+            this.definitions.push(...this.goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id)));
         }
     }
 }
