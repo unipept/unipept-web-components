@@ -2,9 +2,11 @@ import { expose } from "threads";
 import { Observable } from "observable-fns"
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
+import parallelLimit from "async/parallelLimit";
 
 const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
+const PARALLEL_REQUESTS = 5;
 
 expose(process)
 
@@ -20,24 +22,32 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                 value: 0.0
             });
 
+            const requests = [];
+
             for (let i = 0; i < peptides.length; i += PEPTDATA_BATCH_SIZE) {
-                const data = JSON.stringify({
-                    peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
-                    equate_il: config.equateIl,
-                    missed: config.enableMissingCleavageHandling
-                });
+                requests.push(async(done) => {
+                    const data = JSON.stringify({
+                        peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
+                        equate_il: config.equateIl,
+                        missed: config.enableMissingCleavageHandling
+                    });
 
-                const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
+                    const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
 
-                res.peptides.forEach(p => {
-                    responses.set(p.sequence, p);
-                })
+                    res.peptides.forEach(p => {
+                        responses.set(p.sequence, p);
+                    })
 
-                observer.next({
-                    type: "progress",
-                    value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
+                    observer.next({
+                        type: "progress",
+                        value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
+                    });
+
+                    done(null);
                 });
             }
+
+            await parallelLimit(requests, PARALLEL_REQUESTS);
 
             observer.next({
                 type: "progress",

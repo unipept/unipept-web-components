@@ -1,6 +1,5 @@
 <template>
-    <div class="search-settings-form">
-        <h3>Search settings</h3>
+    <div :class="{'search-settings-form': true, 'd-flex': true, 'flex-row': horizontal, 'justify-space-between': horizontal }">
         <v-tooltip top>
             <template v-slot:activator="{ on }">
                 <div v-on="on">
@@ -72,10 +71,15 @@ export default class SearchSetingsForm extends Vue {
     @Prop({ default: true }) equateIl!: boolean;
     @Prop({ default: true }) filterDuplicates!: boolean;
     @Prop({ default: false }) missingCleavage!: boolean;
+    /**
+     * Show the component in a horizontal or vertical fashion? Set to true to show the different checkboxes on one line.
+     */
+    @Prop({ required: false, default: true })
+    private horizontal: boolean;
 
-    equateIlData: boolean = this.equateIl;
-    filterDuplicatesData: boolean = this.filterDuplicates;
-    missingCleavageData: boolean = this.missingCleavage;
+    private equateIlData: boolean = this.equateIl;
+    private filterDuplicatesData: boolean = this.filterDuplicates;
+    private missingCleavageData: boolean = this.missingCleavage;
 
     @Watch("equateIl") onEquateIlChanged() {
         this.equateIlData = this.equateIl;
@@ -94,6 +98,6 @@ export default class SearchSetingsForm extends Vue {
 
 <style scoped>
     .search-settings-form .v-input--selection-controls {
-        margin-top: 0px;
+        margin-top: 0;
     }
 </style>

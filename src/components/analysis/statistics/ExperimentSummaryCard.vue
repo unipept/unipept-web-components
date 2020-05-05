@@ -12,8 +12,9 @@ change the currently active search settings and redo the analysis of all selecte
             </card-title>
         </card-header>
         <v-card-text style="flex-grow: 1; display: flex; flex-direction: column;">
-            <h3>Peptide list</h3>
+            <div class="subtitle-1">Peptide list</div>
             <v-textarea :readonly="true" v-model="peptideList" :loading="disabled || exportLoading"></v-textarea>
+            <div class="subtitle-1">Search settings</div>
             <search-settings-form
                 :disabled="disabled"
                 :equate-il.sync="equateIl"
