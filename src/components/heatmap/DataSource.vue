@@ -29,7 +29,10 @@
             </template>
         </v-data-table>
         <div class="table-extra-content">
-            You selected {{ selectedItems.length }} out of {{ items.length }} items. <a @click="selectAll">Select all?</a>
+            You selected {{ selectedItems.length }} out of {{ items.length }} items.
+            <a @click="selectAll" v-if="selectedItems.length !== items.length">Select all?</a>
+            <a @click="deselectAll" v-else>Deselect all?</a>
+
         </div>
     </div>
 </template>
@@ -64,6 +67,10 @@ export default class DataSource extends Vue {
     private selectAll() {
         this.selectedItems.length = 0;
         this.selectedItems.push(...this.items);
+    }
+
+    private deselectAll() {
+        this.selectedItems.splice(0, this.items.length);
     }
 
     @Watch("categories")
