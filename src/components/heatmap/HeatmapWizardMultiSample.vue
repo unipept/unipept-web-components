@@ -7,9 +7,7 @@ import {NormalizationType} from "./NormalizationType";
             <v-divider></v-divider>
             <v-stepper-step editable :complete="currentStep > 2" step="2">Normalisation</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step editable :complete="currentStep > 3" step="3" @click="computeHeatmapAndProceed()">
-                Heatmap
-            </v-stepper-step>
+            <v-stepper-step editable :complete="currentStep > 3" step="3">Heatmap</v-stepper-step>
         </v-stepper-header>
         <v-stepper-items>
             <v-stepper-content step="1">
