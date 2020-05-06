@@ -1,6 +1,11 @@
 <template>
     <div>
         <v-select :items="availableCategories" v-model="selectedCategory" label="Category"></v-select>
+        <div class="table-extra-content" v-if="selectedItems.length > 0">
+            You selected {{ selectedItems.length }} out of {{ visibleItems.length }} items.
+            <a @click="selectAll" v-if="selectedItems.length !== visibleItems.length">Select all?</a>
+            <a @click="deselectAll" v-else>Deselect all?</a>
+        </div>
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
@@ -28,12 +33,7 @@
                 </tr>
             </template>
         </v-data-table>
-        <div class="table-extra-content">
-            You selected {{ selectedItems.length }} out of {{ items.length }} items.
-            <a @click="selectAll" v-if="selectedItems.length !== items.length">Select all?</a>
-            <a @click="deselectAll" v-else>Deselect all?</a>
 
-        </div>
     </div>
 </template>
 
@@ -66,11 +66,11 @@ export default class DataSource extends Vue {
 
     private selectAll() {
         this.selectedItems.length = 0;
-        this.selectedItems.push(...this.items);
+        this.selectedItems.push(...this.visibleItems);
     }
 
     private deselectAll() {
-        this.selectedItems.splice(0, this.items.length);
+        this.selectedItems.splice(0, this.selectedItems.length);
     }
 
     @Watch("categories")
@@ -83,6 +83,7 @@ export default class DataSource extends Vue {
     @Watch("items")
     private onInputsChanged() {
         this.visibleItems.length = 0;
+        this.selectedItems.splice(0, this.selectedItems.length);
         if (this.items) {
             if (this.selectedCategory === "All") {
                 this.visibleItems.push(...this.items);
@@ -108,9 +109,4 @@ export default class DataSource extends Vue {
 </script>
 
 <style scoped>
-    .table-extra-content {
-        display: inline;
-        position: relative;
-        top: -40px;
-    }
 </style>

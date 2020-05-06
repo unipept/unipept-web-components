@@ -8,7 +8,7 @@
     <div>
         <!-- By passing the datasource model as a prop here, the template in the component filling it in, can
         access and update the v-model -->
-        <slot :datasource="datasource" :datasources="datasources">
+        <slot :update-datasource="updateDatasource" :datasource="datasource" :datasources="datasources">
             <p>Please select type of data that should be compared between samples.</p>
             <v-select :items="datasources" v-model="datasource" label="Datasource" class="flex-grow-0"></v-select>
         </slot>
@@ -86,7 +86,7 @@ type SourceMetadata = {
                         width: "30%"
                     },
                     {
-                        text:  this.identifierInsteadOfCategory ? "Identifier" : this.categoryTitle,
+                        text:  this.identifierInsteadOfCategory ? "Identifier" : "Rank",
                         align: "left",
                         value: this.identifierInsteadOfCategory ? "id" : "category",
                         width: "30%"
@@ -115,7 +115,8 @@ export default class MultiAssayDataSource extends Vue {
     /**
      * Show every items identifier in the table instead of the category it belongs to?
      */
-    private identifierInsteadOfCategory: boolean;
+    private identifierInsteadOfCategory: boolean = false;
+    private categoryTitle: string = "";
 
 
     private datasources: string[] = [
@@ -174,6 +175,12 @@ export default class MultiAssayDataSource extends Vue {
     private onDatasourceChanged() {
         const idx = this.datasources.indexOf(this.datasource);
         this.identifierInsteadOfCategory = this.sourceMetadata[idx].showIdentifier;
+        this.categoryTitle = this.sourceMetadata[idx].categoryTitle;
+
+    }
+
+    private updateDatasource(value: string) {
+        this.datasource = value;
     }
 
     @Watch("assays")
