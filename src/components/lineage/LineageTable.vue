@@ -57,6 +57,7 @@ import ProteinProcessor from "./../../business/processors/protein/ProteinProcess
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import { Ontology } from "./../../business/ontology/Ontology";
 import { v4 as uuidv4 } from "uuid";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     computed: {
@@ -86,6 +87,8 @@ export default class LineageTable extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private taxonRanks: string[] = Object.values(NcbiRank);
     private organisms: { definition: NcbiTaxon, lineage: NcbiTaxon[] }[] = [];
@@ -109,7 +112,7 @@ export default class LineageTable extends Vue {
 
             const organismIds = proteins.map(p => p.organism);
 
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor();
+            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
             const ontology = await ncbiOntologyProcessor.getOntologyByIds(organismIds);
 
             this.organisms.length = 0;

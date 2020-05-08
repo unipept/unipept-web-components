@@ -15,6 +15,7 @@
                 :go-ontology="items[0].ontology"
                 :relative-counts="trust ? trust.totalAmountOfItems : 1"
                 :loading="loading"
+                :communication-source="communicationSource"
                 :show-percentage="false">
             </go-summary>
         </template>
@@ -24,6 +25,7 @@
                 :namespace="namespaces[1]"
                 :go-ontology="items[1].ontology"
                 :relative-counts="trust ? trust.totalAmountOfItems : 1"
+                :communication-source="communicationSource"
                 :loading="loading"
                 :show-percentage="false">
             </go-summary>
@@ -35,6 +37,7 @@
                 :go-ontology="items[2].ontology"
                 :relative-counts="trust ? trust.totalAmountOfItems : 1"
                 :loading="loading"
+                :communication-source="communicationSource"
                 :show-percentage="false">
             </go-summary>
         </template>
@@ -57,6 +60,7 @@ import { FunctionalUtils } from "./../functional/FunctionalUtils";
 import GoSummaryCard from "./../functional/GoSummaryCard.vue";
 import GoSummary from "./../functional/GoSummary.vue";
 import FunctionalTrust from "./../../../business/processors/functional/FunctionalTrust";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -69,6 +73,8 @@ export default class SingleGoSummaryCard extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private trust: FunctionalTrust = null;
     private trustLine: string = "";
@@ -109,7 +115,7 @@ export default class SingleGoSummaryCard extends Vue {
                 const namespace: GoNamespace = this.namespaces[i];
                 this.items[i].countTable = await goProteinProcessor.getCountTable(namespace);
 
-                const ontologyProcessor = new GoOntologyProcessor();
+                const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
                 this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
 
                 this.items[i].definitions.length = 0;

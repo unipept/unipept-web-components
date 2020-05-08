@@ -16,6 +16,7 @@
                 :search-configuration="searchConfiguration"
                 :show-percentage="showPercentage"
                 :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                :communication-source="communicationSource"
                 :tree="tree">
             </go-amount-table>
         </v-col>
@@ -39,6 +40,7 @@ import SearchConfiguration from "./../../../business/configuration/SearchConfigu
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -55,6 +57,8 @@ export default class GoSummary extends Vue {
     private goOntology: Ontology<GoCode, GoDefinition>;
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     /**
      * Maps a GO-term onto all peptides that are annotated with the term. If this is not provided, no TreeView or
      * per-row-exports will be provided.

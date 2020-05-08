@@ -11,7 +11,8 @@
         :ec-count-table="countTable"
         :ec-ontology="ontology"
         :relative-counts="trust ? trust.totalAmountOfItems : 1"
-        :show-percentage="false">
+        :show-percentage="false"
+        :communication-source="communicationSource">
         <template v-slot:analysis-header>
             <span v-html="trustLine" class="ec-trust"></span>
         </template>
@@ -31,6 +32,7 @@ import EcProteinCountTableProcessor from "./../../../business/processors/functio
 import EcOntologyProcessor from "./../../../business/ontology/functional/ec/EcOntologyProcessor";
 import FunctionalTrust from "./../../../business/processors/functional/FunctionalTrust";
 import { FunctionalUtils } from "./../functional/FunctionalUtils";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: { EcSummaryCard }
@@ -40,6 +42,8 @@ export default class SingleEcSummaryCard extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private trust: FunctionalTrust = null;
     private trustLine: string = "";
@@ -61,7 +65,7 @@ export default class SingleEcSummaryCard extends Vue {
             const ecProteinProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl);
             this.countTable = await ecProteinProcessor.getCountTable();
 
-            const ontologyProcessor = new EcOntologyProcessor();
+            const ontologyProcessor = new EcOntologyProcessor(this.communicationSource);
             this.ontology = await ontologyProcessor.getOntology(this.countTable);
 
             this.trust = await ecProteinProcessor.getTrust();

@@ -4,6 +4,7 @@ import { CountTable } from "./../../counts/CountTable";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import Pept2DataCommunicator from "./../../communication/peptides/Pept2DataCommunicator";
 import NcbiOntologyProcessor from "./../../ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import CommunicationSource from "./../../communication/source/CommunicationSource";
 
 export default class FunctionalSummaryProcessor {
     /**
@@ -17,11 +18,12 @@ export default class FunctionalSummaryProcessor {
     public async summarizeFunctionalAnnotation(
         element: FunctionalDefinition,
         peptideTable: CountTable<Peptide>,
-        configuration: SearchConfiguration
+        configuration: SearchConfiguration,
+        communicationSource: CommunicationSource
     ): Promise<string[][]> {
         await Pept2DataCommunicator.process(peptideTable, configuration);
 
-        const ontologyProcessor = new NcbiOntologyProcessor();
+        const ontologyProcessor = new NcbiOntologyProcessor(communicationSource);
 
         const processedPeptides: string[][] = peptideTable.getOntologyIds().map(peptide => {
             let peptideCount = peptideTable.getCounts(peptide);

@@ -97,6 +97,7 @@ import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
 import { CountTable } from "./../../business/counts/CountTable";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -155,6 +156,8 @@ export default class AmountTable extends Vue {
     protected annotationName: string;
     @Prop({ required: true })
     private externalUrlConstructor: (code: string) => string;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     /**
      * What items are displayed as counts? (e.g. peptides, proteins, ...)
@@ -215,7 +218,8 @@ export default class AmountTable extends Vue {
         const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
             term.definition,
             peptideCounts,
-            this.searchConfiguration
+            this.searchConfiguration,
+            this.communicationSource
         );
 
         await NetworkUtils.downloadDataByForm(

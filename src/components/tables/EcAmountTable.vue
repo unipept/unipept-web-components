@@ -3,6 +3,7 @@
         :loading="isLoading"
         annotation-name="EC number"
         :items="items"
+        :communication-source="communicationSource"
         :search-configuration="searchConfiguration"
         :item-to-peptides-mapping="ecPeptideMapping"
         :tree="tree"
@@ -26,6 +27,7 @@ import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntol
 import { Ontology } from "./../../business/ontology/Ontology";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../business/ontology/taxonomic/Tree";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -51,6 +53,8 @@ export default class EcAmountTable extends Vue {
      */
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     @Prop({ required: false })
     private ecPeptideMapping: Map<EcCode, Peptide[]>;

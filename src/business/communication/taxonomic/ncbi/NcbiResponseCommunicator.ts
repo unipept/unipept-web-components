@@ -12,36 +12,39 @@ export default class NcbiResponseCommunicator {
 
     private static inProgress: Promise<void>;
 
-    public static async process(codes: NcbiId[]): Promise<void> {
-        if (this.inProgress) {
-            await this.inProgress;
+    public async process(codes: NcbiId[]): Promise<void> {
+        while (NcbiResponseCommunicator.inProgress) {
+            await NcbiResponseCommunicator.inProgress;
         }
 
-        this.inProgress = this.doProcess(codes);
+        NcbiResponseCommunicator.inProgress = this.doProcess(codes);
 
-        await this.inProgress;
-        this.inProgress = undefined;
+        try {
+            await NcbiResponseCommunicator.inProgress;
+        } finally {
+            NcbiResponseCommunicator.inProgress = undefined;
+        }
     }
 
-    public static getResponse(id: NcbiId): NcbiResponse {
-        return this.idToResponseMap.get(id);
+    public getResponse(id: NcbiId): NcbiResponse {
+        return NcbiResponseCommunicator.idToResponseMap.get(id);
     }
 
-    private static async doProcess(codes: NcbiId[]): Promise<void> {
-        const toProcess = codes.filter(c => c && !this.idsProcessed.has(c));
+    private async doProcess(codes: NcbiId[]): Promise<void> {
+        const toProcess = codes.filter(c => c && !NcbiResponseCommunicator.idsProcessed.has(c));
 
         const lineagesToProcess: Set<NcbiId> = new Set();
 
-        for (let i = 0; i < toProcess.length; i += this.NCBI_BATCH_SIZE) {
+        for (let i = 0; i < toProcess.length; i += NcbiResponseCommunicator.NCBI_BATCH_SIZE) {
             const data = JSON.stringify({
-                taxids: toProcess.slice(i, i + this.NCBI_BATCH_SIZE)
+                taxids: toProcess.slice(i, i + NcbiResponseCommunicator.NCBI_BATCH_SIZE)
             });
 
-            const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + this.NCBI_ENDPOINT, data);
+            const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + NcbiResponseCommunicator.NCBI_ENDPOINT, data);
 
             for (const term of res) {
-                if (!this.idToResponseMap.has(term.id)) {
-                    this.idToResponseMap.set(term.id, term);
+                if (!NcbiResponseCommunicator.idToResponseMap.has(term.id)) {
+                    NcbiResponseCommunicator.idToResponseMap.set(term.id, term);
                     // Some id's are negative due to erroneous classification in the NCBI taxonomy. These taxon id's do
                     // need to be retrieved however!
                     term.lineage.map(l => lineagesToProcess.add(l != -1 ? Math.abs(l) : null));
@@ -49,24 +52,27 @@ export default class NcbiResponseCommunicator {
             }
         }
 
-        const lineages = [...lineagesToProcess].filter(c => c && c !== -1 && !this.idsProcessed.has(c));
+        const lineages = [...lineagesToProcess].filter(c => c && c !== -1 && !NcbiResponseCommunicator.idsProcessed.has(c));
 
-        for (let i = 0; i < lineages.length; i += this.NCBI_BATCH_SIZE) {
+        for (let i = 0; i < lineages.length; i += NcbiResponseCommunicator.NCBI_BATCH_SIZE) {
             const data = JSON.stringify({
-                taxids: lineages.slice(i, i + this.NCBI_BATCH_SIZE)
+                taxids: lineages.slice(i, i + NcbiResponseCommunicator.NCBI_BATCH_SIZE)
             });
 
-            const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + this.NCBI_ENDPOINT, data);
+            const res = await NetworkUtils.postJSON(
+                NetworkConfiguration.BASE_URL + NcbiResponseCommunicator.NCBI_ENDPOINT,
+                data
+            );
 
             for (const term of res) {
-                if (!this.idToResponseMap.has(term.id)) {
-                    this.idToResponseMap.set(term.id, term);
+                if (!NcbiResponseCommunicator.idToResponseMap.has(term.id)) {
+                    NcbiResponseCommunicator.idToResponseMap.set(term.id, term);
                 }
             }
         }
 
         for (const processed of toProcess) {
-            this.idsProcessed.add(processed);
+            NcbiResponseCommunicator.idsProcessed.add(processed);
         }
     }
 }

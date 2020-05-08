@@ -62,6 +62,7 @@ export default class Pept2DataCommunicator {
                 return;
             }
 
+            const start = new Date().getTime();
             const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
 
             const obs: Observable<{ type: string, value: any }> = spawnedProcess(
@@ -103,6 +104,8 @@ export default class Pept2DataCommunicator {
                         processedSet.add(pep);
                     }
 
+                    const end = new Date().getTime();
+                    console.log("Pept2Data took " + (end - start) / 1000 + "s");
                     resolve();
                 } else if (message.type === "error") {
                     reject(new NetworkCommunicationException(message.value));

@@ -3,6 +3,7 @@
         :items="items"
         :loading="isLoading"
         :rows-per-page="10"
+        :communication-source="communicationSource"
         annotation-name="Interpro entry"
         :search-configuration="searchConfiguration"
         :item-to-peptides-mapping="interproPeptideMapping"
@@ -29,6 +30,7 @@ import InterproOntologyProcessor from "./../../business/ontology/functional/inte
 import { Ontology } from "./../../business/ontology/Ontology";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../business/ontology/taxonomic/Tree";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -42,7 +44,7 @@ import Tree from "./../../business/ontology/taxonomic/Tree";
         }
     }
 })
-export default class GoAmountTable extends Vue {
+export default class InterproAmountTable extends Vue {
     @Prop({ required: true })
     private interproCountTable: CountTable<InterproCode>;
     @Prop({ required: true })
@@ -54,6 +56,8 @@ export default class GoAmountTable extends Vue {
      */
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     @Prop({ required: false })
     private interproPeptideMapping: Map<InterproCode, Peptide[]>;

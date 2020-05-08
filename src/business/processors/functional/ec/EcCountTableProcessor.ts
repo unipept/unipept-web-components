@@ -6,6 +6,7 @@ import EcDefinition, { EcCode } from "./../../../ontology/functional/ec/EcDefini
 import FunctionalCountTableProcessor from "./../FunctionalCountTableProcessor";
 import { Ontology } from "./../../../ontology/Ontology";
 import EcOntologyProcessor from "./../../../ontology/functional/ec/EcOntologyProcessor";
+import CommunicationSource from "./../../../communication/source/CommunicationSource";
 
 /**
  * Generates a count table that maps EC-numbers onto the amount of peptides that are annoted with it. A count table can
@@ -17,6 +18,7 @@ export default class EcCountTableProcessor extends FunctionalCountTableProcessor
     constructor(
         readonly peptideCountTable: CountTable<Peptide>,
         readonly configuration: SearchConfiguration,
+        readonly communicationSource: CommunicationSource,
         readonly percentage: number = 50
     ) {
         super(
@@ -33,7 +35,7 @@ export default class EcCountTableProcessor extends FunctionalCountTableProcessor
     }
 
     protected async getOntology(countTable: CountTable<EcCode>): Promise<Ontology<EcCode, EcDefinition>> {
-        const ontologyProcessor = new EcOntologyProcessor();
+        const ontologyProcessor = new EcOntologyProcessor(this.communicationSource);
         return await ontologyProcessor.getOntology(countTable);
     }
 }

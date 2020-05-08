@@ -107,6 +107,7 @@
                     <multi-go-summary-card
                         v-if="filteredCountTable"
                         ref="goSummaryCard"
+                        :communication-source="communicationSource"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
@@ -132,6 +133,7 @@
                     <multi-ec-summary-card
                         v-if="filteredCountTable"
                         ref="ecSummaryCard"
+                        :communication-source="communicationSource"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
@@ -157,6 +159,7 @@
                     <multi-interpro-summary-card
                         v-if="filteredCountTable"
                         ref="interproSummaryCard"
+                        :communication-source="communicationSource"
                         :peptide-count-table="filteredCountTable"
                         :search-configuration="searchConfiguration"
                         :relative-counts="relativeCounts"
@@ -209,6 +212,7 @@ import TreeNode from "./../../../business/ontology/taxonomic/TreeNode";
 import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -236,6 +240,8 @@ export default class FunctionalSummaryCard extends Vue {
     private selectedTaxonId: NcbiId;
     @Prop({ required: true })
     private searchConfiguration: SearchConfiguration;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
 
@@ -287,7 +293,7 @@ export default class FunctionalSummaryCard extends Vue {
                 // Update the count tables so that they only count peptides that are associated with the current taxon
                 // filter
                 const taxaProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
-                const taxaOntologyProcessor = new NcbiOntologyProcessor();
+                const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
 
                 const peptidesForTaxon = await this.getOwnAndChildrenSequences(
                     this.taxonId,
@@ -314,7 +320,7 @@ export default class FunctionalSummaryCard extends Vue {
         this.taxaToPeptidesMapping = await taxaCountProcessor.getAnnotationPeptideMapping();
         const taxaCounts = await taxaCountProcessor.getCountTable();
 
-        const taxaOntologyProcessor = new NcbiOntologyProcessor();
+        const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
         const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
 
         this.tree = new Tree(taxaCounts, taxaOntology);

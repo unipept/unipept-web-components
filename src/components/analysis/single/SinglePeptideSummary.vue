@@ -75,6 +75,7 @@ import EcProteinCountTableProcessor from "./../../../business/processors/functio
 import InterproProteinCountTableProcessor
     from "./../../../business/processors/functional/interpro/InterproProteinCountTableProcessor";
 import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component
 export default class SinglePeptideSummary extends Vue {
@@ -82,6 +83,8 @@ export default class SinglePeptideSummary extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private proteins: ProteinDefinition[] = [];
     private lca: NcbiTaxon = null;
@@ -117,7 +120,7 @@ export default class SinglePeptideSummary extends Vue {
             const lca = await proteinProcessor.getLcaByPeptide(this.peptide, this.equateIl);
             const commonLineage = await proteinProcessor.getCommonLineageByPeptide(this.peptide, this.equateIl);
 
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor();
+            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
             const ontology = await ncbiOntologyProcessor.getOntologyByIds([lca, ...commonLineage]);
 
             this.lca = ontology.getDefinition(lca);

@@ -7,6 +7,7 @@
         :interpro-count-table="getCountTable"
         :interpro-ontology="getOntology"
         :loading="loading"
+        :communication-source="communicationSource"
         :relative-counts="trust ? trust.totalAmountOfItems : 1"
         :show-percentage="false">
         <template v-slot:analysis-header>
@@ -30,6 +31,7 @@ import InterproOntologyProcessor from "./../../../business/ontology/functional/i
 import { FunctionalUtils } from "./../functional/FunctionalUtils";
 import InterproProteinCountTableProcessor
     from "./../../../business/processors/functional/interpro/InterproProteinCountTableProcessor";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: { InterproSummaryCard }
@@ -39,6 +41,8 @@ export default class SingleInterproSummaryCard extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private trust: FunctionalTrust = null;
     private trustLine: string = "";
@@ -88,7 +92,7 @@ export default class SingleInterproSummaryCard extends Vue {
 
                 this.items[i].countTable = countTable;
 
-                const ontologyProcessor = new InterproOntologyProcessor();
+                const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
                 this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
             }
 

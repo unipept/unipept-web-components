@@ -2,6 +2,7 @@
     <amount-table
         :items="items"
         :loading="isLoading"
+        :communication-source="communicationSource"
         annotation-name="GO term"
         :namespace="namespace"
         :search-configuration="searchConfiguration"
@@ -29,6 +30,7 @@ import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntol
 import { Ontology } from "./../../business/ontology/Ontology";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../business/ontology/taxonomic/Tree";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -52,6 +54,8 @@ export default class GoAmountTable extends Vue {
      */
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     @Prop({ required: false })
     private goPeptideMapping: Map<GoCode, Peptide[]>;

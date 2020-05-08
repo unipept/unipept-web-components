@@ -11,6 +11,7 @@
 
                 <ec-amount-table
                     :loading="loading"
+                    :communication-source="communicationSource"
                     :ec-count-table="ecCountTable"
                     :ec-peptide-mapping="ecPeptideMapping"
                     :ec-ontology="ecOntology"
@@ -60,12 +61,11 @@ import EcDefinition, { EcCode } from "./../../../business/ontology/functional/ec
 import { CountTable } from "./../../../business/counts/CountTable";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
-import EcCountTableProcessor from "./../../../business/processors/functional/ec/EcCountTableProcessor";
 import { Ontology } from "./../../../business/ontology/Ontology";
-import EcOntologyProcessor from "./../../../business/ontology/functional/ec/EcOntologyProcessor";
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
 import ImageDownloadModal from "./../../utils/ImageDownloadModal.vue";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -87,6 +87,8 @@ export default class EcSummaryCard extends Vue {
     private ecCountTable: CountTable<Peptide>;
     @Prop({ required: true })
     private ecOntology: Ontology<EcCode, EcDefinition>;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false })
     private ecPeptideMapping: Map<EcCode, Peptide[]>;
     @Prop({ required: false })

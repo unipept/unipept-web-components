@@ -2,6 +2,7 @@
     <interpro-summary-card
         :interpro-count-table="getCountTable"
         :interpro-ontology="getOntology"
+        :communication-source="communicationSource"
         :interpro-peptide-mapping="peptideMapping"
         :analysis-in-progress="peptideCountTable"
         :search-configuration="searchConfiguration"
@@ -40,6 +41,7 @@ import SearchConfiguration from "./../../../business/configuration/SearchConfigu
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
 import { FunctionalUtils } from "./../../../components/analysis/functional/FunctionalUtils";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: { InterproSummaryCard, FilterFunctionalAnnotationsDropdown }
@@ -51,6 +53,8 @@ export default class MultiInterproSummaryCard extends Vue {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
     @Prop({ required: false })
@@ -97,6 +101,7 @@ export default class MultiInterproSummaryCard extends Vue {
             const interproProcessor = new InterproCountTableProcessor(
                 this.peptideCountTable,
                 this.searchConfiguration,
+                this.communicationSource,
                 percentage
             );
 
@@ -114,7 +119,7 @@ export default class MultiInterproSummaryCard extends Vue {
 
                 this.items[i].countTable = countTable;
 
-                const ontologyProcessor = new InterproOntologyProcessor();
+                const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
                 this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
             }
 

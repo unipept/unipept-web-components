@@ -17,6 +17,7 @@
                     :interpro-peptide-mapping="interproPeptideMapping"
                     :interpro-ontology="ontology"
                     :relative-counts="relativeCounts"
+                    :communication-source="communicationSource"
                     :search-configuration="searchConfiguration"
                     :tree="tree"
                     :taxa-to-peptides-mapping="taxaToPeptidesMapping"
@@ -48,6 +49,7 @@ import InterproOntologyProcessor from "./../../../business/ontology/functional/i
 import StringUtils from "./../../../business/misc/StringUtils";
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -60,6 +62,8 @@ export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) 
     private interproCountTable: (ns: string) => Promise<CountTable<InterproCode>>;
     @Prop({ required: true })
     private interproOntology: (ns: string) => Promise<Ontology<InterproCode, InterproDefinition>>;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false })
     private interproPeptideMapping: Map<InterproCode, Peptide[]>;
     @Prop({ required: false })

@@ -51,6 +51,7 @@ import { InterproNamespace } from "./../../business/ontology/functional/interpro
 import StringUtils from "./../../business/misc/StringUtils";
 import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
@@ -111,6 +112,8 @@ type SourceMetadata = {
 export default class MultiAssayDataSource extends Vue {
     @Prop({ required: true })
     private assays: ProteomicsAssay[];
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     /**
      * Show every items identifier in the table instead of the category it belongs to?
@@ -133,7 +136,7 @@ export default class MultiAssayDataSource extends Vue {
             items: [],
             loading: true,
             tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c),
-            ontologyProcessor: new NcbiOntologyProcessor(),
+            ontologyProcessor: new NcbiOntologyProcessor(this.communicationSource),
             categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
             categoryTitle: "Rank"
@@ -141,8 +144,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new GoCountTableProcessor(p, c),
-            ontologyProcessor: new GoOntologyProcessor(),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new GoCountTableProcessor(p, c, this.communicationSource),
+            ontologyProcessor: new GoOntologyProcessor(this.communicationSource),
             categories: Object.values(GoNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -150,8 +153,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new EcCountTableProcessor(p, c),
-            ontologyProcessor: new EcOntologyProcessor(),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new EcCountTableProcessor(p, c, this.communicationSource),
+            ontologyProcessor: new EcOntologyProcessor(this.communicationSource),
             categories: Object.values(EcNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -159,8 +162,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new InterproCountTableProcessor(p, c),
-            ontologyProcessor: new InterproOntologyProcessor(),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new InterproCountTableProcessor(p, c, this.communicationSource),
+            ontologyProcessor: new InterproOntologyProcessor(this.communicationSource),
             categories: Object.values(InterproNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"

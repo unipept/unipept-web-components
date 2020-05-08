@@ -36,13 +36,25 @@
                 <lineage-table :peptide="peptide" :equate-il="equateIl"></lineage-table>
             </v-tab-item>
             <v-tab-item>
-                <single-go-summary-card :peptide="peptide" :equate-il="equateIl"></single-go-summary-card>
+                <single-go-summary-card
+                    :peptide="peptide"
+                    :equate-il="equateIl"
+                    :communication-source="communicationSource">
+                </single-go-summary-card>
             </v-tab-item>
             <v-tab-item>
-                <single-ec-summary-card :peptide="peptide" :equate-il="equateIl"></single-ec-summary-card>
+                <single-ec-summary-card
+                    :peptide="peptide"
+                    :equate-il="equateIl"
+                    :communication-source="communicationSource">
+                </single-ec-summary-card>
             </v-tab-item>
             <v-tab-item>
-                <single-interpro-summary-card :peptide="peptide" :equate-il="equateIl"></single-interpro-summary-card>
+                <single-interpro-summary-card
+                    :peptide="peptide"
+                    :equate-il="equateIl"
+                    :communication-source="communicationSource">
+                </single-interpro-summary-card>
             </v-tab-item>
         </v-tabs-items>
     </v-card>
@@ -59,6 +71,7 @@ import MatchedProteinsTable from "./../../tables/MatchedProteinsTable.vue";
 import SingleGoSummaryCard from "./SingleGoSummaryCard.vue";
 import SingleEcSummaryCard from "./SingleEcSummaryCard.vue";
 import SingleInterproSummaryCard from "./SingleInterproSummaryCard.vue";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -75,6 +88,8 @@ export default class SinglePeptideAnalysisCard extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private currentTab: number = 0;
 }
