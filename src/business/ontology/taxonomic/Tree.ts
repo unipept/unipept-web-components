@@ -27,6 +27,7 @@ export default class Tree {
         id: NcbiId = -1,
         name: string = "Organism"
     ) {
+        const start = new Date().getTime();
         this.root = new TreeNode(id, name);
         this.taxaToPeptidesMapping = taxaToPeptidesMapping;
 
@@ -52,6 +53,8 @@ export default class Tree {
         this.nodes.set(id, this.root);
         this.root.getCounts();
         this.sortTree();
+        const end = new Date().getTime();
+        console.log("Constructing tree took " + (end - start) / 1000 + "s");
     }
 
     /**

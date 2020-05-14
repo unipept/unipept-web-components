@@ -30,6 +30,10 @@ export default class NcbiResponseCommunicator {
         return NcbiResponseCommunicator.idToResponseMap.get(id);
     }
 
+    public getResponseMap(): Map<NcbiId, NcbiResponse> {
+        return NcbiResponseCommunicator.idToResponseMap;
+    }
+
     private async doProcess(codes: NcbiId[]): Promise<void> {
         const toProcess = codes.filter(c => c && !NcbiResponseCommunicator.idsProcessed.has(c));
 

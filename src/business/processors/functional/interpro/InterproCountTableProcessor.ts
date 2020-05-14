@@ -18,6 +18,7 @@ export default class InterproCountTableProcessor extends FunctionalCountTablePro
         super(
             peptideCountTable,
             configuration,
+            communicationSource,
             percentage,
             "IPR",
             "IPR:"

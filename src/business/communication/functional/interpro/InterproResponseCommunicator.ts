@@ -30,6 +30,10 @@ export default class InterproResponseCommunicator implements FunctionalResponseC
         return InterproResponseCommunicator.interproCodeToResponseMap.get(code);
     }
 
+    public getResponseMap(): Map<InterproCode, InterproResponse> {
+        return InterproResponseCommunicator.interproCodeToResponseMap;
+    }
+
     private static async doProcess(codes: InterproCode[]): Promise<void> {
         codes = codes.map(c => c.substr(4));
         const toProcess = codes.filter(c => !this.codesProcessed.has(c));

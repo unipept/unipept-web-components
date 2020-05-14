@@ -4,4 +4,10 @@ export default class SearchConfiguration {
         public readonly filterDuplicates: boolean = true,
         public readonly enableMissingCleavageHandling: boolean = false
     ) {}
+
+    public toString() {
+        return [this.equateIl, this.filterDuplicates, this.enableMissingCleavageHandling].map(
+            t => t.toString()
+        ).join(",");
+    }
 }

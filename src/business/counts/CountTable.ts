@@ -1,4 +1,6 @@
-export class CountTable<OntologyId> {
+import { OntologyIdType } from "./../ontology/Ontology";
+
+export class CountTable<OntologyId extends OntologyIdType> {
     // The total amount of definitions in this count table (sum of the counts of all rows)
     public readonly totalCount: number;
 
@@ -27,5 +29,9 @@ export class CountTable<OntologyId> {
      */
     getOntologyIds() : OntologyId[] {
         return Array.from(this.counts.keys());
+    }
+
+    public toMap(): Map<OntologyId, number> {
+        return this.counts;
     }
 }

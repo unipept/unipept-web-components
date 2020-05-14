@@ -30,6 +30,10 @@ export default class EcResponseCommunicator implements FunctionalResponseCommuni
         return EcResponseCommunicator.ecCodeToResponseMap.get(code);
     }
 
+    public getResponseMap(): Map<EcCode, EcResponse> {
+        return EcResponseCommunicator.ecCodeToResponseMap;
+    }
+
     private static async doProcess(codes: EcCode[]): Promise<void> {
         // Cut of the "EC:" prefix, as this is not being used in the API.
         codes = codes.map(c => c.substr(3))

@@ -24,6 +24,7 @@ export default class EcCountTableProcessor extends FunctionalCountTableProcessor
         super(
             peptideCountTable,
             configuration,
+            communicationSource,
             percentage,
             "EC",
             "EC:"

@@ -2,9 +2,9 @@ import { Peptide } from "./../../../ontology/raw/Peptide";
 import { CountTable } from "./../../../counts/CountTable";
 import SearchConfiguration from "./../../../configuration/SearchConfiguration";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
-import Pept2DataCommunicator from "./../../../communication/peptides/Pept2DataCommunicator";
 import ProteomicsCountTableProcessor from "./../../ProteomicsCountTableProcessor";
 import { spawn, Worker } from "threads";
+import CommunicationSource from "./../../../communication/source/CommunicationSource";
 
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;
@@ -12,7 +12,8 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
 
     constructor(
         private readonly peptideCountTable: CountTable<Peptide>,
-        private readonly configuration: SearchConfiguration
+        private readonly configuration: SearchConfiguration,
+        private readonly communicationSource: CommunicationSource
     ) {}
 
     public async getCountTable(): Promise<CountTable<NcbiId>> {
@@ -30,10 +31,11 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
             return;
         }
 
-        await Pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
+        const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
+        await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
         const worker = await spawn(new Worker("./LcaCountTableProcessor.worker.ts"));
-        const [countsPerLca, lca2Peptides] = await worker(this.peptideCountTable, Pept2DataCommunicator.getPeptideResponseMap(this.configuration))
+        const [countsPerLca, lca2Peptides] = await worker(this.peptideCountTable, pept2DataCommunicator.getPeptideResponseMap(this.configuration))
 
         this.lca2Peptides = lca2Peptides;
         this.countTable = new CountTable<NcbiId>(countsPerLca);

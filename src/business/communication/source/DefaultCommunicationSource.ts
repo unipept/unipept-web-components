@@ -25,5 +25,4 @@ export default class DefaultCommunicationSource implements CommunicationSource {
     public getPept2DataCommunicator(): Pept2DataCommunicator {
         return new Pept2DataCommunicator();
     }
-
 }

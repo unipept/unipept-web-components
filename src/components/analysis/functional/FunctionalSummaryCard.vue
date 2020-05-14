@@ -279,20 +279,21 @@ export default class FunctionalSummaryCard extends Vue {
     @Watch("taxonId")
     @Watch("peptideCountTable")
     @Watch("searchConfiguration")
+    @Watch("communicationSource")
     private async redoCalculations() {
         this.faCalculationsInProgress = true;
 
         this.filteredCountTable = null;
         this.relativeCounts = 0;
 
-        if (this.peptideCountTable && this.searchConfiguration) {
+        if (this.peptideCountTable && this.searchConfiguration && this.communicationSource) {
             if (this.taxonId === -1) {
                 this.filteredCountTable = this.peptideCountTable;
                 this.relativeCounts = this.peptideCountTable.totalCount;
             } else {
                 // Update the count tables so that they only count peptides that are associated with the current taxon
                 // filter
-                const taxaProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
+                const taxaProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration, this.communicationSource);
                 const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
 
                 const peptidesForTaxon = await this.getOwnAndChildrenSequences(
@@ -316,7 +317,7 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     private async computeTree() {
-        const taxaCountProcessor = new LcaCountTableProcessor(this.filteredCountTable, this.searchConfiguration);
+        const taxaCountProcessor = new LcaCountTableProcessor(this.filteredCountTable, this.searchConfiguration, this.communicationSource);
         this.taxaToPeptidesMapping = await taxaCountProcessor.getAnnotationPeptideMapping();
         const taxaCounts = await taxaCountProcessor.getCountTable();
 

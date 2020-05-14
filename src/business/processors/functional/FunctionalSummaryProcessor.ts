@@ -21,13 +21,14 @@ export default class FunctionalSummaryProcessor {
         configuration: SearchConfiguration,
         communicationSource: CommunicationSource
     ): Promise<string[][]> {
-        await Pept2DataCommunicator.process(peptideTable, configuration);
+        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
+        await pept2DataCommunicator.process(peptideTable, configuration);
 
         const ontologyProcessor = new NcbiOntologyProcessor(communicationSource);
 
         const processedPeptides: string[][] = peptideTable.getOntologyIds().map(peptide => {
             let peptideCount = peptideTable.getCounts(peptide);
-            let peptideData = Pept2DataCommunicator.getPeptideResponse(peptide, configuration);
+            let peptideData = pept2DataCommunicator.getPeptideResponse(peptide, configuration);
             let ecProteinCount = element.code in peptideData.fa.data? peptideData.fa.data[element.code] : 0
 
             return [

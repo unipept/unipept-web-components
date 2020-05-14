@@ -7,7 +7,8 @@ import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
 import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
 import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
 import ProteomicsCountTableProcessor from "./../ProteomicsCountTableProcessor";
-import { spawn, Worker } from "threads";
+import { spawn, Worker, Pool } from "threads";
+import CommunicationSource from "./../../communication/source/CommunicationSource";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,
@@ -31,6 +32,7 @@ export default abstract class FunctionalCountTableProcessor<
     protected constructor(
         protected readonly peptideCountTable: CountTable<Peptide>,
         protected readonly configuration: SearchConfiguration,
+        protected readonly communicationSource: CommunicationSource,
         protected readonly percentage: number = 50,
         private readonly peptideData2ProteinCount: string,
         private readonly termPrefix: string
@@ -80,17 +82,22 @@ export default abstract class FunctionalCountTableProcessor<
             return;
         }
 
-        await Pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
+        const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
+        await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
+        let start = new Date().getTime();
         const worker = await spawn(new Worker("./FunctionalCountTableProcessor.worker.ts"));
-        let [countsPerCode, item2Peptides, annotatedCount] = await worker(
-            this.peptideCountTable,
-            Pept2DataCommunicator.getPeptideResponseMap(this.configuration),
+        let [countsPerCode, item2Peptides, annotatedCount] = await worker.compute(
+            this.peptideCountTable.toMap(),
+            pept2DataCommunicator.getPeptideResponseMap(this.configuration),
             this.percentage,
             this.termPrefix,
             this.peptideData2ProteinCount
         );
 
+        let end = new Date().getTime();
+        console.log("Functional count table worker took " + (end - start) / 1000 + "s");
+        start = new Date().getTime();
         this.item2Peptides = item2Peptides;
 
         // Now fetch all definitions for the terms that we just processed
@@ -120,6 +127,9 @@ export default abstract class FunctionalCountTableProcessor<
         this.generalCountTable = new CountTable<OntologyId>(countsPerCode);
 
         this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
+
+        end = new Date().getTime();
+        console.log("Functional count table (non-worker) took " + (end - start) / 1000 + "s");
     }
 
     protected abstract async getOntology(

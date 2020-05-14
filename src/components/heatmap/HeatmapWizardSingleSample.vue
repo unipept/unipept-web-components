@@ -178,7 +178,7 @@ export default class HeatmapWizardSingleSample extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c, this.communicationSource),
             ontologyProcessor: new NcbiOntologyProcessor(this.communicationSource),
             categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
