@@ -18,7 +18,7 @@ export default class PeptideCountTableProcessor {
         searchConfiguration: SearchConfiguration
     ): Promise<CountTable<Peptide>> {
         const peptideWorker = await spawn(new Worker("./PeptideCountProcessor.worker.ts"));
-        const result = await peptideWorker(peptides, searchConfiguration);
-        return new CountTable<Peptide>(result);
+        const [peptideCountsMapping, totalFrequency] = await peptideWorker(peptides, searchConfiguration);
+        return new CountTable<Peptide>(peptideCountsMapping, totalFrequency);
     }
 }

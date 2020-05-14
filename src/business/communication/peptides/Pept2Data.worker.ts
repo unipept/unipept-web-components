@@ -32,18 +32,23 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                         missed: config.enableMissingCleavageHandling
                     });
 
-                    const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
+                    try {
+                        const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
 
-                    res.peptides.forEach(p => {
-                        responses.set(p.sequence, p);
-                    })
+                        res.peptides.forEach(p => {
+                            responses.set(p.sequence, p);
+                        })
 
-                    observer.next({
-                        type: "progress",
-                        value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
-                    });
+                        observer.next({
+                            type: "progress",
+                            value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
+                        });
 
-                    done(null);
+                        done(null);
+                    } catch (err) {
+                        // Fetch errors need to be handled by the outer scope.
+                        done(err);
+                    }
                 });
             }
 
