@@ -8,6 +8,7 @@ import ProgressListener from "./../../progress/ProgressListener";
 import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
 import NetworkConfiguration from "./../NetworkConfiguration";
 import PeptideTrust from "./../../processors/raw/PeptideTrust";
+import ShareableMap from "./../../datastructures/ShareableMap";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -16,7 +17,7 @@ import PeptideTrust from "./../../processors/raw/PeptideTrust";
  */
 export default class Pept2DataCommunicator {
     // Maps a configuration (as string) onto a map in which peptides are mapped onto their responses.
-    private static configurationToResponses = new Map<string, Map<string, PeptideDataResponse>>();
+    private static configurationToResponses = new Map<string, ShareableMap<string, string>>();
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
     private static inProgress: Promise<void>;
@@ -87,7 +88,7 @@ export default class Pept2DataCommunicator {
                     const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
 
                     if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
-                        Pept2DataCommunicator.configurationToResponses.set(config, new Map());
+                        Pept2DataCommunicator.configurationToResponses.set(config, new ShareableMap<string, string>());
                     }
                     const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
 
@@ -104,7 +105,6 @@ export default class Pept2DataCommunicator {
                     }
 
                     const end = new Date().getTime();
-                    console.log("Pept2Data took " + (end - start) / 1000 + "s");
                     resolve();
                 } else if (message.type === "error") {
                     reject(new NetworkCommunicationException(message.value));
@@ -124,7 +124,9 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration
     ): Promise<PeptideTrust> {
         await this.process(countTable, configuration);
-        const responseMap = Pept2DataCommunicator.configurationToResponses.get(configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL);
+        const responseMap = Pept2DataCommunicator.configurationToResponses.get(
+            configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL
+        );
 
         let matchedPeptides: number = 0;
         let missedPeptides: Peptide[] = [];
@@ -154,10 +156,10 @@ export default class Pept2DataCommunicator {
         if (!responseMap) {
             return undefined;
         }
-        return responseMap.get(peptide);
+        return JSON.parse(responseMap.get(peptide));
     }
 
-    public getPeptideResponseMap(configuration: SearchConfiguration): Map<Peptide, PeptideDataResponse> {
+    public getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, string> {
         const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         return Pept2DataCommunicator.configurationToResponses.get(configString);
     }

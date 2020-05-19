@@ -27,13 +27,16 @@ export default class Tree {
         id: NcbiId = -1,
         name: string = "Organism"
     ) {
-        const start = new Date().getTime();
         this.root = new TreeNode(id, name);
         this.taxaToPeptidesMapping = taxaToPeptidesMapping;
 
         for (const ontologyId of taxaCountTable.getOntologyIds().sort()) {
             let currentNode = this.root;
             const taxonDefinition = taxaOntology.getDefinition(ontologyId);
+
+            if (!taxonDefinition) {
+                continue;
+            }
 
             for (const lineageTaxId of taxonDefinition.lineage) {
                 // TODO check out what we should do with negative id's here?
@@ -53,8 +56,6 @@ export default class Tree {
         this.nodes.set(id, this.root);
         this.root.getCounts();
         this.sortTree();
-        const end = new Date().getTime();
-        console.log("Constructing tree took " + (end - start) / 1000 + "s");
     }
 
     /**

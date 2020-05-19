@@ -5,6 +5,7 @@ import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import ProteomicsCountTableProcessor from "./../../ProteomicsCountTableProcessor";
 import { spawn, Worker } from "threads";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
+import { Transfer } from "threads/worker";
 
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;
@@ -35,7 +36,13 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
         await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
         const worker = await spawn(new Worker("./LcaCountTableProcessor.worker.ts"));
-        const [countsPerLca, lca2Peptides] = await worker(this.peptideCountTable, pept2DataCommunicator.getPeptideResponseMap(this.configuration))
+        const pept2DataResponse = pept2DataCommunicator.getPeptideResponseMap(this.configuration);
+        const buffers = pept2DataResponse.getBuffers();
+        const [countsPerLca, lca2Peptides] = await worker(
+            this.peptideCountTable,
+            buffers[0],
+            buffers[1]
+        )
 
         this.lca2Peptides = lca2Peptides;
         this.countTable = new CountTable<NcbiId>(countsPerLca);

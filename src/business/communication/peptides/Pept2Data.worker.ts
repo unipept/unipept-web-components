@@ -3,6 +3,7 @@ import { Observable } from "observable-fns"
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import parallelLimit from "async/parallelLimit";
+import ShareableMap from "./../../datastructures/ShareableMap";
 
 const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
@@ -15,7 +16,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
     return new Observable(async(observer) => {
         try {
             // Maps each peptide onto the response it received from the Unipept API.
-            const responses = new Map();
+            const responses = new ShareableMap();
 
             observer.next({
                 type: "progress",
@@ -36,7 +37,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                         const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
 
                         res.peptides.forEach(p => {
-                            responses.set(p.sequence, p);
+                            responses.set(p.sequence, JSON.stringify(p));
                         })
 
                         observer.next({
@@ -63,6 +64,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                 type: "result",
                 value: responses
             });
+
             observer.complete();
         } catch (err) {
             observer.next({

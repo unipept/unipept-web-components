@@ -3,6 +3,8 @@ import { PeptideDataResponse } from "./../../communication/peptides/PeptideDataR
 import { CountTable } from "./../../counts/CountTable";
 import { OntologyIdType } from "./../../ontology/Ontology";
 import { expose } from "threads";
+import ShareableMap from "./../../datastructures/ShareableMap";
+import { TransferDescriptor } from "threads/dist";
 
 expose({ compute, mergeResultMaps });
 
@@ -33,11 +35,15 @@ export async function mergeResultMaps(
 
 export async function compute(
     peptideCounts: Map<Peptide, number>,
-    peptideToResponseMap: Map<Peptide, PeptideDataResponse>,
+    indexBuffer: SharedArrayBuffer,
+    dataBuffer: SharedArrayBuffer,
     percentage: number,
     termPrefix: string,
     proteinCountProperty: string,
 ): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>, number]> {
+    const peptideToResponseMap = new ShareableMap<Peptide, string>(0, 0);
+    peptideToResponseMap.setBuffers(indexBuffer, dataBuffer);
+
     // First we count the amount of peptides per unique code. Afterwards, we can fetch definitions for all these
     // terms and split them on namespace.
     const countsPerCode = new Map();
@@ -47,11 +53,13 @@ export async function compute(
     const item2Peptides = new Map();
 
     for (const [peptide, peptideCount] of peptideCounts) {
-        const peptideData = peptideToResponseMap.get(peptide);
+        const peptideResponse = peptideToResponseMap.get(peptide);
 
-        if (!peptideData) {
+        if (!peptideResponse) {
             continue;
         }
+
+        const peptideData = JSON.parse(peptideResponse);
 
         const proteinCount = peptideData.fa.counts[proteinCountProperty];
 

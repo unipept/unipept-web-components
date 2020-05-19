@@ -29,7 +29,7 @@
         <div v-once ref="visualization"></div>
     </div>
     <v-container fluid v-else class="error-container mt-2">
-        <div class="network-error">
+        <div class="error-container">
             <v-icon x-large>
                 mdi-alert-circle-outline
             </v-icon>
@@ -153,6 +153,14 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
     .unipept-sunburst {
         width: 100% !important;
+    }
+
+    .error-container {
+        max-width: 600px;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
     }
 
     #sunburstWrapper > .unipept-sunburst > svg {

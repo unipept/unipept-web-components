@@ -2,8 +2,8 @@ import OntologyProcessor from "./../../OntologyProcessor";
 import NcbiTaxon, { NcbiId } from "./NcbiTaxon";
 import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../Ontology";
-import NcbiResponseCommunicator from "./../../../communication/taxonomic/ncbi/NcbiResponseCommunicator";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
+import { spawn, Worker } from "threads/dist";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
     constructor(private readonly comSource: CommunicationSource) {}
@@ -16,34 +16,8 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
         const communicator = this.comSource.getNcbiCommunicator();
         await communicator.process(ids);
 
-        const definitions = new Map<NcbiId, NcbiTaxon>();
-
-        for (const id of ids) {
-            const apiResponse = communicator.getResponse(id);
-
-            if (apiResponse) {
-                definitions.set(id, new NcbiTaxon(
-                    apiResponse.id,
-                    apiResponse.name,
-                    apiResponse.rank,
-                    apiResponse.lineage
-                ));
-
-                for (let lineageId of apiResponse.lineage.filter(t => t !== null && t !== -1)) {
-                    lineageId = Math.abs(lineageId);
-                    const apiResponse = communicator.getResponse(lineageId);
-
-                    if (apiResponse) {
-                        definitions.set(lineageId, new NcbiTaxon(
-                            apiResponse.id,
-                            apiResponse.name,
-                            apiResponse.rank,
-                            apiResponse.lineage
-                        ));
-                    }
-                }
-            }
-        }
+        const worker = await spawn(new Worker("./NcbiOntologyProcessor.worker.ts"));
+        const definitions = await worker.process(ids, communicator.getResponseMap());
 
         return new Ontology<NcbiId, NcbiTaxon>(definitions);
     }
