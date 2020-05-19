@@ -15,6 +15,7 @@ export default class Setup {
         this.setUpPrideNock();
         this.setupClipboard();
         this.setupJQuery();
+        this.setupTextCoders();
     }
 
     public setupLocalStorage() {
@@ -35,6 +36,12 @@ export default class Setup {
         type Writable<T> = { -readonly [P in keyof T]: T[P] };
         let writableNavigator: Writable<Navigator> = navigator;
         writableNavigator.clipboard = new ClipboardMock();
+    }
+
+    public setupTextCoders() {
+        const { TextEncoder, TextDecoder } = require("util");
+        globalThis.TextEncoder = TextEncoder;
+        globalThis.TextDecoder = TextDecoder;
     }
 
     /**

@@ -3,6 +3,7 @@ import { GoCode } from "@/business/ontology/functional/go/GoDefinition";
 import { CountTable } from "@/business/counts/CountTable";
 import GoOntologyProcessor from "@/business/ontology/functional/go/GoOntologyProcessor";
 import { GoNamespace } from "@/business/ontology/functional/go/GoNamespace";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const goCodes = new Map([
     ["GO:0000122", 1],
@@ -19,7 +20,7 @@ describe("GoOntologyProcessor", () => {
     it("returns a correct ontology for an Gene Ontology count table", async() => {
         const goCounts = new CountTable<GoCode>(goCodes);
 
-        const goProcessor = new GoOntologyProcessor();
+        const goProcessor = new GoOntologyProcessor(new DefaultCommunicationSource());
         const ontology = await goProcessor.getOntology(goCounts);
 
         expect(ontology.getDefinition("GO:0000122")).toBeTruthy();
@@ -40,7 +41,7 @@ describe("GoOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const goProcessor = new GoOntologyProcessor();
+        const goProcessor = new GoOntologyProcessor(new DefaultCommunicationSource());
         let definition = await goProcessor.getDefinition("GO:0000122");
 
         expect(definition).toEqual({

@@ -3,6 +3,7 @@ import InterproOntologyProcessor from "@/business/ontology/functional/interpro/I
 import { InterproCode } from "@/business/ontology/functional/interpro/InterproDefinition";
 import { CountTable } from "@/business/counts/CountTable";
 import { InterproNamespace } from "@/business/ontology/functional/interpro/InterproNamespace";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const interproIds = new Map([
     ["IPR:IPR000180", 1],
@@ -21,7 +22,7 @@ describe("InterproOntologyProcessor", () => {
     it("returns a correct ontology for an InterPro count table", async() => {
         const interproCounts = new CountTable<InterproCode>(interproIds);
 
-        const interproProcessor = new InterproOntologyProcessor();
+        const interproProcessor = new InterproOntologyProcessor(new DefaultCommunicationSource());
         const ontology = await interproProcessor.getOntology(interproCounts);
 
         expect(ontology.getDefinition("IPR:IPR000180")).toBeTruthy();
@@ -51,7 +52,7 @@ describe("InterproOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const interproProcessor = new InterproOntologyProcessor();
+        const interproProcessor = new InterproOntologyProcessor(new DefaultCommunicationSource());
         let definition = await interproProcessor.getDefinition("IPR:IPR003018");
 
         expect(definition).toEqual({

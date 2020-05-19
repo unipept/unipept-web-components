@@ -4,7 +4,7 @@ import NcbiResponse from "./../../../communication/taxonomic/ncbi/NcbiResponse";
 
 expose({ process })
 
-export default function process(ids: NcbiId[], responseMap: Map<NcbiId, NcbiResponse>): Map<NcbiId, NcbiTaxon> {
+export function process(ids: NcbiId[], responseMap: Map<NcbiId, NcbiResponse>): Map<NcbiId, NcbiTaxon> {
     const definitions = new Map<NcbiId, NcbiTaxon>();
 
     for (const id of ids) {

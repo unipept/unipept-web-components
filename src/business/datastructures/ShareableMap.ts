@@ -62,7 +62,7 @@ export default class ShareableMap<K, V> extends Map<K, V> {
 
     *entries(): IterableIterator<[K, V]> {
         for (let i = 0; i < this.buckets; i++) {
-            let dataPointer = this.indexView.getUint32(ShareableMap.INDEX_TABLE_OFFSET + i * 4);
+            let dataPointer = this.indexView.getUint32(ShareableMap.INDEX_TABLE_OFFSET + i * ShareableMap.INT_SIZE);
             while (dataPointer !== 0) {
                 const key = this.readKeyFromDataObject(dataPointer) as unknown as K;
                 const value = this.readValueFromDataObject(dataPointer) as unknown as V;
@@ -74,7 +74,7 @@ export default class ShareableMap<K, V> extends Map<K, V> {
 
     *keys(): IterableIterator<K> {
         for (let i = 0; i < this.buckets; i++) {
-            let dataPointer = this.indexView.getUint32(ShareableMap.INDEX_TABLE_OFFSET + i * 4);
+            let dataPointer = this.indexView.getUint32(ShareableMap.INDEX_TABLE_OFFSET + i * ShareableMap.INT_SIZE);
             while (dataPointer !== 0) {
                 // TODO fix types here
                 yield this.readKeyFromDataObject(dataPointer) as unknown as K;
@@ -116,7 +116,7 @@ export default class ShareableMap<K, V> extends Map<K, V> {
 
         const hash: number = fnv.fast1a32(stringKey);
         // Bucket in which this value should be stored.
-        const bucket = (hash % this.buckets) * 4;
+        const bucket = (hash % this.buckets) * ShareableMap.INT_SIZE;
 
         const returnValue = this.findValue(
             this.indexView.getUint32(bucket + ShareableMap.INDEX_TABLE_OFFSET),
@@ -195,7 +195,7 @@ export default class ShareableMap<K, V> extends Map<K, V> {
      * Increase the amount of buckets that currently point to a data object by one.
      */
     private incrementBucketsInUse() {
-        return this.indexView.setUint32(4, this.indexView.getUint32(4) + 1);
+        return this.indexView.setUint32(4, this.getBucketsInUse() + 1);
     }
 
     /**
@@ -453,7 +453,7 @@ export default class ShareableMap<K, V> extends Map<K, V> {
         this.indexView = new DataView(this.index, 0, indexSize);
 
         // Set buckets
-        this.indexView.setUint32(4, buckets);
+        this.indexView.setUint32(4, 0);
         // Free space starts from position 1 in the data array (instead of 0, which we use to indicate the end).
         this.indexView.setUint32(8, 4);
 

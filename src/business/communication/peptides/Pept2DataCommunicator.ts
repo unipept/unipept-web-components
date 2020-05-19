@@ -62,7 +62,6 @@ export default class Pept2DataCommunicator {
                 return;
             }
 
-            const start = new Date().getTime();
             const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
 
             const obs: Observable<{ type: string, value: any }> = spawnedProcess(
@@ -104,7 +103,6 @@ export default class Pept2DataCommunicator {
                         processedSet.add(pep);
                     }
 
-                    const end = new Date().getTime();
                     resolve();
                 } else if (message.type === "error") {
                     reject(new NetworkCommunicationException(message.value));
@@ -156,7 +154,13 @@ export default class Pept2DataCommunicator {
         if (!responseMap) {
             return undefined;
         }
-        return JSON.parse(responseMap.get(peptide));
+
+        const response = responseMap.get(peptide);
+        if (response) {
+            return JSON.parse(response);
+        }
+
+        return undefined;
     }
 
     public getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, string> {

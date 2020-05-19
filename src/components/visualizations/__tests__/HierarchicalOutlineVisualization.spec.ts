@@ -7,6 +7,8 @@ import "jsdom-worker-fix";
 import Vuex from "vuex";
 import flushPromises from "flush-promises"
 import { waitForElement } from "@/test/Utils";
+import Setup from "@/test/Setup";
+import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -19,6 +21,9 @@ describe("HierarchicalOutlineVisualization", () => {
     let store;
 
     beforeEach(() => {
+        const setup = new Setup();
+        setup.setupAll();
+
         vuetify = new Vuetify();
 
         getters = {
@@ -45,7 +50,8 @@ describe("HierarchicalOutlineVisualization", () => {
             localVue,
             vuetify,
             propsData: {
-                tree: tree
+                tree: tree,
+                searchConfiguration: new SearchConfiguration()
             }
         });
 
@@ -86,7 +92,3 @@ describe("HierarchicalOutlineVisualization", () => {
     //     });
     // });
 });
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}

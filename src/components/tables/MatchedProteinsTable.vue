@@ -295,8 +295,10 @@ export default class MatchedProteinsTable extends Vue {
 
             const searchConfig = new SearchConfiguration(this.equateIl, false, false);
 
-            await Pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
-            this.peptideData = Pept2DataCommunicator.getPeptideResponse(
+            const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
+
+            await pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
+            this.peptideData = pept2DataCommunicator.getPeptideResponse(
                 this.peptide,
                 searchConfig
             );

@@ -4,6 +4,7 @@ import { CountTable } from "@/business/counts/CountTable";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import { EcNamespace } from "@/business/ontology/functional/ec/EcNamespace";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const counts = new Map([
     ["YVVLQPGVK", 1],
@@ -38,7 +39,12 @@ describe("FunctionalCountTableProcessor", () => {
 
     it("correctly computes the trust for a count table", async(done) => {
         // First test if the trust is correct without performing a filter on percentage and using a simple count table.
-        let ecCountProcessor = new EcCountTableProcessor(countTable, new SearchConfiguration(), 0);
+        let ecCountProcessor = new EcCountTableProcessor(
+            countTable,
+            new SearchConfiguration(),
+            new DefaultCommunicationSource(),
+            0
+        );
 
         let trust = await ecCountProcessor.getTrust();
         // Only 3 out of the 4 peptides are annotated with at least one EC-number.
@@ -46,7 +52,12 @@ describe("FunctionalCountTableProcessor", () => {
         // We did look up 4 peptides
         expect(trust.totalAmountOfItems).toBe(4);
 
-        ecCountProcessor = new EcCountTableProcessor(multiCountTable, new SearchConfiguration(true, false, false), 0);
+        ecCountProcessor = new EcCountTableProcessor(
+            multiCountTable,
+            new SearchConfiguration(true, false, false),
+            new DefaultCommunicationSource(),
+            0
+        );
 
         trust = await ecCountProcessor.getTrust();
         expect(trust.annotatedItems).toBe(6);
@@ -56,7 +67,12 @@ describe("FunctionalCountTableProcessor", () => {
     });
 
     it("correctly returns counts over all namespaces", async(done) => {
-        let ecCountProcessor = new EcCountTableProcessor(countTable, new SearchConfiguration(), 0);
+        let ecCountProcessor = new EcCountTableProcessor(
+            countTable,
+            new SearchConfiguration(),
+            new DefaultCommunicationSource(),
+            0
+        );
         let table = await ecCountProcessor.getCountTable();
 
         expect(table.getCounts("EC:1.4.1.4")).toBe(1);
@@ -66,7 +82,12 @@ describe("FunctionalCountTableProcessor", () => {
         expect(table.getCounts("EC:1.1.1.1")).toBe(0);
 
         // Now also test with the multi counts table
-        ecCountProcessor = new EcCountTableProcessor(multiCountTable, new SearchConfiguration(true, false, false), 0);
+        ecCountProcessor = new EcCountTableProcessor(
+            multiCountTable,
+            new SearchConfiguration(true, false, false),
+            new DefaultCommunicationSource(),
+            0
+        );
         table = await ecCountProcessor.getCountTable();
         expect(table.getCounts("EC:1.4.1.4")).toBe(3);
         expect(table.getCounts("EC:2.7.7.6")).toBe(2);
@@ -78,7 +99,12 @@ describe("FunctionalCountTableProcessor", () => {
     });
 
     it("correctly returns counts for a specific namespace", async(done) => {
-        let ecCountProcessor = new EcCountTableProcessor(countTable, new SearchConfiguration(), 0);
+        let ecCountProcessor = new EcCountTableProcessor(
+            countTable,
+            new SearchConfiguration(),
+            new DefaultCommunicationSource(),
+            0
+        );
         // Namespace associated with 2.x.x.x EC-numbers
         let table = await ecCountProcessor.getCountTable(EcNamespace.Transferases);
 
@@ -101,7 +127,12 @@ describe("FunctionalCountTableProcessor", () => {
      * computed.
      */
     it("correctly maps annotations onto their associated peptides", async(done) => {
-        const ecCountProcessor = new EcCountTableProcessor(countTable, new SearchConfiguration(), 0);
+        const ecCountProcessor = new EcCountTableProcessor(
+            countTable,
+            new SearchConfiguration(),
+            new DefaultCommunicationSource(),
+            0
+        );
         const mapping = await ecCountProcessor.getAnnotationPeptideMapping();
 
         expect(mapping.get("EC:2.7.7.6")).toEqual(["YVVLQPGVK"]);

@@ -4,6 +4,7 @@ import Vuetify from "vuetify"
 import { createLocalVue, mount } from "@vue/test-utils";
 import { waitForElement } from "@/test/Utils";
 import MatchedProteinsTable from "@/components/tables/MatchedProteinsTable.vue";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 
@@ -27,7 +28,8 @@ describe("MatchedProteinsTable", () => {
             vuetify,
             propsData: {
                 peptide: "AVGFGGDFDGVPR",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });
@@ -81,7 +83,8 @@ describe("MatchedProteinsTable", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });

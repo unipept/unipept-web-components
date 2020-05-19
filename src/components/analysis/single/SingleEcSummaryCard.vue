@@ -62,7 +62,7 @@ export default class SingleEcSummaryCard extends Vue {
         if (this.peptide) {
             this.loading = true;
 
-            const ecProteinProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl);
+            const ecProteinProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
             this.countTable = await ecProteinProcessor.getCountTable();
 
             const ontologyProcessor = new EcOntologyProcessor(this.communicationSource);

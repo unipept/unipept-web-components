@@ -78,7 +78,7 @@ export default class SingleInterproSummaryCard extends Vue {
         if (this.peptide) {
             this.loading = true;
 
-            const interproProteinProcessor = new InterproProteinCountTableProcessor(this.peptide, this.equateIl);
+            const interproProteinProcessor = new InterproProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
 
 
             for (const [i, ns] of this.namespaceValues.entries()) {

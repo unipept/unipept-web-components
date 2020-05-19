@@ -16,7 +16,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
     return new Observable(async(observer) => {
         try {
             // Maps each peptide onto the response it received from the Unipept API.
-            const responses = new ShareableMap();
+            const responses = new ShareableMap<string, string>();
 
             observer.next({
                 type: "progress",
@@ -47,6 +47,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
 
                         done(null);
                     } catch (err) {
+                        console.log(err);
                         // Fetch errors need to be handled by the outer scope.
                         done(err);
                     }
@@ -67,6 +68,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
 
             observer.complete();
         } catch (err) {
+            console.log(err);
             observer.next({
                 type: "error",
                 value: "Could not communicate with external endpoint."

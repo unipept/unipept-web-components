@@ -108,13 +108,17 @@ export default class SinglePeptideSummary extends Vue {
             const proteinProcessor = new ProteinProcessor();
             this.proteins = await proteinProcessor.getProteinsByPeptide(this.peptide, this.equateIl);
 
-            const goProcessor = new GoProteinCountTableProcessor(this.peptide, this.equateIl);
+            const goProcessor = new GoProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
             this.goTrust = await goProcessor.getTrust();
 
-            const ecProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl);
+            const ecProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
             this.ecTrust = await ecProcessor.getTrust();
 
-            const interproProcessor = new InterproProteinCountTableProcessor(this.peptide, this.equateIl);
+            const interproProcessor = new InterproProteinCountTableProcessor(
+                this.peptide,
+                this.equateIl,
+                this.communicationSource
+            );
             this.interproTrust = await interproProcessor.getTrust();
 
             const lca = await proteinProcessor.getLcaByPeptide(this.peptide, this.equateIl);

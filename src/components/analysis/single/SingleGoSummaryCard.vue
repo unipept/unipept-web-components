@@ -109,7 +109,11 @@ export default class SingleGoSummaryCard extends Vue {
         if (this.peptide) {
             this.loading = true;
 
-            const goProteinProcessor = new GoProteinCountTableProcessor(this.peptide, this.equateIl);
+            const goProteinProcessor = new GoProteinCountTableProcessor(
+                this.peptide,
+                this.equateIl,
+                this.communicationSource
+            );
 
             for (let i = 0; i < this.namespaces.length; i++) {
                 const namespace: GoNamespace = this.namespaces[i];

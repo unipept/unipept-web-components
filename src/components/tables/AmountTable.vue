@@ -37,6 +37,9 @@
                             :nodeStrokeColor="highlightColorFunc"
                             :nodeFillColor="highlightColorFunc">
                         </treeview>
+                        <div v-if="treeAvailable.get(item) === undefined" class="d-flex justify-center align-center">
+                            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                        </div>
                     </div>
                 </td>
             </template>
@@ -90,12 +93,9 @@ import CsvUtils from "./../../business/storage/CsvUtils";
 import FunctionalSummaryProcessor from "./../../business/processors/functional/FunctionalSummaryProcessor";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
-import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
-import { CountTable } from "./../../business/counts/CountTable";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 import HighlightedTreeProcessor from "./../../business/processors/taxonomic/ncbi/HighlightedTreeProcessor";

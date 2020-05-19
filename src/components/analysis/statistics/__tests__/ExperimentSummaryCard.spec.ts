@@ -9,6 +9,7 @@ import { waitForPromises, waitForElement, waitForCondition } from "@/test/Utils"
 import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -113,7 +114,8 @@ const mountComponent = async function(
         propsData: {
             activeAssay: activeAssay,
             disabled: false,
-            searchConfiguration: searchConfiguration
+            searchConfiguration: searchConfiguration,
+            communicationSource: new DefaultCommunicationSource()
         }
     });
 }
