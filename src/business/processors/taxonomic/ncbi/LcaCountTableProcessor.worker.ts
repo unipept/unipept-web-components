@@ -1,10 +1,8 @@
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import { CountTable } from "./../../../counts/CountTable";
-import { PeptideDataResponse } from "./../../../communication/peptides/PeptideDataResponse";
-import { expose } from "threads";
-import { TransferDescriptor } from "threads/dist";
-import ShareableMap from "./../../../datastructures/ShareableMap";
+import { expose, TransferDescriptor } from "threads";
+import { ShareableMap } from "shared-memory-datastructures";
 
 expose(compute);
 

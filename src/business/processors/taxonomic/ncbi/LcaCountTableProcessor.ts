@@ -3,9 +3,8 @@ import { CountTable } from "./../../../counts/CountTable";
 import SearchConfiguration from "./../../../configuration/SearchConfiguration";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import ProteomicsCountTableProcessor from "./../../ProteomicsCountTableProcessor";
-import { spawn, Worker } from "threads";
+import { spawn, Worker, Transfer } from "threads";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
-import { Transfer } from "threads/worker";
 
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;

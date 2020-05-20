@@ -8,7 +8,7 @@ import { Ontology } from "./../../../ontology/Ontology";
 import { EcNamespace } from "./../../../ontology/functional/ec/EcNamespace";
 import EcOntologyProcessor from "./../../../ontology/functional/ec/EcOntologyProcessor";
 import { Peptide } from "./../../../ontology/raw/Peptide";
-import CommunicationSource from "@/business/communication/source/CommunicationSource";
+import CommunicationSource from "./../../../communication/source/CommunicationSource";
 
 export default class EcProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<EcCode, EcDefinition> {
     constructor(

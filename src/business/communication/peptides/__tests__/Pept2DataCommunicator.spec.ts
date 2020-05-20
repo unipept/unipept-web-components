@@ -10,8 +10,7 @@ import { CountTable } from "@/business/counts/CountTable";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
-import { PeptideDataResponse } from "@/business/communication/peptides/PeptideDataResponse";
-import ShareableMap from "@/business/datastructures/ShareableMap";
+import { ShareableMap } from "shared-memory-datastructures";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const counts = new Map([

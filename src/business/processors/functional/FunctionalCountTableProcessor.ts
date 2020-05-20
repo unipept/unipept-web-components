@@ -7,10 +7,9 @@ import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
 import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
 import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
 import ProteomicsCountTableProcessor from "./../ProteomicsCountTableProcessor";
-import { spawn, Worker, Pool } from "threads";
+import { spawn, Worker, Pool, Transfer } from "threads";
 import CommunicationSource from "./../../communication/source/CommunicationSource";
-import { Transfer } from "threads/worker";
-import ShareableMap from "./../../datastructures/ShareableMap";
+import { ShareableMap } from "shared-memory-datastructures";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,

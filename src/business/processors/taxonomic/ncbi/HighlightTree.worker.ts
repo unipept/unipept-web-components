@@ -2,7 +2,7 @@ import TreeNode from "./../../../ontology/taxonomic/TreeNode";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import Tree from "./../../../ontology/taxonomic/Tree";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
-import { expose } from "threads/worker";
+import { expose } from "threads";
 
 expose({ computeTree })
 

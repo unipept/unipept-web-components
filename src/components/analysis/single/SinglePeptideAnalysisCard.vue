@@ -27,13 +27,13 @@
         </v-tabs>
         <v-tabs-items v-model="currentTab">
             <v-tab-item>
-                <matched-proteins-table :peptide="peptide" :equate-il="equateIl"></matched-proteins-table>
+                <matched-proteins-table :communication-source="communicationSource" :peptide="peptide" :equate-il="equateIl"></matched-proteins-table>
             </v-tab-item>
             <v-tab-item>
-                <lineage-tree :peptide="peptide" :equate-il="equateIl"></lineage-tree>
+                <lineage-tree :communication-source="communicationSource" :peptide="peptide" :equate-il="equateIl"></lineage-tree>
             </v-tab-item>
             <v-tab-item>
-                <lineage-table :peptide="peptide" :equate-il="equateIl"></lineage-table>
+                <lineage-table :communication-source="communicationSource" :peptide="peptide" :equate-il="equateIl"></lineage-table>
             </v-tab-item>
             <v-tab-item>
                 <single-go-summary-card

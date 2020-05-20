@@ -20,6 +20,7 @@ change the currently active search settings and redo the analysis of all selecte
                 :equate-il.sync="equateIl"
                 :filter-duplicates.sync="filterDuplicates"
                 :missing-cleavage.sync="missingCleavage"
+                :horizontal="false"
                 style="flex-grow: 1;">
             </search-settings-form>
             <div class="card-actions" >

@@ -1,4 +1,4 @@
-import { expose } from "threads/worker";
+import { expose } from "threads";
 import NcbiTaxon, { NcbiId } from "./NcbiTaxon";
 import NcbiResponse from "./../../../communication/taxonomic/ncbi/NcbiResponse";
 

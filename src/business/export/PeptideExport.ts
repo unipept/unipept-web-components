@@ -22,7 +22,7 @@ import { PeptideDataResponse } from "./../communication/peptides/PeptideDataResp
 import EcDefinition from "./../ontology/functional/ec/EcDefinition";
 import GoDefinition from "./../ontology/functional/go/GoDefinition";
 import InterproDefinition from "./../ontology/functional/interpro/InterproDefinition";
-import CommunicationSource from "@/business/communication/source/CommunicationSource";
+import CommunicationSource from "./../communication/source/CommunicationSource";
 
 export default class PeptideExport {
     /**

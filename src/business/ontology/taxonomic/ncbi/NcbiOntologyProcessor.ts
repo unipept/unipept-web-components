@@ -3,7 +3,7 @@ import NcbiTaxon, { NcbiId } from "./NcbiTaxon";
 import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../Ontology";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
-import { spawn, Worker } from "threads/dist";
+import { spawn, Worker } from "threads";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
     constructor(private readonly comSource: CommunicationSource) {}

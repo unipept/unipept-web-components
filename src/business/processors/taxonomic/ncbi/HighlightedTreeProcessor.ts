@@ -1,4 +1,4 @@
-import { spawn, Worker, Pool } from "threads/dist";
+import { spawn, Worker, Pool } from "threads";
 import TreeNode from "./../../../ontology/taxonomic/TreeNode";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import Tree from "./../../../ontology/taxonomic/Tree";

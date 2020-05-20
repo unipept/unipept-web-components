@@ -48,3 +48,9 @@ export function expose(input: any): void {
 export function Pool(spawner: () => Promise<any>): PoolMock {
     return new PoolMock(spawner);
 }
+
+export function Transfer(buffer) {
+    return {
+        transferables: [buffer]
+    }
+}

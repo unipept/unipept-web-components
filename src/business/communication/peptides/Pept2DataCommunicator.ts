@@ -8,7 +8,7 @@ import ProgressListener from "./../../progress/ProgressListener";
 import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
 import NetworkConfiguration from "./../NetworkConfiguration";
 import PeptideTrust from "./../../processors/raw/PeptideTrust";
-import ShareableMap from "./../../datastructures/ShareableMap";
+import { ShareableMap } from "shared-memory-datastructures";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -83,7 +83,11 @@ export default class Pept2DataCommunicator {
                         progressListener.onProgressUpdate(message.value);
                     }
                 } else if (message.type === "result") {
-                    const resultMap = message.value;
+                    const [indexBuffer, dataBuffer] = message.value;
+
+                    const resultMap = new ShareableMap<Peptide, string>(0, 0);
+                    resultMap.setBuffers(indexBuffer.transferables[0], dataBuffer.transferables[0]);
+
                     const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
 
                     if (!Pept2DataCommunicator.configurationToResponses.has(config)) {

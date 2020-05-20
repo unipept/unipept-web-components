@@ -1,10 +1,7 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
-import { PeptideDataResponse } from "./../../communication/peptides/PeptideDataResponse";
-import { CountTable } from "./../../counts/CountTable";
 import { OntologyIdType } from "./../../ontology/Ontology";
 import { expose } from "threads";
-import ShareableMap from "./../../datastructures/ShareableMap";
-import { TransferDescriptor } from "threads/dist";
+import { ShareableMap } from "shared-memory-datastructures";
 
 expose({ compute, mergeResultMaps });
 

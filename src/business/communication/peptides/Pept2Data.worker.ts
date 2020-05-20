@@ -1,9 +1,9 @@
-import { expose } from "threads";
+import { expose, Transfer } from "threads";
 import { Observable } from "observable-fns"
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import parallelLimit from "async/parallelLimit";
-import ShareableMap from "./../../datastructures/ShareableMap";
+import { ShareableMap } from "shared-memory-datastructures";
 
 const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
@@ -42,7 +42,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
 
                         observer.next({
                             type: "progress",
-                            value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
+                            value: i / peptides.length
                         });
 
                         done(null);
@@ -61,9 +61,11 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                 value: 1
             });
 
+            const buffers = responses.getBuffers();
+
             observer.next({
                 type: "result",
-                value: responses
+                value: [Transfer(buffers[0]), Transfer(buffers[1])]
             });
 
             observer.complete();

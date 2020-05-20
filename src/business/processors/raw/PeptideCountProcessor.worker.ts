@@ -1,6 +1,6 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import { expose } from "threads/worker";
+import { expose } from "threads";
 
 expose(process);
 
