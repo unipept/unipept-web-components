@@ -19,7 +19,9 @@ export default function process(
 ): [Map<Peptide, number>, number] {
     peptides = filter(peptides, searchConfiguration);
     const peptideCounts = new Map<Peptide, number>();
+    let processed = 0;
     for (const peptide of peptides) {
+        processed++;
         const count = peptideCounts.get(peptide) || 0;
         if (searchConfiguration.filterDuplicates) {
             peptideCounts.set(peptide, 1);

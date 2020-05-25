@@ -16,3 +16,14 @@ exports[`ExperimentSummaryCard correctly renders all items that are currently pr
             peptides couldn't be found.
         </span>"
 `;
+
+exports[`ExperimentSummaryCard opens a dialog when clicking the missed peptides text 1`] = `
+"<span class=\\"peptide-match-text\\">
+            We managed to match 15 of your 25
+            peptides. Unfortunately,
+            <a style=\\"cursor: pointer;\\">
+                10
+            </a>
+            peptides couldn't be found.
+        </span>"
+`;

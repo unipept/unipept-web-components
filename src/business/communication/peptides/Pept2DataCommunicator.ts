@@ -159,6 +159,7 @@ export default class Pept2DataCommunicator {
             return undefined;
         }
 
+
         const response = responseMap.get(peptide);
         if (response) {
             return JSON.parse(response);
