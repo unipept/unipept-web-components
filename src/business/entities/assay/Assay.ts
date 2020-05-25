@@ -1,6 +1,6 @@
 import ChangeListener from "./../ChangeListener";
 import AssayVisitor from "./AssayVisitor";
-import Visitable from "./../Visitable";
+import Visitable from "./../../visitor/Visitable";
 
 export default abstract class Assay implements Visitable<AssayVisitor> {
     protected constructor(

@@ -8,7 +8,7 @@ export interface FilterState {
 }
 
 const mpaState: FilterState = {
-    searchSettings: { equateIl: true, filterDuplicates: true, enableMissingCleavageHandling: false },
+    searchSettings: new SearchConfiguration(),
     selectedTerm: "Organism",
     selectedTaxonId: -1,
 };
