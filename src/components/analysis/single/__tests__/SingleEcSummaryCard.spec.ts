@@ -4,6 +4,7 @@ import { createLocalVue, mount } from "@vue/test-utils";
 import { waitForCondition, waitForElement } from "@/test/Utils";
 import Setup from "@/test/Setup";
 import SingleEcSummaryCard from "@/components/analysis/single/SingleEcSummaryCard.vue";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 
@@ -27,7 +28,8 @@ describe("SingleEcSummaryCard", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });
@@ -57,7 +59,8 @@ describe("SingleEcSummaryCard", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });

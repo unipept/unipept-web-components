@@ -16,6 +16,7 @@
         <template v-slot:content-biological-process>
             <go-summary
                 :go-count-table="items[0].countTable"
+                :communication-source="communicationSource"
                 :namespace="namespaces[0]"
                 :go-peptide-mapping="items[0].peptideMapping"
                 :go-ontology="items[0].ontology"
@@ -30,6 +31,7 @@
         <template v-slot:content-cellular-component>
             <go-summary
                 :go-count-table="items[1].countTable"
+                :communication-source="communicationSource"
                 :namespace="namespaces[1]"
                 :go-peptide-mapping="items[1].peptideMapping"
                 :go-ontology="items[1].ontology"
@@ -44,6 +46,7 @@
         <template v-slot:content-molecular-function>
             <go-summary
                 :go-count-table="items[2].countTable"
+                :communication-source="communicationSource"
                 :namespace="namespaces[2]"
                 :go-peptide-mapping="items[2].peptideMapping"
                 :go-ontology="items[2].ontology"
@@ -77,6 +80,7 @@ import GoDefinition, { GoCode } from "./../../../business/ontology/functional/go
 import { Ontology } from "./../../../business/ontology/Ontology";
 import StringUtils from "./../../../business/misc/StringUtils";
 import { FunctionalUtils } from "./../functional/FunctionalUtils";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -92,6 +96,8 @@ export default class MultiGoSummaryCard extends Vue {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
     @Prop({ required: false })
@@ -139,6 +145,7 @@ export default class MultiGoSummaryCard extends Vue {
             const goCountTableProcessor = new GoCountTableProcessor(
                 this.peptideCountTable,
                 this.searchConfiguration,
+                this.communicationSource,
                 percentage
             );
 
@@ -147,7 +154,7 @@ export default class MultiGoSummaryCard extends Vue {
                 this.items[i].countTable = await goCountTableProcessor.getCountTable(namespace);
                 this.items[i].peptideMapping = await goCountTableProcessor.getAnnotationPeptideMapping();
 
-                const ontologyProcessor = new GoOntologyProcessor();
+                const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
                 this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
             }
 

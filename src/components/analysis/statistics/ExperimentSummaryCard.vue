@@ -20,6 +20,7 @@ change the currently active search settings and redo the analysis of all selecte
                 :equate-il.sync="equateIl"
                 :filter-duplicates.sync="filterDuplicates"
                 :missing-cleavage.sync="missingCleavage"
+                :horizontal="false"
                 style="flex-grow: 1;">
             </search-settings-form>
             <div class="card-actions" >
@@ -107,6 +108,7 @@ import PeptideExport from "./../../../business/export/PeptideExport";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NetworkUtils from "./../../../business/communication/NetworkUtils";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
@@ -156,6 +158,8 @@ export default class ExperimentSummaryCard extends Vue {
     private activeAssay: ProteomicsAssay;
     @Prop({ required: true })
     private searchConfiguration: SearchConfiguration;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     // Is the export system loading?
     private exportLoading: boolean = false;
@@ -213,7 +217,7 @@ export default class ExperimentSummaryCard extends Vue {
                 this.searchConfiguration
             );
 
-            this.peptideTrust = await Pept2DataCommunicator.getPeptideTrust(
+            this.peptideTrust = await this.communicationSource.getPept2DataCommunicator().getPeptideTrust(
                 this.peptideCountTable,
                 this.searchConfiguration
             );
@@ -228,6 +232,7 @@ export default class ExperimentSummaryCard extends Vue {
             const csv: string = await PeptideExport.exportSummaryAsCsv(
                 this.peptideCountTable,
                 this.searchConfiguration,
+                this.communicationSource,
                 separator,
                 functionalSeparator
             );

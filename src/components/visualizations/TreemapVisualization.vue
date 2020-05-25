@@ -9,7 +9,7 @@
         <div v-once ref="visualization"></div>
     </div>
     <v-container fluid v-else class="error-container mt-2">
-        <div class="network-error">
+        <div class="error-container">
             <v-icon x-large>
                 mdi-alert-circle-outline
             </v-icon>
@@ -97,4 +97,12 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
 
 <style lang="less" scoped>
     @import './../../assets/style/visualizations.css.less';
+
+    .error-container {
+        max-width: 600px;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+    }
 </style>

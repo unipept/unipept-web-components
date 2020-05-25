@@ -4,6 +4,7 @@ import { createLocalVue, mount } from "@vue/test-utils";
 import Setup from "@/test/Setup";
 import { waitForCondition } from "@/test/Utils";
 import SingleGoSummaryCard from "@/components/analysis/single/SingleGoSummaryCard.vue";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 
@@ -27,7 +28,8 @@ describe("SingleGoSummaryCard", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });
@@ -78,7 +80,8 @@ describe("SingleGoSummaryCard", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });

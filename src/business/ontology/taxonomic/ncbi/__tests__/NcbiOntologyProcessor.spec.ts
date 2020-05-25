@@ -3,6 +3,7 @@ import NcbiTaxon, { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon"
 import { CountTable } from "@/business/counts/CountTable";
 import NcbiOntologyProcessor from "@/business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import { NcbiRank } from "@/business/ontology/taxonomic/ncbi/NcbiRank";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const ncbiIds = new Map<NcbiId, number>([
     [2, 1],
@@ -19,7 +20,7 @@ describe("NcbiOntologyProcessor", () => {
     it("returns a correct ontology for a NCBI count table", async() => {
         const ncbiCounts = new CountTable<NcbiId>(ncbiIds);
 
-        const ncbiOntologyProcessor = new NcbiOntologyProcessor();
+        const ncbiOntologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource());
         const ontology = await ncbiOntologyProcessor.getOntology(ncbiCounts);
 
         expect(ontology.getDefinition(2)).toEqual({
@@ -135,7 +136,7 @@ describe("NcbiOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const ncbiOntologyProcessor = new NcbiOntologyProcessor();
+        const ncbiOntologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource());
 
         expect(await ncbiOntologyProcessor.getDefinition(816)).toEqual({
             id: 816,

@@ -5,10 +5,12 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
+      with:
+        node-version: '13'
     - name: Cache node modules
       uses: actions/cache@v1
       with:
@@ -22,4 +24,4 @@ jobs:
       run: npm i -g jest-cli
     - name: Run tests
       run: jest
-    
+

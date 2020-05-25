@@ -1,18 +1,46 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
-import { PeptideDataResponse } from "./../../communication/peptides/PeptideDataResponse";
-import { CountTable } from "./../../counts/CountTable";
 import { OntologyIdType } from "./../../ontology/Ontology";
-import { expose } from "threads/worker";
+import { expose } from "threads";
+import { ShareableMap } from "shared-memory-datastructures";
 
-expose(compute);
+expose({ compute, mergeResultMaps });
 
-export default async function compute(
-    peptideCountTable: CountTable<Peptide>,
-    peptideToResponseMap: Map<Peptide, PeptideDataResponse>,
+export async function mergeResultMaps(
+    countsPerCodeMaps: Map<OntologyIdType, number>[],
+    item2PeptidesMaps: Map<OntologyIdType, Peptide[]>[]
+): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>]> {
+    const countsResult = countsPerCodeMaps[0];
+
+    for (const map of countsPerCodeMaps.slice(1)) {
+        for (const [code, value] of map) {
+            countsResult.set(code, (countsResult.get(code) || 0) + value);
+        }
+    }
+
+    const item2PeptidesResult = item2PeptidesMaps[0];
+
+    for (const map of item2PeptidesMaps.slice(1)) {
+        for (const [code, value] of map) {
+            const existingResult = item2PeptidesResult.get(code) || [];
+            existingResult.push(...value);
+            item2PeptidesResult.set(code, existingResult);
+        }
+    }
+
+    return [countsResult, item2PeptidesResult];
+}
+
+export async function compute(
+    peptideCounts: Map<Peptide, number>,
+    indexBuffer: SharedArrayBuffer,
+    dataBuffer: SharedArrayBuffer,
     percentage: number,
     termPrefix: string,
     proteinCountProperty: string,
 ): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>, number]> {
+    const peptideToResponseMap = new ShareableMap<Peptide, string>(0, 0);
+    peptideToResponseMap.setBuffers(indexBuffer, dataBuffer);
+
     // First we count the amount of peptides per unique code. Afterwards, we can fetch definitions for all these
     // terms and split them on namespace.
     const countsPerCode = new Map();
@@ -21,13 +49,14 @@ export default async function compute(
 
     const item2Peptides = new Map();
 
-    for (const peptide of peptideCountTable["counts"].keys()) {
-        const peptideCount = peptideCountTable["counts"].get(peptide);
-        const peptideData = peptideToResponseMap.get(peptide);
+    for (const [peptide, peptideCount] of peptideCounts) {
+        const peptideResponse = peptideToResponseMap.get(peptide);
 
-        if (!peptideData) {
+        if (!peptideResponse) {
             continue;
         }
+
+        const peptideData = JSON.parse(peptideResponse);
 
         const proteinCount = peptideData.fa.counts[proteinCountProperty];
 
@@ -54,4 +83,3 @@ export default async function compute(
 
     return [countsPerCode, item2Peptides, annotatedCount];
 }
-

@@ -4,6 +4,7 @@ import Vuetify from "vuetify"
 import { createLocalVue, mount } from "@vue/test-utils";
 import { waitForCondition, waitForElement } from "@/test/Utils";
 import SingleInterproSummaryCard from "@/components/analysis/single/SingleInterproSummaryCard.vue";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 
@@ -27,7 +28,8 @@ describe("SingleInterproSummaryCard", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });
@@ -58,7 +60,8 @@ describe("SingleInterproSummaryCard", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });

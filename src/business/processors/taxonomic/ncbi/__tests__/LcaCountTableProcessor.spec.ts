@@ -4,6 +4,7 @@ import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCoun
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import flushPromises from "flush-promises";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const counts = new Map([
     ["YVVLQPGVK", 1],
@@ -31,7 +32,11 @@ describe("LcaCountTableProcessor", () => {
     });
 
     it("correctly computes counts", async(done) => {
-        let lcaProcessor = new LcaCountTableProcessor(countTable, new SearchConfiguration(false, false, false));
+        let lcaProcessor = new LcaCountTableProcessor(
+            countTable,
+            new SearchConfiguration(false, false, false),
+            new DefaultCommunicationSource()
+        );
         let lcaTable = await lcaProcessor.getCountTable();
 
         await flushPromises();
@@ -44,7 +49,11 @@ describe("LcaCountTableProcessor", () => {
         expect(lcaTable.getCounts(2)).toBe(0);
 
         // Also test whether peptides that occur multiple times are computed correctly
-        lcaProcessor = new LcaCountTableProcessor(multiCountTable, new SearchConfiguration(false, false, false));
+        lcaProcessor = new LcaCountTableProcessor(
+            multiCountTable,
+            new SearchConfiguration(false, false, false),
+            new DefaultCommunicationSource()
+        );
         lcaTable = await lcaProcessor.getCountTable();
 
         expect(lcaTable.getCounts(1)).toBe(3);
@@ -56,7 +65,11 @@ describe("LcaCountTableProcessor", () => {
     });
 
     it("correctly computes lca -> peptide mapping", async(done) => {
-        const lcaProcessor = new LcaCountTableProcessor(countTable, new SearchConfiguration(false, false, false));
+        const lcaProcessor = new LcaCountTableProcessor(
+            countTable,
+            new SearchConfiguration(false, false, false),
+            new DefaultCommunicationSource()
+        );
         const mapping = await lcaProcessor.getAnnotationPeptideMapping();
 
         expect(mapping.get(1)).toEqual(["FLGFEQLFK"]);

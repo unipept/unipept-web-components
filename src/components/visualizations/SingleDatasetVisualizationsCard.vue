@@ -168,6 +168,7 @@
                     <v-card flat>
                         <heatmap-wizard-single-sample
                             v-if="peptideCountTable"
+                            :communication-source="communicationSource"
                             :peptide-count-table="peptideCountTable"
                             :search-configuration="searchConfiguration">
                         </heatmap-wizard-single-sample>
@@ -213,7 +214,7 @@ import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/Ncbi
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
-
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 
 @Component({
@@ -242,6 +243,8 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     private peptideCountTable: CountTable<Peptide>;
     @Prop({ required: true })
     private searchConfiguration: SearchConfiguration;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
     @Prop({ required: false, default: "primary" })
@@ -268,13 +271,14 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     @Watch("peptideCountTable")
+    @Watch("communicationSource")
     private async onPeptideCountTableChanged() {
         this.tree = null;
-        if (this.peptideCountTable) {
-            const taxaCountProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration);
+        if (this.peptideCountTable && this.communicationSource) {
+            const taxaCountProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration, this.communicationSource);
             const taxaCounts = await taxaCountProcessor.getCountTable();
 
-            const taxaOntologyProcessor = new NcbiOntologyProcessor();
+            const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
             const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
 
             this.tree = new Tree(taxaCounts, taxaOntology, await taxaCountProcessor.getAnnotationPeptideMapping());
@@ -316,9 +320,9 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
             d3.selectAll(".hidden").attr("class", "arc toHide");
         } else if (this.tabs[this.tab] === "Treemap") {
-            imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
+            await imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
         } else {
-            imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
+            await imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
         }
     }
 

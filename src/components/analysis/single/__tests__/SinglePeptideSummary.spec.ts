@@ -4,6 +4,7 @@ import { createLocalVue, mount } from "@vue/test-utils";
 import Setup from "@/test/Setup";
 import SinglePeptideSummary from "@/components/analysis/single/SinglePeptideSummary.vue";
 import { waitForElement } from "@/test/Utils";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 
@@ -27,7 +28,8 @@ describe("SinglePeptideSummary", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });

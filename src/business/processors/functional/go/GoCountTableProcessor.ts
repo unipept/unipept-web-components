@@ -6,6 +6,7 @@ import GoOntologyProcessor from "./../../../ontology/functional/go/GoOntologyPro
 import SearchConfiguration from "./../../../configuration/SearchConfiguration";
 import FunctionalCountTableProcessor from "./../FunctionalCountTableProcessor";
 import { Ontology } from "./../../../ontology/Ontology";
+import CommunicationSource from "./../../../communication/source/CommunicationSource";
 
 /**
  * Generates a count table that maps GO-terms onto the amount of peptides that are annotated with this term.
@@ -23,13 +24,14 @@ export default class GoCountTableProcessor extends FunctionalCountTableProcessor
     constructor(
         readonly peptideCountTable: CountTable<Peptide>,
         readonly configuration: SearchConfiguration,
+        readonly communicationSource: CommunicationSource,
         readonly percentage: number = 50
     ) {
-        super(peptideCountTable, configuration, percentage, "GO", "GO:");
+        super(peptideCountTable, configuration, communicationSource, percentage,"GO", "GO:");
     }
 
     protected async getOntology(countTable: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {
-        const ontologyProcessor = new GoOntologyProcessor();
+        const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
         return await ontologyProcessor.getOntology(countTable);
     }
 

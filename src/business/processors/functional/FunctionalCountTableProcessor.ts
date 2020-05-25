@@ -7,7 +7,9 @@ import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
 import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
 import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
 import ProteomicsCountTableProcessor from "./../ProteomicsCountTableProcessor";
-import { spawn, Worker } from "threads";
+import { spawn, Worker, Pool, Transfer } from "threads";
+import CommunicationSource from "./../../communication/source/CommunicationSource";
+import { ShareableMap } from "shared-memory-datastructures";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,
@@ -31,6 +33,7 @@ export default abstract class FunctionalCountTableProcessor<
     protected constructor(
         protected readonly peptideCountTable: CountTable<Peptide>,
         protected readonly configuration: SearchConfiguration,
+        protected readonly communicationSource: CommunicationSource,
         protected readonly percentage: number = 50,
         private readonly peptideData2ProteinCount: string,
         private readonly termPrefix: string
@@ -80,12 +83,16 @@ export default abstract class FunctionalCountTableProcessor<
             return;
         }
 
-        await Pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
+        const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
+        await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
         const worker = await spawn(new Worker("./FunctionalCountTableProcessor.worker.ts"));
-        let [countsPerCode, item2Peptides, annotatedCount] = await worker(
-            this.peptideCountTable,
-            Pept2DataCommunicator.getPeptideResponseMap(this.configuration),
+        const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(this.configuration) as ShareableMap<Peptide, string>;
+        const buffers = peptideResponseMap.getBuffers();
+        let [countsPerCode, item2Peptides, annotatedCount] = await worker.compute(
+            this.peptideCountTable.toMap(),
+            buffers[0],
+            buffers[1],
             this.percentage,
             this.termPrefix,
             this.peptideData2ProteinCount

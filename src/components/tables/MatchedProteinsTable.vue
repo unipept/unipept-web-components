@@ -194,6 +194,7 @@ import { PeptideDataResponse } from "./../../business/communication/peptides/Pep
 import { CountTable } from "./../../business/counts/CountTable";
 import StringUtils from "./../../business/misc/StringUtils";
 import { OntologyIdType } from "./../../business/ontology/Ontology";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 type MatchedProtein = {
     uniprotAccessionId: UniprotAccessionId,
@@ -215,6 +216,8 @@ export default class MatchedProteinsTable extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private headers = [
         {
@@ -292,16 +295,18 @@ export default class MatchedProteinsTable extends Vue {
 
             const searchConfig = new SearchConfiguration(this.equateIl, false, false);
 
-            await Pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
-            this.peptideData = Pept2DataCommunicator.getPeptideResponse(
+            const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
+
+            await pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
+            this.peptideData = pept2DataCommunicator.getPeptideResponse(
                 this.peptide,
                 searchConfig
             );
 
-            const ecOntologyProcessor = new EcOntologyProcessor();
-            const goOntologyProcessor = new GoOntologyProcessor();
-            const interproOntologyProcessor = new InterproOntologyProcessor();
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor();
+            const ecOntologyProcessor = new EcOntologyProcessor(this.communicationSource);
+            const goOntologyProcessor = new GoOntologyProcessor(this.communicationSource);
+            const interproOntologyProcessor = new InterproOntologyProcessor(this.communicationSource);
+            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
 
             const ecOntology = await ecOntologyProcessor.getOntologyByIds(ecNumbers);
             const goOntology = await goOntologyProcessor.getOntologyByIds(goTerms);

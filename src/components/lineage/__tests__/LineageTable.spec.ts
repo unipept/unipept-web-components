@@ -5,6 +5,7 @@ import { createLocalVue, mount } from "@vue/test-utils";
 import { waitForCondition, waitForElement } from "@/test/Utils";
 import LineageTable from "@/components/lineage/LineageTable.vue";
 import { NcbiRank } from "@/business/ontology/taxonomic/ncbi/NcbiRank";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 Vue.use(Vuetify);
 
@@ -28,7 +29,8 @@ describe("LineageTable", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });
@@ -60,7 +62,8 @@ describe("LineageTable", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });
@@ -86,7 +89,8 @@ describe("LineageTable", () => {
             vuetify,
             propsData: {
                 peptide: "AALTER",
-                equateIl: true
+                equateIl: true,
+                communicationSource: new DefaultCommunicationSource()
             },
             sync: false
         });

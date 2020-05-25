@@ -37,6 +37,9 @@
                             :nodeStrokeColor="highlightColorFunc"
                             :nodeFillColor="highlightColorFunc">
                         </treeview>
+                        <div v-if="treeAvailable.get(item) === undefined" class="d-flex justify-center align-center">
+                            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                        </div>
                     </div>
                 </td>
             </template>
@@ -90,13 +93,12 @@ import CsvUtils from "./../../business/storage/CsvUtils";
 import FunctionalSummaryProcessor from "./../../business/processors/functional/FunctionalSummaryProcessor";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
-import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
-import { CountTable } from "./../../business/counts/CountTable";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import HighlightedTreeProcessor from "./../../business/processors/taxonomic/ncbi/HighlightedTreeProcessor";
 
 @Component({
     components: {
@@ -155,6 +157,8 @@ export default class AmountTable extends Vue {
     protected annotationName: string;
     @Prop({ required: true })
     private externalUrlConstructor: (code: string) => string;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     /**
      * What items are displayed as counts? (e.g. peptides, proteins, ...)
@@ -184,14 +188,16 @@ export default class AmountTable extends Vue {
     @Prop({ required: false, default: 5 })
     private rowsPerPage: number;
 
-    protected treeAvailable = new Map<TableItem, TreeNode>();
+    private treeAvailable = new Map<TableItem, TreeNode>();
 
     // All settings for each Treeview that remain the same
-    protected tooltip: (d: any) => string = tooltipContent;
-    protected highlightColor: string = "#ffc107";
-    protected highlightColorFunc: (d: any) => string = d => d.included ? this.highlightColor : "lightgrey";
-    protected linkStrokeColor: (d: any) => string = ({ target: d }) => this.highlightColorFunc(d);
-    protected expandedItemsList = [];
+    private tooltip: (d: any) => string = tooltipContent;
+    private highlightColor: string = "#ffc107";
+    private highlightColorFunc: (d: any) => string = d => d.included ? this.highlightColor : "lightgrey";
+    private linkStrokeColor: (d: any) => string = ({ target: d }) => this.highlightColorFunc(d);
+    private expandedItemsList = [];
+
+    private highlightedTreeProcessor: HighlightedTreeProcessor = new HighlightedTreeProcessor();
 
     private async saveTableAsCsv(): Promise<void> {
         const columnNames = ["Peptides", this.annotationName, "Name"];
@@ -215,7 +221,8 @@ export default class AmountTable extends Vue {
         const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
             term.definition,
             peptideCounts,
-            this.searchConfiguration
+            this.searchConfiguration,
+            this.communicationSource
         );
 
         await NetworkUtils.downloadDataByForm(
@@ -236,17 +243,11 @@ export default class AmountTable extends Vue {
      * changes in this map and reacts appropriately.
      */
     private computeTree(term: TableItem): boolean {
-        const peptidesForTerm = this.itemToPeptidesMapping.get(term.code);
-        const rootNode = this.tree.getRoot().callRecursivelyPostOder((t: TreeNode, c: any) => {
-            const included = c.some(x => x.included) ||
-                (
-                    this.taxaToPeptidesMapping.has(t.id) &&
-                    this.taxaToPeptidesMapping.get(t.id).some(pept => peptidesForTerm.includes(pept))
-                );
-
-            return Object.assign(Object.assign({}, t), { included: included, children: c });
-        });
-        this.treeAvailable.set(term, rootNode);
+        this.highlightedTreeProcessor.computeHighlightedTree(
+            this.itemToPeptidesMapping.get(term.code),
+            this.tree,
+            this.taxaToPeptidesMapping
+        ).then(rootNode => this.treeAvailable.set(term, rootNode));
         return true;
     }
 

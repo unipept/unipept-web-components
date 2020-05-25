@@ -6,16 +6,19 @@ import SearchConfiguration from "./../../../configuration/SearchConfiguration";
 import { Ontology } from "./../../../ontology/Ontology";
 import InterproOntologyProcessor from "./../../../ontology/functional/interpro/InterproOntologyProcessor";
 import { InterproNamespace } from "./../../../ontology/functional/interpro/InterproNamespace";
+import CommunicationSource from "./../../../communication/source/CommunicationSource";
 
 export default class InterproCountTableProcessor extends FunctionalCountTableProcessor<InterproCode, InterproDefinition> {
     constructor(
         readonly peptideCountTable: CountTable<Peptide>,
         readonly configuration: SearchConfiguration,
-        readonly percentage: number = 50
+        readonly communicationSource: CommunicationSource,
+        readonly percentage: number = 50,
     ) {
         super(
             peptideCountTable,
             configuration,
+            communicationSource,
             percentage,
             "IPR",
             "IPR:"
@@ -25,7 +28,7 @@ export default class InterproCountTableProcessor extends FunctionalCountTablePro
     protected async getOntology(
         countTable: CountTable<InterproCode>
     ): Promise<Ontology<InterproCode, InterproDefinition>> {
-        const ontologyProcessor = new InterproOntologyProcessor();
+        const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
         return await ontologyProcessor.getOntology(countTable);
     }
 

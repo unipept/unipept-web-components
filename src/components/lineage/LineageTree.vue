@@ -28,6 +28,7 @@ import ProteinProcessor from "./../../business/processors/protein/ProteinProcess
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import { CountTable } from "./../../business/counts/CountTable";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: { TreeviewVisualization, Treeview }
@@ -37,6 +38,8 @@ export default class LineageTree extends Vue {
     private peptide: Peptide;
     @Prop({ required: true })
     private equateIl: boolean;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private tree: Tree = null;
 
@@ -63,7 +66,7 @@ export default class LineageTree extends Vue {
 
             const taxaCountTable = new CountTable<NcbiId>(taxaCounts);
 
-            const taxaOntologyProcessor = new NcbiOntologyProcessor();
+            const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
             const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCountTable);
 
             this.tree = new Tree(taxaCountTable, taxaOntology);

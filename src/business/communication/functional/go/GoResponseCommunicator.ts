@@ -5,7 +5,7 @@ import NetworkConfiguration from "./../../NetworkConfiguration";
 import { EcCode } from "./../../../ontology/functional/ec/EcDefinition";
 import FunctionalResponseCommunicator from "./../../../communication/functional/FunctionalResponseCommunicator";
 
-export default class GoResponseCommunicator implements FunctionalResponseCommunicator<GoCode, GoResponse>{
+export default class GoResponseCommunicator implements FunctionalResponseCommunicator<GoCode, GoResponse> {
     private static goCodeToResponseMap = new Map<GoCode, GoResponse>();
     private static codesProcessed = new Set<GoCode>();
     private static inProgress: Promise<void>;
@@ -29,6 +29,10 @@ export default class GoResponseCommunicator implements FunctionalResponseCommuni
 
     public getResponse(code: GoCode): GoResponse | undefined {
         return GoResponseCommunicator.goCodeToResponseMap.get(code);
+    }
+
+    public getResponseMap(): Map<GoCode, GoResponse> {
+        return GoResponseCommunicator.goCodeToResponseMap;
     }
 
     private static async doProcess(codes: EcCode[]) {

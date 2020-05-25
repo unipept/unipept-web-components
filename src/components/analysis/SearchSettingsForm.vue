@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'search-settings-form': true, 'd-flex': true, 'flex-row': horizontal, 'justify-space-between': horizontal }">
+    <div :class="{'search-settings-form': true, 'd-flex': true, 'flex-column': !horizontal, 'flex-row': horizontal, 'justify-space-between': horizontal }">
         <v-tooltip top>
             <template v-slot:activator="{ on }">
                 <div v-on="on">

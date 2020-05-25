@@ -24,11 +24,33 @@ export class Worker {
     }
 }
 
-export async function spawn(worker: Worker): Promise<Function> {
+export class PoolMock {
+    constructor(private spawner: () => Promise<any>) {}
+
+    queue(func: () => Promise<any>) {
+        func();
+    }
+}
+
+export async function spawn(worker: Worker): Promise<any> {
     const data = await worker.getData();
-    return data["default"];
+    if (data["default"]) {
+        return data["default"];
+    } else {
+        return data;
+    }
 }
 
 export function expose(input: any): void {
     // This function does not need to do anything
+}
+
+export function Pool(spawner: () => Promise<any>): PoolMock {
+    return new PoolMock(spawner);
+}
+
+export function Transfer(buffer) {
+    return {
+        transferables: [buffer]
+    }
 }

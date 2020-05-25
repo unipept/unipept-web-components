@@ -6,10 +6,10 @@ import FunctionalTrust from "./FunctionalTrust";
 import { Peptide } from "./../../ontology/raw/Peptide";
 import ProteinProcessor from "./../protein/ProteinProcessor";
 import ProteinDefinition from "./../../ontology/protein/ProteinDefinition";
-import { Ontology } from "./../../ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
 
 export default abstract class FunctionalProteinCountTableProcessor<
-    OntologyId,
+    OntologyId extends OntologyIdType,
     DefinitionType extends FunctionalDefinition
 > implements CountTableProcessor<OntologyId> {
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();

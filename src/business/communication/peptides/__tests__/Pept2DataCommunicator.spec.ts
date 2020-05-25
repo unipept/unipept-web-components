@@ -10,7 +10,8 @@ import { CountTable } from "@/business/counts/CountTable";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
-import { PeptideDataResponse } from "@/business/communication/peptides/PeptideDataResponse";
+import { ShareableMap } from "shared-memory-datastructures";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 const counts = new Map([
     ["AAAAA", 1],
@@ -26,10 +27,11 @@ describe("Pept2DataCommunicator", () => {
     beforeEach(() => {
         const setup = new Setup();
         setup.setupFetch();
+        setup.setupTextCoders();
         NetworkConfiguration.BASE_URL = "http://unipept.ugent.be";
 
         // Reset Pept2DataCommunicator state
-        Pept2DataCommunicator["configurationToResponses"] = new Map<string, Map<string, PeptideDataResponse>>();
+        Pept2DataCommunicator["configurationToResponses"] = new Map<string, ShareableMap<string, string>>();
         Pept2DataCommunicator["configurationToProcessed"] = new Map<string, Set<Peptide>>();
     })
 
@@ -42,8 +44,11 @@ describe("Pept2DataCommunicator", () => {
             peptides: [AAAAA, AALTER, FATSDLNDLYR]
         }));
 
-        await Pept2DataCommunicator.process(peptideCountTable, searchConfig);
-        const trust = await Pept2DataCommunicator.getPeptideTrust(peptideCountTable, searchConfig);
+        const communicationSource = new DefaultCommunicationSource();
+        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
+
+        await pept2DataCommunicator.process(peptideCountTable, searchConfig);
+        const trust = await pept2DataCommunicator.getPeptideTrust(peptideCountTable, searchConfig);
 
         expect(trust.missedPeptides).toEqual(["YVVIQPGVK", "ELASLHGTK"]);
         expect(trust.matchedPeptides).toBe(3);
@@ -59,8 +64,11 @@ describe("Pept2DataCommunicator", () => {
             peptides: [AAAAA, AALTER, FATSDLNDLYR]
         }));
 
-        await Pept2DataCommunicator.process(peptideCountTable, searchConfig);
-        const response = Pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig);
+        const communicationSource = new DefaultCommunicationSource();
+        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
+
+        await pept2DataCommunicator.process(peptideCountTable, searchConfig);
+        const response = pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig);
 
         expect(response).toEqual(AAAAA);
 
@@ -86,8 +94,11 @@ describe("Pept2DataCommunicator", () => {
             peptides: [AAAAA, AALTER]
         }));
 
+        const communicationSource = new DefaultCommunicationSource();
+        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
+
         // First we call the communicator with a small set of peptides and let him process them.
-        await Pept2DataCommunicator.process(smallCountTable, searchConfig);
+        await pept2DataCommunicator.process(smallCountTable, searchConfig);
 
         // Now, we construct a larger count table in which the peptides from the smaller set also occur. We expect the
         // communicator to only request the peptides that haven't been processed before. We do this by setting up a
@@ -109,7 +120,7 @@ describe("Pept2DataCommunicator", () => {
             });
 
         const largeCountTable = new CountTable<Peptide>(counts);
-        await Pept2DataCommunicator.process(largeCountTable, searchConfig);
+        await pept2DataCommunicator.process(largeCountTable, searchConfig);
 
         expect(interceptorCalled).toBeTruthy();
         done();
@@ -132,14 +143,17 @@ describe("Pept2DataCommunicator", () => {
         const searchConfig1 = new SearchConfiguration(true, true, false);
         const searchConfig2 = new SearchConfiguration(true, true, true);
 
-        await Pept2DataCommunicator.process(countTable, searchConfig1);
+        const communicationSource = new DefaultCommunicationSource();
+        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
 
-        expect(Pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig1)).toBeTruthy();
-        expect(Pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig2)).toBeFalsy();
+        await pept2DataCommunicator.process(countTable, searchConfig1);
+
+        expect(pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig1)).toBeTruthy();
+        expect(pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig2)).toBeFalsy();
 
         // Also make sure that 2 different objects that represent the same search config are considered to be the same.
         const searchConfig3 = new SearchConfiguration(true, true, false);
-        expect(Pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig3)).toBeTruthy();
+        expect(pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig3)).toBeTruthy();
 
         done();
     });

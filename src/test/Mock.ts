@@ -9,6 +9,7 @@ import NcbiTaxon, { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon"
 import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import { Ontology } from "@/business/ontology/Ontology";
 import NcbiOntologyProcessor from "@/business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
 export default class Mock {
     /**
@@ -70,13 +71,17 @@ export default class Mock {
     }
 
     public async mockRealisticLcaCountTable(): Promise<CountTable<NcbiId>> {
-        const lcaCountTableProcessor = new LcaCountTableProcessor(await this.mockRealisticPeptideCountTable(), new SearchConfiguration());
+        const lcaCountTableProcessor = new LcaCountTableProcessor(
+            await this.mockRealisticPeptideCountTable(),
+            new SearchConfiguration(),
+            new DefaultCommunicationSource()
+        );
         return await lcaCountTableProcessor.getCountTable();
     }
 
     public async mockRealisticNcbiOntology(): Promise<Ontology<NcbiId, NcbiTaxon>> {
         const lcaCounts = await this.mockRealisticLcaCountTable();
-        const ontologyProcessor = new NcbiOntologyProcessor();
+        const ontologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource());
         return await ontologyProcessor.getOntology(lcaCounts);
     }
 

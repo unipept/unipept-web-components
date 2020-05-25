@@ -34,6 +34,10 @@ export default class Tree {
             let currentNode = this.root;
             const taxonDefinition = taxaOntology.getDefinition(ontologyId);
 
+            if (!taxonDefinition) {
+                continue;
+            }
+
             for (const lineageTaxId of taxonDefinition.lineage) {
                 // TODO check out what we should do with negative id's here?
                 if (lineageTaxId !== null  && lineageTaxId !== -1 && taxaOntology.getDefinition(lineageTaxId)) {

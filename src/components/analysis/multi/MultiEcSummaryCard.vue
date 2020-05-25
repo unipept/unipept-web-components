@@ -8,6 +8,7 @@
         :search-configuration="searchConfiguration"
         :tree="tree"
         :loading="calculationsInProgress"
+        :communication-source="communicationSource"
         :analysis-in-progress="peptideCountTable"
         :relative-counts="relativeCounts">
         <template v-slot:analysis-header>
@@ -37,6 +38,7 @@ import { FunctionalUtils } from "./../functional/FunctionalUtils";
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
 import FunctionalTrust from "./../../../business/processors/functional/FunctionalTrust";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 
 @Component({
     components: { EcSummaryCard, FilterFunctionalAnnotationsDropdown }
@@ -48,6 +50,8 @@ export default class MultiEcSummaryCard extends Vue {
     private searchConfiguration: SearchConfiguration;
     @Prop({ required: true })
     private relativeCounts: number;
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
     @Prop({ required: false })
@@ -78,12 +82,13 @@ export default class MultiEcSummaryCard extends Vue {
             const ecCountTableProcessor = new EcCountTableProcessor(
                 this.peptideCountTable,
                 this.searchConfiguration,
+                this.communicationSource,
                 percentage
             );
             this.ecCountTable = await ecCountTableProcessor.getCountTable();
             this.ecPeptideMapping = await ecCountTableProcessor.getAnnotationPeptideMapping();
 
-            const ontologyProcessor = new EcOntologyProcessor();
+            const ontologyProcessor = new EcOntologyProcessor(this.communicationSource);
             this.ecOntology = await ontologyProcessor.getOntology(this.ecCountTable);
 
             this.trust = await ecCountTableProcessor.getTrust();

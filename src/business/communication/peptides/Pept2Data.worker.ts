@@ -1,8 +1,9 @@
-import { expose } from "threads";
+import { expose, Transfer } from "threads";
 import { Observable } from "observable-fns"
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import parallelLimit from "async/parallelLimit";
+import { ShareableMap } from "shared-memory-datastructures";
 
 const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
@@ -15,7 +16,7 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
     return new Observable(async(observer) => {
         try {
             // Maps each peptide onto the response it received from the Unipept API.
-            const responses = new Map();
+            const responses = new ShareableMap<string, string>();
 
             observer.next({
                 type: "progress",
@@ -32,18 +33,24 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                         missed: config.enableMissingCleavageHandling
                     });
 
-                    const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
+                    try {
+                        const res = await postJSON(baseUrl + PEPTDATA_ENDPOINT, data)
 
-                    res.peptides.forEach(p => {
-                        responses.set(p.sequence, p);
-                    })
+                        res.peptides.forEach(p => {
+                            responses.set(p.sequence, JSON.stringify(p));
+                        })
 
-                    observer.next({
-                        type: "progress",
-                        value: (i + PEPTDATA_BATCH_SIZE) / peptides.length
-                    });
+                        observer.next({
+                            type: "progress",
+                            value: i / peptides.length
+                        });
 
-                    done(null);
+                        done(null);
+                    } catch (err) {
+                        console.log(err);
+                        // Fetch errors need to be handled by the outer scope.
+                        done(err);
+                    }
                 });
             }
 
@@ -54,12 +61,16 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
                 value: 1
             });
 
+            const buffers = responses.getBuffers();
+
             observer.next({
                 type: "result",
-                value: responses
+                value: [Transfer(buffers[0]), Transfer(buffers[1])]
             });
+
             observer.complete();
         } catch (err) {
+            console.log(err);
             observer.next({
                 type: "error",
                 value: "Could not communicate with external endpoint."
