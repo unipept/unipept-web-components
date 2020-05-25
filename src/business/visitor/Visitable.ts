@@ -1,4 +1,3 @@
-export default interface Visitable<T>
-{
+export default interface Visitable<T> {
     accept(visitor: T) : Promise<void>;
 }

@@ -1,7 +1,7 @@
 import StudyVisitor from "./StudyVisitor";
 import Assay from "./../assay/Assay";
 import ChangeListener from "./../ChangeListener";
-import Visitable from "./../Visitable";
+import Visitable from "./../../visitor/Visitable";
 
 export default class Study implements Visitable<StudyVisitor> {
     protected readonly assays: Assay[] = [];
