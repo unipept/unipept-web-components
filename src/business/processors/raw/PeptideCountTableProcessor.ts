@@ -5,6 +5,8 @@ import { spawn, Worker } from "threads"
 
 
 export default class PeptideCountTableProcessor {
+    private static worker;
+
     /**
      * Convert a list of peptides into a count table. This function directly filters the given list of peptides, based
      * on the search configuration given here.
@@ -17,8 +19,10 @@ export default class PeptideCountTableProcessor {
         peptides: Peptide[],
         searchConfiguration: SearchConfiguration
     ): Promise<CountTable<Peptide>> {
-        const peptideWorker = await spawn(new Worker("./PeptideCountProcessor.worker.ts"));
-        const [peptideCountsMapping, totalFrequency] = await peptideWorker(peptides, searchConfiguration);
+        if (!PeptideCountTableProcessor.worker) {
+            PeptideCountTableProcessor.worker = await spawn(new Worker("./PeptideCountProcessor.worker.ts"));
+        }
+        const [peptideCountsMapping, totalFrequency] = await PeptideCountTableProcessor.worker(peptides, searchConfiguration);
         return new CountTable<Peptide>(peptideCountsMapping, totalFrequency);
     }
 }

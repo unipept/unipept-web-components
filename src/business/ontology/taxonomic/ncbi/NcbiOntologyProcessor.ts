@@ -6,6 +6,8 @@ import CommunicationSource from "./../../../communication/source/CommunicationSo
 import { spawn, Worker } from "threads";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
+    private static worker;
+
     constructor(private readonly comSource: CommunicationSource) {}
 
     public async getOntology(table: CountTable<NcbiId>): Promise<Ontology<NcbiId, NcbiTaxon>> {
@@ -16,8 +18,10 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
         const communicator = this.comSource.getNcbiCommunicator();
         await communicator.process(ids);
 
-        const worker = await spawn(new Worker("./NcbiOntologyProcessor.worker.ts"));
-        const definitions = await worker.process(ids, communicator.getResponseMap());
+        if (!NcbiOntologyProcessor.worker) {
+            NcbiOntologyProcessor.worker = await spawn(new Worker("./NcbiOntologyProcessor.worker.ts"));
+        }
+        const definitions = await NcbiOntologyProcessor.worker.process(ids, communicator.getResponseMap());
 
         return new Ontology<NcbiId, NcbiTaxon>(definitions);
     }

@@ -20,6 +20,7 @@ export default abstract class FunctionalCountTableProcessor<
     private generalCountTable: CountTable<OntologyId>;
     private item2Peptides: Map<OntologyId, Peptide[]> = new Map();
     private trust: FunctionalTrust;
+    private static worker;
 
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
@@ -86,10 +87,13 @@ export default abstract class FunctionalCountTableProcessor<
         const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
         await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
-        const worker = await spawn(new Worker("./FunctionalCountTableProcessor.worker.ts"));
+        if (!FunctionalCountTableProcessor.worker) {
+            FunctionalCountTableProcessor.worker = await spawn(new Worker("./FunctionalCountTableProcessor.worker.ts"));
+        }
+
         const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(this.configuration) as ShareableMap<Peptide, string>;
         const buffers = peptideResponseMap.getBuffers();
-        let [countsPerCode, item2Peptides, annotatedCount] = await worker.compute(
+        let [countsPerCode, item2Peptides, annotatedCount] = await FunctionalCountTableProcessor.worker.compute(
             this.peptideCountTable.toMap(),
             buffers[0],
             buffers[1],
