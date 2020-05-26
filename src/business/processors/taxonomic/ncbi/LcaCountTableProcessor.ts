@@ -9,6 +9,7 @@ import CommunicationSource from "./../../../communication/source/CommunicationSo
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;
     private lca2Peptides: Map<NcbiId, Peptide[]>;
+    private static worker;
 
     constructor(
         private readonly peptideCountTable: CountTable<Peptide>,
@@ -34,10 +35,13 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
         const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
         await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
-        const worker = await spawn(new Worker("./LcaCountTableProcessor.worker.ts"));
+        if (!LcaCountTableProcessor.worker) {
+            LcaCountTableProcessor.worker = await spawn(new Worker("./LcaCountTableProcessor.worker.ts"));
+        }
+
         const pept2DataResponse = pept2DataCommunicator.getPeptideResponseMap(this.configuration);
         const buffers = pept2DataResponse.getBuffers();
-        const [countsPerLca, lca2Peptides] = await worker(
+        const [countsPerLca, lca2Peptides] = await LcaCountTableProcessor.worker(
             this.peptideCountTable,
             buffers[0],
             buffers[1]

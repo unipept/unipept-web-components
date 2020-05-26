@@ -10,7 +10,8 @@ import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
  */
 export default class HighlightedTreeProcessor {
     private static pool = Pool(
-        () => spawn(new Worker("./HighlightTree.worker.ts"))
+        () => spawn(new Worker("./HighlightTree.worker.ts")),
+        4
     );
 
     public async computeHighlightedTree(

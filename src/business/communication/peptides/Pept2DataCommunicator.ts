@@ -21,6 +21,7 @@ export default class Pept2DataCommunicator {
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
     private static inProgress: Promise<void>;
+    private static worker;
 
     /**
      * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed that
@@ -62,9 +63,11 @@ export default class Pept2DataCommunicator {
                 return;
             }
 
-            const spawnedProcess = await spawn(new Worker("./Pept2Data.worker.ts"));
+            if (!Pept2DataCommunicator.worker) {
+                Pept2DataCommunicator.worker = await spawn(new Worker("./Pept2Data.worker.ts"));
+            }
 
-            const obs: Observable<{ type: string, value: any }> = spawnedProcess(
+            const obs: Observable<{ type: string, value: any }> = Pept2DataCommunicator.worker(
                 peptides,
                 {
                     equateIl: configuration.equateIl,
