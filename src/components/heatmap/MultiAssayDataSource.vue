@@ -231,8 +231,8 @@ export default class MultiAssayDataSource extends Vue {
                 let name: string = "";
 
                 if (definition) {
-                    if (definition instanceof NcbiTaxon) {
-                        category = definition.rank;
+                    if (Object.prototype.hasOwnProperty.call(definition, "rank")) {
+                        category = (definition as NcbiTaxon).rank;
                     } else {
                         category = (definition as FunctionalDefinition).namespace;
                     }
