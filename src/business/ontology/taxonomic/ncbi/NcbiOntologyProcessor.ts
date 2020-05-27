@@ -4,9 +4,13 @@ import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../Ontology";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
 import { spawn, Worker } from "threads";
+import { Pool } from "threads/dist";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
-    private static worker;
+    private static pool = Pool(
+        () => spawn(new Worker("./NcbiOntologyProcessor.worker.ts")),
+        2
+    );
 
     constructor(private readonly comSource: CommunicationSource) {}
 
@@ -15,15 +19,16 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
     }
 
     public async getOntologyByIds(ids: NcbiId[]): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        const communicator = this.comSource.getNcbiCommunicator();
-        await communicator.process(ids);
+        return new Promise<Ontology<NcbiId, NcbiTaxon>>((resolve, reject) => {
+            NcbiOntologyProcessor.pool.queue(async(worker) => {
+                const communicator = this.comSource.getNcbiCommunicator();
+                await communicator.process(ids);
 
-        if (!NcbiOntologyProcessor.worker) {
-            NcbiOntologyProcessor.worker = await spawn(new Worker("./NcbiOntologyProcessor.worker.ts"));
-        }
-        const definitions = await NcbiOntologyProcessor.worker.process(ids, communicator.getResponseMap());
+                const definitions = await worker.process(ids, communicator.getResponseMap());
 
-        return new Ontology<NcbiId, NcbiTaxon>(definitions);
+                resolve(new Ontology<NcbiId, NcbiTaxon>(definitions));
+            })
+        });
     }
 
     public async getDefinition(id: NcbiId): Promise<NcbiTaxon> {

@@ -267,12 +267,12 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
     private async mounted() {
-        await this.onPeptideCountTableChanged();
+        await this.recompute();
     }
 
     @Watch("peptideCountTable")
     @Watch("communicationSource")
-    private async onPeptideCountTableChanged() {
+    private async recompute() {
         this.tree = null;
         if (this.peptideCountTable && this.communicationSource) {
             const taxaCountProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration, this.communicationSource);
