@@ -4,7 +4,7 @@ import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../Ontology";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
 import { spawn, Worker } from "threads";
-import { Pool } from "threads/dist";
+import { Pool } from "threads";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
     private static pool = Pool(
