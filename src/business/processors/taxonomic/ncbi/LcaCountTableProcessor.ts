@@ -5,7 +5,7 @@ import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import ProteomicsCountTableProcessor from "./../../ProteomicsCountTableProcessor";
 import { spawn, Worker, Transfer } from "threads";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
-import { Pool } from "threads/dist";
+import { Pool } from "threads";
 
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;

@@ -25,10 +25,14 @@ export class Worker {
 }
 
 export class PoolMock {
-    constructor(private spawner: () => Promise<any>) {}
+    private worker;
 
-    queue(func: () => Promise<any>) {
-        func();
+    constructor(private spawner: () => Promise<any>) {
+        this.worker = spawner();
+    }
+
+    async queue(func: (worker) => Promise<any>) {
+        await func(await this.worker);
     }
 }
 
