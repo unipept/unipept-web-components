@@ -1,25 +1,16 @@
 import Assay from "./Assay";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import ChangeListener from "./../ChangeListener";
 import AssayVisitor from "./AssayVisitor";
 import { Peptide } from "./../../ontology/raw/Peptide";
 
 export default class ProteomicsAssay extends Assay {
     protected amountOfPeptides: number = 0;
 
-    constructor(
-        protected readonly changeListeners: ChangeListener<Assay>[],
-        public readonly id: string,
-        protected searchConfiguration?: SearchConfiguration,
-        protected peptides?: Peptide[],
-        protected name?: string,
-        protected date?: Date,
-    ) {
-        super(changeListeners, id, name, date);
+    private searchConfiguration: SearchConfiguration = new SearchConfiguration();
+    private peptides: Peptide[] = [];
 
-        if (peptides) {
-            this.amountOfPeptides = peptides.length;
-        }
+    constructor(public readonly id: string) {
+        super(id);
     }
 
     public getSearchConfiguration(): SearchConfiguration {
@@ -27,20 +18,33 @@ export default class ProteomicsAssay extends Assay {
     }
 
     public setSearchConfiguration(value: SearchConfiguration) {
-        super.onUpdate("searchConfiguration", this.searchConfiguration, value);
+        const oldConfig = this.searchConfiguration;
         this.searchConfiguration = value;
+
+        if (oldConfig.toString() !== value.toString()) {
+            super.onUpdate("searchConfiguration", oldConfig, value);
+        }
     }
 
     public getPeptides(): Peptide[] {
         return this.peptides;
     }
 
-    public setPeptides(peptides: Peptide[], fireChange: boolean = true): void {
-        if (fireChange) {
-            super.onUpdate("peptides", this.peptides, peptides);
-        }
+    public setPeptides(peptides: Peptide[]): void {
+        const oldPeptides = this.peptides;
         this.amountOfPeptides = peptides.length;
         this.peptides = peptides;
+
+        const equalPeptides: boolean =
+            oldPeptides &&
+            oldPeptides.length === peptides.length &&
+            (oldPeptides === peptides || oldPeptides.every(
+                (oldPept, idx) => oldPept === peptides[idx])
+            );
+
+        if  (equalPeptides) {
+            super.onUpdate("peptides", oldPeptides, peptides);
+        }
     }
 
     public getAmountOfPeptides(): number {
@@ -48,7 +52,11 @@ export default class ProteomicsAssay extends Assay {
     }
 
     public setAmountOfPeptides(amount: number): void {
+        const oldAmount = this.amountOfPeptides;
         this.amountOfPeptides = amount;
+        if (this.amountOfPeptides !== amount) {
+            super.onUpdate("amountOfPeptides", oldAmount, amount);
+        }
     }
 
     async accept(visitor: AssayVisitor): Promise<void> {

@@ -5,14 +5,22 @@ import Visitable from "./../../visitor/Visitable";
 
 export default class Study implements Visitable<StudyVisitor> {
     protected readonly assays: Assay[] = [];
-    protected name: string;
-    protected readonly id: string;
-    protected changeListeners: ChangeListener<Study>[];
+    protected readonly changeListeners: ChangeListener<Study>[] = [];
 
-    constructor(changeListeners: ChangeListener<Study>[], id: string, name?: string) {
+    protected name: string = "";
+
+    constructor(
+        protected readonly id: string
+    ) {
         this.id = id;
-        this.name = name;
-        this.changeListeners = changeListeners;
+    }
+
+    public getId(): string {
+        return this.id;
+    }
+
+    public addChangeListener(listener: ChangeListener<Study>) {
+        this.changeListeners.push(listener);
     }
 
     public getName(): string {
@@ -22,11 +30,9 @@ export default class Study implements Visitable<StudyVisitor> {
     public setName(name: string) {
         const oldName: string = this.name;
         this.name = name;
-        this.onUpdate( "name", oldName, name);
-    }
-
-    public getId(): string {
-        return this.id;
+        if (oldName != name) {
+            this.onUpdate( "name", oldName, name);
+        }
     }
 
     public getAssays(): Assay[] {
