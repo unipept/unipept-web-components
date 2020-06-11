@@ -49,15 +49,10 @@ export default class Mock {
             "AVGFGGDFDGVPR"
         ]
 
-        let output: ProteomicsAssay = new ProteomicsAssay(
-            [],
-            "1",
-            new SearchConfiguration(),
-            sequences,
-            "Sample X",
-            new Date("2019-10-21")
-        );
-
+        let output: ProteomicsAssay = new ProteomicsAssay("1");
+        output.setPeptides(sequences);
+        output.setName("Sample X");
+        output.setDate(new Date("2019-10-21"));
         return output;
     }
 

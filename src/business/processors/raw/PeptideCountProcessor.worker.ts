@@ -49,6 +49,11 @@ function filter(peptides: Peptide[], searchConfiguration: SearchConfiguration): 
  */
 function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boolean): Peptide[] {
     if (!advancedMissedCleavageHandling) {
+        // const output = [];
+        // for (const peptide of peptides) {
+        //     output.push(...peptide.split(/([KR])([^P])/g))
+        // }
+        // return output;
         return peptides.join("+")
             .replace(/([KR])([^P])/g, "$1+$2")
             .replace(/([KR])([^P+])/g, "$1+$2")

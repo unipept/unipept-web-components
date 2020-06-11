@@ -41,7 +41,7 @@ export default class DatasetMixin extends Vue {
      * @return The assay that was created and stored by this function.
      */
     protected storeDataset(peptides: string, name: string, save: boolean): ProteomicsAssay {
-        const assay: ProteomicsAssay = new ProteomicsAssay([], uuidv4());
+        const assay: ProteomicsAssay = new ProteomicsAssay(uuidv4());
 
         assay.setPeptides(peptides.split("\n"));
         assay.setDate(new Date());
