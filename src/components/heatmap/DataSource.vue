@@ -90,6 +90,9 @@ export default class DataSource extends Vue {
             } else {
                 this.visibleItems.push(...this.items.filter(i => i.category.toLowerCase() === this.selectedCategory.toLowerCase()));
             }
+        } else {
+            console.log("Resetting visible items...");
+            this.visibleItems.length = 0;
         }
     }
 

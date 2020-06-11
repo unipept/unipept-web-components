@@ -8,7 +8,7 @@ export default abstract class Assay implements Visitable<AssayVisitor> {
     private changeListeners: ChangeListener<Assay>[] = [];
 
     protected constructor(
-        public readonly id: string
+        public id: string
     ) {}
 
     public addChangeListener(listener: ChangeListener<Assay>): void {

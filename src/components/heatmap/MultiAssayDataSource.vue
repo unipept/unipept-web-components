@@ -198,6 +198,7 @@ export default class MultiAssayDataSource extends Vue {
     }
 
     private async computeItems(dataItem: SourceMetadata) {
+        console.log("Compute items...");
         if (this.assays && this.assays.length > 0) {
             dataItem.loading = true;
 
@@ -253,7 +254,7 @@ export default class MultiAssayDataSource extends Vue {
             dataItem.items.push(...items);
             dataItem.loading = false;
         } else {
-            dataItem.items.length = 0;
+            dataItem.items.splice(0, dataItem.items.length);
             dataItem.loading = false;
         }
     }
