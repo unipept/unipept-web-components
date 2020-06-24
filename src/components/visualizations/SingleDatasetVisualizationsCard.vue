@@ -22,7 +22,7 @@
                 </v-tab>
                 <v-spacer>
                 </v-spacer>
-                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.peptideCountTable">
+                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.assay">
                     <template v-slot:activator="{ on }">
                         <v-btn text class="align-self-center mr-4" v-on="on">
                             More
@@ -165,25 +165,20 @@
                     </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                    <v-card flat>
-                        <heatmap-wizard-single-sample
-                            v-if="peptideCountTable"
-                            :communication-source="communicationSource"
-                            :peptide-count-table="peptideCountTable"
-                            :search-configuration="searchConfiguration">
-                        </heatmap-wizard-single-sample>
-                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            </v-progress-circular>
-                        </div>
-                        <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
-                        </div>
-                    </v-card>
+<!--                    <v-card flat>-->
+<!--                        <heatmap-wizard-single-sample v-if="assay" :assay="assay"></heatmap-wizard-single-sample>-->
+<!--                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">-->
+<!--                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>-->
+<!--                            </v-progress-circular>-->
+<!--                        </div>-->
+<!--                        <div v-else>-->
+<!--                            <v-card-text>-->
+<!--                                <div class="placeholder-text">-->
+<!--                                    {{ placeholderText }}-->
+<!--                                </div>-->
+<!--                            </v-card-text>-->
+<!--                        </div>-->
+<!--                    </v-card>-->
                 </v-tab-item>
             </v-tabs-items>
         </v-card>
@@ -215,6 +210,7 @@ import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/L
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
 import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 
 
 @Component({
@@ -240,11 +236,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     @Prop({ required: true })
-    private peptideCountTable: CountTable<Peptide>;
-    @Prop({ required: true })
-    private searchConfiguration: SearchConfiguration;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
+    private assay: ProteomicsAssay;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
     @Prop({ required: false, default: "primary" })
@@ -260,29 +252,20 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     private isFullScreen: boolean = false;
     private dialogOpen: boolean = false;
 
-    private tree: Tree = null;
-
     private tab = null;
 
     private readonly tabs: string[] = ["Sunburst", "Treemap", "Treeview", "Hierarchical outline", "Heatmap"];
 
-    private async mounted() {
-        await this.recompute();
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.peptideCountTable;
     }
 
-    @Watch("peptideCountTable")
-    @Watch("communicationSource")
-    private async recompute() {
-        this.tree = null;
-        if (this.peptideCountTable && this.communicationSource) {
-            const taxaCountProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration, this.communicationSource);
-            const taxaCounts = await taxaCountProcessor.getCountTable();
+    get tree(): Tree {
+        return this.$store.getters["ncbi/tree"](this.assay);
+    }
 
-            const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
-            const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
-
-            this.tree = new Tree(taxaCounts, taxaOntology, await taxaCountProcessor.getAnnotationPeptideMapping());
-        }
+    get searchConfiguration(): SearchConfiguration {
+        return this.assay?.getSearchConfiguration();
     }
 
     private switchToFullScreen() {

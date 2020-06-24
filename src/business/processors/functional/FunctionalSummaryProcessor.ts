@@ -14,18 +14,16 @@ export default class FunctionalSummaryProcessor {
      * @param element The functional annotation for which a summary should be made.
      * @param peptideTable A count table for the peptides that are annotated with the given functional definition.
      * @param configuration The configuration that's currently being used
+     * @param pept2DataCommunicator A Pept2DataCommunicator that processed the given peptideTable before.
+     * @param ncbiOntologyProcessor A valid NcbiOntologyProcessor that processed the given peptideTable before.
      */
     public async summarizeFunctionalAnnotation(
         element: FunctionalDefinition,
         peptideTable: CountTable<Peptide>,
         configuration: SearchConfiguration,
-        communicationSource: CommunicationSource
+        pept2DataCommunicator: Pept2DataCommunicator,
+        ncbiOntologyProcessor: NcbiOntologyProcessor
     ): Promise<string[][]> {
-        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
-        await pept2DataCommunicator.process(peptideTable, configuration);
-
-        const ontologyProcessor = new NcbiOntologyProcessor(communicationSource);
-
         const processedPeptides: string[][] = peptideTable.getOntologyIds().map(peptide => {
             let peptideCount = peptideTable.getCounts(peptide);
             let peptideData = pept2DataCommunicator.getPeptideResponse(peptide, configuration);
@@ -37,7 +35,7 @@ export default class FunctionalSummaryProcessor {
                 peptideData.fa.counts.all,
                 ecProteinCount,
                 100 * (ecProteinCount / peptideData.fa.counts.all),
-                ontologyProcessor.getDefinition(peptideData.lca)
+                ncbiOntologyProcessor.getDefinition(peptideData.lca)
             ]
         })
 

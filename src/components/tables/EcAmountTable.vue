@@ -1,11 +1,10 @@
 <template>
     <amount-table
-        :loading="isLoading"
+        :loading="ecCountTableProcessor === undefined"
         annotation-name="EC number"
         :items="items"
-        :communication-source="communicationSource"
-        :search-configuration="searchConfiguration"
-        :item-to-peptides-mapping="ecPeptideMapping"
+        :assay="assay"
+        :item-to-peptides-mapping="itemsToPeptidesMapping"
         :tree="tree"
         :taxa-to-peptides-mapping="taxaToPeptidesMapping"
         :show-percentage="showPercentage"
@@ -21,13 +20,13 @@ import AmountTable from "./AmountTable.vue";
 import EcDefinition, { EcCode } from "./../../business/ontology/functional/ec/EcDefinition";
 import { CountTable } from "./../../business/counts/CountTable";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
-import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import TableItem from "./../tables/TableItem";
-import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
 import { Ontology } from "./../../business/ontology/Ontology";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
+import EcCountTableProcessor from "./../../business/processors/functional/ec/EcCountTableProcessor";
 
 @Component({
     components: {
@@ -43,65 +42,77 @@ import CommunicationSource from "./../../business/communication/source/Communica
 })
 export default class EcAmountTable extends Vue {
     @Prop({ required: true })
-    private ecCountTable: CountTable<EcCode>;
-    @Prop({ required: true })
-    private ecOntology: Ontology<EcCode, EcDefinition>;
-    /**
-     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
-     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
-     * relative values will be shown (by dividing every count by x).
-     */
-    @Prop({ required: true })
-    private relativeCounts: number;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    @Prop({ required: false })
-    private ecPeptideMapping: Map<EcCode, Peptide[]>;
-    @Prop({ required: false, default: false })
-    private loading: boolean;
-    @Prop({ required: false })
-    private searchConfiguration: SearchConfiguration;
+    private assay: ProteomicsAssay;
     /**
      * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
      */
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
-    @Prop({ required: false })
-    protected tree: Tree;
 
     private items: TableItem[] = [];
     private computeInProgress: boolean = false;
+    private itemsToPeptidesMapping: Map<EcCode, Peptide[]> = null;
+    private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
 
     public async mounted() {
         await this.onInputsChanged();
     }
 
-    @Watch("ecCountTable")
-    @Watch("ecOntology")
-    @Watch("relativeCounts")
-    public async onInputsChanged() {
-        if (this.ecCountTable && this.ecOntology) {
-            this.computeInProgress = true;
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+    }
 
-            const newItems = this.ecCountTable.getOntologyIds().map(ecCode => {
+    get ecCountTableProcessor(): EcCountTableProcessor {
+        return this.$store.getters["ec/filteredData"](this.assay)?.processor;
+    }
+
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters["ec/ontology"](this.assay);
+    }
+
+    get tree(): Tree {
+        return this.$store.getters["ncbi/tree"](this.assay);
+    }
+
+    get ncbiCountTableProcessor(): LcaCountTableProcessor {
+        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+    }
+
+    @Watch("ncbiCountTableProcessor")
+    private async onNcbiCountTableProcessorChanged() {
+        if (this.ncbiCountTableProcessor) {
+            this.taxaToPeptidesMapping = await this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
+        }
+    }
+
+    @Watch("ecCountTableProcessor")
+    @Watch("ecOntology")
+    @Watch("peptideCountTable")
+    public async onInputsChanged() {
+        this.computeInProgress = true;
+        this.items.splice(0, this.items.length);
+
+        if (this.peptideCountTable && this.ecOntology && this.ecCountTableProcessor) {
+            const newItems: TableItem[] = [];
+            this.itemsToPeptidesMapping = await this.ecCountTableProcessor.getAnnotationPeptideMapping();
+
+            const ecCountTable = await this.ecCountTableProcessor.getCountTable();
+
+            for (const ecCode of ecCountTable.getOntologyIds()) {
                 const definition: EcDefinition = this.ecOntology.getDefinition(ecCode);
-                const currentCount = this.ecCountTable.getCounts(ecCode);
+                const currentCount = ecCountTable.getCounts(ecCode);
 
                 if (definition) {
-                    return new TableItem(
+                    newItems.push(new TableItem(
                         currentCount,
-                        currentCount / this.relativeCounts,
+                        currentCount / this.peptideCountTable.totalCount,
                         definition.name,
                         definition.code,
                         definition
-                    );
+                    ));
                 }
-            });
+            }
 
-            this.items.length = 0;
             this.items.push(...newItems.filter(i => i).sort((a: TableItem, b: TableItem) => b.count - a.count));
 
             this.computeInProgress = false;

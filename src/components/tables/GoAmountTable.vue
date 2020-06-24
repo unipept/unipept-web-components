@@ -1,15 +1,14 @@
 <template>
     <amount-table
         :items="items"
-        :loading="isLoading"
-        :communication-source="communicationSource"
+        :assay="assay"
+        :loading="goCountTableProcessor === undefined"
         annotation-name="GO term"
         :namespace="namespace"
-        :search-configuration="searchConfiguration"
-        :item-to-peptides-mapping="goPeptideMapping"
+        :item-to-peptides-mapping="itemsToPeptidesMapping"
+        :taxa-to-peptides-mapping="taxaToPeptidesMapping"
         :show-percentage="showPercentage"
         :tree="tree"
-        :taxa-to-peptides-mapping="taxaToPeptidesMapping"
         :external-url-constructor="getUrl">
     </amount-table>
 </template>
@@ -18,57 +17,29 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
-import Treeview from "../visualizations/treeview.vue";
 import AmountTable from "./AmountTable.vue";
 import GoDefinition, { GoCode } from "./../../business/ontology/functional/go/GoDefinition";
 import { CountTable } from "./../../business/counts/CountTable";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
-import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import TableItem from "./../tables/TableItem";
-import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import { GoNamespace } from "./../../business/ontology/functional/go/GoNamespace";
 import { Ontology } from "./../../business/ontology/Ontology";
-import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import GoCountTableProcessor from "./../../business/processors/functional/go/GoCountTableProcessor";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 
 @Component({
     components: {
         AmountTable
-    },
-    computed: {
-        isLoading: {
-            get(): boolean {
-                return this.loading || this.isComputing;
-            }
-        }
     }
 })
 export default class GoAmountTable extends Vue {
     @Prop({ required: true })
-    private goCountTable: CountTable<GoCode>;
+    private assay: ProteomicsAssay;
     @Prop({ required: true })
-    private goOntology: Ontology<GoCode, GoDefinition>;
-    /**
-     * The total amount of counts (over all GO-terms / peptides)
-     */
-    @Prop({ required: true })
-    private relativeCounts: number;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    @Prop({ required: false })
-    private goPeptideMapping: Map<GoCode, Peptide[]>;
-    @Prop({ required: false, default: false })
-    private loading: boolean;
-    @Prop({ required: false })
-    private searchConfiguration: SearchConfiguration;
-    @Prop({ required: false })
-    private tree: Tree;
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
-    @Prop({ required: false })
-    private namespace: string;
+    private namespace: GoNamespace;
     /**
      * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
      */
@@ -77,29 +48,61 @@ export default class GoAmountTable extends Vue {
 
     private items: TableItem[] = [];
     private isComputing: boolean = false;
+    private itemsToPeptidesMapping: Map<GoCode, Peptide[]> = null;
+    private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
 
     public async mounted() {
         await this.onInputsChanged();
     }
 
-    @Watch("goCountTable")
-    @Watch("relativeCounts")
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+    }
+
+    get goCountTableProcessor(): GoCountTableProcessor {
+        return this.$store.getters["go/filteredData"](this.assay)?.processor;
+    }
+
+    get goOntology(): Ontology<GoCode, GoDefinition> {
+        return this.$store.getters["go/ontology"](this.assay);
+    }
+
+    get tree(): Tree {
+        return this.$store.getters["ncbi/tree"](this.assay);
+    }
+
+    get ncbiCountTableProcessor(): LcaCountTableProcessor {
+        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+    }
+
+    @Watch("ncbiCountTableProcessor")
+    private async onNcbiCountTableChanged() {
+        if (this.ncbiCountTableProcessor) {
+            this.taxaToPeptidesMapping = await this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
+        }
+    }
+
+    @Watch("goCountTableProcessor")
+    @Watch("peptideCountTable")
     @Watch("goOntology")
-    private onInputsChanged() {
+    private async onInputsChanged() {
         this.isComputing = true;
-        this.items.length = 0;
+        this.items.splice(0, this.items.length);
 
-        if (this.goCountTable && this.goOntology) {
+        if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
             const newItems: TableItem[] = [];
+            this.itemsToPeptidesMapping = await this.goCountTableProcessor.getAnnotationPeptideMapping();
 
-            for (const goCode of this.goCountTable.getOntologyIds()) {
+            const goCountTable = await this.goCountTableProcessor.getCountTable(this.namespace);
+
+            for (const goCode of goCountTable.getOntologyIds()) {
                 const definition: GoDefinition = this.goOntology.getDefinition(goCode);
-                const currentCount = this.goCountTable.getCounts(goCode);
+                const currentCount = goCountTable.getCounts(goCode);
 
                 if (definition) {
                     newItems.push(new TableItem(
                         currentCount,
-                        currentCount / this.relativeCounts,
+                        currentCount / this.peptideCountTable.totalCount,
                         definition.name,
                         definition.code,
                         definition

@@ -21,6 +21,10 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
         private readonly communicationSource: CommunicationSource
     ) {}
 
+    public cancel() {
+        // TODO implement...
+    }
+
     public async getCountTable(): Promise<CountTable<NcbiId>> {
         await this.compute();
         return this.countTable;

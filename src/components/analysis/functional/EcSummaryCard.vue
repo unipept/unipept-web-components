@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!analysisInProgress">
+            <div v-if="$store.getters.activeAssay === undefined">
                 <span class="placeholder-text">
                     Please select at least one dataset for analysis.
                 </span>
@@ -10,15 +10,7 @@
                 <slot name="analysis-header"></slot>
 
                 <ec-amount-table
-                    :loading="loading"
-                    :communication-source="communicationSource"
-                    :ec-count-table="ecCountTable"
-                    :ec-peptide-mapping="ecPeptideMapping"
-                    :ec-ontology="ecOntology"
-                    :search-configuration="searchConfiguration"
-                    :relative-counts="relativeCounts"
-                    :tree="tree"
-                    :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                    :assay="assay"
                     :show-percentage="showPercentage">
                 </ec-amount-table>
                 <v-card outlined>
@@ -50,7 +42,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import Component, { mixins } from "vue-class-component";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
 import EcAmountTable from "../../tables/EcAmountTable.vue";
@@ -60,12 +51,11 @@ import { Prop, Watch } from "vue-property-decorator";
 import EcDefinition, { EcCode } from "./../../../business/ontology/functional/ec/EcDefinition";
 import { CountTable } from "./../../../business/counts/CountTable";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
-import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
 import { Ontology } from "./../../../business/ontology/Ontology";
 import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
-import Tree from "./../../../business/ontology/taxonomic/Tree";
 import ImageDownloadModal from "./../../utils/ImageDownloadModal.vue";
-import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
+import EcCountTableProcessor from "./../../../business/processors/functional/ec/EcCountTableProcessor";
 
 @Component({
     components: {
@@ -73,44 +63,29 @@ import CommunicationSource from "./../../../business/communication/source/Commun
         FilterFunctionalAnnotationsDropdown,
         EcAmountTable,
         Treeview
-    },
-    computed: {
-        isLoading: {
-            get(): boolean {
-                return this.calculationsInProgress || this.loading;
-            }
-        }
     }
 })
 export default class EcSummaryCard extends Vue {
     @Prop({ required: true })
-    private ecCountTable: CountTable<Peptide>;
-    @Prop({ required: true })
-    private ecOntology: Ontology<EcCode, EcDefinition>;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-    @Prop({ required: false })
-    private ecPeptideMapping: Map<EcCode, Peptide[]>;
-    @Prop({ required: false })
-    private searchConfiguration: SearchConfiguration;
-    @Prop({ required: false, default: false })
-    private loading: boolean;
-    @Prop({ required: false, default: true })
-    private analysisInProgress: boolean;
-    @Prop({ required: true })
-    private relativeCounts: number;
+    private assay: ProteomicsAssay;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
     @Prop({ required: false })
     protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
-    @Prop({ required: false })
-    protected tree: Tree;
 
-    private calculationsInProgress: boolean = false;
     private ecTree: TreeViewNode = null;
+    private loading: boolean = false;
 
     public async mounted() {
         await this.recompute();
+    }
+
+    get ecCountTableProcessor(): EcCountTableProcessor {
+        return this.$store.getters["ec/filteredData"](this.assay)?.processor;
+    }
+
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters["ec/ontology"](this.assay);
     }
 
     private ecTreeTooltip: (d: any) => string = (d: any) => {
@@ -131,16 +106,17 @@ export default class EcSummaryCard extends Vue {
 
         tip += "</div>";
         return tip;
-    };
+    }
 
-    @Watch("ecCountTable")
+    @Watch("ecCountTableProcessor")
     @Watch("ecOntology")
     private async recompute() {
-        this.calculationsInProgress = true;
-        if (this.ecCountTable && this.ecOntology) {
-            this.ecTree = await this.computeEcTree(this.ecCountTable, this.ecOntology);
+        this.loading = true;
+        if (this.ecCountTableProcessor && this.ecOntology) {
+            const ecCountTable = await this.ecCountTableProcessor.getCountTable();
+            this.ecTree = await this.computeEcTree(ecCountTable, this.ecOntology);
         }
-        this.calculationsInProgress = false;
+        this.loading = false;
     }
 
     private async computeEcTree(

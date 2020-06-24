@@ -89,6 +89,7 @@ export default class DatasetForm extends Vue {
     @Watch("peptides")
     private onPeptidesChange(newPeptides: string, oldPeptides: string) {
         this.peptidesData = newPeptides;
+        this.$store;
     }
 
     @Watch("name")

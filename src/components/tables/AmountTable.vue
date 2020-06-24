@@ -91,14 +91,15 @@ import TableItem from "./../tables/TableItem";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
 import CsvUtils from "./../../business/storage/CsvUtils";
 import FunctionalSummaryProcessor from "./../../business/processors/functional/FunctionalSummaryProcessor";
-import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
-import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 import HighlightedTreeProcessor from "./../../business/processors/taxonomic/ncbi/HighlightedTreeProcessor";
+import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import Pept2DataCommunicator from "./../../business/communication/peptides/Pept2DataCommunicator";
 
 @Component({
     components: {
@@ -158,7 +159,7 @@ export default class AmountTable extends Vue {
     @Prop({ required: true })
     private externalUrlConstructor: (code: string) => string;
     @Prop({ required: true })
-    private communicationSource: CommunicationSource;
+    private assay: ProteomicsAssay;
 
     /**
      * What items are displayed as counts? (e.g. peptides, proteins, ...)
@@ -170,8 +171,6 @@ export default class AmountTable extends Vue {
     @Prop({ required: false, default: false })
     private showNamespace: boolean;
     @Prop({ required: false })
-    protected searchConfiguration: SearchConfiguration;
-    @Prop({ required: false })
     protected tree: Tree;
     /**
      * A map that returns for a given annotation all peptides associated with this annotation. If this map is not
@@ -179,6 +178,9 @@ export default class AmountTable extends Vue {
      */
     @Prop({ required: false })
     protected itemToPeptidesMapping: Map<string, Peptide[]>;
+    /**
+     * A map that returns for a taxon all peptides associated with this taxon.
+     */
     @Prop({ required: false })
     protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
     @Prop({ required: false, default: false })
@@ -199,6 +201,14 @@ export default class AmountTable extends Vue {
 
     private highlightedTreeProcessor: HighlightedTreeProcessor = new HighlightedTreeProcessor();
 
+    get pept2dataCommunicator(): Pept2DataCommunicator {
+        return this.$store.getters.assayData(this.assay)?.pept2dataCommunicator;
+    }
+
+    get ncbiOntologyProcessor(): NcbiOntologyProcessor {
+        return this.$store.getters["ncbi/ontology"](this.assay)?.processor;
+    }
+
     private async saveTableAsCsv(): Promise<void> {
         const columnNames = ["Peptides", this.annotationName, "Name"];
         let grid: string[][] = this.items.map(item => [item.count.toString(), item.code, item.name]);
@@ -214,15 +224,16 @@ export default class AmountTable extends Vue {
         const peptideTableProcessor = new PeptideCountTableProcessor();
         const peptideCounts = await peptideTableProcessor.getPeptideCountTable(
             this.itemToPeptidesMapping.get(term.code),
-            this.searchConfiguration
+            this.assay.getSearchConfiguration()
         );
 
         const functionalSummaryProcessor = new FunctionalSummaryProcessor();
         const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
             term.definition,
             peptideCounts,
-            this.searchConfiguration,
-            this.communicationSource
+            this.assay.getSearchConfiguration(),
+            this.pept2dataCommunicator,
+            this.ncbiOntologyProcessor
         );
 
         await NetworkUtils.downloadDataByForm(

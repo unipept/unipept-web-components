@@ -107,13 +107,8 @@
                     <multi-go-summary-card
                         v-if="filteredCountTable"
                         ref="goSummaryCard"
-                        :communication-source="communicationSource"
-                        :peptide-count-table="filteredCountTable"
-                        :search-configuration="searchConfiguration"
-                        :relative-counts="relativeCounts"
-                        :show-percentage="showPercentage"
-                        :tree="tree"
-                        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
+                        :assay="assay"
+                        :show-percentage="showPercentage">
                     </multi-go-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-card-text class="d-flex justify-center">
@@ -133,13 +128,8 @@
                     <multi-ec-summary-card
                         v-if="filteredCountTable"
                         ref="ecSummaryCard"
-                        :communication-source="communicationSource"
-                        :peptide-count-table="filteredCountTable"
-                        :search-configuration="searchConfiguration"
-                        :relative-counts="relativeCounts"
-                        :show-percentage="showPercentage"
-                        :tree="tree"
-                        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
+                        :assay="assay"
+                        :show-percentage="showPercentage">
                     </multi-ec-summary-card>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                         <v-card-text class="d-flex justify-center">
@@ -155,32 +145,28 @@
                         </v-card-text>
                     </div>
                 </v-tab-item>
-                <v-tab-item>
-                    <multi-interpro-summary-card
-                        v-if="filteredCountTable"
-                        ref="interproSummaryCard"
-                        :communication-source="communicationSource"
-                        :peptide-count-table="filteredCountTable"
-                        :search-configuration="searchConfiguration"
-                        :relative-counts="relativeCounts"
-                        :show-percentage="showPercentage"
-                        :tree="tree"
-                        :taxa-to-peptides-mapping="taxaToPeptidesMapping">
-                    </multi-interpro-summary-card>
-                    <div v-else-if="this.analysisInProgress">
-                        <v-card-text class="d-flex justify-center">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            </v-progress-circular>
-                        </v-card-text>
-                    </div>
-                    <div v-else>
-                        <v-card-text>
-                            <div class="placeholder-text">
-                                {{ placeholderText }}
-                            </div>
-                        </v-card-text>
-                    </div>
-                </v-tab-item>
+<!--                <v-tab-item>-->
+<!--                    <multi-interpro-summary-card-->
+<!--                        v-if="filteredCountTable"-->
+<!--                        ref="interproSummaryCard"-->
+<!--                        :assay="assay"-->
+<!--                        :tree="tree"-->
+<!--                        :show-percentage="showPercentage">-->
+<!--                    </multi-interpro-summary-card>-->
+<!--                    <div v-else-if="this.analysisInProgress">-->
+<!--                        <v-card-text class="d-flex justify-center">-->
+<!--                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>-->
+<!--                            </v-progress-circular>-->
+<!--                        </v-card-text>-->
+<!--                    </div>-->
+<!--                    <div v-else>-->
+<!--                        <v-card-text>-->
+<!--                            <div class="placeholder-text">-->
+<!--                                {{ placeholderText }}-->
+<!--                            </div>-->
+<!--                        </v-card-text>-->
+<!--                    </div>-->
+<!--                </v-tab-item>-->
             </v-tabs-items>
         </v-card>
         <div id="tooltip" class="tip"></div>
@@ -213,6 +199,8 @@ import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
 import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
+import { Ontology } from "@/business/ontology/Ontology";
 
 @Component({
     components: {
@@ -235,24 +223,19 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     @Prop({ required: true })
-    private peptideCountTable: CountTable<Peptide>;
-    @Prop({ required: true })
-    private selectedTaxonId: NcbiId;
-    @Prop({ required: true })
-    private searchConfiguration: SearchConfiguration;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
+    private assay: ProteomicsAssay;
+    // @Prop({ required: true })
+    // private selectedTaxonId: NcbiId;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
 
-    private filteredCountTable: CountTable<Peptide> = null;
+    private selectedTaxonId: NcbiId = -1;
 
     private selectedSortTypeName: string = "Peptides";
     private relativeCounts: number = 0;
 
     private taxonId: number = -1;
 
-    private totalPeptides: number = 0;
     private selectedNCBITaxon: NcbiTaxon = null;
 
     private currentTab: number = 0;
@@ -268,7 +251,6 @@ export default class FunctionalSummaryCard extends Vue {
 
     mounted() {
         this.onSelectedTaxonIdChanged();
-        this.redoCalculations();
     }
 
     @Watch("selectedTaxonId")
@@ -276,84 +258,27 @@ export default class FunctionalSummaryCard extends Vue {
         this.taxonId = this.selectedTaxonId;
     }
 
-    @Watch("taxonId")
-    @Watch("peptideCountTable")
-    @Watch("searchConfiguration")
-    @Watch("communicationSource")
-    private async redoCalculations() {
-        this.faCalculationsInProgress = true;
-
-        this.filteredCountTable = null;
-        this.relativeCounts = 0;
-
-        if (this.peptideCountTable && this.searchConfiguration && this.communicationSource) {
-            if (this.taxonId === -1) {
-                this.filteredCountTable = this.peptideCountTable;
-                this.relativeCounts = this.peptideCountTable.totalCount;
-            } else {
-                // Update the count tables so that they only count peptides that are associated with the current taxon
-                // filter
-                const taxaProcessor = new LcaCountTableProcessor(this.peptideCountTable, this.searchConfiguration, this.communicationSource);
-                const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
-
-                const peptidesForTaxon = await this.getOwnAndChildrenSequences(
-                    this.taxonId,
-                    taxaProcessor,
-                    taxaOntologyProcessor
-                )
-
-                const peptideProcessor = new PeptideCountTableProcessor();
-
-                this.filteredCountTable = await peptideProcessor.getPeptideCountTable(
-                    peptidesForTaxon,
-                    this.searchConfiguration
-                );
-                this.selectedNCBITaxon = await taxaOntologyProcessor.getDefinition(this.taxonId);
-                this.relativeCounts = this.peptideCountTable.totalCount;
-            }
-            await this.computeTree();
-        }
-        this.faCalculationsInProgress = false;
+    get filteredCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
     }
 
+    get lcaProcessor(): LcaCountTableProcessor {
+        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+    }
+
+    get lcaOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters["ncbi/ontology"](this.assay)?.ontology;
+    }
+
+    @Watch("filteredCountTable")
+    @Watch("lcaProcessor")
+    @Watch("lcaOntology")
     private async computeTree() {
-        const taxaCountProcessor = new LcaCountTableProcessor(this.filteredCountTable, this.searchConfiguration, this.communicationSource);
-        this.taxaToPeptidesMapping = await taxaCountProcessor.getAnnotationPeptideMapping();
-        const taxaCounts = await taxaCountProcessor.getCountTable();
-
-        const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
-        const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCounts);
-
-        this.tree = new Tree(taxaCounts, taxaOntology);
-    }
-
-    private async getOwnAndChildrenSequences(
-        taxonId: NcbiId,
-        taxaProcessor: LcaCountTableProcessor,
-        ontologyProcessor: NcbiOntologyProcessor
-    ): Promise<Peptide[]> {
-        const taxaTable = await taxaProcessor.getCountTable();
-        const peptideMapping = await taxaProcessor.getAnnotationPeptideMapping();
-
-        const tree = new Tree(taxaTable, await ontologyProcessor.getOntology(taxaTable));
-
-        const node = tree.nodes.get(taxonId);
-
-        const sequences: Peptide[] = [];
-        const nodes: TreeNode[] = [node];
-        while (nodes.length > 0) {
-            const node = nodes.pop();
-
-            if (peptideMapping.has(node.id)) {
-                sequences.push(...peptideMapping.get(node.id));
-            }
-
-            if (node.children) {
-                nodes.push(...node.children);
-            }
+        if (this.filteredCountTable && this.lcaProcessor && this.lcaOntology) {
+            this.taxaToPeptidesMapping = await this.lcaProcessor.getAnnotationPeptideMapping();
+            const taxaCounts = await this.lcaProcessor.getCountTable();
+            this.tree = new Tree(taxaCounts, this.lcaOntology);
         }
-
-        return sequences;
     }
 
     private enableRelativeCounts(): void {

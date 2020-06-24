@@ -9,9 +9,11 @@ const PEPTDATA_BATCH_SIZE = 100;
 const PEPTDATA_ENDPOINT = "/mpa/pept2data";
 const PARALLEL_REQUESTS = 5;
 
-expose(process)
+let cancelled: boolean = false;
 
-export default function process(peptides: Peptide[], config: SearchConfiguration, baseUrl: string): Observable<{ type: string, value: any }> {
+expose({ process, cancel })
+
+export function process(peptides: Peptide[], config: SearchConfiguration, baseUrl: string): Observable<{ type: string, value: any }> {
     // @ts-ignore
     return new Observable(async(observer) => {
         try {
@@ -27,6 +29,11 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
 
             for (let i = 0; i < peptides.length; i += PEPTDATA_BATCH_SIZE) {
                 requests.push(async(done) => {
+                    if (cancelled) {
+                        done(new Error("Cancelled execution"));
+                        return;
+                    }
+
                     const data = JSON.stringify({
                         peptides: peptides.slice(i, i + PEPTDATA_BATCH_SIZE),
                         equate_il: config.equateIl,
@@ -47,7 +54,6 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
 
                         done(null);
                     } catch (err) {
-                        console.log(err);
                         // Fetch errors need to be handled by the outer scope.
                         done(err);
                     }
@@ -70,13 +76,26 @@ export default function process(peptides: Peptide[], config: SearchConfiguration
 
             observer.complete();
         } catch (err) {
-            console.log(err);
-            observer.next({
-                type: "error",
-                value: "Could not communicate with external endpoint."
-            })
+            if (err.message.includes("Cancelled execution")) {
+                cancelled = false;
+                observer.next({
+                    type: "cancelled",
+                    value: null
+                });
+            } else {
+                console.log(err);
+                observer.next({
+                    type: "error",
+                    value: "Could not communicate with external endpoint."
+                })
+            }
         }
     });
+}
+
+export function cancel() {
+    console.log("worker is cancelled.");
+    cancelled = true;
 }
 
 async function postJSON(url, data) {

@@ -23,6 +23,8 @@ export default class Pept2DataCommunicator {
     private static inProgress: Promise<void>;
     private static worker;
 
+    private cancelled: boolean = false;
+
     /**
      * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed that
      * peptides that were processed before, will not be looked up again, in order to save bandwidth and computation
@@ -52,6 +54,10 @@ export default class Pept2DataCommunicator {
             await Pept2DataCommunicator.inProgress;
         }
 
+        if (this.cancelled) {
+            return;
+        }
+
         Pept2DataCommunicator.inProgress = new Promise<void>(async(resolve, reject) => {
             let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
@@ -67,7 +73,7 @@ export default class Pept2DataCommunicator {
                 Pept2DataCommunicator.worker = await spawn(new Worker("./Pept2Data.worker.ts"));
             }
 
-            const obs: Observable<{ type: string, value: any }> = Pept2DataCommunicator.worker(
+            const obs: Observable<{ type: string, value: any }> = Pept2DataCommunicator.worker.process(
                 peptides,
                 {
                     equateIl: configuration.equateIl,
@@ -82,6 +88,10 @@ export default class Pept2DataCommunicator {
             obs.subscribe(message => {
                 if (message.type === "progress") {
                     if (progressListener && message.value > previousProgress) {
+                        if (this.cancelled) {
+                            Pept2DataCommunicator.worker.cancel();
+                        }
+
                         previousProgress = message.value;
                         progressListener.onProgressUpdate(message.value);
                     }
@@ -113,6 +123,8 @@ export default class Pept2DataCommunicator {
                     resolve();
                 } else if (message.type === "error") {
                     reject(new NetworkCommunicationException(message.value));
+                } else if (message.type === "cancelled") {
+                    resolve();
                 }
             });
         });
@@ -122,6 +134,10 @@ export default class Pept2DataCommunicator {
         } finally {
             Pept2DataCommunicator.inProgress = undefined;
         }
+    }
+
+    public cancel() {
+        this.cancelled = true;
     }
 
     public async getPeptideTrust(

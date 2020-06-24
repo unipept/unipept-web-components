@@ -111,6 +111,7 @@ import SingleAssayDataSource from "./SingleAssayDataSource.vue";
 import { OntologyIdType } from "./../../business/ontology/Ontology";
 import StringUtils from "./../../business/misc/StringUtils";
 import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
@@ -147,11 +148,7 @@ type SourceMetadata = {
 })
 export default class HeatmapWizardSingleSample extends Vue {
     @Prop({ required: true })
-    private peptideCountTable: CountTable<Peptide>;
-    @Prop({ required: true })
-    private searchConfiguration: SearchConfiguration;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
+    private assay: ProteomicsAssay;
 
     private currentStep: number = 1;
 
