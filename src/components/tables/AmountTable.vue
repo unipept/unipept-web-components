@@ -17,7 +17,7 @@
                 </v-tooltip>
             </template>
             <!-- We can only process the tree when a mapping between items and peptides is given -->
-            <template v-slot:expanded-item="{ headers, item }" v-if="itemToPeptidesMapping">
+            <template v-slot:expanded-item="{ headers, item }" v-if="itemToPeptidesMapping && taxaToPeptidesMapping">
                 <td class="item-treeview" :colspan="headers.length">
                     <div v-if="tree && (treeAvailable.get(item) || computeTree(item))">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">

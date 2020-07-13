@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <div v-if="!analysisInProgress">
+            <div v-if="$store.getters.activeAssay === undefined">
                 <span class="placeholder-text">
                     Please select at least one dataset for analysis.
                 </span>
@@ -12,15 +12,8 @@
                 <v-select :items="namespaceValues" label="Category" v-model="selectedNamespace"></v-select>
 
                 <interpro-amount-table
-                    :loading="loading"
-                    :interpro-count-table="countTable"
-                    :interpro-peptide-mapping="interproPeptideMapping"
-                    :interpro-ontology="ontology"
-                    :relative-counts="relativeCounts"
-                    :communication-source="communicationSource"
-                    :search-configuration="searchConfiguration"
-                    :tree="tree"
-                    :taxa-to-peptides-mapping="taxaToPeptidesMapping"
+                    :assay="assay"
+                    :namespace="namespace"
                     :show-percentage="showPercentage">
                 </interpro-amount-table>
             </div>
@@ -35,21 +28,11 @@ import { Prop, Watch } from "vue-property-decorator";
 import FunctionalSummaryMixin from "./FunctionalSummaryMixin.vue";
 import InterproAmountTable from "./../../tables/InterproAmountTable.vue";
 import FilterFunctionalAnnotationsDropdown from "./FilterFunctionalAnnotationsDropdown.vue";
-import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
-import { Peptide } from "./../../../business/ontology/raw/Peptide";
-import { CountTable } from "./../../../business/counts/CountTable";
 import {
     convertStringToInterproNamespace,
     InterproNamespace
 } from "./../../../business/ontology/functional/interpro/InterproNamespace";
-import InterproDefinition, { InterproCode } from "./../../../business/ontology/functional/interpro/InterproDefinition";
-import { Ontology } from "./../../../business/ontology/Ontology";
-import InterproCountTableProcessor from "./../../../business/processors/functional/interpro/InterproCountTableProcessor";
-import InterproOntologyProcessor from "./../../../business/ontology/functional/interpro/InterproOntologyProcessor";
-import StringUtils from "./../../../business/misc/StringUtils";
-import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
-import Tree from "./../../../business/ontology/taxonomic/Tree";
-import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 
 @Component({
     components: {
@@ -59,43 +42,19 @@ import CommunicationSource from "./../../../business/communication/source/Commun
 })
 export default class InterproSummaryCard extends mixins(FunctionalSummaryMixin) {
     @Prop({ required: true })
-    private interproCountTable: (ns: string) => Promise<CountTable<InterproCode>>;
-    @Prop({ required: true })
-    private interproOntology: (ns: string) => Promise<Ontology<InterproCode, InterproDefinition>>;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-    @Prop({ required: false })
-    private interproPeptideMapping: Map<InterproCode, Peptide[]>;
-    @Prop({ required: false })
-    private searchConfiguration: SearchConfiguration;
+    private assay: ProteomicsAssay;
     @Prop({ required: false, default: false })
-    private loading: boolean;
-    @Prop({ required: false, default: true })
-    private analysisInProgress: boolean;
-    @Prop({ required: true })
-    private relativeCounts: number;
-    @Prop( { required: false, default: false })
     private showPercentage: boolean;
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
-    @Prop({ required: false })
-    protected tree: Tree;
 
     private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace));
     private selectedNamespace: string = "all";
 
-    private countTable: CountTable<InterproCode> = null;
-    private ontology: Ontology<InterproCode, InterproDefinition> = null;
-
-    mounted() {
-        this.onNamespaceChanged();
-    }
-
-    @Watch("selectedNamespace")
-    @Watch("loading")
-    private async onNamespaceChanged() {
-        this.countTable = await this.interproCountTable(this.selectedNamespace);
-        this.ontology = await this.interproOntology(this.selectedNamespace);
+    get namespace(): InterproNamespace | null {
+        if (this.selectedNamespace === "all") {
+            return null;
+        } else {
+            return convertStringToInterproNamespace(this.selectedNamespace);
+        }
     }
 }
 </script>

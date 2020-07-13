@@ -2,13 +2,13 @@ import { PeptideDataResponse } from "./PeptideDataResponse";
 import { CountTable } from "./../../counts/CountTable";
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import { spawn, Worker } from "threads";
-import { Observable } from "observable-fns";
 import ProgressListener from "./../../progress/ProgressListener";
 import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
 import NetworkConfiguration from "./../NetworkConfiguration";
 import PeptideTrust from "./../../processors/raw/PeptideTrust";
 import { ShareableMap } from "shared-memory-datastructures";
+import NetworkUtils from "./../../communication/NetworkUtils";
+import parallelLimit from "async/parallelLimit";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -21,7 +21,10 @@ export default class Pept2DataCommunicator {
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
     private static inProgress: Promise<void>;
-    private static worker;
+
+    public static PEPTDATA_BATCH_SIZE = 100;
+    public static PEPTDATA_ENDPOINT = "/mpa/pept2data";
+    public static PARALLEL_REQUESTS = 5;
 
     private cancelled: boolean = false;
 
@@ -59,74 +62,76 @@ export default class Pept2DataCommunicator {
         }
 
         Pept2DataCommunicator.inProgress = new Promise<void>(async(resolve, reject) => {
+            const responses = new ShareableMap<string, string>();
+            progressListener?.onProgressUpdate(0.0);
+
             let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
-            if (!peptides || peptides.length === 0) {
-                if (progressListener) {
-                    progressListener.onProgressUpdate(1.0);
+            const requests = [];
+            for (let i = 0; i < peptides.length; i += Pept2DataCommunicator.PEPTDATA_BATCH_SIZE) {
+                requests.push(async(done) => {
+                    if (this.cancelled) {
+                        done(new Error("Cancelled execution"));
+                        return;
+                    }
+
+                    const data = JSON.stringify({
+                        peptides: peptides.slice(i, i + Pept2DataCommunicator.PEPTDATA_BATCH_SIZE),
+                        equate_il: configuration.equateIl,
+                        missed: configuration.enableMissingCleavageHandling
+                    });
+
+                    try {
+                        const res = await NetworkUtils.postJSON(
+                            NetworkConfiguration.BASE_URL + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
+                            data
+                        )
+
+                        res.peptides.forEach(p => {
+                            responses.set(p.sequence, JSON.stringify(p));
+                        })
+
+                        progressListener?.onProgressUpdate(i / peptides.length);
+                        done(null);
+                    } catch (err) {
+                        // Fetch errors need to be handled by the outer scope.
+                        done(err);
+                    }
+                });
+            }
+
+            try {
+                await parallelLimit(requests, Pept2DataCommunicator.PARALLEL_REQUESTS);
+            } catch (err) {
+                if (!err.message.includes("Cancelled execution")) {
+                    reject(err);
+                } else {
+                    resolve();
                 }
+            }
+
+            if (!this.cancelled) {
+                const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
+
+                if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
+                    Pept2DataCommunicator.configurationToResponses.set(config, new ShareableMap<string, string>());
+                }
+                const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
+
+                for (const [pep, response] of responses) {
+                    configMap.set(pep, response);
+                }
+
+                if (!Pept2DataCommunicator.configurationToProcessed.has(config)) {
+                    Pept2DataCommunicator.configurationToProcessed.set(config, new Set());
+                }
+                const processedSet = Pept2DataCommunicator.configurationToProcessed.get(config);
+                for (const pep of peptides) {
+                    processedSet.add(pep);
+                }
+
                 resolve();
-                return;
             }
-
-            if (!Pept2DataCommunicator.worker) {
-                Pept2DataCommunicator.worker = await spawn(new Worker("./Pept2Data.worker.ts"));
-            }
-
-            const obs: Observable<{ type: string, value: any }> = Pept2DataCommunicator.worker.process(
-                peptides,
-                {
-                    equateIl: configuration.equateIl,
-                    filterDuplicates: configuration.filterDuplicates,
-                    enableMissingCleavageHandling: configuration.enableMissingCleavageHandling
-                },
-                NetworkConfiguration.BASE_URL
-            );
-
-            let previousProgress: number = 0;
-
-            obs.subscribe(message => {
-                if (message.type === "progress") {
-                    if (progressListener && message.value > previousProgress) {
-                        if (this.cancelled) {
-                            Pept2DataCommunicator.worker.cancel();
-                        }
-
-                        previousProgress = message.value;
-                        progressListener.onProgressUpdate(message.value);
-                    }
-                } else if (message.type === "result") {
-                    const [indexBuffer, dataBuffer] = message.value;
-
-                    const resultMap = new ShareableMap<Peptide, string>(0, 0);
-                    resultMap.setBuffers(indexBuffer.transferables[0], dataBuffer.transferables[0]);
-
-                    const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
-
-                    if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
-                        Pept2DataCommunicator.configurationToResponses.set(config, new ShareableMap<string, string>());
-                    }
-                    const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
-
-                    for (const [pep, response] of resultMap) {
-                        configMap.set(pep, response);
-                    }
-
-                    if (!Pept2DataCommunicator.configurationToProcessed.has(config)) {
-                        Pept2DataCommunicator.configurationToProcessed.set(config, new Set());
-                    }
-                    const processedSet = Pept2DataCommunicator.configurationToProcessed.get(config);
-                    for (const pep of peptides) {
-                        processedSet.add(pep);
-                    }
-
-                    resolve();
-                } else if (message.type === "error") {
-                    reject(new NetworkCommunicationException(message.value));
-                } else if (message.type === "cancelled") {
-                    resolve();
-                }
-            });
         });
 
         try {

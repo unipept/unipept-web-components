@@ -1,16 +1,7 @@
 <template>
     <interpro-summary-card
-        :interpro-count-table="getCountTable"
-        :interpro-ontology="getOntology"
-        :communication-source="communicationSource"
-        :interpro-peptide-mapping="peptideMapping"
-        :analysis-in-progress="peptideCountTable"
-        :search-configuration="searchConfiguration"
-        :loading="loading"
-        :relative-counts="relativeCounts"
-        :show-percentage="showPercentage"
-        :taxa-to-peptides-mapping="taxaToPeptidesMapping"
-        :tree="tree">
+        :assay="assay"
+        :show-percentage="showPercentage">
         <template v-slot:analysis-header>
             <filter-functional-annotations-dropdown v-model="percentSettings">
             </filter-functional-annotations-dropdown>
@@ -27,119 +18,48 @@ import Component from "vue-class-component";
 import InterproSummaryCard from "./../functional/InterproSummaryCard.vue";
 import FilterFunctionalAnnotationsDropdown from "./../functional/FilterFunctionalAnnotationsDropdown.vue";
 import { Prop, Watch } from "vue-property-decorator";
-import { Peptide } from "./../../../business/ontology/raw/Peptide";
-import { CountTable } from "./../../../business/counts/CountTable";
-import InterproDefinition, { InterproCode } from "./../../../business/ontology/functional/interpro/InterproDefinition";
-import { Ontology } from "./../../../business/ontology/Ontology";
 import InterproCountTableProcessor from "./../../../business/processors/functional/interpro/InterproCountTableProcessor";
 import {
     convertStringToInterproNamespace,
     InterproNamespace
 } from "./../../../business/ontology/functional/interpro/InterproNamespace";
-import InterproOntologyProcessor from "./../../../business/ontology/functional/interpro/InterproOntologyProcessor";
-import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
-import { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
-import Tree from "./../../../business/ontology/taxonomic/Tree";
 import { FunctionalUtils } from "./../../../components/analysis/functional/FunctionalUtils";
-import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 
 @Component({
     components: { InterproSummaryCard, FilterFunctionalAnnotationsDropdown }
 })
 export default class MultiInterproSummaryCard extends Vue {
     @Prop({ required: true })
-    private peptideCountTable: CountTable<Peptide>;
+    private assay: ProteomicsAssay;
     @Prop({ required: true })
-    private searchConfiguration: SearchConfiguration;
-    @Prop({ required: true })
-    private relativeCounts: number;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-    @Prop({ required: false, default: false })
     private showPercentage: boolean;
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
-    @Prop({ required: false })
-    protected tree: Tree;
 
     private trustLine: string = "";
     private loading: boolean = false;
-
     private percentSettings: string = "5";
 
     private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace));
-
-    private items: {
-        countTable: CountTable<InterproCode>,
-        title: string,
-        namespace: string
-        ontology: Ontology<InterproCode, InterproDefinition>
-    }[] = [];
-    private peptideMapping: Map<InterproCode, Peptide[]> = null;
-
-    private created() {
-        for (const ns of this.namespaceValues) {
-            this.items.push({
-                countTable: undefined,
-                title: "",
-                namespace: ns,
-                ontology: undefined
-            });
-        }
-    }
 
     private mounted() {
         this.recompute();
     }
 
-    @Watch("peptideCountTable")
-    @Watch("searchConfiguration")
+    get interproCountTableProcessor(): InterproCountTableProcessor {
+        return this.$store.getters["interpro/filteredData"](this.assay)?.processor;
+    }
+
+    @Watch("interproCountTableProcessor")
     public async recompute(): Promise<void> {
-        if (this.peptideCountTable && this.searchConfiguration) {
-            this.loading = true;
-            const percentage = parseInt(this.percentSettings);
-            const interproProcessor = new InterproCountTableProcessor(
-                this.peptideCountTable,
-                this.searchConfiguration,
-                this.communicationSource,
-                percentage
-            );
-
-            this.peptideMapping = await interproProcessor.getAnnotationPeptideMapping();
-
-
-            for (const [i, ns] of this.namespaceValues.entries()) {
-                let countTable: CountTable<InterproCode>;
-
-                if (ns === "all") {
-                    countTable = await interproProcessor.getCountTable();
-                } else {
-                    countTable = await interproProcessor.getCountTable(ns as InterproNamespace);
-                }
-
-                this.items[i].countTable = countTable;
-
-                const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
-                this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
-            }
-
+        this.loading = true;
+        if (this.interproCountTableProcessor) {
             this.trustLine = FunctionalUtils.computeTrustLine(
-                await interproProcessor.getTrust(),
+                await this.interproCountTableProcessor.getTrust(),
                 "InterPro-entry",
                 "peptide"
             );
-            this.loading = false;
         }
-    }
-
-    private getCountTable(ns: string): CountTable<InterproCode> {
-        const item = this.items.find(item => item.namespace == ns);
-        return item ? item.countTable : undefined;
-    }
-
-    private getOntology(ns: string): Ontology<InterproCode, InterproDefinition> {
-        const item = this.items.find(item => item.namespace == ns);
-        return item ? item.ontology : undefined;
+        this.loading = false;
     }
 }
 </script>

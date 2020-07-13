@@ -70,8 +70,6 @@ export default class EcSummaryCard extends Vue {
     private assay: ProteomicsAssay;
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
 
     private ecTree: TreeViewNode = null;
     private loading: boolean = false;

@@ -76,7 +76,6 @@
                             :full-screen="isFullScreen"
                             v-if="tree"
                             :tree="tree"
-                            v-on:update-selected-term="onUpdateSelectedTerm"
                             v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                         </sunburst-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
@@ -100,7 +99,6 @@
                             :full-screen="isFullScreen"
                             v-if="tree"
                             :tree="tree"
-                            v-on:update-selected-term="onUpdateSelectedTerm"
                             v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                         </treemap-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
@@ -126,7 +124,6 @@
                             :full-screen="isFullScreen"
                             v-if="tree"
                             :tree="tree"
-                            v-on:update-selected-term="onUpdateSelectedTerm"
                             v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                         </treeview-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
@@ -149,7 +146,6 @@
                                 v-if="tree"
                                 :tree="tree"
                                 :search-configuration="searchConfiguration"
-                                v-on:update-selected-term="onUpdateSelectedTerm"
                                 v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                             </hierarchical-outline-visualization>
                             <div v-else-if="this.analysisInProgress" class="mpa-waiting">
@@ -320,26 +316,8 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         this.dialogOpen = true;
     }
 
-    private onUpdateSelectedTerm(searchTerm: string): void {
-        /**
-         * Fired after the user indicated that he somehow wants to filter the currently visible results.
-         *
-         * @event update-selected-term
-         * @property {string} searchTerm The search term that was used by the user to filter.
-         */
-        this.$emit("update-selected-term", searchTerm);
-    }
-
     private onUpdateSelectedTaxonId(id: string): void {
-        /**
-         * Fired after the user indicated that he somehow wants to filter the currently visible results in the
-         * application.
-         *
-         * @event update-selected-taxon-id
-         * @property {string} id The id of the taxon to which results should be restricted. Note that alle taxa
-         * that are (both direct and indirect) children of this taxon should also be present in the filtering.
-         */
-        this.$emit("update-selected-taxon-id", id);
+        this.$store.dispatch("filterByTaxon", [this.assay, id]);
     }
 }
 </script>

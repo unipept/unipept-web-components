@@ -198,7 +198,6 @@ export default class MultiAssayDataSource extends Vue {
     }
 
     private async computeItems(dataItem: SourceMetadata) {
-        console.log("Compute items...");
         if (this.assays && this.assays.length > 0) {
             dataItem.loading = true;
 

@@ -1,17 +1,16 @@
 <template>
     <amount-table
+        :assay="assay"
         :items="items"
-        :loading="isLoading"
+        :loading="interproCountTableProcessor === undefined"
         :rows-per-page="10"
-        :communication-source="communicationSource"
         annotation-name="Interpro entry"
-        :search-configuration="searchConfiguration"
-        :item-to-peptides-mapping="interproPeptideMapping"
+        :item-to-peptides-mapping="itemsToPeptidesMapping"
         :show-percentage="showPercentage"
-        :tree="tree"
         :taxa-to-peptides-mapping="taxaToPeptidesMapping"
         :external-url-constructor="getUrl"
-        :show-namespace="true">
+        :show-namespace="true"
+        :tree="tree">
     </amount-table>
 </template>
 
@@ -19,18 +18,18 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { tooltipContent } from "../../components/visualizations/VisualizationHelper";
 import InterproDefinition, { InterproCode } from "./../../business/ontology/functional/interpro/InterproDefinition";
-import { CountTable } from "./../../business/counts/CountTable";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
-import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import AmountTable from "./../tables/AmountTable.vue";
 import TableItem from "./../tables/TableItem";
-import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
-import { Ontology } from "./../../business/ontology/Ontology";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import { CountTable } from "./../../business/counts/CountTable";
+import InterproCountTableProcessor from "./../../business/processors/functional/interpro/InterproCountTableProcessor";
+import { Ontology } from "./../../business/ontology/Ontology";
+import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
+import { InterproNamespace } from "./../../business/ontology/functional/interpro/InterproNamespace";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -46,66 +45,80 @@ import CommunicationSource from "./../../business/communication/source/Communica
 })
 export default class InterproAmountTable extends Vue {
     @Prop({ required: true })
-    private interproCountTable: CountTable<InterproCode>;
-    @Prop({ required: true })
-    private interproOntology: Ontology<InterproCode, InterproDefinition>;
-    /**
-     * Display the counts from the given count table as an absolute value, or as a relative value? If this value is
-     * set to 0, the absolute counts are displayed. If the value is set to a number n (different from 0), the
-     * relative values will be shown (by dividing every count by x).
-     */
-    @Prop({ required: true })
-    private relativeCounts: number;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    @Prop({ required: false })
-    private interproPeptideMapping: Map<InterproCode, Peptide[]>;
-    @Prop({ required: false, default: false })
-    private loading: boolean;
-    @Prop({ required: false })
-    private searchConfiguration: SearchConfiguration;
+    private assay: ProteomicsAssay;
+    @Prop({ required: false, default: null })
+    private namespace: InterproNamespace;
     /**
      * Whether the counts in the amount table should be displayed as absolute or relative (percentage) values.
      */
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
-    @Prop({ required: false })
-    protected tree: Tree;
 
     private items: TableItem[] = [];
     private isComputing: boolean = false;
+    private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
+    private itemsToPeptidesMapping: Map<InterproCode, Peptide[]> = null;
 
     public async mounted() {
         await this.onInputsChanged();
+        await this.onNcbiCountTableProcessorChanged();
     }
 
-    @Watch("interproCountTable")
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+    }
+
+    get interproCountTableProcessor(): InterproCountTableProcessor {
+        return this.$store.getters["interpro/filteredData"](this.assay)?.processor;
+    }
+
+    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
+        return this.$store.getters["interpro/ontology"](this.assay);
+    }
+
+    get ncbiCountTableProcessor(): LcaCountTableProcessor {
+        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+    }
+
+    get tree(): Tree {
+        return this.$store.getters["ncbi/tree"](this.assay);
+    }
+
+    @Watch("ncbiCountTableProcessor")
+    private async onNcbiCountTableProcessorChanged() {
+        if (this.ncbiCountTableProcessor) {
+            this.taxaToPeptidesMapping = await this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
+        }
+    }
+
+    @Watch("namespace")
+    @Watch("interproCountTableProcessor")
     @Watch("interproOntology")
-    @Watch("relativeCounts")
+    @Watch("peptideCountTable")
     private async onInputsChanged() {
         this.isComputing = true;
+        this.items.splice(0, this.items.length);
 
-        if (this.interproCountTable && this.interproOntology) {
+        if (this.peptideCountTable && this.interproOntology && this.interproCountTableProcessor) {
             const newItems: TableItem[] = [];
-            for (const interproCode of this.interproCountTable.getOntologyIds()) {
+            this.itemsToPeptidesMapping = await this.interproCountTableProcessor.getAnnotationPeptideMapping();
+
+            const interproCountTable = await this.interproCountTableProcessor.getCountTable(this.namespace);
+
+            for (const interproCode of interproCountTable.getOntologyIds()) {
                 const definition: InterproDefinition = this.interproOntology.getDefinition(interproCode);
-                const currentCount = this.interproCountTable.getCounts(interproCode);
+                const currentCount = interproCountTable.getCounts(interproCode);
 
                 if (definition) {
                     newItems.push(new TableItem(
                         currentCount,
-                        currentCount / this.relativeCounts,
+                        currentCount / this.peptideCountTable.totalCount,
                         definition.name,
                         definition.code,
                         definition
                     ));
                 }
             }
-
-            this.items.length = 0;
             this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
         }
 

@@ -16,14 +16,6 @@ export default class VisualizationMixin extends Vue {
     public search(id: number, searchTerm, timeout = 500) {
         setTimeout(() => {
             /**
-             * Fired after the user indicated that he somehow wants to filter the currently visible results.
-             *
-             * @event update-selected-term
-             * @property {string} searchTerm The search term that was used by the user to filter.
-             */
-            this.$emit("update-selected-term", searchTerm);
-
-            /**
              * Fired after the user indicated that he soehow wants to filter the currently visible results in the
              * application.
              *

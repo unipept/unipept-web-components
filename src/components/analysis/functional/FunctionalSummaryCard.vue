@@ -145,28 +145,27 @@
                         </v-card-text>
                     </div>
                 </v-tab-item>
-<!--                <v-tab-item>-->
-<!--                    <multi-interpro-summary-card-->
-<!--                        v-if="filteredCountTable"-->
-<!--                        ref="interproSummaryCard"-->
-<!--                        :assay="assay"-->
-<!--                        :tree="tree"-->
-<!--                        :show-percentage="showPercentage">-->
-<!--                    </multi-interpro-summary-card>-->
-<!--                    <div v-else-if="this.analysisInProgress">-->
-<!--                        <v-card-text class="d-flex justify-center">-->
-<!--                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>-->
-<!--                            </v-progress-circular>-->
-<!--                        </v-card-text>-->
-<!--                    </div>-->
-<!--                    <div v-else>-->
-<!--                        <v-card-text>-->
-<!--                            <div class="placeholder-text">-->
-<!--                                {{ placeholderText }}-->
-<!--                            </div>-->
-<!--                        </v-card-text>-->
-<!--                    </div>-->
-<!--                </v-tab-item>-->
+                <v-tab-item>
+                    <multi-interpro-summary-card
+                        v-if="filteredCountTable"
+                        ref="interproSummaryCard"
+                        :assay="assay"
+                        :show-percentage="showPercentage">
+                    </multi-interpro-summary-card>
+                    <div v-else-if="this.analysisInProgress">
+                        <v-card-text class="d-flex justify-center">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            </v-progress-circular>
+                        </v-card-text>
+                    </div>
+                    <div v-else>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
+                    </div>
+                </v-tab-item>
             </v-tabs-items>
         </v-card>
         <div id="tooltip" class="tip"></div>

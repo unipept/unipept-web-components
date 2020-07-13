@@ -24,7 +24,6 @@ export default class PeptideCountTableProcessor {
         }
         const start = new Date().getTime();
         const [peptideCountsMapping, totalFrequency] = await PeptideCountTableProcessor.worker(peptides, searchConfiguration);
-        console.log("Total count processor: " + (new Date().getTime() - start) / 1000);
         return new CountTable<Peptide>(peptideCountsMapping, totalFrequency);
     }
 }

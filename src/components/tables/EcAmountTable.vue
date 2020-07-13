@@ -56,6 +56,7 @@ export default class EcAmountTable extends Vue {
 
     public async mounted() {
         await this.onInputsChanged();
+        await this.onNcbiCountTableProcessorChanged();
     }
 
     get peptideCountTable(): CountTable<Peptide> {

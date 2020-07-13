@@ -53,6 +53,7 @@ export default class GoAmountTable extends Vue {
 
     public async mounted() {
         await this.onInputsChanged();
+        await this.onNcbiCountTableChanged();
     }
 
     get peptideCountTable(): CountTable<Peptide> {

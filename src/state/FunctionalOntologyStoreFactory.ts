@@ -130,6 +130,16 @@ export default class FunctionalOntologyStoreFactory<
                 assayData.originalData.processor = processor;
             },
 
+            RESET(
+                state: FunctionalOntologyState<Id, DefinitionType>,
+                assay: ProteomicsAssay
+            ) {
+                const assayData = getOrCreateData(state, assay);
+                const origData = assayData.originalData;
+                assayData.filteredData.processor = origData.processor;
+                assayData.filteredData.loading = false;
+            },
+
             SET_FILTERED_LOADING(
                 state: FunctionalOntologyState<Id, DefinitionType>,
                 [assay, loading]: [ProteomicsAssay, boolean]
@@ -215,25 +225,38 @@ export default class FunctionalOntologyStoreFactory<
                 }
             },
 
-            async filter(
-                store: ActionContext<FunctionalOntologyState<Id, DefinitionType>, any>,
-                [
-                    assay,
-                    filteredCountTable,
-                    communicationSource
-                ]: [
-                    ProteomicsAssay,
-                    CountTable<Peptide>,
-                    CommunicationSource
-                ]
-            ) {
-                store.commit("SET_FILTERED_LOADING", [assay, true]);
+            filterForAssay: {
+                root: true,
+                async handler(
+                    store: ActionContext<FunctionalOntologyState<Id, DefinitionType>, any>,
+                    [
+                        assay,
+                        filteredCountTable,
+                        communicationSource
+                    ]: [
+                        ProteomicsAssay,
+                        CountTable<Peptide>,
+                        CommunicationSource
+                    ]
+                ) {
+                    store.commit("SET_FILTERED_LOADING", [assay, true]);
 
-                const countTableProcessor = functionalProcessorFactory(filteredCountTable, assay.getSearchConfiguration(), communicationSource);
-                await countTableProcessor.getCountTable();
+                    const countTableProcessor = functionalProcessorFactory(filteredCountTable, assay.getSearchConfiguration(), communicationSource);
+                    await countTableProcessor.getCountTable();
 
-                store.commit("SET_FILTERED_PROCESSOR", [assay, countTableProcessor]);
-                store.commit("SET_FILTERED_LOADING", [assay, false]);
+                    store.commit("SET_FILTERED_PROCESSOR", [assay, countTableProcessor]);
+                    store.commit("SET_FILTERED_LOADING", [assay, false]);
+                }
+            },
+
+            resetFilter: {
+                root: true,
+                async handler(
+                    store: ActionContext<FunctionalOntologyState<Id, DefinitionType>, any>,
+                    assay: ProteomicsAssay
+                ) {
+                    store.commit("RESET", assay);
+                }
             }
         }
     }

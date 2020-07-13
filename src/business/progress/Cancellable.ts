@@ -7,4 +7,5 @@
  */
 export default interface Cancellable {
     cancel(): void;
+    isCancelled(): boolean;
 }
