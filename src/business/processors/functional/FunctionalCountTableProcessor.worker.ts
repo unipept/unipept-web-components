@@ -2,6 +2,7 @@ import { Peptide } from "./../../ontology/raw/Peptide";
 import { OntologyIdType } from "./../../ontology/Ontology";
 import { expose } from "threads";
 import { ShareableMap } from "shared-memory-datastructures";
+import { GoCode } from "@/business/ontology/functional/go/GoDefinition";
 
 expose({ compute, mergeResultMaps });
 
@@ -81,5 +82,10 @@ export async function compute(
         }
     }
 
-    return [countsPerCode, item2Peptides, annotatedCount];
+    // Counts per code is guaranteed to be sorted by count (note that JS Maps return values in the order they were
+    // inserted!)
+    const sortedCounts: Map<GoCode, number> = new Map([...countsPerCode].sort(
+        ([code1, count1], [code2, count2]) => count2 - count1
+    ));
+    return [sortedCounts, item2Peptides, annotatedCount];
 }

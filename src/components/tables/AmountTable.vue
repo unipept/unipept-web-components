@@ -5,6 +5,8 @@
             :loading="loading"
             :items="items"
             :items-per-page="rowsPerPage"
+            :server-items-length="totalItems"
+            :options.sync="options"
             item-key="code"
             :show-expand="itemToPeptidesMapping !== null"
             :expanded.sync="expandedItemsList">
@@ -100,6 +102,7 @@ import HighlightedTreeProcessor from "./../../business/processors/taxonomic/ncbi
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import Pept2DataCommunicator from "./../../business/communication/peptides/Pept2DataCommunicator";
+import { ItemRetriever } from "./ItemRetriever";
 
 @Component({
     components: {
@@ -153,7 +156,7 @@ export default class AmountTable extends Vue {
     }
 
     @Prop({ required: true })
-    protected items: TableItem[];
+    protected itemRetriever: ItemRetriever;
     @Prop({ required: true })
     protected annotationName: string;
     @Prop({ required: true })
@@ -190,7 +193,11 @@ export default class AmountTable extends Vue {
     @Prop({ required: false, default: 5 })
     private rowsPerPage: number;
 
+    private items: TableItem[] = [];
+    private totalItems: number = 0;
     private treeAvailable = new Map<TableItem, TreeNode>();
+
+    private options = {};
 
     // All settings for each Treeview that remain the same
     private tooltip: (d: any) => string = tooltipContent;
@@ -246,6 +253,32 @@ export default class AmountTable extends Vue {
     @Watch("tree")
     private onTreeChanged() {
         this.treeAvailable.clear();
+    }
+
+    @Watch("itemRetriever")
+    private async onItemRetrieverChanged() {
+        this.items.splice(0, this.items.length);
+        if (this.itemRetriever) {
+            this.totalItems = this.itemRetriever.getItemCount();
+            await this.onOptionsChanged({
+                page: 1,
+                itemsPerPage: 5,
+                sortBy: [],
+                sortDesc: [],
+                multiSort: false,
+                mustSort: false,
+                groupBy: [],
+                groupDesc: []
+            });
+        }
+    }
+
+    @Watch("options", { deep: true })
+    private async onOptionsChanged(newOptions) {
+        if (this.itemRetriever) {
+            this.items.splice(0, this.items.length);
+            this.items.push(...this.itemRetriever.getItems(newOptions));
+        }
     }
 
     /**

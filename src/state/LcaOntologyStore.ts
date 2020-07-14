@@ -115,6 +115,8 @@ const lcaActions: ActionTree<TaxonomicOntologyState, any> = {
             store.commit("SET_ONTOLOGY", [assay, ontology]);
             store.commit("SET_COUNT_TABLE_PROCESSOR", [assay, countTableProcessor]);
             store.commit("SET_COUNT_TABLE_LOADING", [assay, false]);
+
+            store.dispatch("lcaOntologyProcessed", [assay, ontology], { root: true });
         }
     },
 

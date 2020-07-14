@@ -1,5 +1,6 @@
 <template>
     <amount-table
+        :item-retriever="itemRetriever"
         :items="items"
         :assay="assay"
         :loading="goCountTableProcessor === undefined"
@@ -29,6 +30,7 @@ import GoCountTableProcessor from "./../../business/processors/functional/go/GoC
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
+import GoItemRetriever from "./GoItemRetriever";
 
 @Component({
     components: {
@@ -50,6 +52,7 @@ export default class GoAmountTable extends Vue {
     private isComputing: boolean = false;
     private itemsToPeptidesMapping: Map<GoCode, Peptide[]> = null;
     private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
+    private itemRetriever: GoItemRetriever = null;
 
     public async mounted() {
         await this.onInputsChanged();
@@ -88,30 +91,13 @@ export default class GoAmountTable extends Vue {
     @Watch("goOntology")
     private async onInputsChanged() {
         this.isComputing = true;
-        this.items.splice(0, this.items.length);
 
         if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
-            const newItems: TableItem[] = [];
-            this.itemsToPeptidesMapping = await this.goCountTableProcessor.getAnnotationPeptideMapping();
-
-            const goCountTable = await this.goCountTableProcessor.getCountTable(this.namespace);
-
-            for (const goCode of goCountTable.getOntologyIds()) {
-                const definition: GoDefinition = this.goOntology.getDefinition(goCode);
-                const currentCount = goCountTable.getCounts(goCode);
-
-                if (definition) {
-                    newItems.push(new TableItem(
-                        currentCount,
-                        currentCount / this.peptideCountTable.totalCount,
-                        definition.name,
-                        definition.code,
-                        definition
-                    ));
-                }
-            }
-
-            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
+            this.itemRetriever = new GoItemRetriever(
+                await this.goCountTableProcessor.getCountTable(this.namespace),
+                this.peptideCountTable,
+                this.goOntology
+            );
         }
 
         this.isComputing = false;
