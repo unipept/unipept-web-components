@@ -258,11 +258,12 @@ export default class AmountTable extends Vue {
     @Watch("itemRetriever")
     private async onItemRetrieverChanged() {
         this.items.splice(0, this.items.length);
+        this.totalItems = 0;
         if (this.itemRetriever) {
             this.totalItems = this.itemRetriever.getItemCount();
             await this.onOptionsChanged({
                 page: 1,
-                itemsPerPage: 5,
+                itemsPerPage: this.rowsPerPage,
                 sortBy: [],
                 sortDesc: [],
                 multiSort: false,

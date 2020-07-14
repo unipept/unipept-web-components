@@ -1,19 +1,19 @@
 import { ItemRetriever } from "./../../components/tables/ItemRetriever";
 import { CountTable } from "./../../business/counts/CountTable";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
-import GoDefinition, { GoCode } from "./../../business/ontology/functional/go/GoDefinition";
-import { Ontology } from "./../../business/ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../../business/ontology/Ontology";
 import TableItem from "./TableItem";
+import FunctionalDefinition from "@/business/ontology/functional/FunctionalDefinition";
 
-export default class GoItemRetriever implements ItemRetriever {
+export default class FunctionalItemRetriever<C extends OntologyIdType, F extends FunctionalDefinition> implements ItemRetriever {
     constructor(
-        private readonly goCountTable: CountTable<GoCode>,
+        private readonly functionalCountTable: CountTable<C>,
         private readonly peptideCountTable: CountTable<Peptide>,
-        private readonly goOntology: Ontology<GoCode, GoDefinition>
+        private readonly ontology: Ontology<C, F>
     ) {}
 
     public getItemCount(): number {
-        return this.goCountTable.toMap().size;
+        return this.functionalCountTable.toMap().size;
     }
 
     public getItems(tableOptions): TableItem[] {
@@ -28,8 +28,8 @@ export default class GoItemRetriever implements ItemRetriever {
 
         // TODO support the sorting based by other columns!
 
-        for (const [goCode, currentCount] of [...this.goCountTable.toMap().entries()].slice(start, end)) {
-            const definition: GoDefinition = this.goOntology.getDefinition(goCode);
+        for (const [code, currentCount] of [...this.functionalCountTable.toMap().entries()].slice(start, end)) {
+            const definition: F = this.ontology.getDefinition(code);
 
             items.push(new TableItem(
                 currentCount,

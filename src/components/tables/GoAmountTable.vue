@@ -30,7 +30,7 @@ import GoCountTableProcessor from "./../../business/processors/functional/go/GoC
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
-import GoItemRetriever from "./GoItemRetriever";
+import FunctionalItemRetriever from "./FunctionalItemRetriever";
 
 @Component({
     components: {
@@ -52,7 +52,7 @@ export default class GoAmountTable extends Vue {
     private isComputing: boolean = false;
     private itemsToPeptidesMapping: Map<GoCode, Peptide[]> = null;
     private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
-    private itemRetriever: GoItemRetriever = null;
+    private itemRetriever: FunctionalItemRetriever<GoCode, GoDefinition> = null;
 
     public async mounted() {
         await this.onInputsChanged();
@@ -91,9 +91,10 @@ export default class GoAmountTable extends Vue {
     @Watch("goOntology")
     private async onInputsChanged() {
         this.isComputing = true;
+        this.itemRetriever = null;
 
         if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
-            this.itemRetriever = new GoItemRetriever(
+            this.itemRetriever = new FunctionalItemRetriever(
                 await this.goCountTableProcessor.getCountTable(this.namespace),
                 this.peptideCountTable,
                 this.goOntology

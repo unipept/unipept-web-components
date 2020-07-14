@@ -2,7 +2,7 @@
     <amount-table
         :loading="ecCountTableProcessor === undefined"
         annotation-name="EC number"
-        :items="items"
+        :item-retriever="itemRetriever"
         :assay="assay"
         :item-to-peptides-mapping="itemsToPeptidesMapping"
         :tree="tree"
@@ -27,6 +27,7 @@ import Tree from "./../../business/ontology/taxonomic/Tree";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import EcCountTableProcessor from "./../../business/processors/functional/ec/EcCountTableProcessor";
+import FunctionalItemRetriever from "./FunctionalItemRetriever";
 
 @Component({
     components: {
@@ -53,6 +54,7 @@ export default class EcAmountTable extends Vue {
     private computeInProgress: boolean = false;
     private itemsToPeptidesMapping: Map<EcCode, Peptide[]> = null;
     private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
+    private itemRetriever: FunctionalItemRetriever<EcCode, EcDefinition> = null;
 
     public async mounted() {
         await this.onInputsChanged();
@@ -91,33 +93,16 @@ export default class EcAmountTable extends Vue {
     @Watch("peptideCountTable")
     public async onInputsChanged() {
         this.computeInProgress = true;
-        this.items.splice(0, this.items.length);
 
-        if (this.peptideCountTable && this.ecOntology && this.ecCountTableProcessor) {
-            const newItems: TableItem[] = [];
-            this.itemsToPeptidesMapping = await this.ecCountTableProcessor.getAnnotationPeptideMapping();
-
-            const ecCountTable = await this.ecCountTableProcessor.getCountTable();
-
-            for (const ecCode of ecCountTable.getOntologyIds()) {
-                const definition: EcDefinition = this.ecOntology.getDefinition(ecCode);
-                const currentCount = ecCountTable.getCounts(ecCode);
-
-                if (definition) {
-                    newItems.push(new TableItem(
-                        currentCount,
-                        currentCount / this.peptideCountTable.totalCount,
-                        definition.name,
-                        definition.code,
-                        definition
-                    ));
-                }
-            }
-
-            this.items.push(...newItems.filter(i => i).sort((a: TableItem, b: TableItem) => b.count - a.count));
-
-            this.computeInProgress = false;
+        if (this.peptideCountTable && this.ecCountTableProcessor && this.ecOntology) {
+            this.itemRetriever = new FunctionalItemRetriever(
+                await this.ecCountTableProcessor.getCountTable(),
+                this.peptideCountTable,
+                this.ecOntology
+            );
         }
+
+        this.computeInProgress = false;
     }
 
     private getUrl(code: string): string {

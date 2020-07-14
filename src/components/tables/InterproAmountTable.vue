@@ -1,7 +1,7 @@
 <template>
     <amount-table
         :assay="assay"
-        :items="items"
+        :item-retriever="itemRetriever"
         :loading="interproCountTableProcessor === undefined"
         :rows-per-page="10"
         annotation-name="Interpro entry"
@@ -30,6 +30,7 @@ import { Ontology } from "./../../business/ontology/Ontology";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import { InterproNamespace } from "./../../business/ontology/functional/interpro/InterproNamespace";
 import Tree from "./../../business/ontology/taxonomic/Tree";
+import FunctionalItemRetriever from "./FunctionalItemRetriever";
 
 @Component({
     components: {
@@ -58,6 +59,7 @@ export default class InterproAmountTable extends Vue {
     private isComputing: boolean = false;
     private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
     private itemsToPeptidesMapping: Map<InterproCode, Peptide[]> = null;
+    private itemRetriever: FunctionalItemRetriever<InterproCode, InterproDefinition> = null;
 
     public async mounted() {
         await this.onInputsChanged();
@@ -97,29 +99,13 @@ export default class InterproAmountTable extends Vue {
     @Watch("peptideCountTable")
     private async onInputsChanged() {
         this.isComputing = true;
-        this.items.splice(0, this.items.length);
 
-        if (this.peptideCountTable && this.interproOntology && this.interproCountTableProcessor) {
-            const newItems: TableItem[] = [];
-            this.itemsToPeptidesMapping = await this.interproCountTableProcessor.getAnnotationPeptideMapping();
-
-            const interproCountTable = await this.interproCountTableProcessor.getCountTable(this.namespace);
-
-            for (const interproCode of interproCountTable.getOntologyIds()) {
-                const definition: InterproDefinition = this.interproOntology.getDefinition(interproCode);
-                const currentCount = interproCountTable.getCounts(interproCode);
-
-                if (definition) {
-                    newItems.push(new TableItem(
-                        currentCount,
-                        currentCount / this.peptideCountTable.totalCount,
-                        definition.name,
-                        definition.code,
-                        definition
-                    ));
-                }
-            }
-            this.items.push(...newItems.sort((a: TableItem, b: TableItem) => b.count - a.count));
+        if (this.peptideCountTable && this.interproCountTableProcessor && this.interproOntology) {
+            this.itemRetriever = new FunctionalItemRetriever(
+                await this.interproCountTableProcessor.getCountTable(),
+                this.peptideCountTable,
+                this.interproOntology
+            );
         }
 
         this.isComputing = false;
