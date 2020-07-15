@@ -64,6 +64,7 @@ export default class Pept2DataCommunicator {
         Pept2DataCommunicator.inProgress = new Promise<void>(async(resolve, reject) => {
             const responses = new ShareableMap<string, string>();
             progressListener?.onProgressUpdate(0.0);
+            let previousProgress: number = 0;
 
             let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
@@ -91,7 +92,9 @@ export default class Pept2DataCommunicator {
                             responses.set(p.sequence, JSON.stringify(p));
                         })
 
-                        progressListener?.onProgressUpdate(i / peptides.length);
+                        if (previousProgress < i / peptides.length) {
+                            progressListener?.onProgressUpdate(i / peptides.length);
+                        }
                         done(null);
                     } catch (err) {
                         // Fetch errors need to be handled by the outer scope.

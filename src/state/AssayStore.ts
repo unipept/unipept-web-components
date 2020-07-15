@@ -134,6 +134,8 @@ const assayMutations: MutationTree<AssayState> = {
             analysisMeta.startProcessingTime = new Date().getTime();
         }
 
+        console.log("Receiving progress for " + assay.getName() + " -> " + progress);
+
         analysisMeta.progress = progress;
 
         const elapsedTime = new Date().getTime() - analysisMeta.startProcessingTime;

@@ -81,9 +81,6 @@ import HeatmapVisualization from "./HeatmapVisualization.vue";
 import sha256 from "crypto-js/sha256";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../business/counts/CountTable";
-import { GoCode } from "./../../business/ontology/functional/go/GoDefinition";
-import { EcCode } from "./../../business/ontology/functional/ec/EcDefinition";
-import { InterproCode } from "./../../business/ontology/functional/interpro/InterproDefinition";
 import NcbiTaxon, { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import AllNormalizer from "./../../business/normalisation/AllNormalizer";
 import RowNormalizer from "./../../business/normalisation/RowNormalizer";
@@ -96,29 +93,22 @@ import { GoNamespace } from "./../../business/ontology/functional/go/GoNamespace
 import { EcNamespace } from "./../../business/ontology/functional/ec/EcNamespace";
 import { InterproNamespace } from "./../../business/ontology/functional/interpro/InterproNamespace";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
-import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
-import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import ProteomicsCountTableProcessor from "./../../business/processors/ProteomicsCountTableProcessor";
-import OntologyProcessor from "./../../business/ontology/OntologyProcessor";
 import GoCountTableProcessor from "./../../business/processors/functional/go/GoCountTableProcessor";
 import EcCountTableProcessor from "./../../business/processors/functional/ec/EcCountTableProcessor";
 import InterproCountTableProcessor from "./../../business/processors/functional/interpro/InterproCountTableProcessor";
-import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
-import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
-import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import FunctionalDefinition from "./../../business/ontology/functional/FunctionalDefinition";
 import SingleAssayDataSource from "./SingleAssayDataSource.vue";
-import { OntologyIdType } from "./../../business/ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../../business/ontology/Ontology";
 import StringUtils from "./../../business/misc/StringUtils";
-import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import GoDefinition, { GoCode } from "./../../business/ontology/functional/go/GoDefinition";
+import EcDefinition, { EcCode } from "./../../business/ontology/functional/ec/EcDefinition";
+import InterproDefinition, { InterproCode } from "./../../business/ontology/functional/interpro/InterproDefinition";
 
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
 type SourceMetadata = {
     items: SingleAssayDataSourceItem[],
-    tableProcessor: (countTable: CountTable<Peptide>, config: SearchConfiguration) => ProteomicsCountTableProcessor<OntologyIdType>,
-    ontologyProcessor: OntologyProcessor<OntologyIdType, DefinitionType>,
     loading: boolean,
     categories: string[],
     // What's the title of the category column that should be shown in the data table?
@@ -175,8 +165,6 @@ export default class HeatmapWizardSingleSample extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c, this.communicationSource),
-            ontologyProcessor: new NcbiOntologyProcessor(this.communicationSource),
             categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
             categoryTitle: "Rank"
@@ -184,8 +172,6 @@ export default class HeatmapWizardSingleSample extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new GoCountTableProcessor(p, c, this.communicationSource),
-            ontologyProcessor: new GoOntologyProcessor(this.communicationSource),
             categories: Object.values(GoNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -193,8 +179,6 @@ export default class HeatmapWizardSingleSample extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new EcCountTableProcessor(p, c, this.communicationSource),
-            ontologyProcessor: new EcOntologyProcessor(this.communicationSource),
             categories: Object.values(EcNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -202,8 +186,6 @@ export default class HeatmapWizardSingleSample extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new InterproCountTableProcessor(p, c, this.communicationSource),
-            ontologyProcessor: new InterproOntologyProcessor(this.communicationSource),
             categories: Object.values(InterproNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -236,45 +218,115 @@ export default class HeatmapWizardSingleSample extends Vue {
         this.normalizer = this.normalizationTypes.keys().next().value;
     }
 
-    mounted() {
-        this.onPeptideCountTableChanged();
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters["assayData"](this.assay)?.peptideCountTable;
     }
 
-    @Watch("peptideCountTable")
-    @Watch("searchConfiguration")
-    private async onPeptideCountTableChanged() {
-        // Switch back to the first step of the configuration.
-        this.currentStep = 1;
+    get ncbiCountTableProcessor(): LcaCountTableProcessor {
+        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+    }
 
-        // Update all data source items
-        for (const item of this.sourceMetadata) {
-            await this.computeItems(item);
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters["ncbi/ontology"](this.assay);
+    }
+
+    get goCountTableProcessor(): GoCountTableProcessor {
+        return this.$store.getters["go/originalData"](this.assay)?.processor;
+    }
+
+    get goOntology(): Ontology<GoCode, GoDefinition> {
+        return this.$store.getters["go/ontology"](this.assay);
+    }
+
+    get ecCountTableProcessor(): EcCountTableProcessor {
+        return this.$store.getters["ec/originalData"](this.assay)?.processor;
+    }
+
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters["ec/ontology"](this.assay);
+    }
+
+    get interproCountTableProcessor(): InterproCountTableProcessor {
+        return this.$store.getters["interpro/originalData"](this.assay)?.processor;
+    }
+
+    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
+        return this.$store.getters["interpro/ontology"](this.assay);
+    }
+
+    @Watch("peptideCountTable", { immediate: true })
+    @Watch("ncbiCountTableProcessor")
+    @Watch("ncbiOntology")
+    private async onNcbiChanged() {
+        if (this.peptideCountTable && this.ncbiCountTableProcessor && this.ncbiOntology) {
+            await this.computeItems(this.sourceMetadata[0], this.ncbiCountTableProcessor, this.ncbiOntology);
         }
     }
 
-    private async computeItems(dataItem: SourceMetadata) {
-        if (this.peptideCountTable && this.searchConfiguration) {
+    @Watch("peptideCountTable", { immediate: true })
+    @Watch("goCountTableProcessor")
+    @Watch("goOntology")
+    private async onGoChanged() {
+        if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
+            await this.computeItems(this.sourceMetadata[1], this.goCountTableProcessor, this.goOntology);
+        }
+    }
+
+    @Watch("peptideCountTable", { immediate: true })
+    @Watch("ecCountTableProcessor")
+    @Watch("ecOntology")
+    private async onEcChanged() {
+        if (this.peptideCountTable && this.ecCountTableProcessor && this.ecOntology) {
+            await this.computeItems(this.sourceMetadata[2], this.ecCountTableProcessor, this.ecOntology);
+        }
+    }
+
+    @Watch("peptideCountTable", { immediate: true })
+    @Watch("interproCountTableProcessor")
+    @Watch("interproOntology")
+    private async onInterproChanged() {
+        if (this.peptideCountTable && this.interproCountTableProcessor && this.interproOntology) {
+            await this.computeItems(this.sourceMetadata[3], this.interproCountTableProcessor, this.interproOntology);
+        }
+    }
+
+    private async computeItems<O extends OntologyIdType, D extends DefinitionType>(
+        dataItem: SourceMetadata,
+        countProcessor,
+        ontology: Ontology<O, D>
+    ) {
+        if (this.peptideCountTable) {
             dataItem.loading = true;
-            const countProcessor = dataItem.tableProcessor(this.peptideCountTable, this.searchConfiguration);
 
             const countTable = await countProcessor.getCountTable();
             const peptideMapping = await countProcessor.getAnnotationPeptideMapping();
 
-            const ontologyProcessor = dataItem.ontologyProcessor;
-            const ontology = await ontologyProcessor.getOntology(countTable);
-
-            const items = countTable.getOntologyIds().map(id => {
+            const items = [];
+            for (const id of countTable.getOntologyIds()) {
                 const definition = ontology.getDefinition(id);
-                let category: string = "";
 
-                if (definition instanceof NcbiTaxon) {
-                    category = definition.rank;
-                } else {
-                    category = (definition as FunctionalDefinition).namespace;
+                if (!definition) {
+                    continue;
                 }
 
-                return new SingleAssayDataSourceItem(definition.name, id, countTable.getCounts(id), StringUtils.stringTitleize(category), peptideMapping.get(id))
-            }).sort((a: SingleAssayDataSourceItem, b: SingleAssayDataSourceItem) => b.count - a.count);
+                let category: string = "";
+
+                if ("rank" in definition) {
+                    category = definition["rank"];
+                } else {
+                    category = (definition as unknown as FunctionalDefinition).namespace;
+                }
+
+                items.push(new SingleAssayDataSourceItem(
+                    definition.name,
+                    id,
+                    countTable.getCounts(id),
+                    StringUtils.stringTitleize(category),
+                    peptideMapping.get(id)
+                ));
+            }
+
+            items.sort((a: SingleAssayDataSourceItem, b: SingleAssayDataSourceItem) => b.count - a.count);
 
             dataItem.items.length = 0;
             dataItem.items.push(...items);
