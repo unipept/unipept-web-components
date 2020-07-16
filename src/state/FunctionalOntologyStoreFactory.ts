@@ -19,7 +19,8 @@ export type FunctionalOntologyData<Id extends OntologyIdType, DefinitionType ext
     assay: ProteomicsAssay,
     originalData: FunctionalCountTableMeta<Id, DefinitionType>,
     filteredData: FunctionalCountTableMeta<Id, DefinitionType>,
-    ontology: Ontology<Id, DefinitionType>
+    ontology: Ontology<Id, DefinitionType>,
+    percentageFilter: number
 }
 
 export interface FunctionalOntologyState<Id extends OntologyIdType, DefinitionType extends FunctionalDefinition> {
@@ -106,7 +107,8 @@ export default class FunctionalOntologyStoreFactory<
                         processor: undefined,
                         loading: false
                     },
-                    ontology: undefined
+                    ontology: undefined,
+                    percentageFilter: 5
                 }
                 state.ontologyData.push(data);
             }
@@ -156,6 +158,14 @@ export default class FunctionalOntologyStoreFactory<
                 assayData.filteredData.processor = processor;
             },
 
+            SET_FILTER_PERCENTAGE(
+                state: FunctionalOntologyState<Id, DefinitionType>,
+                [assay, percentage]: [ProteomicsAssay, number]
+            ) {
+                const assayData = getOrCreateData(state, assay);
+                assayData.percentageFilter = percentage;
+            },
+
             SET_ONTOLOGY(
                 state: FunctionalOntologyState<Id, DefinitionType>,
                 [assay, ontology]: [ProteomicsAssay, Ontology<Id, DefinitionType>]
@@ -170,7 +180,8 @@ export default class FunctionalOntologyStoreFactory<
         functionalProcessorFactory: (
             x: CountTable<Peptide>,
             configuration: SearchConfiguration,
-            communicationSource: CommunicationSource
+            communicationSource: CommunicationSource,
+            filterPercentage: number
         ) => FunctionalCountTableProcessor<Id, DefinitionType>,
 
         ontologyProcessorFactory: (
@@ -199,7 +210,8 @@ export default class FunctionalOntologyStoreFactory<
                     const countTableProcessor = functionalProcessorFactory(
                         countTable,
                         assay.getSearchConfiguration(),
-                        communicationSource
+                        communicationSource,
+                        FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE
                     );
                     // Preload the functional count table...
                     const functionalTable = await countTableProcessor.getCountTable();
@@ -241,9 +253,46 @@ export default class FunctionalOntologyStoreFactory<
                 ) {
                     store.commit("SET_FILTERED_LOADING", [assay, true]);
 
-                    const countTableProcessor = functionalProcessorFactory(filteredCountTable, assay.getSearchConfiguration(), communicationSource);
+                    const countTableProcessor = functionalProcessorFactory(
+                        filteredCountTable,
+                        assay.getSearchConfiguration(),
+                        communicationSource,
+                        FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE
+                    );
                     await countTableProcessor.getCountTable();
 
+                    store.commit("SET_FILTERED_PROCESSOR", [assay, countTableProcessor]);
+                    store.commit("SET_FILTERED_LOADING", [assay, false]);
+                }
+            },
+
+            filterByPercentage: {
+                root: true,
+                async handler(
+                    store: ActionContext<FunctionalOntologyState<Id, DefinitionType>, any>,
+                    [
+                        assay,
+                        percentage
+                    ]: [
+                        ProteomicsAssay,
+                        number
+                    ]
+                ) {
+                    store.commit("SET_FILTERED_LOADING", [assay, true]);
+
+                    const assayData = store.rootGetters["assayData"](assay);
+                    const filteredCountTable = assayData?.filteredPeptideCountTable;
+                    const communicationSource = assayData?.communicationSource;
+
+                    console.log("Computing for " + percentage);
+
+                    const countTableProcessor = functionalProcessorFactory(
+                        filteredCountTable,
+                        assay.getSearchConfiguration(),
+                        communicationSource,
+                        percentage
+                    );
+                    await countTableProcessor.getCountTable();
                     store.commit("SET_FILTERED_PROCESSOR", [assay, countTableProcessor]);
                     store.commit("SET_FILTERED_LOADING", [assay, false]);
                 }

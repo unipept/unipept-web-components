@@ -68,6 +68,13 @@ export default class Treeview extends Vue {
         this.initVisualization();
     }
 
+    beforeDestroy() {
+        const els = document.querySelectorAll(".tip");
+        for (const el of els) {
+            el.parentNode.removeChild(el);
+        }
+    }
+
     public setFullScreen(value: boolean): void {
         if (this.treeview) {
             this.treeview.setFullScreen(value);

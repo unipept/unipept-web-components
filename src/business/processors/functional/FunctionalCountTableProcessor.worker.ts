@@ -2,7 +2,7 @@ import { Peptide } from "./../../ontology/raw/Peptide";
 import { OntologyIdType } from "./../../ontology/Ontology";
 import { expose } from "threads";
 import { ShareableMap } from "shared-memory-datastructures";
-import { GoCode } from "@/business/ontology/functional/go/GoDefinition";
+import { GoCode } from "./../../ontology/functional/go/GoDefinition";
 
 expose({ compute, mergeResultMaps });
 

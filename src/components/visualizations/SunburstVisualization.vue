@@ -76,6 +76,13 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         this.initTree();
     }
 
+    beforeDestroy() {
+        const els = document.querySelectorAll(".tip");
+        for (const el of els) {
+            el.parentNode.removeChild(el);
+        }
+    }
+
     @Watch("tree")
     private async onTreeChanged() {
         await this.initTree();

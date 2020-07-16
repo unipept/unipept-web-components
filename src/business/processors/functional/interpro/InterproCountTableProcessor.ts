@@ -13,7 +13,7 @@ export default class InterproCountTableProcessor extends FunctionalCountTablePro
         readonly peptideCountTable: CountTable<Peptide>,
         readonly configuration: SearchConfiguration,
         readonly communicationSource: CommunicationSource,
-        readonly percentage: number = 50,
+        readonly percentage: number = 5,
     ) {
         super(
             peptideCountTable,

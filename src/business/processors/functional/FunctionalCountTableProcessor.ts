@@ -15,6 +15,8 @@ export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,
     DefinitionType extends FunctionalDefinition
 > implements ProteomicsCountTableProcessor<OntologyId> {
+    public static DEFAULT_FILTER_PERCENTAGE: number = 5;
+
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
     // Aggregation of all counts over all namespaces
     private generalCountTable: CountTable<OntologyId>;
@@ -35,7 +37,7 @@ export default abstract class FunctionalCountTableProcessor<
         protected readonly peptideCountTable: CountTable<Peptide>,
         protected readonly configuration: SearchConfiguration,
         protected readonly communicationSource: CommunicationSource,
-        protected readonly percentage: number = 50,
+        protected readonly percentage: number = FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE,
         private readonly peptideData2ProteinCount: string,
         private readonly termPrefix: string
     ) {}
@@ -63,6 +65,10 @@ export default abstract class FunctionalCountTableProcessor<
 
     public async cancel() {
         // TODO implement;
+    }
+
+    public isCancelled(): boolean {
+        return false;
     }
 
     /**

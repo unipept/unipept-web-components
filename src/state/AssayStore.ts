@@ -12,6 +12,7 @@ import TreeNode from "./../business/ontology/taxonomic/TreeNode";
 import { Ontology } from "./../business/ontology/Ontology";
 import AssayProcessor from "./../business/processors/AssayProcessor";
 import ProgressListener from "./../business/progress/ProgressListener";
+import FunctionalCountTableProcessor from "./../business/processors/functional/FunctionalCountTableProcessor";
 
 export type AnalysisStatus = "healthy" | "cancelled" | "error";
 
@@ -37,7 +38,8 @@ export type AssayData = {
     peptideCountTable: CountTable<Peptide>,
     filteredPeptideCountTable: CountTable<Peptide>,
     communicationSource: CommunicationSource,
-    assayProcessor: AssayProcessor
+    assayProcessor: AssayProcessor,
+    filterPercentage: number
 }
 
 export interface AssayState {
@@ -84,7 +86,8 @@ const assayMutations: MutationTree<AssayState> = {
                 assayProcessor: undefined,
                 peptideCountTable: undefined,
                 filteredPeptideCountTable: undefined,
-                communicationSource: undefined
+                communicationSource: undefined,
+                filterPercentage: FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE
             });
         }
     },
@@ -181,10 +184,17 @@ const assayMutations: MutationTree<AssayState> = {
 
     CANCEL_ASSAY(state: AssayState, assay: ProteomicsAssay) {
         const assayData = state.assayData.find(a => a.assay.id === assay.id);
-        const analysisMeta = assayData.analysisMetaData;
+        const analysisMeta = assayData?.analysisMetaData;
 
-        analysisMeta.error = "";
-        analysisMeta.status = "cancelled";
+        if (analysisMeta) {
+            analysisMeta.error = "";
+            analysisMeta.status = "cancelled";
+        }
+    },
+
+    SET_FILTER_PERCENTAGE(state: AssayState, [assay, percentage]: [ProteomicsAssay, number]) {
+        const assayData = state.assayData.find(a => a.assay.id === assay.id);
+        assayData.filterPercentage = percentage;
     }
 };
 
@@ -201,12 +211,14 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         },
 
         async removeAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
+            console.log("REMOVE CALLED");
             await store.dispatch("cancelAnalysis", assay);
             store.commit("REMOVE_ASSAY", assay);
         },
 
         resetActiveAssay(store: ActionContext<AssayState, any>) {
             let shouldReselect: boolean = true;
+            console.log(store.getters.assays);
             if (store.getters.activeAssay) {
                 const idx: number = store.getters.assays.findIndex(data => data.assay.getId() === store.getters.activeAssay.getId());
                 shouldReselect = idx === -1;
@@ -227,7 +239,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         },
 
         async cancelAnalysis(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
-            const assayProcessor: AssayProcessor = store.getters["assayData"](assay).assayProcessor;
+            const assayProcessor: AssayProcessor = store.getters["assayData"](assay)?.assayProcessor;
             assayProcessor?.cancel();
             store.commit("CANCEL_ASSAY", assay);
         },
@@ -270,6 +282,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         async filterByTaxon(store: ActionContext<AssayState, any>, [assay, ncbiId]: [ProteomicsAssay, NcbiId]) {
             if (ncbiId === -1) {
                 store.commit("RESET_FILTER", assay);
+                // Notify all functional count table stores to also reset the filter.
                 store.dispatch("resetFilter", assay);
                 return;
             }
@@ -315,6 +328,10 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 console.warn(error);
                 store.commit("SET_ASSAY_ERROR", [assay, error.toString()]);
             }
+        },
+
+        filterByPercentage(store: ActionContext<AssayState, any>, [assay, percentage]: [ProteomicsAssay, number]) {
+            store.commit("SET_FILTER_PERCENTAGE", [assay, percentage]);
         }
     };
 }

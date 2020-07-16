@@ -35,37 +35,31 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
+import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
 
 @Component({
     components: {},
     computed: {
         model: {
             get() {
-                return this.content;
+                return this.$store.getters["assayData"](this.activeAssay).percentageFilter;
             },
             set(val) {
-                this.content = val;
-                this.$emit("input", val);
+                this.$store.dispatch("filterByPercentage", [this.activeAssay, val]);
             }
         }
     }
 })
 export default class FilterFunctionalAnnotationsDropdown extends Vue {
-    @Prop({ required: false, default: "5" })
-    private value: string;
-
-    content: string = this.value;
-
-    @Watch("value")
-    private onValueChanged(newValue: string, oldValue: string) {
-        this.content = newValue;
+    get activeAssay(): ProteomicsAssay {
+        return this.$store.getters.activeAssay;
     }
 
     // TODO migrate modal and show to users with help button
     showFunctionalModal() {
         // let modalContent = `
         //     <h4 id="quick-explanation">Quick explanation</h4>
-        //     <p>By default Unipept does not report all found annotations. It uses a clever filtering technique that removes untrustworthy annotations. The strength of This filter is expressed as a percentage.</p>
+        //     <p>By default Unipept does not report all found annotations. It uses a clever filtering technique that removes untrustworthy annotations. The strength of this filter is expressed as a percentage.</p>
         //     <ul>
         //         <li><strong>0%</strong> means no filtering occurs. <br>
         //             We assign the annotation <var>A</var>. to a peptide sequence <var>P</var> if there is at least one protein that contains an exact match for <var>P</var> and has been assigned the annotation <var>A</var>.

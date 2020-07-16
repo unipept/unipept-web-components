@@ -52,6 +52,13 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         this.initTreeMap();
     }
 
+    beforeDestroy() {
+        const els = document.querySelectorAll(".tip");
+        for (const el of els) {
+            el.parentNode.removeChild(el);
+        }
+    }
+
     @Watch("fullScreen")
     private onFullScreenChanged(isFullScreen: boolean) {
         this.treemap.setFullScreen(isFullScreen);
