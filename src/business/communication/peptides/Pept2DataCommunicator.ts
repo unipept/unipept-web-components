@@ -9,6 +9,7 @@ import PeptideTrust from "./../../processors/raw/PeptideTrust";
 import { ShareableMap } from "shared-memory-datastructures";
 import NetworkUtils from "./../../communication/NetworkUtils";
 import parallelLimit from "async/parallelLimit";
+import { config } from "@vue/test-utils";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -23,6 +24,7 @@ export default class Pept2DataCommunicator {
     private static inProgress: Promise<void>;
 
     public static PEPTDATA_BATCH_SIZE = 100;
+    public static MISSED_CLEAVAGE_BATCH = 25;
     public static PEPTDATA_ENDPOINT = "/mpa/pept2data";
     public static PARALLEL_REQUESTS = 5;
 
@@ -61,6 +63,8 @@ export default class Pept2DataCommunicator {
             return;
         }
 
+        const batchSize = configuration.enableMissingCleavageHandling ? Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
+
         Pept2DataCommunicator.inProgress = new Promise<void>(async(resolve, reject) => {
             const responses = new ShareableMap<string, string>();
             progressListener?.onProgressUpdate(0.0);
@@ -69,7 +73,7 @@ export default class Pept2DataCommunicator {
             let peptides: Peptide[] = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
 
             const requests = [];
-            for (let i = 0; i < peptides.length; i += Pept2DataCommunicator.PEPTDATA_BATCH_SIZE) {
+            for (let i = 0; i < peptides.length; i += batchSize) {
                 requests.push(async(done) => {
                     if (this.cancelled) {
                         done(new Error("Cancelled execution"));
@@ -77,7 +81,7 @@ export default class Pept2DataCommunicator {
                     }
 
                     const data = JSON.stringify({
-                        peptides: peptides.slice(i, i + Pept2DataCommunicator.PEPTDATA_BATCH_SIZE),
+                        peptides: peptides.slice(i, i + batchSize),
                         equate_il: configuration.equateIl,
                         missed: configuration.enableMissingCleavageHandling
                     });
@@ -93,6 +97,7 @@ export default class Pept2DataCommunicator {
                         })
 
                         if (previousProgress < i / peptides.length) {
+                            previousProgress = i / peptides.length;
                             progressListener?.onProgressUpdate(i / peptides.length);
                         }
                         done(null);

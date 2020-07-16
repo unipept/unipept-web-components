@@ -15,4 +15,8 @@ export class Ontology<OntologyId, DefinitionType extends Definition> {
     getDefinition(id: OntologyId) : Readonly<DefinitionType> | undefined {
         return this.definitions.get(id);
     }
+
+    getOntologyIds(): OntologyId[] {
+        return [...this.definitions.keys()];
+    }
 }

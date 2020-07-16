@@ -39,6 +39,8 @@ export async function compute(
     termPrefix: string,
     proteinCountProperty: string,
 ): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>, number]> {
+    const start = new Date().getTime();
+
     const peptideToResponseMap = new ShareableMap<Peptide, string>(0, 0);
     peptideToResponseMap.setBuffers(indexBuffer, dataBuffer);
 
@@ -87,5 +89,9 @@ export async function compute(
     const sortedCounts: Map<GoCode, number> = new Map([...countsPerCode].sort(
         ([code1, count1], [code2, count2]) => count2 - count1
     ));
+
+    const end = new Date().getTime();
+    console.log("Functional count table took: " + (end - start) / 1000 + "s");
+
     return [sortedCounts, item2Peptides, annotatedCount];
 }

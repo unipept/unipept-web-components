@@ -3,7 +3,6 @@ import { Peptide } from "./../business/ontology/raw/Peptide";
 import { CountTable } from "./../business/counts/CountTable";
 import { ActionContext, ActionTree, GetterTree, MutationTree, Store } from "vuex";
 import PeptideCountTableProcessor from "./../business/processors/raw/PeptideCountTableProcessor";
-import Pept2DataCommunicator from "./../business/communication/peptides/Pept2DataCommunicator";
 import CommunicationSource from "./../business/communication/source/CommunicationSource";
 import Assay from "./../business/entities/assay/Assay";
 import NcbiTaxon, { NcbiId } from "./../business/ontology/taxonomic/ncbi/NcbiTaxon";
@@ -133,8 +132,6 @@ const assayMutations: MutationTree<AssayState> = {
         if (!analysisMeta.startProcessingTime){
             analysisMeta.startProcessingTime = new Date().getTime();
         }
-
-        console.log("Receiving progress for " + assay.getName() + " -> " + progress);
 
         analysisMeta.progress = progress;
 
