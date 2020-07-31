@@ -20,8 +20,8 @@ export default class InterproCountTableProcessor extends FunctionalCountTablePro
             configuration,
             communicationSource,
             percentage,
-            "IPR",
-            "IPR:"
+            "ipr",
+            "ipr"
         );
     }
 

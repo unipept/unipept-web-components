@@ -1,4 +1,3 @@
-import { PeptideDataResponse } from "./PeptideDataResponse";
 import { CountTable } from "./../../counts/CountTable";
 import { Peptide } from "./../../ontology/raw/Peptide";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
@@ -9,7 +8,8 @@ import PeptideTrust from "./../../processors/raw/PeptideTrust";
 import { ShareableMap } from "shared-memory-datastructures";
 import NetworkUtils from "./../../communication/NetworkUtils";
 import parallelLimit from "async/parallelLimit";
-import { config } from "@vue/test-utils";
+import PeptideData from "./PeptideData";
+import PeptideDataSerializer from "./PeptideDataSerializer";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -18,7 +18,7 @@ import { config } from "@vue/test-utils";
  */
 export default class Pept2DataCommunicator {
     // Maps a configuration (as string) onto a map in which peptides are mapped onto their responses.
-    private static configurationToResponses = new Map<string, ShareableMap<string, string>>();
+    private static configurationToResponses = new Map<string, ShareableMap<string, PeptideData>>();
     // Keeps track of which peptides have been processed per concrete configuration
     private static configurationToProcessed = new Map<string, Set<Peptide>>();
     private static inProgress: Promise<void>;
@@ -66,7 +66,12 @@ export default class Pept2DataCommunicator {
         const batchSize = configuration.enableMissingCleavageHandling ? Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
 
         Pept2DataCommunicator.inProgress = new Promise<void>(async(resolve, reject) => {
-            const responses = new ShareableMap<string, string>();
+            const responses = new ShareableMap<string, PeptideData>(
+                undefined,
+                undefined,
+                new PeptideDataSerializer()
+            );
+
             progressListener?.onProgressUpdate(0.0);
             let previousProgress: number = 0;
 
@@ -93,7 +98,7 @@ export default class Pept2DataCommunicator {
                         )
 
                         res.peptides.forEach(p => {
-                            responses.set(p.sequence, JSON.stringify(p));
+                            responses.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
                         })
 
                         if (previousProgress < i / peptides.length) {
@@ -110,35 +115,42 @@ export default class Pept2DataCommunicator {
 
             try {
                 await parallelLimit(requests, Pept2DataCommunicator.PARALLEL_REQUESTS);
+
+                if (!this.cancelled) {
+                    const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
+
+                    if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
+                        Pept2DataCommunicator.configurationToResponses.set(
+                            config,
+                            new ShareableMap<string, PeptideData>(
+                                undefined,
+                                undefined,
+                                new PeptideDataSerializer()
+                            )
+                        );
+                    }
+                    const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
+
+                    for (const [pep, response] of responses) {
+                        configMap.set(pep, response);
+                    }
+
+                    if (!Pept2DataCommunicator.configurationToProcessed.has(config)) {
+                        Pept2DataCommunicator.configurationToProcessed.set(config, new Set());
+                    }
+                    const processedSet = Pept2DataCommunicator.configurationToProcessed.get(config);
+                    for (const pep of peptides) {
+                        processedSet.add(pep);
+                    }
+
+                    resolve();
+                }
             } catch (err) {
                 if (!err.message.includes("Cancelled execution")) {
                     reject(err);
                 } else {
                     resolve();
                 }
-            }
-
-            if (!this.cancelled) {
-                const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
-
-                if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
-                    Pept2DataCommunicator.configurationToResponses.set(config, new ShareableMap<string, string>());
-                }
-                const configMap = Pept2DataCommunicator.configurationToResponses.get(config);
-
-                for (const [pep, response] of responses) {
-                    configMap.set(pep, response);
-                }
-
-                if (!Pept2DataCommunicator.configurationToProcessed.has(config)) {
-                    Pept2DataCommunicator.configurationToProcessed.set(config, new Set());
-                }
-                const processedSet = Pept2DataCommunicator.configurationToProcessed.get(config);
-                for (const pep of peptides) {
-                    processedSet.add(pep);
-                }
-
-                resolve();
             }
         });
 
@@ -184,7 +196,7 @@ export default class Pept2DataCommunicator {
      * @param configuration The search settings that need to be applied when looking for this peptide.
      * @return The data that was retrieved through Unipept's API if the peptide is known. Returns undefined otherwise.
      */
-    public getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideDataResponse {
+    public getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideData {
         const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         const responseMap = Pept2DataCommunicator.configurationToResponses.get(configString);
         if (!responseMap) {
@@ -194,13 +206,13 @@ export default class Pept2DataCommunicator {
 
         const response = responseMap.get(peptide);
         if (response) {
-            return JSON.parse(response);
+            return response;
         }
 
         return undefined;
     }
 
-    public getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, string> {
+    public getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, PeptideData> {
         const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         return Pept2DataCommunicator.configurationToResponses.get(configString);
     }

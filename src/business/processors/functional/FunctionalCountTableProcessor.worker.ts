@@ -3,6 +3,8 @@ import { OntologyIdType } from "./../../ontology/Ontology";
 import { expose } from "threads";
 import { ShareableMap } from "shared-memory-datastructures";
 import { GoCode } from "./../../ontology/functional/go/GoDefinition";
+import PeptideData from "./../../communication/peptides/PeptideData";
+import PeptideDataSerializer from "./../../communication/peptides/PeptideDataSerializer";
 
 expose({ compute, mergeResultMaps });
 
@@ -39,9 +41,14 @@ export async function compute(
     termPrefix: string,
     proteinCountProperty: string,
 ): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>, number]> {
+    console.log("Started to compute...");
     const start = new Date().getTime();
 
-    const peptideToResponseMap = new ShareableMap<Peptide, string>(0, 0);
+    const peptideToResponseMap = new ShareableMap<Peptide, PeptideData>(
+        0,
+        0,
+        new PeptideDataSerializer()
+    );
     peptideToResponseMap.setBuffers(indexBuffer, dataBuffer);
 
     // First we count the amount of peptides per unique code. Afterwards, we can fetch definitions for all these
@@ -52,23 +59,31 @@ export async function compute(
 
     const item2Peptides = new Map();
 
-    for (const [peptide, peptideCount] of peptideCounts) {
-        const peptideResponse = peptideToResponseMap.get(peptide);
+    // const retrievedValues = [];
+    // for (const [peptide, peptideCount] of peptideCounts) {
+    //     retrievedValues.push(peptideToResponseMap.get(peptide));
+    // }
+    //
+    // let i = 0;
+    // const parseStart = new Date().getTime();
+    // for (const peptideResponse of retrievedValues) {
+    //     const data = JSON.parse(peptideResponse);
+    //     i += data.fa.counts.all;
+    // }
+    // const parseEnd = new Date().getTime();
+    // console.log("JSON parse time:" + (parseEnd - parseStart) / 1000 + "s --> value " + i);
 
-        if (!peptideResponse) {
+    for (const [peptide, peptideCount] of peptideCounts) {
+        const peptideData = peptideToResponseMap.get(peptide);
+
+        if (!peptideData) {
             continue;
         }
 
-        const peptideData = JSON.parse(peptideResponse);
+        const proteinCount = peptideData.faCounts[proteinCountProperty];
+        const terms = peptideData[termPrefix];
 
-        const proteinCount = peptideData.fa.counts[proteinCountProperty];
-
-        const uniqueTerms = Object.keys(peptideData.fa.data).filter(
-            code => code.startsWith(termPrefix)
-        );
-
-        for (const term of uniqueTerms) {
-            const proteinCountOfTerm: number = peptideData.fa.data[term];
+        for (const [term, proteinCountOfTerm] of Object.entries(terms) as [string, number][]) {
             if ((proteinCountOfTerm / proteinCount) * 100 > percentage) {
                 countsPerCode.set(term, (countsPerCode.get(term) || 0) + peptideCount);
             }
@@ -79,7 +94,7 @@ export async function compute(
             item2Peptides.get(term).push(peptide);
         }
 
-        if (uniqueTerms.length > 0) {
+        if (terms.length > 0) {
             annotatedCount += peptideCount;
         }
     }

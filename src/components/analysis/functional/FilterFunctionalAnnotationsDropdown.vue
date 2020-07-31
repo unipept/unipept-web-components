@@ -35,7 +35,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
+import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 
 @Component({
     components: {},

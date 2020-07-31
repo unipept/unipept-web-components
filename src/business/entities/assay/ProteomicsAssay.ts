@@ -9,7 +9,7 @@ export default class ProteomicsAssay extends Assay {
     private searchConfiguration: SearchConfiguration = new SearchConfiguration();
     private peptides: Peptide[] = [];
 
-    constructor(public readonly id: string) {
+    constructor(public id: string) {
         super(id);
     }
 

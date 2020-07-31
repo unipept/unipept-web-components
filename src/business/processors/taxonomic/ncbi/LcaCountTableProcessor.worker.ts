@@ -3,6 +3,8 @@ import { Peptide } from "./../../../ontology/raw/Peptide";
 import { CountTable } from "./../../../counts/CountTable";
 import { expose, TransferDescriptor } from "threads";
 import { ShareableMap } from "shared-memory-datastructures";
+import PeptideData from "./../../../communication/peptides/PeptideData";
+import PeptideDataSerializer from "./../../../communication/peptides/PeptideDataSerializer";
 
 expose(compute);
 
@@ -11,7 +13,11 @@ export default function compute(
     indexBuffer: SharedArrayBuffer,
     dataBuffer: SharedArrayBuffer
 ) {
-    const peptideToResponseMap = new ShareableMap<Peptide, string>(0, 0);
+    const peptideToResponseMap = new ShareableMap<Peptide, PeptideData>(
+        0,
+        0,
+        new PeptideDataSerializer()
+    );
     peptideToResponseMap.setBuffers(indexBuffer, dataBuffer);
 
     const countsPerLca = new Map<NcbiId, number>();
@@ -19,13 +25,11 @@ export default function compute(
 
     for (const peptide of peptideCountTable["counts"].keys()) {
         const peptideCount = peptideCountTable["counts"].get(peptide);
-        const peptideResponse = peptideToResponseMap.get(peptide);
+        const peptideData = peptideToResponseMap.get(peptide);
 
-        if (!peptideResponse) {
+        if (!peptideData) {
             continue;
         }
-
-        const peptideData = JSON.parse(peptideResponse);
 
         const lcaTaxon = peptideData.lca;
         countsPerLca.set(lcaTaxon, (countsPerLca.get(lcaTaxon) || 0) + peptideCount);

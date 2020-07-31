@@ -92,51 +92,59 @@ export default class PeptideExport {
 
                 // Now add information about the EC-numbers.
                 // This list contains the (EC-code, protein count)-mapping, sorted descending on counts.
-                const ecNumbers = await PeptideExport.getAnnotations(pept2DataResponse, x => x[0].startsWith("EC:"));
+                const ecNumbers = await PeptideExport.sortAnnotations(pept2DataResponse.ec);
                 row.push(
                     ecNumbers
-                        .map(a => `${a[0].substr(3)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.fa.counts.EC)})`)
+                        .map(a => `${a[0].substr(3)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.faCounts.ec)})`)
                         .join(secondarySeparator)
                 );
 
                 const ecDefinitions: [EcDefinition, number][] = ecNumbers.map(c => [ecOntology.getDefinition(c[0]), c[1]]);
                 row.push(
                     ecDefinitions.map(
-                        c => `${c[0] ? c[0].name : ""} (${StringUtils.numberToPercent(c[1] / pept2DataResponse.fa.counts.EC)})`
+                        c => `${c[0] ? c[0].name : ""} (${StringUtils.numberToPercent(c[1] / pept2DataResponse.faCounts.ec)})`
                     ).join(secondarySeparator)
                 );
 
                 // Now process the GO-terms
                 for (const ns of Object.values(GoNamespace)) {
-                    const goTerms = await PeptideExport.getAnnotations(
-                        pept2DataResponse,
-                        x => x[0].startsWith("GO:") && goOntology.getDefinition(x[0]).namespace == ns
+                    const gos = pept2DataResponse.go;
+                    const goAnnotations = Object.keys(gos).filter(
+                        x => goOntology.getDefinition(x).namespace === ns
                     );
 
+                    const goTerms = {};
+
+                    for (const annotation of goAnnotations) {
+                        goTerms[annotation] = gos[annotation];
+                    }
+
+                    const sortedTerms = PeptideExport.sortAnnotations(goTerms);
+
                     row.push(
-                        goTerms
-                            .map(a => `${a[0]} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.fa.counts.GO)})`)
+                        sortedTerms
+                            .map(a => `${a[0]} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.faCounts.go)})`)
                             .join(secondarySeparator)
                     );
 
-                    const goDefinitions: [GoDefinition, number][] = goTerms.map(c => [goOntology.getDefinition(c[0]), c[1]]);
+                    const goDefinitions: [GoDefinition, number][] = sortedTerms.map(c => [goOntology.getDefinition(c[0]), c[1]]);
                     row.push(
                         goDefinitions.map(
-                            c => `${c ? c[0].name : ""} (${StringUtils.numberToPercent(c[1] / pept2DataResponse.fa.counts.GO)})`
+                            c => `${c ? c[0].name : ""} (${StringUtils.numberToPercent(c[1] / pept2DataResponse.faCounts.go)})`
                         ).join(secondarySeparator));
                 }
 
                 // Now process the InterPro-terms
-                const interproNumbers = await PeptideExport.getAnnotations(pept2DataResponse, x => x[0].startsWith("IPR:"));
+                const interproNumbers = await PeptideExport.sortAnnotations(pept2DataResponse.ipr);
                 row.push(
                     interproNumbers
-                        .map(a => `${a[0].substr(4)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.fa.counts.IPR)})`)
+                        .map(a => `${a[0].substr(4)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.faCounts.ipr)})`)
                         .join(secondarySeparator)
                 );
 
                 const interproDefinitions: [InterproDefinition, number][] = interproNumbers.map(i => [interproOntology.getDefinition(i[0]), i[1]]);
                 row.push(interproDefinitions.map(
-                    i => `${i ? i[0].name : ""} (${StringUtils.numberToPercent(i[1] / pept2DataResponse.fa.counts.IPR)})`
+                    i => `${i ? i[0].name : ""} (${StringUtils.numberToPercent(i[1] / pept2DataResponse.faCounts.ipr)})`
                 ).join(secondarySeparator));
             }
 
@@ -150,12 +158,10 @@ export default class PeptideExport {
         return rows.join(lineEnding);
     }
 
-    private static getAnnotations(
-        pept2DataResponse: PeptideDataResponse,
-        filterCondition: (x: [string, number]) => boolean
+    private static sortAnnotations(
+        annotations: any
     ): [string, number][] {
-        return (Object.entries(pept2DataResponse.fa.data) as [string, any][] as [string, number][])
-            .filter(filterCondition)
+        return (Object.entries(annotations) as [string, any][] as [string, number][])
             .sort((a, b) => {
                 if (b[1] === a[1]) {
                     return a[0] < b[0] ? -1 : 1;

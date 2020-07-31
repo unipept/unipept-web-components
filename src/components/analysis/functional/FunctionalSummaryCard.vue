@@ -199,7 +199,7 @@ import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
 import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
-import { Ontology } from "@/business/ontology/Ontology";
+import { Ontology } from "./../../../business/ontology/Ontology";
 
 @Component({
     components: {

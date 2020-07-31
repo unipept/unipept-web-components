@@ -25,6 +25,10 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
         // TODO implement...
     }
 
+    public isCancelled(): boolean {
+        return false;
+    }
+
     public async getCountTable(): Promise<CountTable<NcbiId>> {
         await this.compute();
         return this.countTable;

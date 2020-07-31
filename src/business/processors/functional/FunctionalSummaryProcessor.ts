@@ -27,14 +27,17 @@ export default class FunctionalSummaryProcessor {
         const processedPeptides: string[][] = peptideTable.getOntologyIds().map(peptide => {
             let peptideCount = peptideTable.getCounts(peptide);
             let peptideData = pept2DataCommunicator.getPeptideResponse(peptide, configuration);
-            let ecProteinCount = element.code in peptideData.fa.data? peptideData.fa.data[element.code] : 0
+            const ecs = peptideData.ec;
+            let ecProteinCount = element.code in ecs ? ecs[element.code] : 0
+
+            const totalCount = peptideData.faCounts.all;
 
             return [
                 peptide,
                 peptideCount,
-                peptideData.fa.counts.all,
+                totalCount,
                 ecProteinCount,
-                100 * (ecProteinCount / peptideData.fa.counts.all),
+                100 * (ecProteinCount / totalCount),
                 ncbiOntologyProcessor.getDefinition(peptideData.lca)
             ]
         })

@@ -26,8 +26,8 @@ export default class EcCountTableProcessor extends FunctionalCountTableProcessor
             configuration,
             communicationSource,
             percentage,
-            "EC",
-            "EC:"
+            "ec",
+            "ec"
         )
     }
 

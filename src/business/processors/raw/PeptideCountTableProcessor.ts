@@ -1,11 +1,15 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
 import { CountTable } from "./../../counts/CountTable";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import { spawn, Worker } from "threads"
+import { spawn, Worker, Pool } from "threads"
 
 
 export default class PeptideCountTableProcessor {
-    private static worker;
+    public static THREAD_COUNT: number = 4;
+    private static pool = Pool(
+        () => spawn(new Worker("./PeptideCountProcessor.worker.ts")),
+        PeptideCountTableProcessor.THREAD_COUNT
+    );
 
     /**
      * Convert a list of peptides into a count table. This function directly filters the given list of peptides, based
@@ -19,11 +23,11 @@ export default class PeptideCountTableProcessor {
         peptides: Peptide[],
         searchConfiguration: SearchConfiguration
     ): Promise<CountTable<Peptide>> {
-        if (!PeptideCountTableProcessor.worker) {
-            PeptideCountTableProcessor.worker = await spawn(new Worker("./PeptideCountProcessor.worker.ts"));
-        }
-        const start = new Date().getTime();
-        const [peptideCountsMapping, totalFrequency] = await PeptideCountTableProcessor.worker(peptides, searchConfiguration);
-        return new CountTable<Peptide>(peptideCountsMapping, totalFrequency);
+        return new Promise<CountTable<Peptide>>((resolve) => {
+            PeptideCountTableProcessor.pool.queue(async(worker) => {
+                const [peptideCountsMapping, totalFrequency] = await worker(peptides, searchConfiguration);
+                resolve(new CountTable<Peptide>(peptideCountsMapping, totalFrequency))
+            });
+        });
     }
 }
