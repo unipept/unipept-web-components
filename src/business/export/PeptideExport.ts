@@ -34,6 +34,7 @@ export default class PeptideExport {
      * present in the generated export.
      * @param searchConfiguration The particular configuration settings that are used for processing the peptides
      * present in the count table.
+     * @param communicationSource
      * @param separator The delimiter used to separate columns in the CSV. Use comma for international format, and semi-
      * colon for the European version.
      * @param secondarySeparator The delimiter used to separate multiple functional annotations from each other. Some

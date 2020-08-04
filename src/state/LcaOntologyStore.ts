@@ -105,11 +105,12 @@ const lcaActions: ActionTree<TaxonomicOntologyState, any> = {
                 communicationSource
             );
             const taxaTable = await countTableProcessor.getCountTable();
+            const taxaPeptideMapping = await countTableProcessor.getAnnotationPeptideMapping();
 
             const ontologyProcessor = new NcbiOntologyProcessor(communicationSource);
             const ontology = await ontologyProcessor.getOntology(taxaTable);
 
-            const tree = new Tree(taxaTable, ontology);
+            const tree = new Tree(taxaTable, ontology, taxaPeptideMapping);
 
             store.commit("SET_TREE", [assay, tree]);
             store.commit("SET_ONTOLOGY", [assay, ontology]);

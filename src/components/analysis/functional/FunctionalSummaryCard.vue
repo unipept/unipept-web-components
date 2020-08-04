@@ -83,7 +83,7 @@
                 </v-menu>
             </v-tabs>
             <v-alert
-                v-if="this.selectedNCBITaxon && this.taxonId !== -1"
+                v-if="this.filteredNcbiTaxon"
                 dense
                 colored-border
                 id="filtered-taxon-information">
@@ -94,11 +94,11 @@
                         </b>
                         : These results are limited to the {{ this.filteredCountTable.totalCount }} peptides specific to
                         <b>
-                            {{ this.selectedNCBITaxon.name }} ({{this.selectedNCBITaxon.rank}})
+                            {{ this.filteredNcbiTaxon.name }} ({{this.filteredNcbiTaxon.rank}})
                         </b>.
                     </v-col>
                     <v-col class="shrink">
-                        <v-btn @click="taxonId = -1">Undo</v-btn>
+                        <v-btn @click="resetFilter">Reset filter</v-btn>
                     </v-col>
                 </v-row>
             </v-alert>
@@ -269,6 +269,10 @@ export default class FunctionalSummaryCard extends Vue {
         return this.$store.getters["ncbi/ontology"](this.assay)?.ontology;
     }
 
+    get filteredNcbiTaxon(): NcbiTaxon {
+        return this.$store.getters.assayData(this.assay)?.taxonFilter;
+    }
+
     @Watch("filteredCountTable")
     @Watch("lcaProcessor")
     @Watch("lcaOntology")
@@ -288,6 +292,10 @@ export default class FunctionalSummaryCard extends Vue {
     private disableRelativeCounts(): void {
         this.showPercentage = false;
         this.selectedSortTypeName = "Peptides";
+    }
+
+    private resetFilter(): void {
+        this.$store.dispatch("filterByTaxon", [this.assay, -1]);
     }
 }
 </script>

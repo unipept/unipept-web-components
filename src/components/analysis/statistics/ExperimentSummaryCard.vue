@@ -32,34 +32,7 @@ change the currently active search settings and redo the analysis of all selecte
                         Update
                     </v-btn>
                 </tooltip>
-                <tooltip message="Download a CSV-file with the results of this analysis.">
-                    <v-menu offset-y bottom left origin="top right">
-                        <template v-slot:activator="{ on }">
-                            <v-btn min-width="187" :disabled="disabled || exportLoading" v-on="on" color="default">
-                                <div v-if="!exportLoading">
-                                    <v-icon>
-                                        mdi-download
-                                    </v-icon>
-                                    Download results
-                                    <v-icon>mdi-menu-down</v-icon>
-                                </div>
-                                <v-progress-circular v-else indeterminate color="black" :size="20">
-                                </v-progress-circular>
-                            </v-btn>
-                        </template>
-                        <v-list>
-                            <v-list-item @click="downloadCsv()">
-                                <v-list-item-title>Comma-separated (international)</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="downloadCsv(';', ',')">
-                                <v-list-item-title>Semi-colon-separated (Europe)</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="downloadCsv('\t', ';')">
-                                <v-list-item-title>Tab-separated</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                </tooltip>
+                <export-results-button :assay="activeAssay"></export-results-button>
             </div>
             <v-divider></v-divider>
             <span v-if="!activeAssay || !peptideTrust" class="dataset-placeholder-text">
@@ -101,7 +74,6 @@ import MissingPeptidesList from "./MissingPeptidesList.vue";
 import Tooltip from "../../custom/Tooltip.vue";
 import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 import PeptideTrust from "./../../../business/processors/raw/PeptideTrust";
-import Pept2DataCommunicator from "./../../../business/communication/peptides/Pept2DataCommunicator";
 import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
 import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
 import PeptideExport from "./../../../business/export/PeptideExport";
@@ -109,9 +81,10 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NetworkUtils from "./../../../business/communication/NetworkUtils";
 import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import ExportResultsButton from "./ExportResultsButton.vue";
 
 @Component({
-    components: { CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
+    components: { ExportResultsButton, CardTitle, CardHeader, SearchSettingsForm, Tooltip, MissingPeptidesList },
     computed: {
         peptideList: {
             get() {
@@ -223,21 +196,6 @@ export default class ExperimentSummaryCard extends Vue {
             );
 
             this.loading = false;
-        }
-    }
-
-    private async downloadCsv(separator: string = ",", functionalSeparator: string = ";"): Promise<void> {
-        if (this.activeAssay && this.peptideCountTable) {
-            this.exportLoading = true;
-            const csv: string = await PeptideExport.exportSummaryAsCsv(
-                this.peptideCountTable,
-                this.searchConfiguration,
-                this.communicationSource,
-                separator,
-                functionalSeparator
-            );
-            await NetworkUtils.downloadDataByForm(csv, `${this.activeAssay.getName()}_mpa.csv`, "text/csv");
-            this.exportLoading = false;
         }
     }
 }

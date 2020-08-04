@@ -164,6 +164,47 @@ export default class HierarchicalOutlineVisualization extends Vue {
         font-family: Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;
         font-size: 12px;
         color: rgb(85, 85, 85);
+        width: 420px;
+        float: right;
+        padding: 8px;
+        background: @gray-lighter;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        .transition(all 1s ease-in-out);
+        .shadow-z5();
+
+        a{
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: block;
+        }
+    }
+
+    #tree_data::before {
+        content: "";
+        display: block;
+        height: 0;
+        width: 0;
+        margin-left: -18px;
+        border: 10px solid #ccc;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent #ccc transparent transparent;
+        position: absolute;
+    }
+
+    #tree_data h3 {
+        line-height: 30px;
+        margin: 3px 0 5px;
+        color: @black-secondary;
+    }
+
+    #tree_data h4 {
+        line-height: 25px;
+        margin-left: 5px;
+    }
+
+    #tree_data h3 a {
+        color: @black-text !important;
     }
 
     #searchtree {
@@ -172,5 +213,36 @@ export default class HierarchicalOutlineVisualization extends Vue {
 
     .hierarchical-outline-container legend {
         display: none;
+    }
+
+    .transition(@transition) {
+        -webkit-transition: @transition;
+        -o-transition: @transition;
+        transition: @transition;
+    }
+    .transition-property(@transition-property) {
+        -webkit-transition-property: @transition-property;
+        transition-property: @transition-property;
+    }
+    .transition-delay(@transition-delay) {
+        -webkit-transition-delay: @transition-delay;
+        transition-delay: @transition-delay;
+    }
+    .transition-duration(@transition-duration) {
+        -webkit-transition-duration: @transition-duration;
+        transition-duration: @transition-duration;
+    }
+    .transition-timing-function(@timing-function) {
+        -webkit-transition-timing-function: @timing-function;
+        transition-timing-function: @timing-function;
+    }
+    .transition-transform(@transition) {
+        -webkit-transition: -webkit-transform @transition;
+        -moz-transition: -moz-transform @transition;
+        -o-transition: -o-transform @transition;
+        transition: transform @transition;
+    }
+    .shadow-z5() {
+        box-shadow: 0 8px 10px -5px rgba(0,0,0,.14),0 16px 24px 2px rgba(0,0,0,.098),0 6px 30px 5px rgba(0,0,0,.084);
     }
 </style>

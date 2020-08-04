@@ -39,7 +39,8 @@ export type AssayData = {
     filteredPeptideCountTable: CountTable<Peptide>,
     communicationSource: CommunicationSource,
     assayProcessor: AssayProcessor,
-    filterPercentage: number
+    filterPercentage: number,
+    taxonFilter: NcbiTaxon
 }
 
 export interface AssayState {
@@ -87,12 +88,17 @@ const assayMutations: MutationTree<AssayState> = {
                 peptideCountTable: undefined,
                 filteredPeptideCountTable: undefined,
                 communicationSource: undefined,
-                filterPercentage: FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE
+                filterPercentage: FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE,
+                taxonFilter: undefined
             });
         }
     },
 
     REMOVE_ASSAY(state: AssayState, assay: ProteomicsAssay) {
+        if (state.activeAssay?.id === assay.id) {
+            state.activeAssay = undefined;
+        }
+
         const idx = state.assayData.findIndex(a => a.assay.id === assay.id);
         if (idx >= 0) {
             state.assayData.splice(idx, 1);
@@ -167,6 +173,7 @@ const assayMutations: MutationTree<AssayState> = {
     RESET_FILTER(state: AssayState, assay: ProteomicsAssay) {
         const assayData = state.assayData.find(a => a.assay.id === assay.id);
         assayData.filteredPeptideCountTable = assayData.peptideCountTable;
+        assayData.taxonFilter = undefined;
     },
 
     SET_ASSAY_ERROR(state: AssayState, [assay, error]: [ProteomicsAssay, string]) {
@@ -195,6 +202,11 @@ const assayMutations: MutationTree<AssayState> = {
     SET_FILTER_PERCENTAGE(state: AssayState, [assay, percentage]: [ProteomicsAssay, number]) {
         const assayData = state.assayData.find(a => a.assay.id === assay.id);
         assayData.filterPercentage = percentage;
+    },
+
+    SET_NCBI_FILTER(state: AssayState, [assay, taxon]: [ProteomicsAssay, NcbiTaxon]) {
+        const assayData = state.assayData.find(a => a.assay.id === assay.id);
+        assayData.taxonFilter = taxon;
     }
 };
 
@@ -211,14 +223,12 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         },
 
         async removeAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
-            console.log("REMOVE CALLED");
             await store.dispatch("cancelAnalysis", assay);
             store.commit("REMOVE_ASSAY", assay);
         },
 
         resetActiveAssay(store: ActionContext<AssayState, any>) {
             let shouldReselect: boolean = true;
-            console.log(store.getters.assays);
             if (store.getters.activeAssay) {
                 const idx: number = store.getters.assays.findIndex(data => data.assay.getId() === store.getters.activeAssay.getId());
                 shouldReselect = idx === -1;
@@ -323,7 +333,10 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
 
                 const communicationSource = store.getters["assayData"](assay).communicationSource;
 
-                store.dispatch("filterForAssay", [assay, filteredCountTable, communicationSource])
+                const taxon = await ncbiOntology.getDefinition(ncbiId);
+
+                store.commit("SET_NCBI_FILTER", [assay, taxon]);
+                store.dispatch("filterForAssay", [assay, filteredCountTable, communicationSource]);
             } catch (error) {
                 console.warn(error);
                 store.commit("SET_ASSAY_ERROR", [assay, error.toString()]);
