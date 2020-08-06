@@ -159,9 +159,9 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             infoPane.append(stringBuffer);
             infoPane.find("h4.own").before("<div id='copy-own' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
 
-            $("#copy-own span").click(() => {
+            $("#copy-own span").on("click", () => {
                 clipboard.writeText(ownSequences.join("\n"));
-            })
+            });
         }
         allSequences = dataTree.getAllSequences(d).sort();
         if (allSequences && allSequences.length > 0 && allSequences.length !== (ownSequences ? ownSequences.length : 0)) {
@@ -173,8 +173,8 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             infoPane.append(stringBuffer);
             infoPane.find("h4.all").before("<div id='copy-all' class='clipboard-btn-wrapper'><span class='btn-clipboard'>Copy</span></div>");
 
-            $("#copy-all span").click(() => {
-                clipboard.writeText(ownSequences.join("\n"));
+            $("#copy-all span").on("click",() => {
+                clipboard.writeText(allSequences.join("\n"));
             })
         }
         return false;

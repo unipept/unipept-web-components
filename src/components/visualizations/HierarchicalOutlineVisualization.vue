@@ -245,4 +245,28 @@ export default class HierarchicalOutlineVisualization extends Vue {
     .shadow-z5() {
         box-shadow: 0 8px 10px -5px rgba(0,0,0,.14),0 16px 24px 2px rgba(0,0,0,.098),0 6px 30px 5px rgba(0,0,0,.084);
     }
+    .clipboard-btn-wrapper {
+        position: relative;
+        display: block;
+    }
+    .btn-clipboard {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        display: block;
+        padding: 5px 8px;
+        font-size: 12px;
+        color: @black-secondary;
+        cursor: pointer;
+        background-color: #fff;
+        border: 1px solid @black-divider;
+        border-radius: 2px;
+    }
+    .btn-clipboard:hover {
+        color: @black-text;
+    }
+    .btn-clipboard:active {
+        color: @gray-light;
+    }
 </style>

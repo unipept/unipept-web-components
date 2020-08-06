@@ -10,6 +10,7 @@ import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import { createAssayStore } from "@/state/AssayStore";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);

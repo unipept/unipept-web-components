@@ -39,15 +39,15 @@ export default class PeptideData {
     }
 
     public static createFromPeptideDataResponse(response: PeptideDataResponse): PeptideData {
-        const gos = Object.keys(response.fa.data).filter(
+        const gos = response.fa.data ? Object.keys(response.fa.data).filter(
             code => code.startsWith("GO:")
-        );
-        const iprs = Object.keys(response.fa.data).filter(
+        ) : [];
+        const iprs = response.fa.data ? Object.keys(response.fa.data).filter(
             code => code.startsWith("IPR:")
-        );
-        const ecs = Object.keys(response.fa.data).filter(
+        ) : [];
+        const ecs = response.fa.data ? Object.keys(response.fa.data).filter(
             code => code.startsWith("EC:")
-        );
+        ) : [];
 
         // We need 12 bytes to record the length of each of the functional annotation arrays.
         // GO is stored as an integer (4 bytes) and it's count (4 bytes for count)
@@ -205,5 +205,29 @@ export default class PeptideData {
         }
 
         return output;
+    }
+
+
+    public toPeptideDataResponse(): PeptideDataResponse {
+        const faCounts = this.faCounts;
+
+        const dataObject = {};
+        Object.assign(dataObject, this.go);
+        Object.assign(dataObject, this.ec);
+        Object.assign(dataObject, this.ipr);
+
+        return {
+            lca: this.lca,
+            lineage: this.lineage,
+            fa: {
+                counts: {
+                    all: faCounts.all,
+                    EC: faCounts.ec,
+                    GO: faCounts.go,
+                    IPR: faCounts.ipr
+                },
+                data: dataObject
+            }
+        }
     }
 }

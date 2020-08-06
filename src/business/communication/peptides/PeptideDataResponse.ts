@@ -1,6 +1,6 @@
 export type PeptideDataResponse = {
     lca: number,
-    lineage: [number],
+    lineage: number[],
     fa:
         {
             counts:

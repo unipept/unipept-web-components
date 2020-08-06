@@ -36,6 +36,12 @@ export default abstract class FunctionalProteinCountTableProcessor<
         return this.trust;
     }
 
+    public cancel(): void {}
+
+    public isCancelled(): boolean {
+        return false;
+    }
+
     private async compute(): Promise<void> {
         if (this.countTables.size > 0) {
             return;

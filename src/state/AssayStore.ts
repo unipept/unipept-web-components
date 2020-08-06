@@ -225,6 +225,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         async removeAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
             await store.dispatch("cancelAnalysis", assay);
             store.commit("REMOVE_ASSAY", assay);
+            store.dispatch("resetActiveAssay");
         },
 
         resetActiveAssay(store: ActionContext<AssayState, any>) {

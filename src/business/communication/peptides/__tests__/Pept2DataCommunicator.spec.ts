@@ -12,6 +12,7 @@ import Setup from "@/test/Setup";
 import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
 import { ShareableMap } from "shared-memory-datastructures";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import PeptideData from "@/business/communication/peptides/PeptideData";
 
 const counts = new Map([
     ["AAAAA", 1],
@@ -31,7 +32,7 @@ describe("Pept2DataCommunicator", () => {
         NetworkConfiguration.BASE_URL = "http://unipept.ugent.be";
 
         // Reset Pept2DataCommunicator state
-        Pept2DataCommunicator["configurationToResponses"] = new Map<string, ShareableMap<string, string>>();
+        Pept2DataCommunicator["configurationToResponses"] = new Map<string, ShareableMap<string, PeptideData>>();
         Pept2DataCommunicator["configurationToProcessed"] = new Map<string, Set<Peptide>>();
     })
 
@@ -68,7 +69,8 @@ describe("Pept2DataCommunicator", () => {
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
 
         await pept2DataCommunicator.process(peptideCountTable, searchConfig);
-        const response = pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig);
+        const response = pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig).toPeptideDataResponse();
+        response["sequence"] = "AAAAA";
 
         expect(response).toEqual(AAAAA);
 
