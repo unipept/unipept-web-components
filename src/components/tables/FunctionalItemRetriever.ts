@@ -44,6 +44,10 @@ export default class FunctionalItemRetriever<C extends OntologyIdType, F extends
             for (const code of codes.slice(start, end)) {
                 const definition: F = this.ontology.getDefinition(code);
 
+                if (!definition) {
+                    console.log(code);
+                }
+
                 items.push(new TableItem(
                     this.functionalCountTable.getCounts(code),
                     this.functionalCountTable.getCounts(code) / this.peptideCountTable.totalCount,

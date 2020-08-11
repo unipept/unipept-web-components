@@ -1,6 +1,6 @@
 <template>
     <amount-table
-        :loading="ecCountTableProcessor === undefined"
+        :loading="ecCountTableProcessor === undefined || computeInProgress"
         annotation-name="EC number"
         :item-retriever="itemRetriever"
         :assay="assay"
@@ -28,6 +28,8 @@ import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import EcCountTableProcessor from "./../../business/processors/functional/ec/EcCountTableProcessor";
 import FunctionalItemRetriever from "./FunctionalItemRetriever";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import FunctionalCountTableProcessor from "./../../business/processors/functional/FunctionalCountTableProcessor";
 
 @Component({
     components: {
@@ -81,6 +83,14 @@ export default class EcAmountTable extends Vue {
         return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
     }
 
+    get filterPercentage(): number {
+        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+    }
+
+    get communicationSource(): CommunicationSource {
+        return this.$store.getters.assayData(this.assay)?.communicationSource;
+    }
+
     @Watch("ncbiCountTableProcessor")
     private async onNcbiCountTableProcessorChanged() {
         if (this.ncbiCountTableProcessor) {
@@ -91,12 +101,30 @@ export default class EcAmountTable extends Vue {
     @Watch("ecCountTableProcessor")
     @Watch("ecOntology")
     @Watch("peptideCountTable")
+    @Watch("filterPercentage")
     public async onInputsChanged() {
         this.computeInProgress = true;
+        this.itemRetriever = null;
 
         if (this.peptideCountTable && this.ecCountTableProcessor && this.ecOntology) {
+            let ecCountTable: CountTable<EcCode>;
+
+            if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+                ecCountTable = await this.ecCountTableProcessor.getCountTable();
+                this.itemsToPeptidesMapping = await this.ecCountTableProcessor.getAnnotationPeptideMapping();
+            } else {
+                const ecProcessor = new EcCountTableProcessor(
+                    this.peptideCountTable,
+                    this.assay.getSearchConfiguration(),
+                    this.communicationSource,
+                    this.filterPercentage
+                );
+
+                ecCountTable = await ecProcessor.getCountTable();
+                this.itemsToPeptidesMapping = await ecProcessor.getAnnotationPeptideMapping();
+            }
             this.itemRetriever = new FunctionalItemRetriever(
-                await this.ecCountTableProcessor.getCountTable(),
+                ecCountTable,
                 this.peptideCountTable,
                 this.ecOntology
             );

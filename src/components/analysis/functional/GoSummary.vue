@@ -31,6 +31,9 @@ import { Ontology } from "./../../../business/ontology/Ontology";
 import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 import GoCountTableProcessor from "./../../../business/processors/functional/go/GoCountTableProcessor";
 import { GoNamespace } from "./../../../business/ontology/functional/go/GoNamespace";
+import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import FunctionalCountTableProcessor from "./../../../business/processors/functional/FunctionalCountTableProcessor";
+import { Peptide } from "./../../../business/ontology/raw/Peptide";
 
 @Component({
     components: {
@@ -66,12 +69,40 @@ export default class GoSummary extends Vue {
         return this.$store.getters["go/ontology"](this.assay);
     }
 
+    get filterPercentage(): number {
+        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+    }
+
+    get communicationSource(): CommunicationSource {
+        return this.$store.getters.assayData(this.assay)?.communicationSource;
+    }
+
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+    }
+
     @Watch("goCountTableProcessor")
     @Watch("goOntology")
+    @Watch("filterPercentage")
+    @Watch("peptideCountTable")
     private async onInputsChanged() {
         this.definitions.splice(0, this.definitions.length);
-        if (this.goCountTableProcessor && this.goOntology) {
-            const goCountTable: CountTable<GoCode> = await this.goCountTableProcessor.getCountTable(this.namespace);
+        if (this.goCountTableProcessor && this.goOntology && this.peptideCountTable) {
+            let goCountTable: CountTable<GoCode>;
+
+            if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+                goCountTable = await this.goCountTableProcessor.getCountTable(this.namespace);
+            } else {
+                const goProcessor = new GoCountTableProcessor(
+                    this.peptideCountTable,
+                    this.assay.getSearchConfiguration(),
+                    this.communicationSource,
+                    this.filterPercentage
+                );
+
+                goCountTable = await goProcessor.getCountTable(this.namespace);
+            }
+
             this.definitions.push(...goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id)));
         }
     }

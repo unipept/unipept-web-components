@@ -2,7 +2,7 @@
     <amount-table
         :assay="assay"
         :item-retriever="itemRetriever"
-        :loading="interproCountTableProcessor === undefined"
+        :loading="interproCountTableProcessor === undefined || isComputing"
         :rows-per-page="10"
         annotation-name="Interpro entry"
         :item-to-peptides-mapping="itemsToPeptidesMapping"
@@ -31,17 +31,12 @@ import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/L
 import { InterproNamespace } from "./../../business/ontology/functional/interpro/InterproNamespace";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import FunctionalItemRetriever from "./FunctionalItemRetriever";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
+import FunctionalCountTableProcessor from "./../../business/processors/functional/FunctionalCountTableProcessor";
 
 @Component({
     components: {
         AmountTable
-    },
-    computed: {
-        isLoading: {
-            get(): boolean {
-                return this.isComputing || this.loading;
-            }
-        }
     }
 })
 export default class InterproAmountTable extends Vue {
@@ -55,7 +50,6 @@ export default class InterproAmountTable extends Vue {
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
 
-    private items: TableItem[] = [];
     private isComputing: boolean = false;
     private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
     private itemsToPeptidesMapping: Map<InterproCode, Peptide[]> = null;
@@ -86,6 +80,14 @@ export default class InterproAmountTable extends Vue {
         return this.$store.getters["ncbi/tree"](this.assay);
     }
 
+    get filterPercentage(): number {
+        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+    }
+
+    get communicationSource(): CommunicationSource {
+        return this.$store.getters.assayData(this.assay)?.communicationSource;
+    }
+
     @Watch("ncbiCountTableProcessor")
     private async onNcbiCountTableProcessorChanged() {
         if (this.ncbiCountTableProcessor) {
@@ -97,12 +99,30 @@ export default class InterproAmountTable extends Vue {
     @Watch("interproCountTableProcessor")
     @Watch("interproOntology")
     @Watch("peptideCountTable")
+    @Watch("filterPercentage")
     private async onInputsChanged() {
         this.isComputing = true;
+        this.itemRetriever = null;
 
         if (this.peptideCountTable && this.interproCountTableProcessor && this.interproOntology) {
+            let interproTable: CountTable<InterproCode>;
+
+            if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+                interproTable = await this.interproCountTableProcessor.getCountTable();
+                this.itemsToPeptidesMapping = await this.interproCountTableProcessor.getAnnotationPeptideMapping();
+            } else {
+                const interproProcessor = new InterproCountTableProcessor(
+                    this.peptideCountTable,
+                    this.assay.getSearchConfiguration(),
+                    this.communicationSource,
+                    this.filterPercentage
+                );
+                interproTable = await interproProcessor.getCountTable();
+                this.itemsToPeptidesMapping = await interproProcessor.getAnnotationPeptideMapping();
+            }
+
             this.itemRetriever = new FunctionalItemRetriever(
-                await this.interproCountTableProcessor.getCountTable(),
+                interproTable,
                 this.peptideCountTable,
                 this.interproOntology
             );

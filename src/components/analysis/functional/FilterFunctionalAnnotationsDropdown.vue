@@ -19,8 +19,7 @@
                                 autocomplete="off"
                                 step="5"
                                 class="form-control"
-                                v-model.lazy="model"
-                                @change="model = Math.min(Math.max(parseInt(model), 0), 100)">
+                                v-model.lazy="model">
                             <span class="input-group-addon">% of annotated proteins</span>
                         </div>
                         <a v-if="model !== '5'" class="pull-right" @click="model = '5'">reset to 5%</a>
@@ -42,10 +41,10 @@ import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay"
     computed: {
         model: {
             get() {
-                return this.$store.getters["assayData"](this.activeAssay).percentageFilter;
+                return this.$store.getters["assayData"](this.activeAssay)?.filterPercentage;
             },
             set(val) {
-                this.$store.dispatch("filterByPercentage", [this.activeAssay, val]);
+                this.$store.dispatch("filterByPercentage", [this.activeAssay, parseInt(val)]);
             }
         }
     }

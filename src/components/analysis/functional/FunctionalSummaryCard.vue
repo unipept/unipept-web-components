@@ -59,9 +59,9 @@
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
                                             <v-btn
-                                                    color="primary"
-                                                    text
-                                                    @click="dialogOpen = false">
+                                                color="primary"
+                                                text
+                                                @click="dialogOpen = false">
                                                 I understand
                                             </v-btn>
                                         </v-card-actions>
@@ -223,8 +223,6 @@ export default class FunctionalSummaryCard extends Vue {
 
     @Prop({ required: true })
     private assay: ProteomicsAssay;
-    // @Prop({ required: true })
-    // private selectedTaxonId: NcbiId;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
 

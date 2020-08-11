@@ -81,10 +81,11 @@ export default class PeptideData {
         currentPos += 4;
         for (const ec of ecs) {
             const parts = ec.replace("EC:", "").split(".");
-            dataView.setUint32(currentPos, parseInt(parts[0]));
-            dataView.setUint32(currentPos + 4, parseInt(parts[1]));
-            dataView.setUint32(currentPos + 8, parseInt(parts[2]));
-            dataView.setUint32(currentPos + 12, parseInt(parts[3]));
+            // Encode null-values as -1
+            dataView.setInt32(currentPos, parts[0] !== "-" ? parseInt(parts[0]) : -1);
+            dataView.setInt32(currentPos + 4, parts[1] !== "-" ? parseInt(parts[1]) : -1);
+            dataView.setInt32(currentPos + 8, parts[2] !== "-" ? parseInt(parts[2]) : -1);
+            dataView.setInt32(currentPos + 12, parts[3] !== "-" ? parseInt(parts[3]) : -1);
             dataView.setUint32(currentPos + 16, response.fa.data[ec]);
             currentPos += 20;
         }
@@ -150,10 +151,10 @@ export default class PeptideData {
 
         // Decode each of the EC numbers
         for (let i = 0; i < ecLength; i++) {
-            const part1 = this.dataView.getUint32(ecStart);
-            const part2 = this.dataView.getUint32(ecStart + 4);
-            const part3 = this.dataView.getUint32(ecStart + 8);
-            const part4 = this.dataView.getUint32(ecStart + 12);
+            const part1 = this.encodedNullOrNumberToString(this.dataView.getInt32(ecStart));
+            const part2 = this.encodedNullOrNumberToString(this.dataView.getInt32(ecStart + 4));
+            const part3 = this.encodedNullOrNumberToString(this.dataView.getInt32(ecStart + 8));
+            const part4 = this.encodedNullOrNumberToString(this.dataView.getInt32(ecStart + 12));
 
             output[`EC:${part1}.${part2}.${part3}.${part4}`] = this.dataView.getUint32(ecStart + 16);
 
@@ -161,6 +162,14 @@ export default class PeptideData {
         }
 
         return output;
+    }
+
+    private encodedNullOrNumberToString(value: number): string {
+        if (value === -1) {
+            return "-";
+        } else {
+            return value.toString();
+        }
     }
 
     public get go(): any {

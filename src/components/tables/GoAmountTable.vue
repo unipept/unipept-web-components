@@ -1,9 +1,8 @@
 <template>
     <amount-table
         :item-retriever="itemRetriever"
-        :items="items"
         :assay="assay"
-        :loading="goCountTableProcessor === undefined"
+        :loading="goCountTableProcessor === undefined || isComputing"
         annotation-name="GO term"
         :namespace="namespace"
         :item-to-peptides-mapping="itemsToPeptidesMapping"
@@ -31,6 +30,8 @@ import Tree from "./../../business/ontology/taxonomic/Tree";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import FunctionalItemRetriever from "./FunctionalItemRetriever";
+import FunctionalCountTableProcessor from "./../../business/processors/functional/FunctionalCountTableProcessor";
+import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
 @Component({
     components: {
@@ -48,7 +49,6 @@ export default class GoAmountTable extends Vue {
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
 
-    private items: TableItem[] = [];
     private isComputing: boolean = false;
     private itemsToPeptidesMapping: Map<GoCode, Peptide[]> = null;
     private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
@@ -79,6 +79,14 @@ export default class GoAmountTable extends Vue {
         return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
     }
 
+    get filterPercentage(): number {
+        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+    }
+
+    get communicationSource(): CommunicationSource {
+        return this.$store.getters.assayData(this.assay)?.communicationSource;
+    }
+
     @Watch("ncbiCountTableProcessor")
     private async onNcbiCountTableChanged() {
         if (this.ncbiCountTableProcessor) {
@@ -89,13 +97,31 @@ export default class GoAmountTable extends Vue {
     @Watch("goCountTableProcessor")
     @Watch("peptideCountTable")
     @Watch("goOntology")
+    @Watch("filterPercentage")
     private async onInputsChanged() {
         this.isComputing = true;
         this.itemRetriever = null;
 
         if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
+            let goCountTable: CountTable<GoCode>;
+
+            if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+                goCountTable = await this.goCountTableProcessor.getCountTable(this.namespace);
+                this.itemsToPeptidesMapping = await this.goCountTableProcessor.getAnnotationPeptideMapping();
+            } else {
+                const goProcessor = new GoCountTableProcessor(
+                    this.peptideCountTable,
+                    this.assay.getSearchConfiguration(),
+                    this.communicationSource,
+                    this.filterPercentage
+                );
+
+                goCountTable = await goProcessor.getCountTable(this.namespace);
+                this.itemsToPeptidesMapping = await goProcessor.getAnnotationPeptideMapping();
+            }
+
             this.itemRetriever = new FunctionalItemRetriever(
-                await this.goCountTableProcessor.getCountTable(this.namespace),
+                goCountTable,
                 this.peptideCountTable,
                 this.goOntology
             );
