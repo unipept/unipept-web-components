@@ -13,9 +13,10 @@ import { Prop, Watch } from "vue-property-decorator";
 
 @Component
 export default class IndeterminateProgressBar extends Vue {
-    @Prop({ default: false }) active;
+    @Prop({ default: false })
+    private active: boolean;
 
-    content: boolean = this.active;
+    private content: boolean = this.active;
 
     @Watch("active") onActiveChanged() {
         this.content = this.active;

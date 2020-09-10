@@ -1,4 +1,4 @@
-<template>
+\<template>
     <div>
         <v-select :items="availableCategories" v-model="selectedCategory" label="Category"></v-select>
         <div class="table-extra-content" v-if="selectedItems.length > 0">

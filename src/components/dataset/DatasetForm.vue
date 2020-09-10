@@ -76,11 +76,16 @@ import { Prop, Watch } from "vue-property-decorator";
     }
 })
 export default class DatasetForm extends Vue {
-    @Prop({ default: "" }) peptides: string;
-    @Prop({ default: "" }) name: string;
-    @Prop({ default: true }) save: boolean;
-    @Prop({ default: false }) loading: boolean;
-    @Prop({ default: true }) showSave: boolean;
+    @Prop({ required: false, default: "" })
+    private peptides: string;
+    @Prop({ required: false, default: "" })
+    private name: string;
+    @Prop({ required: false, default: true })
+    private save: boolean;
+    @Prop({ required: false, default: false })
+    private loading: boolean;
+    @Prop({ required: false, default: true })
+    private showSave: boolean;
 
     private peptidesData: string = this.peptides;
     private nameData: string = this.name;
