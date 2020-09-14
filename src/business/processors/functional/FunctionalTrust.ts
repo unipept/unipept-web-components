@@ -11,7 +11,7 @@ export default class FunctionalTrust {
      * @param totalAmountOfItems How many items were looked up in total?
      */
     constructor(
-        public readonly annotatedItems,
-        public readonly totalAmountOfItems,
+        public readonly annotatedItems: number,
+        public readonly totalAmountOfItems: number,
     ) {}
 }

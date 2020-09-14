@@ -80,7 +80,7 @@ export default class TreeNode {
      * @param f The function to call
      * @return cs
      */
-    public callRecursivelyPostOder(f: (Node, any) => any): any {
+    public callRecursivelyPostOder(f: (Node: TreeNode, any: any) => any): any {
         let childResults = [];
         if (this.children) {
             childResults = this.children.map(c =>

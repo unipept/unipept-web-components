@@ -9,7 +9,7 @@ export default class NetworkUtils {
      * @param data The data to post in JSON format.
      * @return A promise containing the parsed response data.
      */
-    public static async postJSON(url, data): Promise<any> {
+    public static async postJSON(url: string, data: any): Promise<any> {
         const response = await fetch(url, {
             method: "POST",
             headers: {

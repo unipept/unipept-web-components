@@ -1,3 +1,3 @@
 export default class {
-    public static BASE_URL: string = "http://localhost:3000";
+    public static BASE_URL: string = "https://unipept.ugent.be";
 }

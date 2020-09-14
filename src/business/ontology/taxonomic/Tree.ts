@@ -90,7 +90,7 @@ export default class Tree {
      */
     public sortTree(): void {
         this.root.callRecursively( function() {
-            this.children.sort(function(a, b) {
+            this.children.sort(function(a: TreeNode, b: TreeNode) {
                 if (a.name < b.name) return -1;
                 if (a.name > b.name) return 1;
                 return 0;

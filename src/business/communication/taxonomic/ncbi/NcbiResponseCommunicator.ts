@@ -44,19 +44,24 @@ export default class NcbiResponseCommunicator {
                 taxids: toProcess.slice(i, i + NcbiResponseCommunicator.NCBI_BATCH_SIZE)
             });
 
-            const res = await NetworkUtils.postJSON(NetworkConfiguration.BASE_URL + NcbiResponseCommunicator.NCBI_ENDPOINT, data);
+            const res = await NetworkUtils.postJSON(
+                NetworkConfiguration.BASE_URL + NcbiResponseCommunicator.NCBI_ENDPOINT,
+                data
+            );
 
             for (const term of res) {
                 if (!NcbiResponseCommunicator.idToResponseMap.has(term.id)) {
                     NcbiResponseCommunicator.idToResponseMap.set(term.id, term);
                     // Some id's are negative due to erroneous classification in the NCBI taxonomy. These taxon id's do
                     // need to be retrieved however!
-                    term.lineage.map(l => lineagesToProcess.add(l != -1 ? Math.abs(l) : null));
+                    term.lineage.map((l: number) => lineagesToProcess.add(l != -1 ? Math.abs(l) : null));
                 }
             }
         }
 
-        const lineages = [...lineagesToProcess].filter(c => c && c !== -1 && !NcbiResponseCommunicator.idsProcessed.has(c));
+        const lineages = [...lineagesToProcess].filter(
+            c => c && c !== -1 && !NcbiResponseCommunicator.idsProcessed.has(c)
+        );
 
         for (let i = 0; i < lineages.length; i += NcbiResponseCommunicator.NCBI_BATCH_SIZE) {
             const data = JSON.stringify({

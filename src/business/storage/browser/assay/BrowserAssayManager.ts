@@ -20,7 +20,6 @@ export default class BrowserAssayManager {
             let key = storage.key(i);
             if (key && key.startsWith(BrowserStorageConsts.MPA_METADATA_PREFIX)) {
                 const assay = new ProteomicsAssay(
-                    [],
                     key.substr(BrowserStorageConsts.MPA_METADATA_PREFIX.length)
                 );
                 await assay.accept(assayMetaDataReader);

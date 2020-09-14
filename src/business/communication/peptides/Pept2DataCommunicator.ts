@@ -10,6 +10,7 @@ import NetworkUtils from "./../../communication/NetworkUtils";
 import parallelLimit from "async/parallelLimit";
 import PeptideData from "./PeptideData";
 import PeptideDataSerializer from "./PeptideDataSerializer";
+import { Pept2DataApiResponse } from "./Pept2DataApiResponse";
 
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
@@ -47,6 +48,7 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
     ): Promise<void> {
+        console.log("Test");
         const unprocessed = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
         if (!unprocessed || unprocessed.length === 0) {
             if (progressListener) {
@@ -63,7 +65,8 @@ export default class Pept2DataCommunicator {
             return;
         }
 
-        const batchSize = configuration.enableMissingCleavageHandling ? Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
+        const batchSize = configuration.enableMissingCleavageHandling ?
+            Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
 
         Pept2DataCommunicator.inProgress = new Promise<void>(async(resolve, reject) => {
             const responses = new ShareableMap<string, PeptideData>(
@@ -79,7 +82,7 @@ export default class Pept2DataCommunicator {
 
             const requests = [];
             for (let i = 0; i < peptides.length; i += batchSize) {
-                requests.push(async(done) => {
+                requests.push(async(done: (val: any) => void) => {
                     if (this.cancelled) {
                         done(new Error("Cancelled execution"));
                         return;
@@ -97,7 +100,7 @@ export default class Pept2DataCommunicator {
                             data
                         )
 
-                        res.peptides.forEach(p => {
+                        res.peptides.forEach((p: Pept2DataApiResponse) => {
                             responses.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
                         })
 
@@ -114,10 +117,13 @@ export default class Pept2DataCommunicator {
             }
 
             try {
+                console.log("Start parallel limit....");
                 await parallelLimit(requests, Pept2DataCommunicator.PARALLEL_REQUESTS);
+                console.log("Done with parallel limit...");
 
                 if (!this.cancelled) {
-                    const config = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
+                    const config = configuration.enableMissingCleavageHandling.toString() +
+                        NetworkConfiguration.BASE_URL;
 
                     if (!Pept2DataCommunicator.configurationToResponses.has(config)) {
                         Pept2DataCommunicator.configurationToResponses.set(
@@ -146,6 +152,7 @@ export default class Pept2DataCommunicator {
                     resolve();
                 }
             } catch (err) {
+                console.error(err);
                 if (!err.message.includes("Cancelled execution")) {
                     reject(err);
                 } else {

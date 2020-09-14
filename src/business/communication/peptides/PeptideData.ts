@@ -156,6 +156,7 @@ export default class PeptideData {
             const part3 = this.encodedNullOrNumberToString(this.dataView.getInt32(ecStart + 8));
             const part4 = this.encodedNullOrNumberToString(this.dataView.getInt32(ecStart + 12));
 
+            // @ts-ignore
             output[`EC:${part1}.${part2}.${part3}.${part4}`] = this.dataView.getUint32(ecStart + 16);
 
             ecStart += 20;
@@ -184,6 +185,7 @@ export default class PeptideData {
         for (let i = 0; i < goLength; i++) {
             const term = this.dataView.getUint32(goStart);
 
+            // @ts-ignore
             output[
                 "GO:" + StringUtils.leftPad(term.toString(), "0", 7)
             ] = this.dataView.getUint32(goStart + 4);
@@ -206,6 +208,7 @@ export default class PeptideData {
         for (let i = 0; i < iprLength; i++) {
             const term = this.dataView.getUint32(iprStart);
 
+            // @ts-ignore
             output[
                 "IPR:IPR" + StringUtils.leftPad(term.toString(), "0", 6)
             ] = this.dataView.getUint32(iprStart + 4);

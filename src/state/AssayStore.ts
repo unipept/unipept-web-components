@@ -63,7 +63,9 @@ const assayGetters: GetterTree<AssayState, any> = {
     },
 
     assayData(state: AssayState): (assay: ProteomicsAssay) => AssayData | undefined {
-        return (assay: ProteomicsAssay) => assay ? state.assayData.find(a => a.assay.id === assay.id) : undefined;
+        return (assay: ProteomicsAssay) => assay ? state.assayData.find(
+            (a: AssayData) => a.assay.id === assay.id
+        ) : undefined;
     },
 
     activeAssay(state: AssayState): ProteomicsAssay | undefined {
@@ -231,7 +233,9 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         resetActiveAssay(store: ActionContext<AssayState, any>) {
             let shouldReselect: boolean = true;
             if (store.getters.activeAssay) {
-                const idx: number = store.getters.assays.findIndex(data => data.assay.getId() === store.getters.activeAssay.getId());
+                const idx: number = store.getters.assays.findIndex(
+                    (data: AssayData) => data.assay.getId() === store.getters.activeAssay.getId()
+                );
                 shouldReselect = idx === -1;
             }
 
@@ -256,6 +260,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         },
 
         async processAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
+            console.log("Process assay has been called!");
             store.commit("RESET_ASSAY", assay);
             store.commit("RESET_ASSAY_METADATA", assay);
 
@@ -274,6 +279,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 });
 
                 store.commit("SET_ASSAY_PROCESSOR", [assay, assayProcessor]);
+                console.log("Start processing!");
                 const communicationSource = await assayProcessor.processAssay(countTable);
 
                 if (!assayProcessor.isCancelled()) {
