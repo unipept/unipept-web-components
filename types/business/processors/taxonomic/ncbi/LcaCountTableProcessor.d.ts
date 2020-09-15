@@ -10,7 +10,7 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
     private readonly communicationSource;
     private countTable;
     private lca2Peptides;
-    private static pool;
+    private static worker;
     constructor(peptideCountTable: CountTable<Peptide>, configuration: SearchConfiguration, communicationSource: CommunicationSource);
     cancel(): void;
     isCancelled(): boolean;

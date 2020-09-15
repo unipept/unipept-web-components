@@ -20,6 +20,7 @@ export default abstract class FunctionalCountTableProcessor<OntologyId extends O
     private item2Peptides;
     private trust;
     private static pool;
+    private static worker;
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
      * @param configuration The search configuration that should be applied while processing the peptides.

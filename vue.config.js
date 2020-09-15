@@ -1,5 +1,4 @@
 const webpack = require("webpack");
-const ThreadsPlugin = require("threads-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
@@ -22,8 +21,7 @@ module.exports = {
             new webpack.IgnorePlugin({
                 resourceRegExp: /^(electron|fs)/,
                 contextRegExp: /.*/
-            }),
-            new ThreadsPlugin()
+            })
         ],
         output: {
             globalObject: "this"

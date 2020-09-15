@@ -1,46 +1,34 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
 import { OntologyIdType } from "./../../ontology/Ontology";
-import { expose } from "threads";
 import { ShareableMap } from "shared-memory-datastructures";
 import { GoCode } from "./../../ontology/functional/go/GoDefinition";
 import PeptideData from "./../../communication/peptides/PeptideData";
 import PeptideDataSerializer from "./../../communication/peptides/PeptideDataSerializer";
 
-expose({ compute, mergeResultMaps });
+const ctx: Worker = self as any;
 
-export async function mergeResultMaps(
-    countsPerCodeMaps: Map<OntologyIdType, number>[],
-    item2PeptidesMaps: Map<OntologyIdType, Peptide[]>[]
-): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>]> {
-    const countsResult = countsPerCodeMaps[0];
+// Respond to message from parent thread
+ctx.addEventListener("message", async(event: MessageEvent) => {
+    await compute(event.data.args);
+});
 
-    for (const map of countsPerCodeMaps.slice(1)) {
-        for (const [code, value] of map) {
-            countsResult.set(code, (countsResult.get(code) || 0) + value);
-        }
-    }
-
-    const item2PeptidesResult = item2PeptidesMaps[0];
-
-    for (const map of item2PeptidesMaps.slice(1)) {
-        for (const [code, value] of map) {
-            const existingResult = item2PeptidesResult.get(code) || [];
-            existingResult.push(...value);
-            item2PeptidesResult.set(code, existingResult);
-        }
-    }
-
-    return [countsResult, item2PeptidesResult];
-}
-
-export async function compute(
-    peptideCounts: Map<Peptide, number>,
-    indexBuffer: SharedArrayBuffer,
-    dataBuffer: SharedArrayBuffer,
-    percentage: number,
-    termPrefix: string,
-    proteinCountProperty: string,
-): Promise<[Map<OntologyIdType, number>, Map<OntologyIdType, Peptide[]>, number]> {
+async function compute(
+    [
+        peptideCounts,
+        indexBuffer,
+        dataBuffer,
+        percentage,
+        termPrefix,
+        proteinCountProperty
+    ]: [
+        Map<Peptide, number>,
+        SharedArrayBuffer,
+        SharedArrayBuffer,
+        number,
+        string,
+        string
+    ],
+): Promise<void> {
     console.log("Started to compute...");
     const start = new Date().getTime();
 
@@ -108,5 +96,8 @@ export async function compute(
     const end = new Date().getTime();
     console.log("Functional count table took: " + (end - start) / 1000 + "s");
 
-    return [sortedCounts, item2Peptides, annotatedCount];
+    ctx.postMessage({
+        type: "result",
+        result: [sortedCounts, item2Peptides, annotatedCount]
+    });
 }

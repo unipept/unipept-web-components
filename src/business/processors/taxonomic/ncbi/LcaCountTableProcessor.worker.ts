@@ -1,18 +1,23 @@
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import { CountTable } from "./../../../counts/CountTable";
-import { expose, TransferDescriptor } from "threads";
 import { ShareableMap } from "shared-memory-datastructures";
 import PeptideData from "./../../../communication/peptides/PeptideData";
 import PeptideDataSerializer from "./../../../communication/peptides/PeptideDataSerializer";
 
-expose(compute);
+const ctx: Worker = self as any;
 
-export default function compute(
-    peptideCountTable: CountTable<Peptide>,
-    indexBuffer: SharedArrayBuffer,
-    dataBuffer: SharedArrayBuffer
-) {
+// Respond to message from parent thread
+ctx.addEventListener("message", (event: MessageEvent) => {
+    const result = compute(event.data.args);
+    ctx.postMessage({
+        result: result
+    });
+});
+
+function compute(
+    [peptideCountTable, indexBuffer, dataBuffer]: [CountTable<Peptide>, SharedArrayBuffer, SharedArrayBuffer]
+): [Map<NcbiId, number>, Map<NcbiId, Peptide[]>] {
     const peptideToResponseMap = new ShareableMap<Peptide, PeptideData>(
         0,
         0,

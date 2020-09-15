@@ -322,8 +322,8 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 }
 </script>
 
-<style scoped lang="css">
-    @import './../../assets/style/placeholder.css.less';
+<style scoped lang="less">
+    /*@import './../../assets/style/placeholder.css.less';*/
 
     .mpa-waiting {
         margin-top: 16px;

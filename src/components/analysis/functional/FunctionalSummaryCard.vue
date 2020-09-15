@@ -299,7 +299,7 @@ export default class FunctionalSummaryCard extends Vue {
 </script>
 
 <style lang="less">
-    @import './../../../assets/style/placeholder.css.less';
+    /*@import './../../../assets/style/placeholder.css.less';*/
 
     .menu-header .v-list__tile {
         height: 28px;

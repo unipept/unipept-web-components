@@ -2,14 +2,20 @@ import TreeNode from "./../../../ontology/taxonomic/TreeNode";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import Tree from "./../../../ontology/taxonomic/Tree";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
-import { expose } from "threads";
 
-expose({ computeTree })
+const ctx: Worker = self as any;
 
-export default function computeTree(
-    peptides: Peptide[],
-    tree: Tree,
-    taxaToPeptidesMapping: Map<NcbiId, Peptide[]>
+// Respond to message from parent thread
+ctx.addEventListener("message", (event: MessageEvent) => {
+    const result = computeTree(event.data.args);
+    ctx.postMessage({
+        type: "result",
+        result: result
+    });
+});
+
+function computeTree(
+    [peptides, tree, taxaToPeptidesMapping]: [Peptide[], Tree, Map<NcbiId, Peptide[]>]
 ): TreeNode {
     return callRecursivelyPostOrder(tree.root, (t: TreeNode, c: any) => {
         const included = c.some(x => x.included) ||
