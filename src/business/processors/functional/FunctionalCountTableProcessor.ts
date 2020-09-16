@@ -10,24 +10,22 @@ import CommunicationSource from "./../../communication/source/CommunicationSourc
 import { ShareableMap } from "shared-memory-datastructures";
 import PeptideData from "./../../communication/peptides/PeptideData";
 import Worker from "worker-loader?inline=fallback!./FunctionalCountTableProcessor.worker";
+import async, { AsyncQueue } from "async";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,
     DefinitionType extends FunctionalDefinition
 > implements ProteomicsCountTableProcessor<OntologyId> {
     public static DEFAULT_FILTER_PERCENTAGE: number = 5;
+    public static FUNCTIONAL_COUNT_TABLE_PARALLEL_LIMIT: number = 4;
 
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
     // Aggregation of all counts over all namespaces
     private generalCountTable: CountTable<OntologyId>;
     private item2Peptides: Map<OntologyId, Peptide[]> = new Map();
     private trust: FunctionalTrust;
-    // private static pool = Pool(
-    //     () => spawn(new Worker("./FunctionalCountTableProcessor.worker.ts")),
-    //     4
-    // );
-    private static pool = null;
-    private static worker = new Worker();
+
+    private static queue: AsyncQueue<any>;
 
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
@@ -102,47 +100,32 @@ export default abstract class FunctionalCountTableProcessor<
         const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
         await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
-        return new Promise<void>(resolve => {
-            FunctionalCountTableProcessor.worker.addEventListener("message", async(event: MessageEvent) => {
-                const [countsPerCode, item2Peptides, annotatedCount] = event.data.result;
+        if (!FunctionalCountTableProcessor.queue) {
+            FunctionalCountTableProcessor.queue = async.queue((task, callback: (a: any) => void) => {
+                const worker = new Worker();
 
-                this.item2Peptides = item2Peptides;
+                worker.addEventListener("message", (event: MessageEvent) => {
+                    callback(event.data.result);
+                });
 
-                // Now fetch all definitions for the terms that we just processed
-                const ontology = await this.getOntology(new CountTable<OntologyId>(countsPerCode));
+                worker.postMessage({
+                    args: task.data
+                });
+            }, FunctionalCountTableProcessor.FUNCTIONAL_COUNT_TABLE_PARALLEL_LIMIT);
+        }
 
-                // Split all the counts per namespace.
-                const tablePerNamespace = new Map<FunctionalNamespace, Map<OntologyId, number>>();
+        const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(
+            this.configuration
+        ) as ShareableMap<Peptide, PeptideData>;
+        const buffers = peptideResponseMap.getBuffers();
 
-                for (const ns of this.getNamespaces()) {
-                    tablePerNamespace.set(ns, new Map<OntologyId, number>());
-                }
-
-                // Add each definition to the count table of it's specific namespace.
-                for (const [term, counts] of countsPerCode) {
-                    const definition: DefinitionType = ontology.getDefinition(term);
-
-                    if (definition) {
-                        const nsMap = tablePerNamespace.get(definition.namespace);
-                        nsMap.set(term, counts);
-                    }
-                }
-
-                // Convert the maps to real CountTable-objects.
-                for (const [ns, table] of tablePerNamespace) {
-                    this.countTables.set(ns, new CountTable<OntologyId>(table));
-                }
-                this.generalCountTable = new CountTable<OntologyId>(countsPerCode);
-
-                this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
-                resolve();
-            });
-
-            const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(this.configuration) as ShareableMap<Peptide, PeptideData>;
-            const buffers = peptideResponseMap.getBuffers();
-
-            FunctionalCountTableProcessor.worker.postMessage({
-                args: [
+        const [countsPerCode, item2Peptides, annotatedCount] = await new Promise<[
+            Map<OntologyId, number>,
+            Map<OntologyId, Peptide[]>,
+            number
+        ]>((resolve) => FunctionalCountTableProcessor.queue.push(
+            {
+                data: [
                     this.peptideCountTable.toMap(),
                     buffers[0],
                     buffers[1],
@@ -150,52 +133,38 @@ export default abstract class FunctionalCountTableProcessor<
                     this.termPrefix,
                     this.peptideData2ProteinCount
                 ]
-            });
+            }, resolve)
+        );
 
-            // FunctionalCountTableProcessor.pool.queue(async(worker) => {
-            //     const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(this.configuration) as ShareableMap<Peptide, PeptideData>;
-            //     const buffers = peptideResponseMap.getBuffers();
-            //     let [countsPerCode, item2Peptides, annotatedCount] = await worker.compute(
-            //         this.peptideCountTable.toMap(),
-            //         buffers[0],
-            //         buffers[1],
-            //         this.percentage,
-            //         this.termPrefix,
-            //         this.peptideData2ProteinCount
-            //     );
-            //
-            //     this.item2Peptides = item2Peptides;
-            //
-            //     // Now fetch all definitions for the terms that we just processed
-            //     const ontology = await this.getOntology(new CountTable<OntologyId>(countsPerCode));
-            //
-            //     // Split all the counts per namespace.
-            //     const tablePerNamespace = new Map<FunctionalNamespace, Map<OntologyId, number>>();
-            //
-            //     for (const ns of this.getNamespaces()) {
-            //         tablePerNamespace.set(ns, new Map<OntologyId, number>());
-            //     }
-            //
-            //     // Add each definition to the count table of it's specific namespace.
-            //     for (const [term, counts] of countsPerCode) {
-            //         const definition: DefinitionType = ontology.getDefinition(term);
-            //
-            //         if (definition) {
-            //             const nsMap = tablePerNamespace.get(definition.namespace);
-            //             nsMap.set(term, counts);
-            //         }
-            //     }
-            //
-            //     // Convert the maps to real CountTable-objects.
-            //     for (const [ns, table] of tablePerNamespace) {
-            //         this.countTables.set(ns, new CountTable<OntologyId>(table));
-            //     }
-            //     this.generalCountTable = new CountTable<OntologyId>(countsPerCode);
-            //
-            //     this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
-            //     resolve();
-            // })
-        });
+        this.item2Peptides = item2Peptides;
+
+        // Now fetch all definitions for the terms that we just processed
+        const ontology = await this.getOntology(new CountTable<OntologyId>(countsPerCode));
+
+        // Split all the counts per namespace.
+        const tablePerNamespace = new Map<FunctionalNamespace, Map<OntologyId, number>>();
+
+        for (const ns of this.getNamespaces()) {
+            tablePerNamespace.set(ns, new Map<OntologyId, number>());
+        }
+
+        // Add each definition to the count table of it's specific namespace.
+        for (const [term, counts] of countsPerCode) {
+            const definition: DefinitionType = ontology.getDefinition(term);
+
+            if (definition) {
+                const nsMap = tablePerNamespace.get(definition.namespace);
+                nsMap.set(term, counts);
+            }
+        }
+
+        // Convert the maps to real CountTable-objects.
+        for (const [ns, table] of tablePerNamespace) {
+            this.countTables.set(ns, new CountTable<OntologyId>(table));
+        }
+        this.generalCountTable = new CountTable<OntologyId>(countsPerCode);
+
+        this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
     }
 
     protected abstract async getOntology(

@@ -2,15 +2,12 @@ import { Peptide } from "./../../ontology/raw/Peptide";
 import { CountTable } from "./../../counts/CountTable";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import Worker from "worker-loader?inline=fallback!./PeptideCountProcessor.worker";
+import async, { AsyncQueue } from "async";
 
 export default class PeptideCountTableProcessor {
-    public static THREAD_COUNT: number = 4;
-    // private static pool = Pool(
-    //     () => spawn(new Worker("./PeptideCountProcessor.worker.ts")),
-    //     PeptideCountTableProcessor.THREAD_COUNT
-    // );
+    public static PEPTIDE_COUNT_PROCESSOR_PARALLEL_LIMIT: number = 4;
 
-    private static worker = new Worker();
+    private static queue: AsyncQueue<any>;
 
     /**
      * Convert a list of peptides into a count table. This function directly filters the given list of peptides, based
@@ -24,20 +21,29 @@ export default class PeptideCountTableProcessor {
         peptides: Peptide[],
         searchConfiguration: SearchConfiguration
     ): Promise<CountTable<Peptide>> {
+        if (!PeptideCountTableProcessor.queue) {
+            PeptideCountTableProcessor.queue = async.queue((
+                task: { data: [Peptide[], SearchConfiguration] },
+                callback: (a: CountTable<Peptide>) => void
+            ) => {
+                const worker = new Worker();
+
+                worker.addEventListener("message", (event: MessageEvent) => {
+                    const [peptideCountsMapping, totalFrequency] = event.data.result;
+                    callback(new CountTable<Peptide>(peptideCountsMapping, totalFrequency));
+                });
+
+                worker.postMessage({
+                    args: task.data
+                })
+
+            }, PeptideCountTableProcessor.PEPTIDE_COUNT_PROCESSOR_PARALLEL_LIMIT);
+        }
+
         return new Promise<CountTable<Peptide>>((resolve) => {
-            PeptideCountTableProcessor.worker.addEventListener("message", (event: MessageEvent) => {
-                const [peptideCountsMapping, totalFrequency] = event.data.result;
-                resolve(new CountTable<Peptide>(peptideCountsMapping, totalFrequency));
-            });
-
-            PeptideCountTableProcessor.worker.postMessage({
-                args: [peptides, searchConfiguration]
-            });
-
-            // PeptideCountTableProcessor.pool.queue(async(worker) => {
-            //     const [peptideCountsMapping, totalFrequency] = await worker(peptides, searchConfiguration);
-            //     resolve(new CountTable<Peptide>(peptideCountsMapping, totalFrequency))
-            // });
+            PeptideCountTableProcessor.queue.push({
+                data: [peptides, searchConfiguration]
+            }, resolve);
         });
     }
 }

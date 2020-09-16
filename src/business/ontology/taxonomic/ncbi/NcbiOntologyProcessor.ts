@@ -4,14 +4,13 @@ import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../Ontology";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
 import Worker from "worker-loader?inline=fallback!./NcbiOntologyProcessor.worker";
+import async, { AsyncQueue } from "async";
+import NcbiResponse from "@/business/communication/taxonomic/ncbi/NcbiResponse";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
-    // private static pool = Pool(
-    //     () => spawn(new Worker("./NcbiOntologyProcessor.worker.ts")),
-    //     2
-    // );
+    public static NCBI_ONTOLOGY_PARALLEL_LIMIT = 2;
 
-    private static worker = new Worker();
+    private static queue: AsyncQueue<any>;
 
     constructor(private readonly comSource: CommunicationSource) {}
 
@@ -20,27 +19,31 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
     }
 
     public async getOntologyByIds(ids: NcbiId[]): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        return new Promise<Ontology<NcbiId, NcbiTaxon>>(async(resolve) => {
-            NcbiOntologyProcessor.worker.addEventListener("message", (event: MessageEvent) => {
-                const definitions = event.data.result;
-                resolve(new Ontology<NcbiId, NcbiTaxon>(definitions));
-            });
+        if (!NcbiOntologyProcessor.queue) {
+            NcbiOntologyProcessor.queue = async.queue((
+                task: { data: [NcbiId[], Map<number, NcbiResponse>] },
+                callback: (a: any) => void
+            ) => {
+                const worker = new Worker();
 
-            const communicator = this.comSource.getNcbiCommunicator();
-            await communicator.process(ids);
+                worker.addEventListener("message", (event: MessageEvent) => {
+                    const definitions = event.data.result;
+                    callback(new Ontology<NcbiId, NcbiTaxon>(definitions));
+                });
 
-            NcbiOntologyProcessor.worker.postMessage({
-                args: [ids, communicator.getResponseMap()]
-            })
+                worker.postMessage({
+                    args: task.data
+                });
+            }, NcbiOntologyProcessor.NCBI_ONTOLOGY_PARALLEL_LIMIT);
+        }
 
-            // NcbiOntologyProcessor.pool.queue(async(worker) => {
-            //     const communicator = this.comSource.getNcbiCommunicator();
-            //     await communicator.process(ids);
-            //
-            //     const definitions = await worker.process(ids, communicator.getResponseMap());
-            //
-            //     resolve(new Ontology<NcbiId, NcbiTaxon>(definitions));
-            // })
+        const communicator = this.comSource.getNcbiCommunicator();
+        await communicator.process(ids);
+
+        return new Promise<Ontology<NcbiId, NcbiTaxon>>((resolve) => {
+            NcbiOntologyProcessor.queue.push({
+                data: [ids, communicator.getResponseMap()]
+            }, resolve);
         });
     }
 

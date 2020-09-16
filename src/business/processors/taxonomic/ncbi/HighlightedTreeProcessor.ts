@@ -3,40 +3,42 @@ import { Peptide } from "./../../../ontology/raw/Peptide";
 import Tree from "./../../../ontology/taxonomic/Tree";
 import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
 import Worker from "worker-loader?inline=fallback!./HighlightTree.worker";
+import async, { AsyncQueue } from "async";
 
 /**
  * A highlighted tree is a variant of the Tree that's used to construct most visualisations, specifically aimed at
  * highlighting the nodes that are involved in some protein function.
  */
 export default class HighlightedTreeProcessor {
-    // private static pool = Pool(
-    //     () => spawn(new Worker("./HighlightTree.worker.ts")),
-    //     4
-    // );
-    private static worker = new Worker();
+    public static HIGHLIGHT_TREE_PARALLEL_LIMIT: number = 4;
+    private static queue: AsyncQueue<any>;
 
     public async computeHighlightedTree(
         peptides: Peptide[],
         tree: Tree,
         taxaToPeptidesMapping: Map<NcbiId, Peptide[]>
     ): Promise<TreeNode> {
-        return new Promise<TreeNode>((resolve, reject) => {
-            HighlightedTreeProcessor.worker.addEventListener("message", (event: MessageEvent) => {
-                resolve(event.data.result);
-            });
+        if (!HighlightedTreeProcessor.queue) {
+            HighlightedTreeProcessor.queue = async.queue((
+                task: {data: [Peptide[], Tree, Map<NcbiId, Peptide[]>]},
+                callback: (a: any) => void
+            ) => {
+                const worker = new Worker();
 
-            HighlightedTreeProcessor.worker.postMessage({
-                args: [peptides, tree, taxaToPeptidesMapping]
-            });
+                worker.addEventListener("message", (event: MessageEvent) => {
+                    callback(event.data.result);
+                });
 
-            // HighlightedTreeProcessor.pool.queue(async(worker) => {
-            //     try {
-            //         const result = await worker.computeTree(peptides, tree, taxaToPeptidesMapping);
-            //         resolve(result);
-            //     } catch (err) {
-            //         reject(err);
-            //     }
-            // })
+                worker.postMessage({
+                    args: task.data
+                });
+            }, HighlightedTreeProcessor.HIGHLIGHT_TREE_PARALLEL_LIMIT);
+        }
+
+        return new Promise<TreeNode>((resolve) => {
+            HighlightedTreeProcessor.queue.push({
+                data: [peptides, tree, taxaToPeptidesMapping]
+            }, resolve);
         });
     }
 }

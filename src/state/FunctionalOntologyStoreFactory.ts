@@ -207,6 +207,8 @@ export default class FunctionalOntologyStoreFactory<
                     const functionalTable = await countTableProcessor.getCountTable();
 
                     const ontologyProcessor = ontologyProcessorFactory(communicationSource);
+                    console.log("In store factory...");
+                    console.log(functionalTable);
                     const ontology = await ontologyProcessor.getOntology(functionalTable);
 
                     store.commit("SET_ONTOLOGY", [assay, ontology]);

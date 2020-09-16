@@ -31,6 +31,7 @@ export default class GoCountTableProcessor extends FunctionalCountTableProcessor
     }
 
     protected async getOntology(countTable: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {
+        console.log("GETTING ONTOLOGY...");
         const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
         return await ontologyProcessor.getOntology(countTable);
     }

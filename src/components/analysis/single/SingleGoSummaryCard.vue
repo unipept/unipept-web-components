@@ -119,6 +119,7 @@ export default class SingleGoSummaryCard extends Vue {
                 const namespace: GoNamespace = this.namespaces[i];
                 this.items[i].countTable = await goProteinProcessor.getCountTable(namespace);
 
+                console.log("In single go summary card...");
                 const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
                 this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
 
