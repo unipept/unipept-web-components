@@ -2,8 +2,8 @@ import { Peptide } from "./../../ontology/raw/Peptide";
 import { CountTable } from "./../../counts/CountTable";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 export default class PeptideCountTableProcessor {
-    static THREAD_COUNT: number;
-    private static worker;
+    static PEPTIDE_COUNT_PROCESSOR_PARALLEL_LIMIT: number;
+    private static queue;
     /**
      * Convert a list of peptides into a count table. This function directly filters the given list of peptides, based
      * on the search configuration given here.

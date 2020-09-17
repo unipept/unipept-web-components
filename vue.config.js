@@ -17,17 +17,19 @@ module.exports = {
     configureWebpack: {
         plugins: [
             // Ignore all electron related things, as these are only required for the desktop application.
-            new webpack.IgnorePlugin({
-                resourceRegExp: /^(electron|fs)/,
-                contextRegExp: /.*/
-            })
+            // new webpack.IgnorePlugin({
+            //     resourceRegExp: /^(electron|fs)/,
+            //     contextRegExp: /.*/
+            // })
         ],
         output: {
             globalObject: "this"
         },
         externals: {
             vuex: "vuex",
-            vue: "vue"
+            vue: "vue",
+            fs: "fs",
+            electron: "electron"
         }
     }
 };

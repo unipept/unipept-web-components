@@ -145,7 +145,7 @@ export default class PeptideExport {
 
                 const interproDefinitions: [InterproDefinition, number][] = interproNumbers.map(i => [interproOntology.getDefinition(i[0]), i[1]]);
                 row.push(interproDefinitions.map(
-                    i => `${i ? i[0].name : ""} (${StringUtils.numberToPercent(i[1] / pept2DataResponse.faCounts.ipr)})`
+                    i => `${i && i[0] ? i[0].name : ""} (${StringUtils.numberToPercent(i[1] / pept2DataResponse.faCounts.ipr)})`
                 ).join(secondarySeparator));
             }
 
