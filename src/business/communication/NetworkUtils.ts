@@ -67,19 +67,20 @@ export default class NetworkUtils {
 
     public static async downloadDataByForm(data: string, fileName: string, fileType: string = null): Promise<string> {
         if (SystemUtils.isElectron()) {
-            const fs = require("fs");
-            const { dialog } = require("electron").remote;
-            const returnValue = await dialog.showSaveDialog(
-                null,
-                {
-                    title: "save to CSV",
-                    defaultPath: fileName
-                }
-            );
-
-            if (!returnValue.canceled) {
-                fs.writeFileSync(returnValue.filePath, data);
-            }
+            //TODO
+            // const fs = require("fs");
+            // const { dialog } = require("electron").remote;
+            // const returnValue = await dialog.showSaveDialog(
+            //     null,
+            //     {
+            //         title: "save to CSV",
+            //         defaultPath: fileName
+            //     }
+            // );
+            //
+            // if (!returnValue.canceled) {
+            //     fs.writeFileSync(returnValue.filePath, data);
+            // }
         } else {
             return new Promise(function(resolve, reject) {
                 let nonce = Math.random();
@@ -133,8 +134,9 @@ export default class NetworkUtils {
      */
     public static openInBrowser(url: string): void {
         if (SystemUtils.isElectron()) {
-            const shell = require("electron").shell;
-            shell.openExternal(url);
+            //TODO
+            // const shell = require("electron").shell;
+            // shell.openExternal(url);
         } else {
             window.open(url);
         }

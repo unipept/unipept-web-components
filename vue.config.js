@@ -1,5 +1,3 @@
-const webpack = require("webpack");
-
 module.exports = {
     css: {
         extract: false,
@@ -15,21 +13,13 @@ module.exports = {
         config.optimization.minimize(false);
     },
     configureWebpack: {
-        plugins: [
-            // Ignore all electron related things, as these are only required for the desktop application.
-            // new webpack.IgnorePlugin({
-            //     resourceRegExp: /^(electron|fs)/,
-            //     contextRegExp: /.*/
-            // })
-        ],
+        plugins: [],
         output: {
             globalObject: "this"
         },
         externals: {
             vuex: "vuex",
-            vue: "vue",
-            fs: "fs",
-            electron: "electron"
+            vue: "vue"
         }
     }
 };

@@ -234,7 +234,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
             let shouldReselect: boolean = true;
             if (store.getters.activeAssay) {
                 const idx: number = store.getters.assays.findIndex(
-                    (data: AssayData) => data.assay.getId() === store.getters.activeAssay.getId()
+                    (data: AssayData) => data.assay.id === store.getters.activeAssay.id
                 );
                 shouldReselect = idx === -1;
             }
@@ -260,7 +260,6 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         },
 
         async processAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
-            console.log("Process assay has been called!");
             store.commit("RESET_ASSAY", assay);
             store.commit("RESET_ASSAY_METADATA", assay);
 
@@ -279,7 +278,6 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 });
 
                 store.commit("SET_ASSAY_PROCESSOR", [assay, assayProcessor]);
-                console.log("Start processing!");
                 const communicationSource = await assayProcessor.processAssay(countTable);
 
                 if (!assayProcessor.isCancelled()) {

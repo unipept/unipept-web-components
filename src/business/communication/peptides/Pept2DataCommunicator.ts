@@ -48,8 +48,8 @@ export default class Pept2DataCommunicator {
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
     ): Promise<void> {
-        console.log("Test");
         const unprocessed = this.getUnprocessedPeptides(countTable.getOntologyIds(), configuration);
+
         if (!unprocessed || unprocessed.length === 0) {
             if (progressListener) {
                 progressListener.onProgressUpdate(1.0);
@@ -60,6 +60,7 @@ export default class Pept2DataCommunicator {
         while (Pept2DataCommunicator.inProgress) {
             await Pept2DataCommunicator.inProgress;
         }
+
 
         if (this.cancelled) {
             return;
@@ -116,10 +117,9 @@ export default class Pept2DataCommunicator {
                 });
             }
 
+
             try {
-                console.log("Start parallel limit....");
                 await parallelLimit(requests, Pept2DataCommunicator.PARALLEL_REQUESTS);
-                console.log("Done with parallel limit...");
 
                 if (!this.cancelled) {
                     const config = configuration.enableMissingCleavageHandling.toString() +
@@ -220,6 +220,7 @@ export default class Pept2DataCommunicator {
     }
 
     public getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, PeptideData> {
+        console.log(Pept2DataCommunicator.configurationToResponses);
         const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         return Pept2DataCommunicator.configurationToResponses.get(configString);
     }
