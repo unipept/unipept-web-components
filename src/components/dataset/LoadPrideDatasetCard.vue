@@ -11,14 +11,14 @@
             <v-form ref="prideAssayForm" @submit.prevent>
                 <v-text-field v-on:keyup.enter="fetchPrideAssay()" class="assay-id-input"  label="Assay id" placeholder="e.g. 8500" :disabled="prideLoading" v-model="prideAssay" :rules="[value => !!value || 'Please enter a valid PRIDE assay number']" clearable></v-text-field>
             </v-form>
-            <div class="card-actions fetch-pride-button">
+            <div class="text-center fetch-pride-button">
                 <v-btn v-if="!prideLoading" @click="fetchPrideAssay()">
                     <v-icon left>mdi-cloud-download</v-icon>
                     Fetch PRIDE dataset
                 </v-btn>
             </div>
             <dataset-form ref="prideDatasetForm" v-on:peptide-change="pridePeptides = $event" :peptides="pridePeptides" v-on:name-change="prideName = $event" :name="prideName" v-on:save-change="prideSave = $event" :save="prideSave" :loading="prideLoading"></dataset-form>
-            <div class="card-actions" id="select-pride-assay-button">
+            <div class="text-center" id="select-pride-assay-button">
                 <v-btn :disabled="prideLoading" @click="selectPrideAssay()">
                     <v-icon left>mdi-plus</v-icon>
                     Add to selected datasets

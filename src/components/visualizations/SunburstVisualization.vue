@@ -28,7 +28,7 @@
         </h2>
         <div v-once ref="visualization"></div>
     </div>
-    <v-container fluid v-else class="error-container mt-2">
+    <v-container fluid v-else class="error-container mt-2 d-flex align-center">
         <div class="error-container">
             <v-icon x-large>
                 mdi-alert-circle-outline

@@ -17,4 +17,10 @@ export default class StringUtils {
      * @param len The length the string should be after it has been padded.
      */
     static leftPad(str: string, character: string, len: number): string;
+    /**
+     * Convert an amount of seconds into a human readable time string. Supports up to 24 hours of time strings.
+     *
+     * @param seconds
+     */
+    static secondsToTimeString(seconds: number): string;
 }

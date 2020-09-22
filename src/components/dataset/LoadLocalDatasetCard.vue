@@ -97,7 +97,7 @@ import Assay from "./../../business/entities/assay/Assay";
 export default class LoadLocalDatasetCard extends mixins(DatasetMixin) {
     /**
      * All datasets that are stored in persistent storage (and have already been loaded into memory). The user is able
-     * to chose each any one of these items and start an analysis.
+     * to chose any one of these items and start an analysis.
      */
     @Prop({ required: true })
     private storedAssays: Assay[];

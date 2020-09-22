@@ -15,7 +15,7 @@ select assays by itself, it only emits an event with it's intended action.
                 v-on:save-change="createSave = $event"
                 :save="createSave">
             </dataset-form>
-            <div class="card-actions" id="create-assay-button">
+            <div class="text-center" id="create-assay-button">
                 <v-btn @click="selectCreateDataset()">
                     <v-icon left>mdi-plus</v-icon>
                     Add to selected datasets

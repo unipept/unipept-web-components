@@ -32,4 +32,33 @@ export default class StringUtils {
         }
         return chars + str;
     }
+
+    /**
+     * Convert an amount of seconds into a human readable time string. Supports up to 24 hours of time strings.
+     *
+     * @param seconds
+     */
+    public static secondsToTimeString(seconds: number): string {
+        if (seconds && !isNaN(seconds) && seconds !== Infinity) {
+            const date = new Date(seconds * 1000);
+            let timeString = "";
+            if (date.getDate() - 1 > 0) {
+                timeString += `${date.getDate() - 1} day${date.getDate() - 1 !== 1 ? "s" : ""}, `
+            }
+
+            if (date.getHours() - 1 > 0) {
+                timeString += `${date.getHours() - 1} hour${date.getHours() - 1 !== 1 ? "s" : ""}, `
+            }
+
+            if (date.getHours() - 1 > 0 || date.getMinutes() > 0) {
+                timeString += `${date.getMinutes()} minute${date.getMinutes() !== 1 ? "s" : ""} and `
+            }
+
+            timeString += `${date.getSeconds()} second${date.getSeconds() !== 1 ? "s" : ""}`;
+
+            return timeString;
+        } else {
+            return "0 seconds";
+        }
+    }
 }

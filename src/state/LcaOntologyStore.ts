@@ -31,15 +31,33 @@ const lcaState = {
 
 const lcaGetters: GetterTree<TaxonomicOntologyState, any> = {
     originalData(state: TaxonomicOntologyState): (assay: ProteomicsAssay) => TaxonomicCountTableMeta | undefined {
-        return assay => state.ontologyData.find(a => a.assay.id === assay.id)?.originalData;
+        return (assay: ProteomicsAssay) => {
+            if (!assay) {
+                return undefined;
+            }
+
+            return state.ontologyData.find(a => a.assay.id === assay.id)?.originalData;
+        }
     },
 
     ontology(state: TaxonomicOntologyState): (assay: ProteomicsAssay) => Ontology<NcbiId, NcbiTaxon> | undefined {
-        return assay => state.ontologyData.find(a => a.assay.id === assay.id)?.ontology;
+        return (assay: ProteomicsAssay) =>  {
+            if (!assay) {
+                return undefined;
+            }
+
+            return state.ontologyData.find(a => a.assay.id === assay.id)?.ontology;
+        }
     },
 
     tree(state: TaxonomicOntologyState): (assay: ProteomicsAssay) => Tree | undefined {
-        return assay => state.ontologyData.find(a => a.assay.id === assay.id)?.tree;
+        return (assay: ProteomicsAssay) => {
+            if (!assay) {
+                return undefined;
+            }
+
+            return state.ontologyData.find(a => a.assay.id === assay.id)?.tree;
+        }
     }
 };
 
