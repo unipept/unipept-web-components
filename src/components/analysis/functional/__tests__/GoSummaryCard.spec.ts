@@ -27,8 +27,7 @@ describe("GoSummaryCard", () => {
             vuetify,
             propsData: {
                 loading: true
-            },
-            sync: false
+            }
         });
 
         await waitForElement(wrapper, ".go-waiting");

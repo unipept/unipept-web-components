@@ -30,8 +30,7 @@ describe("MatchedProteinsTable", () => {
                 peptide: "AVGFGGDFDGVPR",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await waitForElement(wrapper, ".v-data-table__expand-icon");
@@ -85,8 +84,7 @@ describe("MatchedProteinsTable", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await waitForElement(wrapper, ".v-data-table__expand-icon");

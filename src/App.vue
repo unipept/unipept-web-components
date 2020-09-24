@@ -28,7 +28,6 @@ export default class App extends Vue {
           ]
       ))
       await pept2DataComm.process(countTable, new SearchConfiguration());
-      console.log(pept2DataComm.getPeptideResponse("ATNYNAGDR", new SearchConfiguration()));
   }
 }
 </script>

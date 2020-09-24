@@ -82,7 +82,6 @@ export default class ProteomicsAssay extends Assay {
     public setDatabaseVersion(databaseVersion: string): void {
         const oldVersion = databaseVersion;
         this.databaseVersion = databaseVersion;
-        console.log("Version: " + oldVersion + " --> " + this.databaseVersion);
         if (this.databaseVersion !== oldVersion) {
             super.onUpdate("databaseVersion", oldVersion, databaseVersion);
         }

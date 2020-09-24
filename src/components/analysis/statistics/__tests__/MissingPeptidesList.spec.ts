@@ -79,7 +79,6 @@ describe("MissingPeptidesList", () => {
             store,
             localVue,
             vuetify,
-            sync: false,
             propsData: {
                 missedPeptides: missedPeptides
             }
@@ -108,7 +107,6 @@ describe("MissingPeptidesList", () => {
             store,
             localVue,
             vuetify,
-            sync: false,
             propsData: {
                 missedPeptides: missedPeptides
             }
@@ -129,7 +127,6 @@ describe("MissingPeptidesList", () => {
             store,
             localVue,
             vuetify,
-            sync: false,
             propsData: {
                 missedPeptides: missedPeptides
             }

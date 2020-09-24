@@ -1,5 +1,4 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
-import { OntologyIdType } from "./../../ontology/Ontology";
 import { ShareableMap } from "shared-memory-datastructures";
 import { GoCode } from "./../../ontology/functional/go/GoDefinition";
 import PeptideData from "./../../communication/peptides/PeptideData";
@@ -29,9 +28,6 @@ async function compute(
         string
     ],
 ): Promise<void> {
-    console.log("Started to compute...");
-    const start = new Date().getTime();
-
     const peptideToResponseMap = new ShareableMap<Peptide, PeptideData>(
         0,
         0,
@@ -46,20 +42,6 @@ async function compute(
     let annotatedCount = 0;
 
     const item2Peptides = new Map();
-
-    // const retrievedValues = [];
-    // for (const [peptide, peptideCount] of peptideCounts) {
-    //     retrievedValues.push(peptideToResponseMap.get(peptide));
-    // }
-    //
-    // let i = 0;
-    // const parseStart = new Date().getTime();
-    // for (const peptideResponse of retrievedValues) {
-    //     const data = JSON.parse(peptideResponse);
-    //     i += data.fa.counts.all;
-    // }
-    // const parseEnd = new Date().getTime();
-    // console.log("JSON parse time:" + (parseEnd - parseStart) / 1000 + "s --> value " + i);
 
     for (const [peptide, peptideCount] of peptideCounts) {
         const peptideData = peptideToResponseMap.get(peptide);
@@ -82,7 +64,9 @@ async function compute(
             item2Peptides.get(term).push(peptide);
         }
 
-        if (terms.length > 0) {
+        // If there is at least one protein that belongs to this peptide annotated with an annotation of the
+        // kind we're currently investigating, we should increase the annotation count.
+        if (proteinCount > 0) {
             annotatedCount += peptideCount;
         }
     }
@@ -92,9 +76,6 @@ async function compute(
     const sortedCounts: Map<GoCode, number> = new Map([...countsPerCode].sort(
         ([code1, count1], [code2, count2]) => count2 - count1
     ));
-
-    const end = new Date().getTime();
-    console.log("Functional count table took: " + (end - start) / 1000 + "s");
 
     ctx.postMessage({
         type: "result",

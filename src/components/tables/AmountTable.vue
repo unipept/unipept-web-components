@@ -8,7 +8,7 @@
             :server-items-length="totalItems"
             :options.sync="options"
             item-key="code"
-            :show-expand="itemToPeptidesMapping !== null"
+            :show-expand="itemsToPeptides !== undefined && taxaToPeptides !== undefined && tree !== undefined"
             :expanded.sync="expandedItemsList">
             <template v-slot:header.action>
                 <v-tooltip top>
@@ -19,7 +19,9 @@
                 </v-tooltip>
             </template>
             <!-- We can only process the tree when a mapping between items and peptides is given -->
-            <template v-slot:expanded-item="{ headers, item }" v-if="itemToPeptidesMapping && taxaToPeptidesMapping">
+            <template
+                v-slot:expanded-item="{ headers, item }"
+                v-if="itemsToPeptides !== undefined && taxaToPeptides !== undefined">
                 <td class="item-treeview" :colspan="headers.length">
                     <div v-if="tree && (treeAvailable.get(item) || computeTree(item))">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
@@ -48,7 +50,8 @@
             <template v-slot:item.count="{ item }">
                 <div :style="{
                         padding: '12px',
-                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' + item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
+                        background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' +
+                            item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
                     }">
                     {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
@@ -65,9 +68,9 @@
                 </a>
             </template>
             <template v-slot:item.action="{ item }">
-                <v-tooltip top v-if="itemToPeptidesMapping">
+                <v-tooltip top v-if="itemToCsvSummary !== undefined">
                     <template v-slot:activator="{ on }">
-                        <v-btn icon @click="saveSummaryAsCsv(item)" v-on="on">
+                        <v-btn icon @click="itemToCsvSummary(item.code)" v-on="on">
                             <v-icon>
                                 mdi-download
                             </v-icon>
@@ -89,20 +92,16 @@ import { tooltipContent } from "../visualizations/VisualizationHelper";
 import Treeview from "../visualizations/Treeview.vue";
 import ImageDownloadModal from "../utils/ImageDownloadModal.vue";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
-import TableItem from "./../tables/TableItem";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
 import CsvUtils from "./../../business/storage/CsvUtils";
-import FunctionalSummaryProcessor from "./../../business/processors/functional/FunctionalSummaryProcessor";
-import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import HighlightedTreeProcessor from "./../../business/processors/taxonomic/ncbi/HighlightedTreeProcessor";
-import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
-import Pept2DataCommunicator from "./../../business/communication/peptides/Pept2DataCommunicator";
-import { ItemRetriever } from "./ItemRetriever";
+import { FunctionalCode } from "@/business";
+import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
+import AmountTableItem from "@/components/tables/AmountTableItem";
 
 @Component({
     components: {
@@ -155,47 +154,102 @@ export default class AmountTable extends Vue {
         imageDownloadModal: ImageDownloadModal
     }
 
+    /*******************************************************************************************************************
+     *  Properties that are always required for this AmountTable to function.
+     ******************************************************************************************************************/
+
     @Prop({ required: true })
-    protected itemRetriever: ItemRetriever;
+    private itemRetriever: AmountTableItemRetriever<any, any>;
+    /**
+     * Name of the annotation type as it should be used in the table header and the title of the CSV-export for this
+     * table. (E.g. GO-term, EC-number, ...)
+     */
     @Prop({ required: true })
-    protected annotationName: string;
+    private annotationName: string;
+    /**
+     * A function that maps a functional code onto a URL to an external service that provides more information about the
+     * given code.
+     */
     @Prop({ required: true })
-    private externalUrlConstructor: (code: string) => string;
-    @Prop({ required: true })
-    private assay: ProteomicsAssay;
+    private externalUrlConstructor: (code: FunctionalCode) => string;
+
+    /*******************************************************************************************************************
+     * Properties that are required to display the functional <-> taxonomical link (e.g. the taxonomic tree per table
+     * item, etc.) If these are not all present, this link will not be presented by the table.
+     ******************************************************************************************************************/
 
     /**
-     * What items are displayed as counts? (e.g. peptides, proteins, ...)
+     * Maps a functional annotation onto all peptides that are annotated with this annotation. This property is required
+     * for the functional <-> taxonomical link to be displayed!
+     */
+    @Prop({ required: false })
+    private itemsToPeptides: Map<FunctionalCode, Peptide[]>;
+    /**
+     * Maps a taxon identifier onto all peptides that belong to this taxon. This property is required for the functional
+     * <-> taxonomical link to be displayed!
+     */
+    @Prop({ required: false })
+    private taxaToPeptides: Map<NcbiId, Peptide[]>;
+    /**
+     * A taxonomic tree computed from the assay that's currently being rendered. This property is required for the
+     * functional <-> taxonomical link to be displayed!
+     */
+    @Prop({ required: false })
+    private tree: Tree;
+
+    /*******************************************************************************************************************
+     * Properties required to export a CSV summary per item.
+     ******************************************************************************************************************/
+
+    /**
+     * Function that downloads a CSV summary for the given functional code. If this function is not present, no download
+     * button per row will be provided by the amount table.
+     */
+    @Prop({ required: false })
+    private itemToCsvSummary: (code: FunctionalCode) => Promise<void>;
+
+    /*******************************************************************************************************************
+     * Properties that are purely esthetically or that can be used to further tune the AmountTable.
+     ******************************************************************************************************************/
+
+    /**
+     * What items are being displayed as counts? (e.g. peptides, proteins, ...)
      */
     @Prop({ required: false, default: "Peptides" })
     protected countName: string;
+    /**
+     * If only items from a specific namespace are displayed, then please also provide the namespace that's being used.
+     * This name is used to properly construct the export filename.
+     */
     @Prop({ required: false })
     protected namespace: string;
+    /**
+     * Should the namespace column be displayed as part of the amount table?
+     */
     @Prop({ required: false, default: false })
     private showNamespace: boolean;
-    @Prop({ required: false })
-    protected tree: Tree;
     /**
-     * A map that returns for a given annotation all peptides associated with this annotation. If this map is not
-     * given, then no TreeView will be rendered and no expandable rows will be present.
+     * Should the loading status of the table be activated?
      */
-    @Prop({ required: false })
-    protected itemToPeptidesMapping: Map<string, Peptide[]>;
-    /**
-     * A map that returns for a taxon all peptides associated with this taxon.
-     */
-    @Prop({ required: false })
-    protected taxaToPeptidesMapping: Map<NcbiId, Peptide[]>;
     @Prop({ required: false, default: false })
     protected loading: boolean;
+    /**
+     * Do we display the absolute or relative counts for peptides and proteins in the table? Absolute counts will be
+     * used if this property is set to false.
+     */
     @Prop({ required: false, default: false })
     protected showPercentage: boolean;
+    /**
+     * How many table rows should be displayed per page?
+     */
     @Prop({ required: false, default: 5 })
     private rowsPerPage: number;
 
-    private items: TableItem[] = [];
+    private items: AmountTableItem[] = [];
     private totalItems: number = 0;
-    private treeAvailable = new Map<TableItem, TreeNode>();
+
+
+    private treeAvailable = new Map<AmountTableItem, TreeNode>();
 
     private options = {};
 
@@ -207,48 +261,6 @@ export default class AmountTable extends Vue {
     private expandedItemsList = [];
 
     private highlightedTreeProcessor: HighlightedTreeProcessor = new HighlightedTreeProcessor();
-
-    get pept2dataCommunicator(): Pept2DataCommunicator {
-        return this.$store.getters.assayData(this.assay)?.pept2dataCommunicator;
-    }
-
-    get ncbiOntologyProcessor(): NcbiOntologyProcessor {
-        return this.$store.getters["ncbi/ontology"](this.assay)?.processor;
-    }
-
-    private async saveTableAsCsv(): Promise<void> {
-        const columnNames = ["Peptides", this.annotationName, "Name"];
-        let grid: string[][] = this.items.map(item => [item.count.toString(), item.code, item.name]);
-        grid = [columnNames].concat(grid);
-        await NetworkUtils.downloadDataByForm(
-            CsvUtils.toCsvString(grid),
-            this.annotationName.replace(/ /g, "_") + (this.namespace? "-" + this.namespace: "") + "-export.csv",
-            "text/csv"
-        )
-    }
-
-    private async saveSummaryAsCsv(term: TableItem): Promise<void> {
-        const peptideTableProcessor = new PeptideCountTableProcessor();
-        const peptideCounts = await peptideTableProcessor.getPeptideCountTable(
-            this.itemToPeptidesMapping.get(term.code),
-            this.assay.getSearchConfiguration()
-        );
-
-        const functionalSummaryProcessor = new FunctionalSummaryProcessor();
-        const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
-            term.definition,
-            peptideCounts,
-            this.assay.getSearchConfiguration(),
-            this.pept2dataCommunicator,
-            this.ncbiOntologyProcessor
-        );
-
-        await NetworkUtils.downloadDataByForm(
-            CsvUtils.toCsvString(data),
-            term.code.replace(/:/g, "_") + ".csv",
-            "text/csv"
-        );
-    }
 
     @Watch("tree")
     private onTreeChanged() {
@@ -287,25 +299,36 @@ export default class AmountTable extends Vue {
      * computes this tree and fills in the associated entry in the treeAvailable map. The DataTable watches
      * changes in this map and reacts appropriately.
      */
-    private computeTree(term: TableItem): boolean {
+    private computeTree(term: AmountTableItem): boolean {
         this.highlightedTreeProcessor.computeHighlightedTree(
-            this.itemToPeptidesMapping.get(term.code),
+            this.itemsToPeptides.get(term.code),
             this.tree,
-            this.taxaToPeptidesMapping
+            this.taxaToPeptides
         ).then(rootNode => this.treeAvailable.set(term, rootNode));
         return true;
     }
 
-    private treeViewId(term: TableItem): string {
+    private treeViewId(term: AmountTableItem): string {
         return "TreeView-" + term.code.replace(/[.:]/g, "-");
     }
 
-    private saveImage(term: TableItem): void {
+    private saveImage(term: AmountTableItem): void {
         AnalyticsUtil.logToGoogle("Multi peptide", "Save Image for FA");
         const downloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
         downloadModal.downloadSVG(
             "unipept_treeview_" + term.code.replace(":", "_"),
             "#" + this.treeViewId(term) + " svg"
+        );
+    }
+
+    private async saveTableAsCsv(): Promise<void> {
+        const columnNames = ["Peptides", this.annotationName, "Name"];
+        let grid: string[][] = this.items.map(item => [item.count.toString(), item.code, item.name]);
+        grid = [columnNames].concat(grid);
+        await NetworkUtils.downloadDataByForm(
+            CsvUtils.toCsvString(grid),
+            this.annotationName.replace(/ /g, "_") + (this.namespace? "-" + this.namespace: "") + "-export.csv",
+            "text/csv"
         );
     }
 }

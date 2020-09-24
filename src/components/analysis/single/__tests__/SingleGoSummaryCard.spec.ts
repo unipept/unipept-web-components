@@ -30,8 +30,7 @@ describe("SingleGoSummaryCard", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await waitForCondition(() => wrapper.findAll("tr").length > 1);
@@ -82,8 +81,7 @@ describe("SingleGoSummaryCard", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         // Wait for the table to be rendered.

@@ -9,6 +9,7 @@ import SearchConfiguration from "./../business/configuration/SearchConfiguration
 import CommunicationSource from "./../business/communication/source/CommunicationSource";
 import FunctionalOntologyProcessor from "./../business/ontology/functional/FunctionalOntologyProcessor";
 import FunctionalResponse from "./../business/communication/functional/FunctionalResponse";
+import CountTableProcessor from "@/business/processors/CountTableProcessor";
 
 export type FunctionalCountTableMeta<Id extends OntologyIdType, DefinitionType extends FunctionalDefinition> = {
     processor: FunctionalCountTableProcessor<Id, DefinitionType>,
@@ -172,7 +173,7 @@ export default class FunctionalOntologyStoreFactory<
             configuration: SearchConfiguration,
             communicationSource: CommunicationSource,
             filterPercentage: number
-        ) => FunctionalCountTableProcessor<Id, DefinitionType>,
+        ) => CountTableProcessor<Id>,
 
         ontologyProcessorFactory: (
             communicationSource: CommunicationSource
@@ -207,8 +208,6 @@ export default class FunctionalOntologyStoreFactory<
                     const functionalTable = await countTableProcessor.getCountTable();
 
                     const ontologyProcessor = ontologyProcessorFactory(communicationSource);
-                    console.log("In store factory...");
-                    console.log(functionalTable);
                     const ontology = await ontologyProcessor.getOntology(functionalTable);
 
                     store.commit("SET_ONTOLOGY", [assay, ontology]);

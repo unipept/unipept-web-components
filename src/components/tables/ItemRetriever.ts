@@ -1,6 +1,6 @@
-import TableItem from "./TableItem";
+import { DataOptions } from "vuetify";
 
-export interface ItemRetriever {
+export interface ItemRetriever<TableItemType> {
     getItemCount(): number;
-    getItems(tableOptions): TableItem[];
+    getItems(tableOptions: DataOptions): TableItemType[];
 }

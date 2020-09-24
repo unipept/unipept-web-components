@@ -220,7 +220,6 @@ export default class Pept2DataCommunicator {
     }
 
     public getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, PeptideData> {
-        console.log(Pept2DataCommunicator.configurationToResponses);
         const configString = configuration.enableMissingCleavageHandling.toString() + NetworkConfiguration.BASE_URL;
         return Pept2DataCommunicator.configurationToResponses.get(configString);
     }

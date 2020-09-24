@@ -75,7 +75,6 @@ export default class ExportResultsButton extends Vue {
                 separator,
                 functionalSeparator
             );
-            console.log(csv);
             await NetworkUtils.downloadDataByForm(csv, `${this.assay.getName()}_mpa.csv`, "text/csv");
             this.exportLoading = false;
         }

@@ -30,8 +30,7 @@ describe("SinglePeptideSummary", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await wrapper.vm.$nextTick();

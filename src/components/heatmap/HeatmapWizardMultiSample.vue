@@ -13,6 +13,7 @@ import {NormalizationType} from "./NormalizationType";
             <v-stepper-content step="1">
                 <multi-assay-data-source
                     :assays="assays"
+                    :communication-source="communicationSource"
                     v-on:selected-items="updateSelectedItems">
                 </multi-assay-data-source>
                 <v-spacer></v-spacer>
@@ -55,6 +56,8 @@ import Normalizer from "./../../business/normalisation/Normalizer";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import NormalizationSelector from "./NormalizationSelector.vue";
 import HeatmapMultiSample from "./HeatmapMultiSample.vue";
+import CommunicationSource from "@/business/communication/source/CommunicationSource";
+import { AllNormalizer } from "@/business";
 
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
@@ -76,11 +79,13 @@ type SourceMetadata = {
 export default class HeatmapWizardMultiSample extends Vue {
     @Prop({ required: true })
     private assays: ProteomicsAssay[];
+    @Prop({ required: true })
+    private communicationSource: CommunicationSource;
 
     private currentStep: number = 1;
 
     private selectedItems: MultiAssayDataSourceItem[] = [];
-    private normalizer: Normalizer = undefined;
+    private normalizer: Normalizer = new AllNormalizer();
 
     private updateSelectedItems(newItems: MultiAssayDataSourceItem[]) {
         this.selectedItems = newItems;

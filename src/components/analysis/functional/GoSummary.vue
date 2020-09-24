@@ -1,114 +1,142 @@
 <docs>
-    This component displays both a GoAmountTable and a QuickGoCard. By providing the `loading` prop, the loading state
-    of this component will be triggered.
+    This component provides 4 different slots that can be filled in to display the GO-terms associated with a specific
+    item. The component automatically displays a loading state when the `loading` prop has been properly set.
 </docs>
 
 <template>
-    <v-row>
-        <v-col :cols="9">
-            <go-amount-table
-                :assay="assay"
-                :namespace="namespace"
-                :show-percentage="showPercentage">
-            </go-amount-table>
-        </v-col>
-        <v-col :cols="3">
-            <quick-go-card :items="definitions">
-            </quick-go-card>
-        </v-col>
-    </v-row>
+    <div class="go-table-container">
+        <h2>{{ titleize(namespace) }}</h2>
+        <v-row>
+            <v-col :cols="9">
+                <amount-table
+                    annotation-name="GO-term"
+                    :item-retriever="itemRetriever"
+                    :external-url-constructor="getUrl"
+                    :loading="loading"
+                    :items-to-peptides="itemsToPeptides"
+                    :taxa-to-peptides="taxaToPeptides"
+                    :tree="tree"
+                    :item-to-csv-summary="itemToCsvSummary"
+                    :count-name="countName"
+                    :show-percentage="showPercentage">
+                </amount-table>
+            </v-col>
+            <v-col :cols="3">
+                <quick-go-card :items="definitions">
+                </quick-go-card>
+            </v-col>
+        </v-row>
+
+    </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
+import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import GoAmountTable from "./../../tables/GoAmountTable.vue"
-import QuickGoCard from "./QuickGoCard.vue";
-import GoDefinition, { GoCode } from "./../../../business/ontology/functional/go/GoDefinition";
-import { CountTable } from "./../../../business/counts/CountTable";
-import { Ontology } from "./../../../business/ontology/Ontology";
-import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
-import GoCountTableProcessor from "./../../../business/processors/functional/go/GoCountTableProcessor";
-import { GoNamespace } from "./../../../business/ontology/functional/go/GoNamespace";
-import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
-import FunctionalCountTableProcessor from "./../../../business/processors/functional/FunctionalCountTableProcessor";
-import { Peptide } from "./../../../business/ontology/raw/Peptide";
+
+import {
+    FunctionalCode,
+    NcbiId,
+    Peptide,
+    Tree,
+    GoDefinition,
+    GoCode
+} from "@/business";
+
+import AmountTable from "@/components/tables/AmountTable.vue";
+import QuickGoCard from "@/components/analysis/functional/QuickGoCard.vue";
+import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
+import StringUtils from "@/business/misc/StringUtils";
 
 @Component({
-    components: {
-        GoAmountTable,
-        QuickGoCard
-    }
+    components: { AmountTable, QuickGoCard }
 })
 export default class GoSummary extends Vue {
+    /*******************************************************************************************************************
+     *  Properties that are always required for this summary to function.
+     ******************************************************************************************************************/
+
     @Prop({ required: true })
-    private assay: ProteomicsAssay;
+    private itemRetriever: AmountTableItemRetriever<GoCode, GoDefinition>;
+    /**
+     * All GO-definitions for this namespace, ordered by popularity, descending.
+     */
+    @Prop( { required: true })
+    private definitions: GoDefinition[];
     @Prop({ required: true })
-    private namespace: GoNamespace;
+    private namespace: string;
+
+    /*******************************************************************************************************************
+     * Properties that are required to display the functional <-> taxonomical link (e.g. the taxonomic tree per table
+     * item, etc.) If these are not all present, this link will not be presented by the table.
+     ******************************************************************************************************************/
 
     /**
-     * Do we show the counts in an absolute or relative manner? If this is set to true, the relative counts will be
-     * displayed. Otherwise the absolute will be given.
+     * Maps a functional annotation onto all peptides that are annotated with this annotation. This property is required
+     * for the functional <-> taxonomical link to be displayed!
+     */
+    @Prop({ required: false })
+    private itemsToPeptides: Map<FunctionalCode, Peptide[]>;
+    /**
+     * Maps a taxon identifier onto all peptides that belong to this taxon. This property is required for the functional
+     * <-> taxonomical link to be displayed!
+     */
+    @Prop({ required: false })
+    private taxaToPeptides: Map<NcbiId, Peptide[]>;
+    /**
+     * A taxonomic tree computed from the assay that's currently being rendered. This property is required for the
+     * functional <-> taxonomical link to be displayed!
+     */
+    @Prop({ required: false })
+    private tree: Tree;
+
+    /*******************************************************************************************************************
+     * Properties required to export a CSV summary per item.
+     ******************************************************************************************************************/
+
+    /**
+     * Function that returns a CSV summary for the given functional code. If this function is not present, no download
+     * button per row will be provided by the amount table.
+     */
+    @Prop({ required: false })
+    private itemToCsvSummary: (code: FunctionalCode) => string;
+
+    /*******************************************************************************************************************
+     * Properties that are purely esthetically or that can be used to further tune the AmountTable.
+     ******************************************************************************************************************/
+
+    /**
+     * What items are being displayed as counts? (e.g. peptides, proteins, ...)
+     */
+    @Prop({ required: false, default: "Peptides" })
+    protected countName: string;
+    /**
+     * Do we display the absolute or relative counts for peptides and proteins in the table? Absolute counts will be
+     * used if this property is set to false.
      */
     @Prop({ required: false, default: false })
-    private showPercentage: boolean;
+    protected showPercentage: boolean;
 
-    // A list of all GO-terms that should be displayed in this component.
-    private definitions: GoDefinition[] = [];
+    @Prop({ required: false, default: false })
+    private loading: boolean;
 
-    private mounted() {
-        this.onInputsChanged();
+    private getUrl(code: string): string {
+        return `http://amigo.geneontology.org/amigo/search/ontology?q=${code}`;
     }
 
-    get goCountTableProcessor(): GoCountTableProcessor {
-        return this.$store.getters["go/filteredData"](this.assay)?.processor;
-    }
-
-    get goOntology(): Ontology<GoCode, GoDefinition> {
-        return this.$store.getters["go/ontology"](this.assay);
-    }
-
-    get filterPercentage(): number {
-        return this.$store.getters.assayData(this.assay)?.filterPercentage;
-    }
-
-    get communicationSource(): CommunicationSource {
-        return this.$store.getters.assayData(this.assay)?.communicationSource;
-    }
-
-    get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
-    }
-
-    @Watch("goCountTableProcessor")
-    @Watch("goOntology")
-    @Watch("filterPercentage")
-    @Watch("peptideCountTable")
-    private async onInputsChanged() {
-        this.definitions.splice(0, this.definitions.length);
-        if (this.goCountTableProcessor && this.goOntology && this.peptideCountTable) {
-            let goCountTable: CountTable<GoCode>;
-
-            if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
-                goCountTable = await this.goCountTableProcessor.getCountTable(this.namespace);
-            } else {
-                const goProcessor = new GoCountTableProcessor(
-                    this.peptideCountTable,
-                    this.assay.getSearchConfiguration(),
-                    this.communicationSource,
-                    this.filterPercentage
-                );
-
-                goCountTable = await goProcessor.getCountTable(this.namespace);
-            }
-
-            this.definitions.push(...goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id)));
-        }
+    private titleize(val: string): string {
+        return StringUtils.stringTitleize(val);
     }
 }
 </script>
 
-<style scoped>
+<style>
+    .go-table-container .row {
+        flex-wrap: nowrap;
+    }
 
+    .go-table-container {
+        margin-top: 16px;
+    }
 </style>

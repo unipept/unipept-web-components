@@ -30,8 +30,7 @@ describe("SingleEcSummaryCard", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await wrapper.vm.$nextTick();
@@ -61,8 +60,7 @@ describe("SingleEcSummaryCard", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await wrapper.vm.$nextTick();

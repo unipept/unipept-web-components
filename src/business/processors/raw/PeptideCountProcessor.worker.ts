@@ -23,7 +23,6 @@ ctx.addEventListener("message", (event: MessageEvent) => {
 function process(
     [peptides, searchConfiguration]: [Peptide[], SearchConfiguration]
 ): [Map<Peptide, number>, number] {
-    const start = new Date().getTime();
     peptides = filter(peptides, searchConfiguration);
     const peptideCounts = new Map<Peptide, number>();
     let processed = 0;
@@ -42,8 +41,6 @@ function process(
         totalFrequency += value;
     }
 
-    const end = new Date().getTime();
-    console.log("Counting peptides took: " + (end - start) / 1000 + "s");
     return [peptideCounts, totalFrequency];
 }
 
@@ -57,7 +54,6 @@ function filter(peptides: Peptide[], searchConfiguration: SearchConfiguration): 
  * Split all peptides after every K or R if not followed by P if advancedMissedCleavageHandling isn't set.
  */
 function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boolean): Peptide[] {
-    const start = new Date().getTime();
     if (!advancedMissedCleavageHandling) {
         // const output = [];
         // for (const peptide of peptides) {
@@ -69,8 +65,6 @@ function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boo
             .replace(/([KR])([^P+])/g, "$1+$2")
             .split("+");
     }
-    const end = new Date().getTime();
-    console.log("Cleaving peptides took: " + (end - start) / 1000 + "s");
     return peptides;
 }
 

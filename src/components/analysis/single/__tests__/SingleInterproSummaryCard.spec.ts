@@ -30,8 +30,7 @@ describe("SingleInterproSummaryCard", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         // Wait for the table to be rendered.
@@ -62,8 +61,7 @@ describe("SingleInterproSummaryCard", () => {
                 peptide: "AALTER",
                 equateIl: true,
                 communicationSource: new DefaultCommunicationSource()
-            },
-            sync: false
+            }
         });
 
         await wrapper.vm.$nextTick();

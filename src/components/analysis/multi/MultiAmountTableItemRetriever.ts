@@ -1,11 +1,14 @@
-import { ItemRetriever } from "./../../components/tables/ItemRetriever";
-import { CountTable } from "./../../business/counts/CountTable";
-import { Peptide } from "./../../business/ontology/raw/Peptide";
-import { Ontology, OntologyIdType } from "./../../business/ontology/Ontology";
-import TableItem from "./TableItem";
-import FunctionalDefinition from "./../../business/ontology/functional/FunctionalDefinition";
+import { CountTable } from "@/business/counts/CountTable";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import { Ontology, OntologyIdType } from "@/business/ontology/Ontology";
+import AmountTableItem from "./../../tables/AmountTableItem";
+import FunctionalDefinition from "@/business/ontology/functional/FunctionalDefinition";
+import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
 
-export default class FunctionalItemRetriever<C extends OntologyIdType, F extends FunctionalDefinition> implements ItemRetriever {
+export default class MultiAmountTableItemRetriever<
+    C extends OntologyIdType,
+    F extends FunctionalDefinition
+> implements AmountTableItemRetriever<C, F> {
     constructor(
         private readonly functionalCountTable: CountTable<C>,
         private readonly peptideCountTable: CountTable<Peptide>,
@@ -16,8 +19,8 @@ export default class FunctionalItemRetriever<C extends OntologyIdType, F extends
         return this.functionalCountTable.toMap().size;
     }
 
-    public getItems(tableOptions): TableItem[] {
-        let items: TableItem[] = [];
+    public getItems(tableOptions): AmountTableItem[] {
+        let items: AmountTableItem[] = [];
 
         const start = tableOptions.itemsPerPage * (tableOptions.page - 1);
         let end = tableOptions.itemsPerPage * tableOptions.page;
@@ -44,16 +47,11 @@ export default class FunctionalItemRetriever<C extends OntologyIdType, F extends
             for (const code of codes.slice(start, end)) {
                 const definition: F = this.ontology.getDefinition(code);
 
-                if (!definition) {
-                    console.log(code);
-                }
-
-                items.push(new TableItem(
+                items.push(new AmountTableItem(
                     this.functionalCountTable.getCounts(code),
                     this.functionalCountTable.getCounts(code) / this.peptideCountTable.totalCount,
                     definition.name,
-                    definition.code,
-                    definition
+                    definition.code
                 ));
             }
         } else {
@@ -62,16 +60,15 @@ export default class FunctionalItemRetriever<C extends OntologyIdType, F extends
             for (const [code, currentCount] of this.functionalCountTable.toMap()) {
                 const definition: F = this.ontology.getDefinition(code);
 
-                allItems.push(new TableItem(
+                allItems.push(new AmountTableItem(
                     currentCount,
                     currentCount / this.peptideCountTable.totalCount,
                     definition.name,
-                    definition.code,
-                    definition
+                    definition.code
                 ));
             }
 
-            allItems.sort((a: TableItem, b: TableItem) => {
+            allItems.sort((a: AmountTableItem, b: AmountTableItem) => {
                 let value: number = a[sortKey] > b[sortKey] ? 1 : -1;
                 if (tableOptions.sortDesc.length > 0 && tableOptions.sortDesc[0]) {
                     value *= -1;

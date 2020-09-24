@@ -3,38 +3,43 @@
 </docs>
 
 <template>
-    <interpro-summary-card
-        :interpro-count-table="getCountTable"
-        :interpro-ontology="getOntology"
-        :loading="loading"
-        :communication-source="communicationSource"
-        :relative-counts="trust ? trust.totalAmountOfItems : 1"
-        :show-percentage="false">
-        <template v-slot:analysis-header>
-            <span v-html="trustLine" class="interpro-trust"></span>
-        </template>
-    </interpro-summary-card>
+    <v-card flat>
+        <v-card-text>
+            <span v-html="trustLine" class="go-trust"></span>
+            <v-select :items="namespaceValues" label="Category" v-model="selectedNamespace"></v-select>
+            <amount-table
+                annotation-name="InterPro-Entry"
+                :item-retriever="getSelectedItemRetriever()"
+                :external-url-constructor="getUrl"
+                :loading="isComputing"
+                :show-percentage="false"
+                :show-namespace="true"
+                :rows-per-page="10">
+            </amount-table>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import InterproSummaryCard from "./../functional/InterproSummaryCard.vue";
 import { Prop, Watch } from "vue-property-decorator";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import FunctionalTrust from "./../../../business/processors/functional/FunctionalTrust";
 import { CountTable } from "./../../../business/counts/CountTable";
 import InterproDefinition, { InterproCode } from "./../../../business/ontology/functional/interpro/InterproDefinition";
-import { Ontology } from "./../../../business/ontology/Ontology";
 import { InterproNamespace } from "./../../../business/ontology/functional/interpro/InterproNamespace";
 import InterproOntologyProcessor from "./../../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import { FunctionalUtils } from "./../functional/FunctionalUtils";
 import InterproProteinCountTableProcessor
     from "./../../../business/processors/functional/interpro/InterproProteinCountTableProcessor";
 import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
+import AmountTable from "@/components/tables/AmountTable.vue";
+import SingleAmountTableItemRetriever from "@/components/analysis/single/SingleAmountTableItemRetriever";
 
 @Component({
-    components: { InterproSummaryCard }
+    components: { AmountTable }
 })
 export default class SingleInterproSummaryCard extends Vue {
     @Prop({ required: true })
@@ -46,29 +51,23 @@ export default class SingleInterproSummaryCard extends Vue {
 
     private trust: FunctionalTrust = null;
     private trustLine: string = "";
-    private loading: boolean = false;
+    private isComputing: boolean = false;
 
-    private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace));
+    private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).sort());
+    private selectedNamespace: string = "all";
 
-    private items: {
-        countTable: CountTable<InterproCode>,
-        title: string,
+    private computedItems: {
+        itemRetriever: AmountTableItemRetriever<InterproCode, InterproDefinition>;
         namespace: string
-        ontology: Ontology<InterproCode, InterproDefinition>
     }[] = [];
 
     private created() {
         for (const ns of this.namespaceValues) {
-            this.items.push({
-                countTable: undefined,
-                title: "",
-                namespace: ns,
-                ontology: undefined
+            this.computedItems.push({
+                itemRetriever: undefined,
+                namespace: ns
             });
         }
-    }
-
-    private mounted() {
         this.recompute();
     }
 
@@ -76,10 +75,20 @@ export default class SingleInterproSummaryCard extends Vue {
     @Watch("equateIl")
     private async recompute() {
         if (this.peptide) {
-            this.loading = true;
+            this.isComputing = true;
 
-            const interproProteinProcessor = new InterproProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
+            const interproProteinProcessor = new InterproProteinCountTableProcessor(
+                this.peptide,
+                this.equateIl,
+                this.communicationSource
+            );
 
+            this.trust = await interproProteinProcessor.getTrust();
+            this.trustLine = FunctionalUtils.computeTrustLine(
+                this.trust,
+                "InterPro-entry",
+                "protein"
+            );
 
             for (const [i, ns] of this.namespaceValues.entries()) {
                 let countTable: CountTable<InterproCode>;
@@ -90,31 +99,30 @@ export default class SingleInterproSummaryCard extends Vue {
                     countTable = await interproProteinProcessor.getCountTable(ns as InterproNamespace);
                 }
 
-                this.items[i].countTable = countTable;
-
                 const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
-                this.items[i].ontology = await ontologyProcessor.getOntology(this.items[i].countTable);
+                const ontology = await ontologyProcessor.getOntology(countTable);
+
+                const itemRetriever = new SingleAmountTableItemRetriever(
+                    countTable,
+                    ontology,
+                    this.trust.totalAmountOfItems
+                );
+
+                const currentObj = this.computedItems[i];
+                currentObj.itemRetriever = itemRetriever;
             }
 
-            this.trust = await interproProteinProcessor.getTrust();
-            this.trustLine = FunctionalUtils.computeTrustLine(
-                this.trust,
-                "InterPro-entry",
-                "protein"
-            );
-
-            this.loading = false;
+            this.isComputing = false;
         }
     }
 
-    private getCountTable(ns: string): CountTable<InterproCode> {
-        const item = this.items.find(item => item.namespace == ns);
-        return item ? item.countTable : undefined;
+    private getSelectedItemRetriever(): AmountTableItemRetriever<InterproCode, InterproDefinition> {
+        return this.computedItems.filter(i => i.namespace === this.selectedNamespace)[0].itemRetriever;
     }
 
-    private getOntology(ns: string): Ontology<InterproCode, InterproDefinition> {
-        const item = this.items.find(item => item.namespace == ns);
-        return item ? item.ontology : undefined;
+
+    private getUrl(code: string): string {
+        return `https://www.ebi.ac.uk/interpro/search/text/${code.substr(4)}/#table`;
     }
 }
 </script>
