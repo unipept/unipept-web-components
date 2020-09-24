@@ -9,7 +9,11 @@
                     This interactive tree bundles the complete taxonomic lineages of all UniProt entries whose protein
                     sequence contains the tryptic peptide.
                 </span>
-                <treeview-visualization analysis-type="Single peptide" :tree="tree" :height="400" :tooltip="tooltipContent">
+                <treeview-visualization
+                    analysis-type="Single peptide"
+                    :tree="tree"
+                    :height="400"
+                    :tooltip="tooltipContent">
                 </treeview-visualization>
             </v-card-text>
         </v-card>

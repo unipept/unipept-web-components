@@ -11,12 +11,9 @@
             :show-expand="itemsToPeptides !== undefined && taxaToPeptides !== undefined && tree !== undefined"
             :expanded.sync="expandedItemsList">
             <template v-slot:header.action>
-                <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                        <v-icon @click="saveTableAsCsv()" v-on="on">mdi-download</v-icon>
-                    </template>
-                    <span>Download table as CSV</span>
-                </v-tooltip>
+                <tooltip message="Download table as CSV">
+                    <v-icon @click="saveTableAsCsv()" v-on="on">mdi-download</v-icon>
+                </tooltip>
             </template>
             <!-- We can only process the tree when a mapping between items and peptides is given -->
             <template
@@ -68,16 +65,15 @@
                 </a>
             </template>
             <template v-slot:item.action="{ item }">
-                <v-tooltip top v-if="itemToCsvSummary !== undefined">
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon @click="itemToCsvSummary(item.code)" v-on="on">
-                            <v-icon>
-                                mdi-download
-                            </v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Download CSV summary of the filtered functional annotation</span>
-                </v-tooltip>
+                <tooltip
+                    v-if="itemToCsvSummary !== undefined"
+                    message="Download CSV summary of the filtered functional annotation">
+                    <v-btn icon @click="itemToCsvSummary(item.code)" v-on="on">
+                        <v-icon>
+                            mdi-download
+                        </v-icon>
+                    </v-btn>
+                </tooltip>
             </template>
         </v-data-table>
         <image-download-modal ref="imageDownloadModal"/>
@@ -102,10 +98,12 @@ import HighlightedTreeProcessor from "./../../business/processors/taxonomic/ncbi
 import { FunctionalCode } from "@/business";
 import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
 import AmountTableItem from "@/components/tables/AmountTableItem";
+import Tooltip from "@/components/custom/Tooltip.vue";
 
 @Component({
     components: {
         Treeview,
+        Tooltip,
         ImageDownloadModal
     },
     computed:

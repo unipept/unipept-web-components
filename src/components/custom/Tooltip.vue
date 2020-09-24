@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip :top="position === 'top'" :bottom="position === 'bottom'" :left="position === 'left'" :right="position === 'right'" >
+  <v-tooltip top :open-delay="500" >
     <template v-slot:activator="{ on }">
       <span v-on="on">
        <slot></slot>
@@ -14,12 +14,10 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator"
 
-  @Component
+@Component
 export default class Tooltip extends Vue {
     @Prop()
     private message!: string;
-    @Prop({ default: "top" })
-    private position: string;
 }
 </script>
 

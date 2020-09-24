@@ -5,7 +5,7 @@
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
             <span class="dir text">Click a square to zoom in and right click to zoom out</span>
-        </h2>T
+        </h2>
         <div v-once ref="visualization"></div>
     </div>
     <v-container fluid v-else class="error-container mt-2 d-flex align-center">

@@ -1,31 +1,27 @@
 <template>
-    <div :class="{'search-settings-form': true, 'd-flex': true, 'flex-column': !horizontal, 'flex-row': horizontal, 'justify-space-between': horizontal }">
-        <v-tooltip top>
-            <template v-slot:activator="{ on }">
-                <div v-on="on">
-                    <v-checkbox :disabled="disabled" v-model="equateIlModel" label="Equate I and L" hide-details>
-                        <span slot="label" v-on="on">Equate I and L</span>
-                    </v-checkbox>
-                </div>
-            </template>
-            <span>Equate isoleucine (I) and leucine (L) when matching peptides to UniProt entries.</span>
-        </v-tooltip>
-        <v-tooltip top>
-            <template v-slot:activator="{ on }">
-                <v-checkbox v-on="on" :disabled="disabled" v-model="filterDuplicatesModel" hide-details>
-                    <span slot="label" v-on="on">Filter duplicate peptides</span>
-                </v-checkbox>
-            </template>
-            <span>Remove duplicate peptides from the input before searching.</span>
-        </v-tooltip>
-        <v-tooltip top>
-            <template v-slot:activator="{ on }">
-                <v-checkbox v-on="on" :disabled="disabled" v-model="missingCleavageModel" hide-details>
-                    <span slot="label" v-on="on">Advanced missing cleavage handling</span>
-                </v-checkbox>
-            </template>
-            <span>Recombine subpeptides of miscleavages. Enabling this has a serious performance impact!</span>
-        </v-tooltip>
+    <div
+        :class="{
+            'search-settings-form': true,
+            'd-flex': true,
+            'flex-column': !horizontal,
+            'flex-row': horizontal,
+            'justify-space-between': horizontal
+    }">
+        <tooltip message="Equate isoleucine (I) and leucine (L) when matching peptides to UniProt entries.">
+            <v-checkbox :disabled="disabled" v-model="equateIlModel" label="Equate I and L" hide-details class="mt-0">
+                <span slot="label" v-on="on">Equate I and L</span>
+            </v-checkbox>
+        </tooltip>
+        <tooltip message="Remove duplicate peptides from the input before searching.">
+            <v-checkbox v-on="on" :disabled="disabled" v-model="filterDuplicatesModel" hide-details class="mt-0">
+                <span slot="label" v-on="on">Filter duplicate peptides</span>
+            </v-checkbox>
+        </tooltip>
+        <tooltip message="Recombine subpeptides of miscleavages. Enabling this has a serious performance impact!">
+            <v-checkbox v-on="on" :disabled="disabled" v-model="missingCleavageModel" hide-details class="mt-0">
+                <span slot="label" v-on="on">Advanced missed cleavage handling</span>
+            </v-checkbox>
+        </tooltip>
     </div>
 </template>
 
@@ -33,9 +29,12 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
+import Tooltip from "@/components/custom/Tooltip.vue";
 
 @Component({
-    components: {},
+    components: {
+        Tooltip
+    },
     computed: {
         equateIlModel: {
             get() {
@@ -95,9 +94,3 @@ export default class SearchSetingsForm extends Vue {
     }
 }
 </script>
-
-<style scoped>
-    .search-settings-form .v-input--selection-controls {
-        margin-top: 0;
-    }
-</style>

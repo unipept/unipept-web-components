@@ -28,7 +28,7 @@
                 </span>
             </template>
             <template v-slot:item.fa="{ item }">
-                <v-tooltip top>
+                <v-tooltip top :open-delay="500">
                     <template v-slot:activator="{ on }">
                         <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.ec.length > 0 ? 'indigo' : 'indigo lighten-4'">
                             <span class="white--text headline" style="font-size: 14px !important;">EC</span>
@@ -48,7 +48,7 @@
                     </span>
                 </v-tooltip>
 
-                <v-tooltip top>
+                <v-tooltip top :open-delay="500">
                     <template v-slot:activator="{ on }">
                         <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.go.length > 0 ? 'amber' : 'amber lighten-4'">
                             <span :class="[item.functionalAnnotations.go.length > 0 ? 'dark--text' : 'gray--text', 'headline']" style="font-size: 14px !important;">GO</span>
@@ -68,7 +68,7 @@
                     </span>
                 </v-tooltip>
 
-                <v-tooltip top>
+                <v-tooltip top :open-delay="500">
                     <template v-slot:activator="{ on }">
                         <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.interpro.length > 0 ? 'red' : 'red lighten-4'">
                             <span class="white--text headline" style="font-size: 14px !important;">IPR</span>
@@ -188,7 +188,6 @@ import InterproOntologyProcessor from "./../../business/ontology/functional/inte
 import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
-import Pept2DataCommunicator from "./../../business/communication/peptides/Pept2DataCommunicator";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import { CountTable } from "./../../business/counts/CountTable";
 import StringUtils from "./../../business/misc/StringUtils";
