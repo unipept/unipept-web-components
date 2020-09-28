@@ -295,7 +295,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         },
 
         async filterByTaxon(store: ActionContext<AssayState, any>, [assay, ncbiId]: [ProteomicsAssay, NcbiId]) {
-            if (ncbiId === -1) {
+            if (ncbiId === 1) {
                 store.commit("RESET_FILTER", assay);
                 // Notify all functional count table stores to also reset the filter.
                 store.dispatch("resetFilter", assay);
@@ -341,6 +341,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 const taxon = await ncbiOntology.getDefinition(ncbiId);
 
                 store.commit("SET_NCBI_FILTER", [assay, taxon]);
+                store.commit("SET_FILTERED_TABLE", [assay, filteredCountTable]);
                 store.dispatch("filterForAssay", [assay, filteredCountTable, communicationSource]);
             } catch (error) {
                 console.warn(error);

@@ -226,12 +226,12 @@ export default class FunctionalSummaryCard extends Vue {
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
 
-    private selectedTaxonId: NcbiId = -1;
+    private selectedTaxonId: NcbiId = 1;
 
     private selectedSortTypeName: string = "Peptides";
     private relativeCounts: number = 0;
 
-    private taxonId: number = -1;
+    private taxonId: number = 1;
 
     private selectedNCBITaxon: NcbiTaxon = null;
 
@@ -272,10 +272,16 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     @Watch("filteredCountTable")
+    private onFilteredChanged() {
+        console.log(this.filteredCountTable);
+    }
+
+    @Watch("filteredCountTable")
     @Watch("lcaProcessor")
     @Watch("lcaOntology")
     private async computeTree() {
         if (this.filteredCountTable && this.lcaProcessor && this.lcaOntology) {
+            console.log(this.filteredCountTable);
             this.taxaToPeptidesMapping = await this.lcaProcessor.getAnnotationPeptideMapping();
             const taxaCounts = await this.lcaProcessor.getCountTable();
             this.tree = new Tree(taxaCounts, this.lcaOntology);
@@ -293,7 +299,7 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     private resetFilter(): void {
-        this.$store.dispatch("filterByTaxon", [this.assay, -1]);
+        this.$store.dispatch("filterByTaxon", [this.assay, 1]);
     }
 }
 </script>
