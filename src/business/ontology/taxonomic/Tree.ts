@@ -24,7 +24,7 @@ export default class Tree {
         taxaCountTable: CountTable<NcbiId>,
         taxaOntology: Ontology<NcbiId, NcbiTaxon>,
         taxaToPeptidesMapping?: Map<NcbiId, Peptide[]>,
-        id: NcbiId = -1,
+        id: NcbiId = 1,
         name: string = "Organism"
     ) {
         this.root = new TreeNode(id, name);
@@ -130,8 +130,11 @@ export default class Tree {
         }
 
         let s = this.getOwnSequences(node) || [];
-        for (let i = 0; i < node.children.length; i++) {
-            s = s.concat(this.getAllSequences(node.children[i].id));
+
+        if (node) {
+            for (let i = 0; i < node.children.length; i++) {
+                s = s.concat(this.getAllSequences(node.children[i].id));
+            }
         }
 
         return s;

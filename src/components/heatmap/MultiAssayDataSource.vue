@@ -135,7 +135,9 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new LcaCountTableProcessor(p, c, this.communicationSource),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) =>  {
+                return new LcaCountTableProcessor(p, c, this.communicationSource);
+            },
             ontologyProcessor: new NcbiOntologyProcessor(this.communicationSource),
             categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
@@ -144,7 +146,9 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new GoCountTableProcessor(p, c, this.communicationSource),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => {
+                return new GoCountTableProcessor(p, c, this.communicationSource);
+            },
             ontologyProcessor: new GoOntologyProcessor(this.communicationSource),
             categories: Object.values(GoNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
@@ -153,7 +157,9 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new EcCountTableProcessor(p, c, this.communicationSource),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) =>  {
+                return new EcCountTableProcessor(p, c, this.communicationSource);
+            },
             ontologyProcessor: new EcOntologyProcessor(this.communicationSource),
             categories: Object.values(EcNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
@@ -162,7 +168,9 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => new InterproCountTableProcessor(p, c, this.communicationSource),
+            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => {
+                return new InterproCountTableProcessor(p, c, this.communicationSource);
+            },
             ontologyProcessor: new InterproOntologyProcessor(this.communicationSource),
             categories: Object.values(InterproNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
@@ -207,7 +215,10 @@ export default class MultiAssayDataSource extends Vue {
 
             for (const assay of this.assays) {
                 const peptideCountProcessor = new PeptideCountTableProcessor();
-                const peptideCountTable = await peptideCountProcessor.getPeptideCountTable(assay.getPeptides(), assay.getSearchConfiguration());
+                const peptideCountTable = await peptideCountProcessor.getPeptideCountTable(
+                    assay.getPeptides(),
+                    assay.getSearchConfiguration()
+                );
 
                 const countProcessor = dataItem.tableProcessor(peptideCountTable, assay.getSearchConfiguration());
                 const countTable = await countProcessor.getCountTable();
@@ -229,6 +240,7 @@ export default class MultiAssayDataSource extends Vue {
 
                 let category: string = "";
                 let name: string = "";
+                let count: number = 0;
 
                 if (definition) {
                     if (Object.prototype.hasOwnProperty.call(definition, "rank")) {

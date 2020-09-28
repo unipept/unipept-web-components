@@ -104,6 +104,7 @@ import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import GoDefinition, { GoCode } from "./../../business/ontology/functional/go/GoDefinition";
 import EcDefinition, { EcCode } from "./../../business/ontology/functional/ec/EcDefinition";
 import InterproDefinition, { InterproCode } from "./../../business/ontology/functional/interpro/InterproDefinition";
+import { Tree } from "@/business";
 
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
@@ -254,6 +255,10 @@ export default class HeatmapWizardSingleSample extends Vue {
         return this.$store.getters["interpro/ontology"](this.assay);
     }
 
+    get tree(): Tree {
+        return this.$store.getters["ncbi/tree"](this.assay);
+    }
+
     @Watch("peptideCountTable", { immediate: true })
     @Watch("ncbiCountTableProcessor")
     @Watch("ncbiOntology")
@@ -310,17 +315,20 @@ export default class HeatmapWizardSingleSample extends Vue {
                 }
 
                 let category: string = "";
+                let count: number = 0;
 
                 if ("rank" in definition) {
                     category = definition["rank"];
+                    count = this.tree.nodes.get(id)?.data.count;
                 } else {
                     category = (definition as unknown as FunctionalDefinition).namespace;
+                    count = countTable.getCounts(id);
                 }
 
                 items.push(new SingleAssayDataSourceItem(
                     definition.name,
                     id,
-                    countTable.getCounts(id),
+                    count,
                     StringUtils.stringTitleize(category),
                     peptideMapping.get(id)
                 ));
