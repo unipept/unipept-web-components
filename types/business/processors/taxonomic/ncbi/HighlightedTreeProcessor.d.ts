@@ -7,7 +7,5 @@ import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
  * highlighting the nodes that are involved in some protein function.
  */
 export default class HighlightedTreeProcessor {
-    static HIGHLIGHT_TREE_PARALLEL_LIMIT: number;
-    private static queue;
     computeHighlightedTree(peptides: Peptide[], tree: Tree, taxaToPeptidesMapping: Map<NcbiId, Peptide[]>): Promise<TreeNode>;
 }

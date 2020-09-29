@@ -15,12 +15,10 @@ export default abstract class FunctionalCountTableProcessor<OntologyId extends O
     private readonly peptideData2ProteinCount;
     private readonly termPrefix;
     static DEFAULT_FILTER_PERCENTAGE: number;
-    static FUNCTIONAL_COUNT_TABLE_PARALLEL_LIMIT: number;
     private countTables;
     private generalCountTable;
     private item2Peptides;
     private trust;
-    private static queue;
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
      * @param configuration The search configuration that should be applied while processing the peptides.

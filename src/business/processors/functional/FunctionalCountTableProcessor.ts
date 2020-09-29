@@ -10,14 +10,13 @@ import CommunicationSource from "./../../communication/source/CommunicationSourc
 import { ShareableMap } from "shared-memory-datastructures";
 import PeptideData from "./../../communication/peptides/PeptideData";
 import Worker from "worker-loader?inline=fallback!./FunctionalCountTableProcessor.worker";
-import async, { AsyncQueue } from "async";
+import { QueueManager } from "@/business";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,
     DefinitionType extends FunctionalDefinition
 > implements ProteomicsCountTableProcessor<OntologyId> {
     public static DEFAULT_FILTER_PERCENTAGE: number = 5;
-    public static FUNCTIONAL_COUNT_TABLE_PARALLEL_LIMIT: number = 4;
 
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
     // Aggregation of all counts over all namespaces
@@ -25,7 +24,6 @@ export default abstract class FunctionalCountTableProcessor<
     private item2Peptides: Map<OntologyId, Peptide[]> = new Map();
     private trust: FunctionalTrust;
 
-    private static queue: AsyncQueue<any>;
 
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
@@ -100,41 +98,40 @@ export default abstract class FunctionalCountTableProcessor<
         const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
         await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
 
-        if (!FunctionalCountTableProcessor.queue) {
-            FunctionalCountTableProcessor.queue = async.queue((task, callback: (a: any) => void) => {
-                const worker = new Worker();
-
-                worker.addEventListener("message", (event: MessageEvent) => {
-                    callback(event.data.result);
-                });
-
-                worker.postMessage({
-                    args: task.data
-                });
-            }, FunctionalCountTableProcessor.FUNCTIONAL_COUNT_TABLE_PARALLEL_LIMIT);
-        }
-
         const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(
             this.configuration
         ) as ShareableMap<Peptide, PeptideData>;
         const buffers = peptideResponseMap.getBuffers();
 
-        const [countsPerCode, item2Peptides, annotatedCount] = await new Promise<[
+        const [countsPerCode, item2Peptides, annotatedCount] = await QueueManager.getLongRunningQueue().pushTask<[
             Map<OntologyId, number>,
             Map<OntologyId, Peptide[]>,
             number
-        ]>((resolve) => FunctionalCountTableProcessor.queue.push(
-            {
-                data: [
-                    this.peptideCountTable.toMap(),
-                    buffers[0],
-                    buffers[1],
-                    this.percentage,
-                    this.termPrefix,
-                    this.peptideData2ProteinCount
-                ]
-            }, resolve)
-        );
+        ]>(() => {
+            return new Promise<[
+                Map<OntologyId, number>,
+                Map<OntologyId, Peptide[]>,
+                number
+            ]>((resolve) => {
+                const worker = new Worker();
+
+                worker.addEventListener("message", (event: MessageEvent) => {
+                    worker.terminate();
+                    resolve(event.data.result);
+                });
+
+                worker.postMessage({
+                    args: [
+                        this.peptideCountTable.toMap(),
+                        buffers[0],
+                        buffers[1],
+                        this.percentage,
+                        this.termPrefix,
+                        this.peptideData2ProteinCount
+                    ]
+                });
+            });
+        });
 
         this.item2Peptides = item2Peptides;
 
