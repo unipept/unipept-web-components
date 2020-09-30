@@ -1,17 +1,9 @@
-import NcbiTaxon, { NcbiId } from "./NcbiTaxon";
-import NcbiResponse from "./../../../communication/taxonomic/ncbi/NcbiResponse";
+import NcbiTaxon, { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
+import NcbiResponse from "@/business/communication/taxonomic/ncbi/NcbiResponse";
 
-const ctx: Worker = self as any;
-
-// Respond to message from parent thread
-ctx.addEventListener("message", (event: MessageEvent) => {
-    const result = process(event.data.args);
-    ctx.postMessage({
-        result: result
-    });
-});
-
-export function process([ids, responseMap]: [NcbiId[], Map<NcbiId, NcbiResponse>]): Map<NcbiId, NcbiTaxon> {
+export async function computeNcbiOntology(
+    [ids, responseMap]: [NcbiId[], Map<NcbiId, NcbiResponse>]
+): Promise<Map<NcbiId, NcbiTaxon>> {
     const definitions = new Map<NcbiId, NcbiTaxon>();
 
     for (const id of ids) {

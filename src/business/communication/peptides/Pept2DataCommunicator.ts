@@ -1,17 +1,19 @@
-import { CountTable } from "./../../counts/CountTable";
-import { Peptide } from "./../../ontology/raw/Peptide";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import ProgressListener from "./../../progress/ProgressListener";
-import NetworkCommunicationException from "./../../exceptions/NetworkCommunicationException";
-import NetworkConfiguration from "./../NetworkConfiguration";
-import PeptideTrust from "./../../processors/raw/PeptideTrust";
-import { ShareableMap } from "shared-memory-datastructures";
-import NetworkUtils from "./../../communication/NetworkUtils";
-import parallelLimit from "async/parallelLimit";
-import PeptideData from "./PeptideData";
-import PeptideDataSerializer from "./PeptideDataSerializer";
-import { Pept2DataApiResponse } from "./Pept2DataApiResponse";
+import {
+    CountTable,
+    Peptide,
+    SearchConfiguration,
+    ProgressListener,
+    NetworkCommunicationException,
+    NetworkConfiguration,
+    PeptideTrust,
+    PeptideData,
+    NetworkUtils,
+    PeptideDataSerializer,
+    Pept2DataApiResponse
+} from "@/business";
 
+import { ShareableMap } from "shared-memory-datastructures";
+import parallelLimit from "async/parallelLimit";
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
  *
@@ -27,7 +29,6 @@ export default class Pept2DataCommunicator {
     public static PEPTDATA_BATCH_SIZE = 100;
     public static MISSED_CLEAVAGE_BATCH = 25;
     public static PEPTDATA_ENDPOINT = "/mpa/pept2data";
-    public static PARALLEL_REQUESTS = 5;
 
     private cancelled: boolean = false;
 
@@ -119,7 +120,7 @@ export default class Pept2DataCommunicator {
 
 
             try {
-                await parallelLimit(requests, Pept2DataCommunicator.PARALLEL_REQUESTS);
+                await parallelLimit(requests, NetworkConfiguration.PARALLEL_API_REQUESTS);
 
                 if (!this.cancelled) {
                     const config = configuration.enableMissingCleavageHandling.toString() +

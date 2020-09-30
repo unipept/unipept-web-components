@@ -1,10 +1,5 @@
-import { CountTable } from "./../../counts/CountTable";
-import { Peptide } from "./../../ontology/raw/Peptide";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import ProgressListener from "./../../progress/ProgressListener";
-import PeptideTrust from "./../../processors/raw/PeptideTrust";
+import { CountTable, Peptide, SearchConfiguration, ProgressListener, PeptideTrust, PeptideData } from "@/business";
 import { ShareableMap } from "shared-memory-datastructures";
-import PeptideData from "./PeptideData";
 /**
  * Communicates with the Unipept API through a separate worker in its own thread.
  *
@@ -17,7 +12,6 @@ export default class Pept2DataCommunicator {
     static PEPTDATA_BATCH_SIZE: number;
     static MISSED_CLEAVAGE_BATCH: number;
     static PEPTDATA_ENDPOINT: string;
-    static PARALLEL_REQUESTS: number;
     private cancelled;
     /**
      * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed that

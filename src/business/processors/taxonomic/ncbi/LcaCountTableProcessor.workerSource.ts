@@ -1,23 +1,13 @@
-import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
-import { Peptide } from "./../../../ontology/raw/Peptide";
-import { CountTable } from "./../../../counts/CountTable";
 import { ShareableMap } from "shared-memory-datastructures";
-import PeptideData from "./../../../communication/peptides/PeptideData";
-import PeptideDataSerializer from "./../../../communication/peptides/PeptideDataSerializer";
+import { CountTable } from "@/business/counts/CountTable";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import PeptideData from "@/business/communication/peptides/PeptideData";
+import { NcbiId } from "@/business/ontology/taxonomic/ncbi/NcbiTaxon";
+import PeptideDataSerializer from "@/business/communication/peptides/PeptideDataSerializer";
 
-const ctx: Worker = self as any;
-
-// Respond to message from parent thread
-ctx.addEventListener("message", (event: MessageEvent) => {
-    const result = compute(event.data.args);
-    ctx.postMessage({
-        result: result
-    });
-});
-
-function compute(
-    [peptideCountTable, indexBuffer, dataBuffer]: [CountTable<Peptide>, SharedArrayBuffer, SharedArrayBuffer]
-): [Map<NcbiId, number>, Map<NcbiId, Peptide[]>] {
+export async function compute(
+    [peptideCountTable, indexBuffer, dataBuffer]: [CountTable<Peptide>, ArrayBuffer, ArrayBuffer]
+): Promise<[Map<NcbiId, number>, Map<NcbiId, Peptide[]>]> {
     const peptideToResponseMap = new ShareableMap<Peptide, PeptideData>(
         0,
         0,

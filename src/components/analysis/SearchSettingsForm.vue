@@ -9,17 +9,17 @@
     }">
         <tooltip message="Equate isoleucine (I) and leucine (L) when matching peptides to UniProt entries.">
             <v-checkbox :disabled="disabled" v-model="equateIlModel" label="Equate I and L" hide-details class="mt-0">
-                <span slot="label" v-on="on">Equate I and L</span>
+                <span slot="label">Equate I and L</span>
             </v-checkbox>
         </tooltip>
         <tooltip message="Remove duplicate peptides from the input before searching.">
-            <v-checkbox v-on="on" :disabled="disabled" v-model="filterDuplicatesModel" hide-details class="mt-0">
-                <span slot="label" v-on="on">Filter duplicate peptides</span>
+            <v-checkbox :disabled="disabled" v-model="filterDuplicatesModel" hide-details class="mt-0">
+                <span slot="label">Filter duplicate peptides</span>
             </v-checkbox>
         </tooltip>
         <tooltip message="Recombine subpeptides of miscleavages. Enabling this has a serious performance impact!">
-            <v-checkbox v-on="on" :disabled="disabled" v-model="missingCleavageModel" hide-details class="mt-0">
-                <span slot="label" v-on="on">Advanced missed cleavage handling</span>
+            <v-checkbox :disabled="disabled" v-model="missingCleavageModel" hide-details class="mt-0">
+                <span slot="label">Advanced missed cleavage handling</span>
             </v-checkbox>
         </tooltip>
     </div>

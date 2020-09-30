@@ -1,15 +1,5 @@
-import { Peptide } from "./../../ontology/raw/Peptide";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-
-const ctx: Worker = self as any;
-
-// Respond to message from parent thread
-ctx.addEventListener("message", (event: MessageEvent) => {
-    const result = process(event.data.args);
-    ctx.postMessage({
-        result: result
-    });
-});
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 
 /**
  * Convert a list of peptides into a count table with respect to a given set of search settings. This count table maps
@@ -20,9 +10,9 @@ ctx.addEventListener("message", (event: MessageEvent) => {
  * @returns A tuple with 2 items. The first item is a mapping between a peptide and it's frequency, and the second item
  * is the total frequency of all items combined (from the first map).
  */
-function process(
+export async function compute(
     [peptides, searchConfiguration]: [Peptide[], SearchConfiguration]
-): [Map<Peptide, number>, number] {
+): Promise<[Map<Peptide, number>, number]> {
     peptides = filter(peptides, searchConfiguration);
     const peptideCounts = new Map<Peptide, number>();
     let processed = 0;

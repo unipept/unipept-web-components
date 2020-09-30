@@ -1,16 +1,18 @@
-import { CountTable } from "./../../counts/CountTable";
-import { Peptide } from "./../../ontology/raw/Peptide";
-import FunctionalTrust from "./FunctionalTrust";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
-import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
-import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
-import ProteomicsCountTableProcessor from "./../ProteomicsCountTableProcessor";
-import CommunicationSource from "./../../communication/source/CommunicationSource";
+import { OntologyIdType } from "./../../ontology/Ontology";
 import { ShareableMap } from "shared-memory-datastructures";
-import PeptideData from "./../../communication/peptides/PeptideData";
-import Worker from "worker-loader?inline=fallback!./FunctionalCountTableProcessor.worker";
-import { QueueManager } from "@/business";
+import {
+    QueueManager,
+    CountTable,
+    Peptide,
+    FunctionalTrust,
+    SearchConfiguration,
+    Ontology,
+    FunctionalDefinition,
+    FunctionalNamespace,
+    ProteomicsCountTableProcessor,
+    CommunicationSource,
+    PeptideData
+} from "@/business";
 
 export default abstract class FunctionalCountTableProcessor<
     OntologyId extends OntologyIdType,
@@ -107,31 +109,21 @@ export default abstract class FunctionalCountTableProcessor<
             Map<OntologyId, number>,
             Map<OntologyId, Peptide[]>,
             number
-        ]>(() => {
-            return new Promise<[
-                Map<OntologyId, number>,
-                Map<OntologyId, Peptide[]>,
-                number
-            ]>((resolve) => {
-                const worker = new Worker();
-
-                worker.addEventListener("message", (event: MessageEvent) => {
-                    worker.terminate();
-                    resolve(event.data.result);
-                });
-
-                worker.postMessage({
-                    args: [
-                        this.peptideCountTable.toMap(),
-                        buffers[0],
-                        buffers[1],
-                        this.percentage,
-                        this.termPrefix,
-                        this.peptideData2ProteinCount
-                    ]
-                });
-            });
-        });
+        ], [
+            Map<Peptide, number>,
+            ArrayBuffer,
+            ArrayBuffer,
+            number,
+            string,
+            string
+        ]>( "computeFunctionalCountTable", [
+            this.peptideCountTable.toMap(),
+            buffers[0],
+            buffers[1],
+            this.percentage,
+            this.termPrefix,
+            this.peptideData2ProteinCount
+        ]);
 
         this.item2Peptides = item2Peptides;
 

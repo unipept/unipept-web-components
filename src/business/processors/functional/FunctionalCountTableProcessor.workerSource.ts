@@ -1,17 +1,10 @@
-import { Peptide } from "./../../ontology/raw/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
-import { GoCode } from "./../../ontology/functional/go/GoDefinition";
-import PeptideData from "./../../communication/peptides/PeptideData";
-import PeptideDataSerializer from "./../../communication/peptides/PeptideDataSerializer";
+import { FunctionalCode } from "@/business/ontology/functional/FunctionalDefinition";
+import { Peptide } from "@/business/ontology/raw/Peptide";
+import PeptideData from "@/business/communication/peptides/PeptideData";
+import PeptideDataSerializer from "@/business/communication/peptides/PeptideDataSerializer";
 
-const ctx: Worker = self as any;
-
-// Respond to message from parent thread
-ctx.addEventListener("message", async(event: MessageEvent) => {
-    await compute(event.data.args);
-});
-
-async function compute(
+export async function compute(
     [
         peptideCounts,
         indexBuffer,
@@ -21,13 +14,13 @@ async function compute(
         proteinCountProperty
     ]: [
         Map<Peptide, number>,
-        SharedArrayBuffer,
-        SharedArrayBuffer,
+        ArrayBuffer,
+        ArrayBuffer,
         number,
         string,
         string
     ],
-): Promise<void> {
+): Promise<[Map<FunctionalCode, number>, Map<FunctionalCode, Peptide[]>, number]> {
     const peptideToResponseMap = new ShareableMap<Peptide, PeptideData>(
         0,
         0,
@@ -41,7 +34,7 @@ async function compute(
     // Keeps track of how many peptides are associated with at least one annotation
     let annotatedCount = 0;
 
-    const item2Peptides = new Map();
+    const item2Peptides: Map<FunctionalCode, Peptide[]> = new Map();
 
     for (const [peptide, peptideCount] of peptideCounts) {
         const peptideData = peptideToResponseMap.get(peptide);
@@ -73,12 +66,9 @@ async function compute(
 
     // Counts per code is guaranteed to be sorted by count (note that JS Maps return values in the order they were
     // inserted!)
-    const sortedCounts: Map<GoCode, number> = new Map([...countsPerCode].sort(
+    const sortedCounts: Map<FunctionalCode, number> = new Map([...countsPerCode].sort(
         ([code1, count1], [code2, count2]) => count2 - count1
     ));
 
-    ctx.postMessage({
-        type: "result",
-        result: [sortedCounts, item2Peptides, annotatedCount]
-    });
+    return [sortedCounts, item2Peptides, annotatedCount];
 }

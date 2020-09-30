@@ -1,15 +1,6 @@
-import { Peptide } from "./../../ontology/raw/Peptide";
-import { CountTable } from "./../../counts/CountTable";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import Worker from "worker-loader?inline=fallback!./PeptideCountProcessor.worker";
-import async, { AsyncQueue } from "async";
-import { QueueManager } from "@/business";
+import { QueueManager, CountTable, SearchConfiguration, Peptide } from "@/business";
 
 export default class PeptideCountTableProcessor {
-    public static PEPTIDE_COUNT_PROCESSOR_PARALLEL_LIMIT: number = 4;
-
-    private static queue: AsyncQueue<any>;
-
     /**
      * Convert a list of peptides into a count table. This function directly filters the given list of peptides, based
      * on the search configuration given here.
@@ -22,21 +13,10 @@ export default class PeptideCountTableProcessor {
         peptides: Peptide[],
         searchConfiguration: SearchConfiguration
     ): Promise<CountTable<Peptide>> {
-        return QueueManager.getLongRunningQueue().pushTask<CountTable<Peptide>>(() => {
-            return new Promise<CountTable<Peptide>>((resolve) => {
-                const worker = new Worker();
-
-                worker.addEventListener("message", (event: MessageEvent) => {
-                    const [peptideCountsMapping, totalFrequency] = event.data.result;
-                    worker.terminate();
-                    resolve(new CountTable<Peptide>(peptideCountsMapping, totalFrequency));
-                });
-
-                worker.postMessage({
-                    args: [peptides, searchConfiguration]
-                });
-            });
-
-        });
+        const [peptideCountsMapping, totalFrequency] = await QueueManager.getLongRunningQueue().pushTask<
+            [Map<Peptide, number>, number],
+            [Peptide[], SearchConfiguration]
+        >("computePeptideCountTable", [peptides, searchConfiguration]);
+        return new CountTable<Peptide>(peptideCountsMapping, totalFrequency);
     }
 }

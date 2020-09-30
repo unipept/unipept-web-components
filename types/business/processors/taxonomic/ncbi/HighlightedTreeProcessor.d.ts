@@ -1,7 +1,4 @@
-import TreeNode from "./../../../ontology/taxonomic/TreeNode";
-import { Peptide } from "./../../../ontology/raw/Peptide";
-import Tree from "./../../../ontology/taxonomic/Tree";
-import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
+import { NcbiId, Tree, Peptide, TreeNode } from "@/business";
 /**
  * A highlighted tree is a variant of the Tree that's used to construct most visualisations, specifically aimed at
  * highlighting the nodes that are involved in some protein function.

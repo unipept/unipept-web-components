@@ -1,12 +1,5 @@
-import { CountTable } from "./../../counts/CountTable";
-import { Peptide } from "./../../ontology/raw/Peptide";
-import FunctionalTrust from "./FunctionalTrust";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
-import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
-import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNamespace";
-import ProteomicsCountTableProcessor from "./../ProteomicsCountTableProcessor";
-import CommunicationSource from "./../../communication/source/CommunicationSource";
+import { OntologyIdType } from "./../../ontology/Ontology";
+import { CountTable, Peptide, FunctionalTrust, SearchConfiguration, Ontology, FunctionalDefinition, FunctionalNamespace, ProteomicsCountTableProcessor, CommunicationSource } from "@/business";
 export default abstract class FunctionalCountTableProcessor<OntologyId extends OntologyIdType, DefinitionType extends FunctionalDefinition> implements ProteomicsCountTableProcessor<OntologyId> {
     protected readonly peptideCountTable: CountTable<Peptide>;
     protected readonly configuration: SearchConfiguration;

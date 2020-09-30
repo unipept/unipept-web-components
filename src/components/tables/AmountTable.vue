@@ -12,7 +12,7 @@
             :expanded.sync="expandedItemsList">
             <template v-slot:header.action>
                 <tooltip message="Download table as CSV">
-                    <v-icon @click="saveTableAsCsv()" v-on="on">mdi-download</v-icon>
+                    <v-icon @click="saveTableAsCsv()">mdi-download</v-icon>
                 </tooltip>
             </template>
             <!-- We can only process the tree when a mapping between items and peptides is given -->
@@ -20,7 +20,10 @@
                 v-slot:expanded-item="{ headers, item }"
                 v-if="itemsToPeptides !== undefined && taxaToPeptides !== undefined">
                 <td class="item-treeview" :colspan="headers.length">
-                    <div v-if="tree && (treeAvailable.get(item) || computeTree(item))">
+                    <div v-if="tree &&
+                        expandedItemsList.indexOf(item) !== -1 &&
+                        (computedTrees.indexOf(item.code) !== -1 || computeTree(item))
+                    ">
                         <v-btn small depressed class="item-treeview-dl-btn" @click="saveImage(item)">
                             <v-icon>mdi-download</v-icon>
                             Save as image
@@ -38,7 +41,7 @@
                             :nodeStrokeColor="highlightColorFunc"
                             :nodeFillColor="highlightColorFunc">
                         </treeview>
-                        <div v-if="treeAvailable.get(item) === undefined" class="d-flex justify-center align-center">
+                        <div v-if="computedTrees.indexOf(item.code) === -1" class="d-flex justify-center align-center">
                             <v-progress-circular indeterminate color="primary"></v-progress-circular>
                         </div>
                     </div>
@@ -68,7 +71,7 @@
                 <tooltip
                     v-if="itemToCsvSummary !== undefined"
                     message="Download CSV summary of the filtered functional annotation">
-                    <v-btn icon @click="itemToCsvSummary(item.code)" v-on="on">
+                    <v-btn icon @click="itemToCsvSummary(item.code)">
                         <v-icon>
                             mdi-download
                         </v-icon>
@@ -246,8 +249,8 @@ export default class AmountTable extends Vue {
     private items: AmountTableItem[] = [];
     private totalItems: number = 0;
 
-
     private treeAvailable = new Map<AmountTableItem, TreeNode>();
+    private computedTrees: string[] = [];
 
     private options = {};
 
@@ -263,6 +266,7 @@ export default class AmountTable extends Vue {
     @Watch("tree")
     private onTreeChanged() {
         this.treeAvailable.clear();
+        this.computedTrees.splice(0, this.computedTrees.length);
     }
 
     @Watch("itemRetriever")
@@ -298,11 +302,16 @@ export default class AmountTable extends Vue {
      * changes in this map and reacts appropriately.
      */
     private computeTree(term: AmountTableItem): boolean {
-        this.highlightedTreeProcessor.computeHighlightedTree(
-            this.itemsToPeptides.get(term.code),
-            this.tree,
-            this.taxaToPeptides
-        ).then(rootNode => this.treeAvailable.set(term, rootNode));
+        if (this.taxaToPeptides) {
+            this.highlightedTreeProcessor.computeHighlightedTree(
+                this.itemsToPeptides.get(term.code),
+                this.tree,
+                this.taxaToPeptides
+            ).then(rootNode => {
+                this.treeAvailable.set(term, rootNode);
+                this.computedTrees.push(term.code);
+            });
+        }
         return true;
     }
 

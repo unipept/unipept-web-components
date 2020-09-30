@@ -1,22 +1,8 @@
-import TreeNode from "./../../../ontology/taxonomic/TreeNode";
-import { Peptide } from "./../../../ontology/raw/Peptide";
-import Tree from "./../../../ontology/taxonomic/Tree";
-import { NcbiId } from "./../../../ontology/taxonomic/ncbi/NcbiTaxon";
+import { NcbiId, TreeNode, Peptide, Tree } from "@/business";
 
-const ctx: Worker = self as any;
-
-// Respond to message from parent thread
-ctx.addEventListener("message", (event: MessageEvent) => {
-    const result = computeTree(event.data.args);
-    ctx.postMessage({
-        type: "result",
-        result: result
-    });
-});
-
-function computeTree(
+export async function compute(
     [peptides, tree, taxaToPeptidesMapping]: [Peptide[], Tree, Map<NcbiId, Peptide[]>]
-): TreeNode {
+): Promise<TreeNode> {
     return callRecursivelyPostOrder(tree.root, (t: TreeNode, c: any) => {
         const included = c.some(x => x.included) ||
             (

@@ -1,8 +1,13 @@
-import OntologyProcessor from "./../../OntologyProcessor";
-import NcbiTaxon, { NcbiId } from "./NcbiTaxon";
-import CommunicationSource from "./../../../communication/source/CommunicationSource";
-import Worker from "worker-loader?inline=fallback!./NcbiOntologyProcessor.worker";
-import { QueueManager, CountTable, Ontology } from "@/business";
+import {
+    QueueManager,
+    CountTable,
+    Ontology,
+    NcbiResponse,
+    OntologyProcessor,
+    NcbiTaxon,
+    NcbiId,
+    CommunicationSource
+} from "@/business";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
     constructor(private readonly comSource: CommunicationSource) {}
@@ -15,21 +20,11 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
         const communicator = this.comSource.getNcbiCommunicator();
         await communicator.process(ids);
 
-        return QueueManager.getLongRunningQueue().pushTask<Ontology<NcbiId, NcbiTaxon>>(() => {
-            return new Promise<Ontology<NcbiId, NcbiTaxon>>((resolve) => {
-                const worker = new Worker();
+        const result: Map<NcbiId, NcbiTaxon> = await QueueManager.getLongRunningQueue().pushTask<
+            Map<NcbiId, NcbiTaxon>, [NcbiId[], Map<NcbiId, NcbiResponse>]
+        >("computeNcbiOntology", [ids, communicator.getResponseMap()]);
 
-                worker.addEventListener("message", (event: MessageEvent) => {
-                    const definitions = event.data.result;
-                    worker.terminate();
-                    resolve(new Ontology<NcbiId, NcbiTaxon>(definitions));
-                });
-
-                worker.postMessage({
-                    args: [ids, communicator.getResponseMap()]
-                });
-            })
-        });
+        return new Ontology<NcbiId, NcbiTaxon>(result);
     }
 
     public async getDefinition(id: NcbiId): Promise<NcbiTaxon> {
