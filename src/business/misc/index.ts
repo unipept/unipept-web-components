@@ -1,3 +1,4 @@
 import StringUtils from "./StringUtils";
+import DateUtils from "./DateUtils";
 
-export { StringUtils };
+export { StringUtils, DateUtils };
