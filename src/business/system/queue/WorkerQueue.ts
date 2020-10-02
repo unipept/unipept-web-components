@@ -20,8 +20,6 @@ export default class WorkerQueue {
             task: { type: string, args: any },
             callback: (x: any) => void,
         ) => {
-            console.log("Task started...");
-            const start = new Date().getTime();
             // Retrieve worker from the pool.
             const worker: Worker = this.workers.pop();
 
@@ -35,11 +33,10 @@ export default class WorkerQueue {
                 worker.postMessage(task);
             });
 
+            callback(result);
+
             // Add worker back to the pool.
             this.workers.push(worker);
-            const end = new Date().getTime();
-            callback(result);
-            console.log("Task took: " + (end - start) / 1000 + "s");
         }, this.concurrency);
     }
 

@@ -13,7 +13,7 @@ const ctx: Worker = self as any;
 // Respond to message from parent thread
 ctx.addEventListener("message", async(event: MessageEvent) => {
     const messageType: string = event.data.type;
-    const args: any = event.data.args;
+    let args: any = event.data.args;
 
     let result: any;
 
@@ -36,4 +36,13 @@ ctx.addEventListener("message", async(event: MessageEvent) => {
         type: "result",
         result: result
     });
+
+    try {
+        // This is unfortunately required to get the workers to stop consuming 100% CPU once they're done processing...
+        if (global && global.gc) {
+            global.gc();
+        }
+    } catch (err) {
+        // GC is not available.
+    }
 });
