@@ -1,10 +1,11 @@
 import WorkerQueue from "./WorkerQueue";
+import Worker from "worker-loader?inline=fallback!./GeneralWorker.worker";
 
 export default class QueueManager {
     private static longRunningQueue;
 
-    public static initializeQueue(concurrency: number) {
-        QueueManager.longRunningQueue = new WorkerQueue(concurrency);
+    public static initializeQueue(concurrency: number, workerConstructor: () => any = () => new Worker()) {
+        QueueManager.longRunningQueue = new WorkerQueue(concurrency, workerConstructor);
     }
 
     /**

@@ -1,3 +1,4 @@
 import WorkerQueue from "./WorkerQueue";
 import QueueManager from "./QueueManager";
-export { WorkerQueue, QueueManager };
+import { createMessageEventListener, workerFunctionMap } from "./GeneralWorkerExports";
+export { WorkerQueue, QueueManager, createMessageEventListener, workerFunctionMap };

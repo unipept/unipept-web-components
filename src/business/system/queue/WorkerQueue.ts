@@ -1,5 +1,4 @@
 import async, { AsyncQueue } from "async";
-import Worker from "worker-loader?inline=fallback!./GeneralWorker.worker";
 
 export default class WorkerQueue {
     private queue: AsyncQueue<any>;
@@ -7,13 +6,15 @@ export default class WorkerQueue {
 
     /**
      * @param concurrency How many tasks are allowed to be processed in parallel?
+     * @param workerConstructor Function that can be used to construct a new worker of a specific type.
      */
     public constructor(
-        private readonly concurrency: number = 4
+        private readonly concurrency: number = 4,
+        workerConstructor: () => Worker
     ) {
         // Create the specified amount of workers
         for (let i = 0; i < this.concurrency; i++) {
-            this.workers.push(new Worker());
+            this.workers.push(workerConstructor());
         }
 
         this.queue = async.queue(async(
