@@ -259,7 +259,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
             store.commit("CANCEL_ASSAY", assay);
         },
 
-        async processAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
+        async processAssay(store: ActionContext<AssayState, any>, [assay, forceUpdate]: [ProteomicsAssay, boolean]) {
             store.commit("RESET_ASSAY", assay);
             store.commit("RESET_ASSAY_METADATA", assay);
 
@@ -278,7 +278,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 });
 
                 store.commit("SET_ASSAY_PROCESSOR", [assay, assayProcessor]);
-                const communicationSource = await assayProcessor.processAssay(countTable);
+                const communicationSource = await assayProcessor.processAssay(countTable, forceUpdate);
 
                 if (!assayProcessor.isCancelled()) {
                     store.commit("SET_COMMUNICATION_SOURCE", [assay, communicationSource]);

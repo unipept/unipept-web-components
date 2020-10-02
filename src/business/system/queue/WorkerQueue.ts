@@ -33,10 +33,10 @@ export default class WorkerQueue {
                 worker.postMessage(task);
             });
 
-            callback(result);
-
             // Add worker back to the pool.
             this.workers.push(worker);
+
+            callback(result);
         }, this.concurrency);
     }
 
