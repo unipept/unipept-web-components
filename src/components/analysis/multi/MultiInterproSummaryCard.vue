@@ -71,8 +71,8 @@ export default class MultiInterproSummaryCard extends Vue {
         namespace: string
     }[] = [];
 
-    private itemsToPeptides: Map<InterproCode, Peptide[]>;
-    private taxaToPeptides: Map<NcbiId, Peptide[]>;
+    private itemsToPeptides: Map<InterproCode, Peptide[]> = null;
+    private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
 
     private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).sort());
     private selectedNamespace: string = "all";

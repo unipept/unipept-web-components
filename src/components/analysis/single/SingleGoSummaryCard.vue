@@ -72,6 +72,10 @@ export default class SingleGoSummaryCard extends Vue {
     @Watch("peptide")
     @Watch("equateIl")
     private async recompute() {
+        for (const item of this.computedItems) {
+            item.itemRetriever = null;
+        }
+
         if (this.peptide) {
             this.isComputing = true;
 

@@ -24,7 +24,6 @@ describe("LineageTable", () => {
     });
 
     it("correctly renders information about each taxon associated with the given peptide", async() => {
-        console.log(DefaultCommunicationSource);
         // const wrapper = mount(LineageTable, {
         //     localVue,
         //     vuetify,

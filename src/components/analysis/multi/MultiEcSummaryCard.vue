@@ -90,9 +90,9 @@ export default class MultiEcSummaryCard extends Vue {
     @Prop({ required: false, default: false })
     private showPercentage: boolean;
 
-    private itemRetriever: AmountTableItemRetriever<EcCode, EcDefinition>;
-    private itemsToPeptides: Map<EcCode, Peptide[]>;
-    private taxaToPeptides: Map<NcbiId, Peptide[]>;
+    private itemRetriever: AmountTableItemRetriever<EcCode, EcDefinition> = null;
+    private itemsToPeptides: Map<EcCode, Peptide[]> = null;
+    private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
     private ecTree: TreeViewNode = null;
 
     private trust: FunctionalTrust = null;

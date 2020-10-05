@@ -30,7 +30,7 @@ export default class WorkerQueue {
                     resolve(event.data.result);
                 };
 
-                worker.addEventListener("message", listener);
+                worker.addEventListener("message",listener);
                 worker.postMessage(task);
             });
 

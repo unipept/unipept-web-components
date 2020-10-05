@@ -153,6 +153,10 @@ export default class MultiGoSummaryCard extends Vue {
     private async onInputsChanged() {
         this.isComputing = true;
 
+        for (const item of this.computedItems) {
+            item.itemRetriever = null;
+        }
+
         if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
             for (const [idx, namespace] of Object.values(GoNamespace).sort().entries()) {
                 let goCountTable: CountTable<GoCode>;

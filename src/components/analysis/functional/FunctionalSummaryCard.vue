@@ -272,16 +272,10 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     @Watch("filteredCountTable")
-    private onFilteredChanged() {
-        console.log(this.filteredCountTable);
-    }
-
-    @Watch("filteredCountTable")
     @Watch("lcaProcessor")
     @Watch("lcaOntology")
     private async computeTree() {
         if (this.filteredCountTable && this.lcaProcessor && this.lcaOntology) {
-            console.log(this.filteredCountTable);
             this.taxaToPeptidesMapping = await this.lcaProcessor.getAnnotationPeptideMapping();
             const taxaCounts = await this.lcaProcessor.getCountTable();
             this.tree = new Tree(taxaCounts, this.lcaOntology);
