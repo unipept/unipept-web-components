@@ -84,12 +84,18 @@ const lcaMutations: MutationTree<TaxonomicOntologyState> = {
         assayData.originalData.loading = loading;
     },
 
-    SET_COUNT_TABLE_PROCESSOR(state: TaxonomicOntologyState, [assay, processor]: [ProteomicsAssay, LcaCountTableProcessor]) {
+    SET_COUNT_TABLE_PROCESSOR(
+        state: TaxonomicOntologyState,
+        [assay, processor]: [ProteomicsAssay, LcaCountTableProcessor]
+    ) {
         const assayData = getOrCreateData(state, assay);
         assayData.originalData.processor = processor;
     },
 
-    SET_ONTOLOGY(state: TaxonomicOntologyState, [assay, ontology]: [ProteomicsAssay, Ontology<NcbiId, NcbiTaxon>]) {
+    SET_ONTOLOGY(
+        state: TaxonomicOntologyState,
+        [assay, ontology]: [ProteomicsAssay, Ontology<NcbiId, NcbiTaxon>]
+    ) {
         const assayData = getOrCreateData(state, assay);
         assayData.ontology = ontology;
     },

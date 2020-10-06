@@ -27,29 +27,16 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import DataSource from "./DataSource.vue";
 import { Prop, Watch } from "vue-property-decorator";
-import { CountTable } from "./../../business/counts/CountTable";
-import { Peptide } from "./../../business/ontology/raw/Peptide";
-import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import ProteomicsCountTableProcessor from "./../../business/processors/ProteomicsCountTableProcessor";
-import OntologyProcessor from "./../../business/ontology/OntologyProcessor";
 import FunctionalDefinition from "./../../business/ontology/functional/FunctionalDefinition";
 import NcbiTaxon from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
-import { OntologyIdType } from "./../../business/ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../../business/ontology/Ontology";
 import MultiAssayDataSourceItem from "./MultiAssayDataSourceItem";
-import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
-import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import { NcbiRank } from "./../../business/ontology/taxonomic/ncbi/NcbiRank";
-import GoCountTableProcessor from "./../../business/processors/functional/go/GoCountTableProcessor";
-import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
 import { GoNamespace } from "./../../business/ontology/functional/go/GoNamespace";
-import EcCountTableProcessor from "./../../business/processors/functional/ec/EcCountTableProcessor";
-import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
 import { EcNamespace } from "./../../business/ontology/functional/ec/EcNamespace";
-import InterproCountTableProcessor from "./../../business/processors/functional/interpro/InterproCountTableProcessor";
-import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
 import { InterproNamespace } from "./../../business/ontology/functional/interpro/InterproNamespace";
 import StringUtils from "./../../business/misc/StringUtils";
-import PeptideCountTableProcessor from "./../../business/processors/raw/PeptideCountTableProcessor";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 
@@ -57,8 +44,8 @@ type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
 type SourceMetadata = {
     items: MultiAssayDataSourceItem[],
-    tableProcessor: (countTable: CountTable<Peptide>, config: SearchConfiguration) => ProteomicsCountTableProcessor<OntologyIdType>,
-    ontologyProcessor: OntologyProcessor<OntologyIdType, DefinitionType>,
+    tableProcessor: (a: ProteomicsAssay) => ProteomicsCountTableProcessor<OntologyIdType>,
+    ontology: (a: ProteomicsAssay) => Ontology<OntologyIdType, DefinitionType>,
     loading: boolean,
     categories: string[],
     // What's the title of the category column that should be shown in the data table?
@@ -121,7 +108,6 @@ export default class MultiAssayDataSource extends Vue {
     private identifierInsteadOfCategory: boolean = false;
     private categoryTitle: string = "";
 
-
     private datasources: string[] = [
         "NCBI taxonomy",
         "Gene Ontology",
@@ -131,14 +117,13 @@ export default class MultiAssayDataSource extends Vue {
 
     private datasource: string = this.datasources[0];
 
+
     private sourceMetadata: SourceMetadata[] = [
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) =>  {
-                return new LcaCountTableProcessor(p, c, this.communicationSource);
-            },
-            ontologyProcessor: new NcbiOntologyProcessor(this.communicationSource),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["ncbi/originalData"](a).processor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters["ncbi/ontology"](a),
             categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
             categoryTitle: "Rank"
@@ -146,10 +131,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => {
-                return new GoCountTableProcessor(p, c, this.communicationSource);
-            },
-            ontologyProcessor: new GoOntologyProcessor(this.communicationSource),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["go/originalData"](a).processor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters["go/ontology"](a),
             categories: Object.values(GoNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -157,10 +140,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) =>  {
-                return new EcCountTableProcessor(p, c, this.communicationSource);
-            },
-            ontologyProcessor: new EcOntologyProcessor(this.communicationSource),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["ec/originalData"](a).processor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters["ec/ontology"](a),
             categories: Object.values(EcNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -168,10 +149,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (p: CountTable<Peptide>, c: SearchConfiguration) => {
-                return new InterproCountTableProcessor(p, c, this.communicationSource);
-            },
-            ontologyProcessor: new InterproOntologyProcessor(this.communicationSource),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["interpro/originalData"](a).processor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters["interpro/ontology"](a),
             categories: Object.values(InterproNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -208,20 +187,15 @@ export default class MultiAssayDataSource extends Vue {
     private async computeItems(dataItem: SourceMetadata) {
         if (this.assays && this.assays.length > 0) {
             dataItem.loading = true;
+            const start = new Date().getTime();
 
             // Maps an annotation onto a tuple that keeps track of the counts. Every ontology id is mapped onto a new
             // map that keeps track of the amount of peptides associated with this annotation per assay id.
             const definitionCountMap = new Map<OntologyIdType, Map<string, number>>();
+            let ontology: Ontology<OntologyIdType, DefinitionType>;
 
             for (const assay of this.assays) {
-                const peptideCountProcessor = new PeptideCountTableProcessor();
-                const peptideCountTable = await peptideCountProcessor.getPeptideCountTable(
-                    assay.getPeptides(),
-                    assay.getSearchConfiguration()
-                );
-
-                const countProcessor = dataItem.tableProcessor(peptideCountTable, assay.getSearchConfiguration());
-                const countTable = await countProcessor.getCountTable();
+                const countTable = await dataItem.tableProcessor(assay).getCountTable();
 
                 for (const ontologyId of countTable.getOntologyIds()) {
                     if (!definitionCountMap.has(ontologyId)) {
@@ -229,10 +203,12 @@ export default class MultiAssayDataSource extends Vue {
                     }
                     definitionCountMap.get(ontologyId).set(assay.getId(), countTable.getCounts(ontologyId));
                 }
+
+                ontology = dataItem.ontology(assay);
             }
 
-            const ontologyProcessor = dataItem.ontologyProcessor;
-            const ontology = await ontologyProcessor.getOntologyByIds(Array.from(definitionCountMap.keys()));
+            const end1 = new Date().getTime();
+            console.log("Time after first block: " + (end1 - start) / 1000 + "s");
 
             const items: MultiAssayDataSourceItem[] = [];
             for (const [ontologyId, countMap] of definitionCountMap) {
@@ -240,7 +216,6 @@ export default class MultiAssayDataSource extends Vue {
 
                 let category: string = "";
                 let name: string = "";
-                let count: number = 0;
 
                 if (definition) {
                     if (Object.prototype.hasOwnProperty.call(definition, "rank")) {
@@ -264,6 +239,8 @@ export default class MultiAssayDataSource extends Vue {
             dataItem.items.length = 0;
             dataItem.items.push(...items);
             dataItem.loading = false;
+            const end = new Date().getTime();
+            console.log("Comparative took: " + (end - start) / 1000 + "s");
         } else {
             dataItem.items.splice(0, dataItem.items.length);
             dataItem.loading = false;
