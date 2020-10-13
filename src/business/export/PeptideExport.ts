@@ -56,7 +56,12 @@ export default class PeptideExport {
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
         await pept2DataCommunicator.process(peptideCountTable, searchConfiguration);
 
-        const ncbiOntology = await PeptideExport.computeNcbiOntology(peptideCountTable, searchConfiguration, communicationSource);
+        const ncbiOntology = await PeptideExport.computeNcbiOntology(
+            peptideCountTable,
+            searchConfiguration,
+            communicationSource
+        );
+        console.log(ncbiOntology);
         const goOntology = await PeptideExport.computeFunctionalOntology(
             new GoCountTableProcessor(peptideCountTable, searchConfiguration, communicationSource, 0),
             new GoOntologyProcessor(communicationSource)

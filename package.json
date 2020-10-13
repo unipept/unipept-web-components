@@ -1,13 +1,13 @@
 {
     "name": "unipept-web-components",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "private": false,
     "types": "./types",
     "scripts": {
         "serve": "vue-cli-service build --target lib --name unipept-web-components src/index.ts --watch",
         "build": "vue-cli-service build --target lib --name unipept-web-components src/index.ts",
         "types": "tsc --emitDeclarationOnly && rm -rf types/test types/plugins types/main.d.ts",
-        "test": "vue-cli-service test:unit",
+        "test": "jest src/components/analysis/statistics/__tests__/*",
         "lint": "vue-cli-service lint",
         "docs": "vue-styleguidist server",
         "docs:build": "vue-styleguidist build"
@@ -64,7 +64,7 @@
         "@vue/cli-service": "^4.5.0",
         "@vue/eslint-config-typescript": "^4.0.0",
         "@vue/test-utils": "^1.1.0",
-        "babel-core": "7.0.0-bridge.0",
+        "babel-core": "^7.0.0-bridge.0",
         "babel-eslint": "^10.1.0",
         "babel-jest": "^26.3.0",
         "babel-loader": "^8.1.0",
@@ -76,11 +76,11 @@
         "glob": "^7.1.6",
         "jest": "^26.4.2",
         "jsdom-worker-fix": "^0.1.8",
+        "less": "^3.12.2",
+        "less-loader": "^7.0.1",
         "nock": "^11.4.0",
         "node-fetch": "^2.6.0",
         "node-sass": "^4.12.0",
-        "less": "^3.12.2",
-        "less-loader": "^7.0.1",
         "sass": "^1.17.4",
         "sass-loader": "^7.1.0",
         "svg-inline-loader": "^0.8.0",
@@ -97,35 +97,5 @@
         "webpack-cli": "^3.3.7",
         "worker-loader": "^3.0.2"
     },
-    "cdn": "dist/unipept-web-components.umd.min.js",
-    "jest": {
-        "moduleFileExtensions": [
-            "ts",
-            "tsx",
-            "js",
-            "jsx",
-            "vue"
-        ],
-        "transform": {
-            ".*\\.(vue)$": "vue-jest",
-            "^.+\\.tsx?$": "ts-jest"
-        },
-        "testURL": "http://localhost/",
-        "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-        "moduleNameMapper": {
-            "^@/(.*)$": "<rootDir>/src/$1",
-            "threads": "<rootDir>/src/test/mocks/MockThreads",
-            "^worker-loader!./Pept2Data.worker.js$": "<rootDir>/src/test/MockPeptideContainerProcessor",
-            "html-to-image-no-fonts": "<rootDir>/src/test/mocks/HtmlToImage"
-        },
-        "testEnvironment": "jsdom",
-        "setupFilesAfterEnv": [
-            "./src/test/init.js"
-        ],
-        "collectCoverageFrom": [
-            "src/business/**/*.{ts,vue}",
-            "src/components/**/*.{ts,vue}",
-            ",!/node_modules/"
-        ]
-    }
+    "cdn": "dist/unipept-web-components.umd.min.js"
 }

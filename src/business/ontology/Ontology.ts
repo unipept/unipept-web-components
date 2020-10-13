@@ -19,4 +19,8 @@ export class Ontology<OntologyId, DefinitionType extends Definition> {
     getOntologyIds(): OntologyId[] {
         return [...this.definitions.keys()];
     }
+
+    toMap(): Map<OntologyId, DefinitionType> {
+        return this.definitions;
+    }
 }

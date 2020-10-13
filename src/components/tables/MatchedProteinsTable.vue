@@ -7,7 +7,7 @@
 <template>
     <v-card>
         <v-card-title>
-            <v-text-field v-model="filter" append-icon="search" label="Filter" single-line hide-details>
+            <v-text-field v-model="filter" append-icon="mdi-magnify" label="Filter" single-line hide-details>
             </v-text-field>
         </v-card-title>
         <v-data-table
@@ -279,6 +279,7 @@ export default class MatchedProteinsTable extends Vue {
     @Watch("peptide")
     @Watch("equateIl")
     private async onInputsChanged() {
+        this.items.splice(0, this.items.length);
         if (this.peptide) {
             this.loading = true;
             const proteinProcessor = new ProteinProcessor();

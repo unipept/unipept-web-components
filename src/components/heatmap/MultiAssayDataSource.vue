@@ -187,12 +187,11 @@ export default class MultiAssayDataSource extends Vue {
     private async computeItems(dataItem: SourceMetadata) {
         if (this.assays && this.assays.length > 0) {
             dataItem.loading = true;
-            const start = new Date().getTime();
 
             // Maps an annotation onto a tuple that keeps track of the counts. Every ontology id is mapped onto a new
             // map that keeps track of the amount of peptides associated with this annotation per assay id.
             const definitionCountMap = new Map<OntologyIdType, Map<string, number>>();
-            let ontology: Ontology<OntologyIdType, DefinitionType>;
+            const ontologyMap = new Map<OntologyIdType, DefinitionType>();
 
             for (const assay of this.assays) {
                 const countTable = await dataItem.tableProcessor(assay).getCountTable();
@@ -204,11 +203,10 @@ export default class MultiAssayDataSource extends Vue {
                     definitionCountMap.get(ontologyId).set(assay.getId(), countTable.getCounts(ontologyId));
                 }
 
-                ontology = dataItem.ontology(assay);
+                dataItem.ontology(assay).toMap().forEach((val, key, _) => ontologyMap.set(key, val));
             }
 
-            const end1 = new Date().getTime();
-            console.log("Time after first block: " + (end1 - start) / 1000 + "s");
+            const ontology: Ontology<OntologyIdType, DefinitionType> = new Ontology(ontologyMap);
 
             const items: MultiAssayDataSourceItem[] = [];
             for (const [ontologyId, countMap] of definitionCountMap) {
@@ -217,14 +215,16 @@ export default class MultiAssayDataSource extends Vue {
                 let category: string = "";
                 let name: string = "";
 
-                if (definition) {
-                    if (Object.prototype.hasOwnProperty.call(definition, "rank")) {
-                        category = (definition as NcbiTaxon).rank;
-                    } else {
-                        category = (definition as FunctionalDefinition).namespace;
-                    }
-                    name = definition.name;
+                if (!definition) {
+                    continue;
                 }
+
+                if (Object.prototype.hasOwnProperty.call(definition, "rank")) {
+                    category = (definition as NcbiTaxon).rank;
+                } else {
+                    category = (definition as FunctionalDefinition).namespace;
+                }
+                name = definition.name;
 
                 items.push(new MultiAssayDataSourceItem(
                     name,
@@ -239,8 +239,6 @@ export default class MultiAssayDataSource extends Vue {
             dataItem.items.length = 0;
             dataItem.items.push(...items);
             dataItem.loading = false;
-            const end = new Date().getTime();
-            console.log("Comparative took: " + (end - start) / 1000 + "s");
         } else {
             dataItem.items.splice(0, dataItem.items.length);
             dataItem.loading = false;

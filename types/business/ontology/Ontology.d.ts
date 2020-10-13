@@ -10,4 +10,5 @@ export declare class Ontology<OntologyId, DefinitionType extends Definition> {
     constructor(definitions?: Map<OntologyId, DefinitionType>);
     getDefinition(id: OntologyId): Readonly<DefinitionType> | undefined;
     getOntologyIds(): OntologyId[];
+    toMap(): Map<OntologyId, DefinitionType>;
 }
