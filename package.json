@@ -1,6 +1,6 @@
 {
     "name": "unipept-web-components",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "private": false,
     "types": "./types",
     "scripts": {
@@ -34,7 +34,7 @@
         "html2canvas": "^1.0.0-rc.5",
         "jquery": "^3.4.1",
         "observable-fns": "^0.5.1",
-        "shared-memory-datastructures": "0.1.8",
+        "shared-memory-datastructures": "0.1.9",
         "unipept-heatmap": "^1.0.27",
         "unipept-visualizations": "^1.7.3",
         "uuid": "^3.4.0",
