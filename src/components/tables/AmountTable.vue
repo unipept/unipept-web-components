@@ -252,7 +252,16 @@ export default class AmountTable extends Vue {
     private treeAvailable = new Map<AmountTableItem, TreeNode>();
     private computedTrees: string[] = [];
 
-    private options = {};
+    private options = {
+        page: 1,
+        itemsPerPage: this.rowsPerPage,
+        sortBy: [],
+        sortDesc: [],
+        multiSort: false,
+        mustSort: false,
+        groupBy: [],
+        groupDesc: []
+    };
 
     // All settings for each Treeview that remain the same
     private tooltip: (d: any) => string = tooltipContent;
@@ -275,24 +284,15 @@ export default class AmountTable extends Vue {
         this.totalItems = 0;
         if (this.itemRetriever) {
             this.totalItems = this.itemRetriever.getItemCount();
-            await this.onOptionsChanged({
-                page: 1,
-                itemsPerPage: this.rowsPerPage,
-                sortBy: [],
-                sortDesc: [],
-                multiSort: false,
-                mustSort: false,
-                groupBy: [],
-                groupDesc: []
-            });
+            await this.onOptionsChanged();
         }
     }
 
     @Watch("options", { deep: true })
-    private async onOptionsChanged(newOptions) {
+    private async onOptionsChanged() {
         if (this.itemRetriever) {
             this.items.splice(0, this.items.length);
-            this.items.push(...this.itemRetriever.getItems(newOptions));
+            this.items.push(...this.itemRetriever.getItems(this.options));
         }
     }
 

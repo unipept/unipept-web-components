@@ -55,7 +55,28 @@ export default class SingleAmountTableItemRetriever<
                 ));
             }
         } else {
-            // do nothing at this point in time...
+            // General case, create all table items and sort by the specified key.
+            const allItems = [];
+            for (const [code, currentCount] of this.functionalCountTable.toMap()) {
+                const definition: F = this.ontology.getDefinition(code);
+
+                allItems.push(new AmountTableItem(
+                    currentCount,
+                    this.functionalCountTable.getCounts(code) / this.totalItemCount,
+                    definition.name,
+                    definition.code
+                ));
+            }
+
+            allItems.sort((a: AmountTableItem, b: AmountTableItem) => {
+                let value: number = a[sortKey] > b[sortKey] ? 1 : -1;
+                if (tableOptions.sortDesc.length > 0 && tableOptions.sortDesc[0]) {
+                    value *= -1;
+                }
+                return value;
+            });
+
+            items = allItems.slice(start, end);
         }
 
         return items;

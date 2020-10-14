@@ -2,7 +2,7 @@ import Vue from "vue"
 import Vuetify from "vuetify"
 import { createLocalVue, mount } from "@vue/test-utils";
 import Setup from "@/test/Setup";
-import { waitForCondition } from "@/test/Utils";
+import { sleep, waitForCondition } from "@/test/Utils";
 import SingleGoSummaryCard from "@/components/analysis/single/SingleGoSummaryCard.vue";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 
@@ -15,9 +15,6 @@ describe("SingleGoSummaryCard", () => {
 
     beforeEach(() => {
         vuetify = new Vuetify();
-    });
-
-    beforeAll(() => {
         const setup = new Setup();
         setup.setupAll();
     });
@@ -33,11 +30,14 @@ describe("SingleGoSummaryCard", () => {
             }
         });
 
+        await Vue.nextTick();
         await waitForCondition(() => wrapper.findAll("tr").length > 1);
 
-        const sortButtons = wrapper.findAll("th").filter(w => w.html().includes("GO term"));
+        const sortButtons = wrapper.findAll("th").filter(w => w.html().includes("GO-term"));
         // Filter each of the 3 tables by GO-term code.
         sortButtons.wrappers.map(w => w.trigger("click"));
+
+        await Vue.nextTick();
 
         // This should include 3 containers. The first one for biological process, the second one for cellular
         // component and the last one for molecular function.

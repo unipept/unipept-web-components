@@ -5,6 +5,7 @@ import { createLocalVue, mount } from "@vue/test-utils";
 import { waitForElement } from "@/test/Utils";
 import MatchedProteinsTable from "@/components/tables/MatchedProteinsTable.vue";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import "regenerator-runtime/runtime"
 
 Vue.use(Vuetify);
 
