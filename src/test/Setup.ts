@@ -10,6 +10,7 @@ import { QueueManager } from "@/business";
 
 export default class Setup {
     public setupAll() {
+        this.setupQueue();
         this.setupLocalStorage();
         this.setupFetch();
         this.setupUnipeptNock();
@@ -63,13 +64,15 @@ export default class Setup {
             .reply(200, pridedata);
     }
 
+    public setupQueue() {
+        QueueManager.initializeQueue(1);
+    }
+
     /**
      * Set up interceptors for Unipept API-calls that are performed when analysing the realistic assay, given by the
      * mockRealisticAssay-function in the Mock-class.
      */
     public setupUnipeptNock() {
-        QueueManager.initializeQueue(1);
-
         const baseUrl: string = "http://unipept.ugent.be";
         NetworkConfiguration.BASE_URL = baseUrl;
 

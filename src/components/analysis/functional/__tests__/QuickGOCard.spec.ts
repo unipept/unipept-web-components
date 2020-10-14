@@ -16,7 +16,7 @@ describe("QuickGoCard", () => {
         vuetify = new Vuetify();
     });
 
-    it("renders a placeholder when no GO-terms are found", () => {
+    it("renders a placeholder when no GO-terms are found", async() => {
         const wrapper = shallowMount(QuickGoCard, {
             localVue,
             vuetify,
@@ -27,11 +27,12 @@ describe("QuickGoCard", () => {
         });
 
         wrapper.setData({ showModal: true });
+        await Vue.nextTick();
 
         expect(wrapper.find("v-card-text-stub").html()).toMatchSnapshot();
     });
 
-    it("renders valid GO-terms correctly", () => {
+    it("renders valid GO-terms correctly", async() => {
         let goTerms: GoDefinition[] = [];
         goTerms.push(new GoDefinition(
             "GO:0006412",
@@ -56,6 +57,8 @@ describe("QuickGoCard", () => {
                 items: goTerms,
             }
         });
+
+        await Vue.nextTick();
 
         expect(wrapper.find("v-card-text-stub").html()).toMatchSnapshot();
     });

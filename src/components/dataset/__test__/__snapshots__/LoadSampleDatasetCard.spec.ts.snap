@@ -3993,7 +3993,13 @@ SampleAssay {
 `;
 
 exports[`LoadSampleDatasetCard shows an error when retrieving samples fails 1`] = `
-"<div style=\\"\\" class=\\"connection-error\\"><div role=\\"alert\\" class=\\"v-alert v-sheet theme--dark error\\"><div class=\\"v-alert__wrapper\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate v-alert__icon mdi mdi-alert theme--dark\\"></i><div class=\\"v-alert__content\\">
-                Unable to retrieve list of sample datasets.
-            </div></div></div></div>"
+"<div style=\\"\\" class=\\"connection-error\\">
+  <div role=\\"alert\\" class=\\"v-alert v-sheet theme--dark error\\">
+    <div class=\\"v-alert__wrapper\\"><i aria-hidden=\\"true\\" class=\\"v-icon notranslate v-alert__icon mdi mdi-alert theme--dark\\"></i>
+      <div class=\\"v-alert__content\\">
+        Unable to retrieve list of sample datasets.
+      </div>
+    </div>
+  </div>
+</div>"
 `;

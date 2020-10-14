@@ -1,5 +1,6 @@
 import PeptideCountTableProcessor from "@/business/processors/raw/PeptideCountTableProcessor";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
+import Setup from "@/test/Setup";
 
 const peptides = [
     "AAAAA",
@@ -17,6 +18,11 @@ const peptides = [
 ];
 
 const peptideProcessor = new PeptideCountTableProcessor();
+
+beforeAll(() => {
+    const setup = new Setup();
+    setup.setupQueue();
+});
 
 describe("PeptideCountTableProcessor", ()=> {
     it ("correctly counts peptides without filtering", async(done) => {

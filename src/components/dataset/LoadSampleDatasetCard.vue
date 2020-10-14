@@ -55,6 +55,7 @@ import { Watch, Prop } from "vue-property-decorator";
 import axios from "axios";
 import SampleAssayCollection from "./../../business/entities/sample/SampleAssayCollection";
 import SampleAssay from "./../../business/entities/sample/SampleAssay";
+import { NetworkConfiguration } from "@/business";
 
 @Component({
     computed: {
@@ -80,7 +81,7 @@ export default class LoadSampleDatasetCard extends mixins(DatasetMixin) {
     private retrieveSampleDatasets() {
         this.loadingSampleDatasets = true;
         this.errorSampleDatasets = false;
-        axios.post(this.$store.getters.baseUrl + "/datasets/sampledata")
+        axios.post(NetworkConfiguration.BASE_URL + "/datasets/sampledata")
             .then(result => {
                 this.sampleDatasets = [];
                 this.selectedSampleDataset = {};

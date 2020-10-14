@@ -8,6 +8,7 @@ import { sleep, waitForPromises, waitForElement, waitForCondition } from "@/test
 import * as expectedSampleData from "@/test/api/resources/unipept/sampledata.json";
 import SampleAssayCollection from "@/business/entities/sample/SampleAssayCollection";
 import SampleAssay from "@/business/entities/sample/SampleAssay";
+import { NetworkConfiguration } from "@/business";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
@@ -69,7 +70,8 @@ describe("LoadSampleDatasetCard", () => {
 
     it("shows an error when retrieving samples fails", async(done) => {
         // By not setting up nock here, we can simulate a failing network request and check if the error is displayed
-        // correctly.
+        // correctly. Use a non-existing URL to make sure we're not communicating with the outside world...
+        NetworkConfiguration.BASE_URL = "http://localhost:8728"
 
         store = new Vuex.Store({});
 
