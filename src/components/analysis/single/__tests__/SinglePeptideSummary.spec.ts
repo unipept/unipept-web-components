@@ -5,6 +5,7 @@ import Setup from "@/test/Setup";
 import SinglePeptideSummary from "@/components/analysis/single/SinglePeptideSummary.vue";
 import { waitForElement } from "@/test/Utils";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import "regenerator-runtime/runtime";
 
 Vue.use(Vuetify);
 

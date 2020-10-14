@@ -1803,7 +1803,7 @@ Tree {
       "name": "Homo sapiens",
       "rank": "species",
     },
-    -1 => TreeNode {
+    1 => TreeNode {
       "children": Array [
         TreeNode {
           "children": Array [
@@ -2082,7 +2082,7 @@ Tree {
         "count": 15,
         "self_count": 3,
       },
-      "id": -1,
+      "id": 1,
       "name": "Organism",
       "rank": "no rank",
     },
@@ -2366,7 +2366,7 @@ Tree {
       "count": 15,
       "self_count": 3,
     },
-    "id": -1,
+    "id": 1,
     "name": "Organism",
     "rank": "no rank",
   },
