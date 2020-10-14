@@ -5,7 +5,7 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <span v-html="trustLine" class="go-trust"></span>
+            <span v-html="trustLine" class="interpro-trust"></span>
             <v-select :items="namespaceValues" label="Category" v-model="selectedNamespace"></v-select>
             <amount-table
                 annotation-name="InterPro-Entry"

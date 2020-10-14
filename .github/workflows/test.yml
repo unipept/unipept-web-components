@@ -23,5 +23,5 @@ jobs:
     - name: Install Jest CLI
       run: npm i -g jest-cli
     - name: Run tests
-      run: jest
+      run: npm run test
 

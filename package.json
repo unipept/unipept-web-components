@@ -119,6 +119,7 @@
             "^worker-loader\\?inline=fallback\\!./GeneralWorker.worker$": "<rootDir>/src/test/MockPeptideContainerProcessor",
             "html-to-image-no-fonts": "<rootDir>/src/test/mocks/HtmlToImage"
         },
+        "modulePathIgnorePatterns": ["types"],
         "testEnvironment": "jsdom",
         "setupFilesAfterEnv": [
             "./src/test/init.js"

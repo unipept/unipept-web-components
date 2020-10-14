@@ -9,6 +9,7 @@ import flushPromises from "flush-promises"
 import { waitForElement } from "@/test/Utils";
 import Setup from "@/test/Setup";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
+import "regenerator-runtime/runtime";
 
 Vue.use(Vuetify);
 Vue.use(Vuex);

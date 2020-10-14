@@ -16,7 +16,13 @@ export default class SingleAmountTableItemRetriever<
     ) {}
 
     public getItemCount(): number {
-        return this.functionalCountTable.toMap().size;
+        let count = 0;
+        for (const entry of this.functionalCountTable.toMap().keys()){
+            if (this.ontology.getDefinition(entry)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public getItems(tableOptions: DataOptions): AmountTableItem[] {
@@ -47,6 +53,10 @@ export default class SingleAmountTableItemRetriever<
             for (const code of codes.slice(start, end)) {
                 const definition: F = this.ontology.getDefinition(code);
 
+                if (!definition) {
+                    continue;
+                }
+
                 items.push(new AmountTableItem(
                     this.functionalCountTable.getCounts(code),
                     this.functionalCountTable.getCounts(code) / this.totalItemCount,
@@ -59,6 +69,10 @@ export default class SingleAmountTableItemRetriever<
             const allItems = [];
             for (const [code, currentCount] of this.functionalCountTable.toMap()) {
                 const definition: F = this.ontology.getDefinition(code);
+
+                if (!definition) {
+                    continue;
+                }
 
                 allItems.push(new AmountTableItem(
                     currentCount,

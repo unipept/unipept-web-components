@@ -18,7 +18,6 @@ export default class Mock {
      * calling this function!
      */
     public mockRealisticAssay(): ProteomicsAssay {
-        console.log("Mock assay...");
         const setup = new Setup();
         setup.setupUnipeptNock();
 
