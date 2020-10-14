@@ -9,13 +9,15 @@ import { workerFunctionMap } from "@/business/system/queue/GeneralWorkerExports"
  */
 export default class Worker {
     public async postMessage(task: any) {
-        const messageType: string = task.data.type;
-        const args: any = task.data.args;
+        const messageType: string = task.type;
+        const args: any = task.args;
 
         const result = await workerFunctionMap.get(messageType)(args);
         this.onmessage({
-            type: "result",
-            result: result
+            data: {
+                type: "result",
+                result: result
+            }
         });
     }
 

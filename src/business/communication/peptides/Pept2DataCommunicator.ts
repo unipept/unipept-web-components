@@ -84,10 +84,9 @@ export default class Pept2DataCommunicator {
 
             const requests = [];
             for (let i = 0; i < peptides.length; i += batchSize) {
-                requests.push(async(done: (val: any) => void) => {
+                requests.push(async() => {
                     if (this.cancelled) {
-                        done(new Error("Cancelled execution"));
-                        return;
+                        throw new Error("Cancelled execution")
                     }
 
                     const data = JSON.stringify({
@@ -96,25 +95,20 @@ export default class Pept2DataCommunicator {
                         missed: configuration.enableMissingCleavageHandling
                     });
 
-                    try {
-                        const res = await NetworkUtils.postJSON(
-                            NetworkConfiguration.BASE_URL + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
-                            data
-                        )
+                    const res = await NetworkUtils.postJSON(
+                        NetworkConfiguration.BASE_URL + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
+                        data
+                    )
 
-                        res.peptides.forEach((p: Pept2DataApiResponse) => {
-                            responses.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
-                        })
+                    res.peptides.forEach((p: Pept2DataApiResponse) => {
+                        responses.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
+                    })
 
-                        if (previousProgress < i / peptides.length) {
-                            previousProgress = i / peptides.length;
-                            progressListener?.onProgressUpdate(i / peptides.length);
-                        }
-                        done(null);
-                    } catch (err) {
-                        // Fetch errors need to be handled by the outer scope.
-                        done(err);
+                    if (previousProgress < i / peptides.length) {
+                        previousProgress = i / peptides.length;
+                        progressListener?.onProgressUpdate(i / peptides.length);
                     }
+                    return null;
                 });
             }
 
@@ -153,8 +147,8 @@ export default class Pept2DataCommunicator {
                     resolve();
                 }
             } catch (err) {
-                console.error(err);
                 if (!err.message.includes("Cancelled execution")) {
+                    console.error(err);
                     reject(err);
                 } else {
                     resolve();

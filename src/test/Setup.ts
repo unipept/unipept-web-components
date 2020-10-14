@@ -6,6 +6,7 @@ import NetworkConfiguration from "@/business/communication/NetworkConfiguration"
 import UnipeptApiDataSource from "@/test/api/UnipeptApiDataSource";
 const fetchPolyfill = require("whatwg-fetch")
 import $ from "@/test/mocks/jQuery";
+import { QueueManager } from "@/business";
 
 export default class Setup {
     public setupAll() {
@@ -67,6 +68,8 @@ export default class Setup {
      * mockRealisticAssay-function in the Mock-class.
      */
     public setupUnipeptNock() {
+        QueueManager.initializeQueue(1);
+
         const baseUrl: string = "http://unipept.ugent.be";
         NetworkConfiguration.BASE_URL = baseUrl;
 
