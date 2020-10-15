@@ -1,10 +1,10 @@
-import EcCountTableProcessor from "@/business/processors/functional/ec/EcCountTableProcessor";
 import { Peptide } from "@/business/ontology/raw/Peptide";
 import { CountTable } from "@/business/counts/CountTable";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import { EcNamespace } from "@/business/ontology/functional/ec/EcNamespace";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import EcCountTableProcessor from "@/business/processors/functional/ec/EcCountTableProcessor";
 
 const counts = new Map([
     ["YVVLQPGVK", 1],

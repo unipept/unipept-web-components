@@ -39,8 +39,10 @@ describe("SingleEcSummaryCard", () => {
         await waitForCondition(() => wrapper.findAll("tr").length > 1);
 
         // We sort the proteins by code, to make the test deterministic
-        const sortButton = wrapper.findAll("th").filter(w => w.html().includes("EC number")).at(0);
+        const sortButton = wrapper.findAll("th").filter(w => w.html().includes("EC-number")).at(0);
         sortButton.trigger("click");
+
+        await Vue.nextTick();
 
         // Wait for this element to be the first in the table, which means sorting is done
         await waitForCondition(() => wrapper.find("tbody tr").html().includes("EC:2.3.2.27"));
@@ -66,8 +68,8 @@ describe("SingleEcSummaryCard", () => {
         await wrapper.vm.$nextTick();
 
         // Wait for the table to be rendered.
-        await waitForCondition(() => wrapper.findAll("tr").length > 1);
+        await waitForCondition(() => wrapper.html().includes("EC:2.3.2.27"));
 
-        expect(wrapper.find(".ec-trust")).toMatchSnapshot();
+        expect(wrapper.find(".ec-trust").html()).toMatchSnapshot();
     });
 });

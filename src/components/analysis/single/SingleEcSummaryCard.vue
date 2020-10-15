@@ -7,7 +7,7 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <span v-html="trustLine" class="go-trust"></span>
+            <span v-html="trustLine" class="ec-trust"></span>
             <amount-table
                 annotation-name="EC-number"
                 :item-retriever="itemRetriever"
