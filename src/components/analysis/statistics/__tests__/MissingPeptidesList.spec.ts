@@ -4,13 +4,10 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
 import Mock from "@/test/Mock";
-import flushPromises from "flush-promises";
 import Utils from "./../../../custom/Utils";
 import { sleep, waitForElement } from "./../../../../test/Utils";
-import ProteomicsAssay from "@/business/entities/assay/ProteomicsAssay";
 import Setup from "@/test/Setup";
 import { Peptide } from "@/business/ontology/raw/Peptide";
-import Pept2DataCommunicator from "@/business/communication/peptides/Pept2DataCommunicator";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
 

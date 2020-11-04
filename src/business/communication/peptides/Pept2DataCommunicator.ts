@@ -29,6 +29,9 @@ export default class Pept2DataCommunicator {
     public static PEPTDATA_BATCH_SIZE = 100;
     public static MISSED_CLEAVAGE_BATCH = 25;
     public static PEPTDATA_ENDPOINT = "/mpa/pept2data";
+    // If a network error occurs, wait this amount of time before trying the same request again. This measure helps to
+    // prevent temporary network errors to kill the complete assay analysis.
+    public static NETWORK_ERROR_TIMEOUT = 1000 * 60;
 
     private cancelled: boolean = false;
 
@@ -96,24 +99,36 @@ export default class Pept2DataCommunicator {
                         missed: configuration.enableMissingCleavageHandling
                     });
 
-                    try {
-                        const res = await NetworkUtils.postJSON(
-                            NetworkConfiguration.BASE_URL + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
-                            data
-                        )
+                    let didRetry: number = 0;
 
-                        res.peptides.forEach((p: Pept2DataApiResponse) => {
-                            responses.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
-                        })
+                    while (didRetry < 2) {
+                        try {
+                            const res = await NetworkUtils.postJSON(
+                                NetworkConfiguration.BASE_URL + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
+                                data
+                            );
 
-                        if (previousProgress < i / peptides.length) {
-                            previousProgress = i / peptides.length;
-                            progressListener?.onProgressUpdate(i / peptides.length);
+                            res.peptides.forEach((p: Pept2DataApiResponse) => {
+                                responses.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
+                            })
+
+                            if (previousProgress < i / peptides.length) {
+                                previousProgress = i / peptides.length;
+                                progressListener?.onProgressUpdate(i / peptides.length);
+                            }
+                            didRetry = 2;
+                            done(null);
+                        } catch (err) {
+                            if (didRetry < 1) {
+                                didRetry += 1;
+                                await new Promise<void>(
+                                    (resolve) => setTimeout(resolve, Pept2DataCommunicator.NETWORK_ERROR_TIMEOUT)
+                                );
+                            } else {
+                                // Fetch errors need to be handled by the outer scope.
+                                done(err);
+                            }
                         }
-                        done(null);
-                    } catch (err) {
-                        // Fetch errors need to be handled by the outer scope.
-                        done(err);
                     }
                 });
             }

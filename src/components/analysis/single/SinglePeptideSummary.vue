@@ -7,6 +7,10 @@
             UniProt entries with a lowest common ancestor of
             <span class="font-weight-bold" v-if="lca">{{ lca.name }}</span>
         </div>
+        <div class="subtitle-2">
+            <span v-if="equateIl">Equate I/L is enabled.</span>
+            <span v-else>Equate I/L is disabled.</span>
+        </div>
         <v-row>
             <v-col :cols="6">
                 <div class="headline">Biodiversity</div>

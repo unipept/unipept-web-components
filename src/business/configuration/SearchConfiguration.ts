@@ -16,7 +16,7 @@ export default class SearchConfiguration implements Visitable<SearchConfiguratio
     }
 
     public async accept(visitor: SearchConfigurationVisitor): Promise<void> {
-        visitor.visitSearchConfiguration(this);
+        await visitor.visitSearchConfiguration(this);
     }
 }
 
