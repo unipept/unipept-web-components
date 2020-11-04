@@ -67,20 +67,23 @@ export default class NetworkUtils {
 
     public static async downloadDataByForm(data: string, fileName: string, fileType: string = null): Promise<string> {
         if (SystemUtils.isElectron()) {
-            //TODO
-            const fs = require("fs");
-            const { dialog } = require("electron").remote;
-            const returnValue = await dialog.showSaveDialog(
-                null,
-                {
-                    title: "save to CSV",
-                    defaultPath: fileName
-                }
-            );
-
-            if (!returnValue.canceled) {
-                fs.writeFileSync(returnValue.filePath, data);
-            }
+            // Hack to be able to use Electron without the need to add it to the required dependencies
+            eval(`
+                const fs = require("fs");
+                const { dialog } = require("electron").remote;
+                
+                dialog.showSaveDialog(
+                    null,
+                    {
+                        title: "save to CSV",
+                        defaultPath: fileName
+                    }
+                ).then((returnValue) => {
+                    if (!returnValue.canceled) {
+                        fs.writeFileSync(returnValue.filePath, data);
+                    }
+                });
+            `);
         } else {
             return new Promise(function(resolve, reject) {
                 let nonce = Math.random();
@@ -134,9 +137,10 @@ export default class NetworkUtils {
      */
     public static openInBrowser(url: string): void {
         if (SystemUtils.isElectron()) {
-            //TODO
-            // const shell = require("electron").shell;
-            // shell.openExternal(url);
+            eval(`
+                const shell = require("electron").shell;
+                shell.openExternal(url);
+            `);
         } else {
             window.open(url);
         }

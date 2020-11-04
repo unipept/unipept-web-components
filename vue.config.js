@@ -14,9 +14,7 @@ module.exports = {
         },
         externals: {
             vuex: "vuex",
-            vue: "vue",
-            electron: "electron",
-            fs: "fs"
+            vue: "vue"
         }
     }
 };
