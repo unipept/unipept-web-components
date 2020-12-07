@@ -1,6 +1,14 @@
 <template>
-    <div v-once>
-        <div ref="heatmapElement"></div>
+    <div>
+        <h2 class="ghead">
+            <span class="dir">
+                <v-btn x-small fab @click="download()" :elevation="0"><v-icon>mdi-download</v-icon></v-btn>
+                <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
+            </span>
+            <span class="dir text">Scroll to zoom, drag to pan.</span>
+        </h2>
+        <div ref="heatmapElement" v-once></div>
+        <image-download-modal ref="imageDownloadModal" />
     </div>
 </template>
 
@@ -9,12 +17,24 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { Heatmap, HeatmapSettings } from "unipept-heatmap";
+import ImageDownloadModal from "./../utils/ImageDownloadModal.vue";
 
 import VisualizationMixin from "../visualizations/VisualizationMixin.vue";
 import { HeatmapData, HeatmapElement, HeatmapValue } from "unipept-heatmap/src/heatmap/input";
+import Treeview from "@/components/visualizations/Treeview.vue";
+import AnalyticsUtil from "@/business/analytics/AnalyticsUtil";
 
-@Component
+@Component({
+    components: {
+        ImageDownloadModal
+    }
+})
 export default class HeatmapVisualization extends mixins(VisualizationMixin) {
+    $refs: {
+        heatmapElement: any,
+        imageDownloadModal: ImageDownloadModal
+    }
+
     @Prop({ default: false })
     private fullScreen: false;
     @Prop({ required: true })
@@ -71,6 +91,12 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
             }
             this.heatmap.cluster(clusterType);
         }
+    }
+
+    private async download() {
+        AnalyticsUtil.logToGoogle("Comparative analysis", "Save Image", "Heatmap");
+        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+        await imageDownloadModal.downloadSVG("unipept_comparative_heatmap", ".heatmap svg")
     }
 }
 </script>

@@ -2,7 +2,6 @@
     <div id="treeviewWrapper" ref="treeviewWrapper" style="height: 100%;">
         <h2 class="ghead">
             <span class="dir">
-                <v-btn x-small fab @click="download()" :elevation="0"><v-icon>mdi-download</v-icon></v-btn>
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
             <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
@@ -79,7 +78,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     }
 
     @Watch("fullScreen")
-    private onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
+    private onFullScreenChanged(newFullScreen: boolean,) {
         this.$refs.treeview.setFullScreen(newFullScreen)
     }
 
@@ -92,12 +91,6 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
         if (this.tree) {
             this.data = this.tree.getRoot();
         }
-    }
-
-    private async download() {
-        AnalyticsUtil.logToGoogle(this.analysisType, "Save Image", "Treeview");
-        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-        imageDownloadModal.downloadPNG("unipept_treemap", "#treeviewWrapper > div")
     }
 }
 </script>
