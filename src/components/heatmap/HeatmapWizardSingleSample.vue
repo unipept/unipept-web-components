@@ -66,7 +66,12 @@ import {NormalizationType} from "./NormalizationType";
                     Please select at least one item for both axis of the heatmap.
                 </div>
                 <v-progress-circular v-else-if="!heatmapData" indeterminate color="primary"></v-progress-circular>
-                <heatmap-visualization v-else :data="heatmapData"></heatmap-visualization>
+                <heatmap-visualization
+                    v-else
+                    :data="heatmapData"
+                    :row-labels="heatmapRows"
+                    :column-labels="heatmapColumns">
+                </heatmap-visualization>
             </v-stepper-content>
         </v-stepper-items>
     </v-stepper>
@@ -76,7 +81,6 @@ import {NormalizationType} from "./NormalizationType";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch, Prop } from "vue-property-decorator";
-import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
 import HeatmapVisualization from "./HeatmapVisualization.vue";
 import sha256 from "crypto-js/sha256";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
@@ -105,6 +109,7 @@ import GoDefinition, { GoCode } from "./../../business/ontology/functional/go/Go
 import EcDefinition, { EcCode } from "./../../business/ontology/functional/ec/EcDefinition";
 import InterproDefinition, { InterproCode } from "./../../business/ontology/functional/interpro/InterproDefinition";
 import { Tree } from "@/business";
+import { column } from "vuetify/src/components/VCalendar/modes/column";
 
 type DefinitionType = (FunctionalDefinition | NcbiTaxon)
 
@@ -143,7 +148,9 @@ export default class HeatmapWizardSingleSample extends Vue {
 
     private currentStep: number = 1;
 
-    private heatmapData: HeatmapData = null;
+    private heatmapData: number[][] = [];
+    private heatmapRows: string[] = [];
+    private heatmapColumns: string[] = [];
     // Keeps track of a hash of the previously computed data for the heatmap
     private previouslyComputed: string = "";
 
@@ -368,19 +375,19 @@ export default class HeatmapWizardSingleSample extends Vue {
         // Go the next step in the wizard.
         this.currentStep = 4;
 
-        let rows: HeatmapElement[] = [];
-        let cols: HeatmapElement[] = [];
+        let rows: string[] = [];
+        let cols: string[] = [];
 
         let grid: number[][] = [];
 
         for (let i = 0; i < this.verticalItems.length; i++) {
             let vertical: SingleAssayDataSourceItem = this.verticalItems[i];
-            rows.push({ id: i.toString(), name: vertical.name });
+            rows.push(vertical.name);
         }
 
         for (let i = 0; i < this.horizontalItems.length; i++) {
             let horizontal: SingleAssayDataSourceItem = this.horizontalItems[i];
-            cols.push({ id: i.toString(), name: horizontal.name });
+            cols.push(horizontal.name);
         }
 
         for (let vertical of this.verticalItems) {
@@ -392,11 +399,12 @@ export default class HeatmapWizardSingleSample extends Vue {
             grid.push(gridRow);
         }
 
-        this.heatmapData = {
-            rows: rows,
-            columns: cols,
-            values: this.normalizationTypes.get(this.normalizer).factory().normalize(grid)
-        };
+        this.heatmapRows.splice(0, this.heatmapRows.length);
+        this.heatmapRows.push(...rows);
+        this.heatmapColumns.splice(0, this.heatmapColumns.length);
+        this.heatmapColumns.push(...cols);
+        this.heatmapData.splice(0, this.heatmapData.length);
+        this.heatmapData.push(...this.normalizationTypes.get(this.normalizer).factory().normalize(grid));
     }
 
     private computeCrossPopularity(ownSequences: Readonly<string[]>, otherSequences: Readonly<string[]>): number {

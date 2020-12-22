@@ -8,17 +8,21 @@
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { Heatmap, HeatmapSettings } from "unipept-heatmap";
+import { Heatmap } from "unipept-heatmap";
+
 
 import VisualizationMixin from "../visualizations/VisualizationMixin.vue";
-import { HeatmapData, HeatmapElement, HeatmapValue } from "unipept-heatmap/src/heatmap/input";
 
 @Component
 export default class HeatmapVisualization extends mixins(VisualizationMixin) {
     @Prop({ default: false })
     private fullScreen: false;
     @Prop({ required: true })
-    private data: HeatmapData;
+    private data: number[][];
+    @Prop({ required: true })
+    private rowLabels: string[];
+    @Prop({ required: true })
+    private columnLabels: string[];
     @Prop({ required: false, default: true })
     private clusterRows: boolean;
     @Prop({ required: false, default: true })
@@ -53,11 +57,11 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
 
     private async initHeatmap() {
         if (this.data) {
-            // let settings: HeatmapSettings = new HeatmapSettings();
-            // settings.getTooltip = (cell: HeatmapValue, row: HeatmapElement, column: HeatmapElement) =>
-            // `<b>${row.name}</b><br>Absolute count: ${rowMappings[row.idx][column.idx].absoluteCount}<br>${rowMappings[row.idx][column.idx].numberOfPepts} matched peptides`;
             let heatmapElement: HTMLElement = this.$refs.heatmapElement as HTMLElement;
-            this.heatmap = new Heatmap(heatmapElement, this.data);
+            this.heatmap = new Heatmap(heatmapElement, this.data, this.rowLabels, this.columnLabels, {
+                width: heatmapElement.clientWidth,
+                height: 800
+            });
 
             let clusterType: "all" | "columns" | "rows" | "none" = "all";
 

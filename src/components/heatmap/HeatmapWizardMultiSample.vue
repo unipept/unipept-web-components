@@ -40,7 +40,6 @@ import {NormalizationType} from "./NormalizationType";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch, Prop } from "vue-property-decorator";
-import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
 import HeatmapVisualization from "./HeatmapVisualization.vue";
 import { CountTable } from "./../../business/counts/CountTable";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
