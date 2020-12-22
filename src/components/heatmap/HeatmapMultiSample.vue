@@ -2,7 +2,7 @@
     <div v-if="selectedItems.length === 0">
         Please select at least one item for both axis of the heatmap.
     </div>
-    <div v-else class="reorder-heatmap-buttons">
+    <div v-else style="width: 100%;">
         <div
             v-if="heatmapLoading"
             style="display: flex; justify-content: center;">

@@ -1,6 +1,6 @@
 <template>
-    <div v-once>
-        <div ref="heatmapElement"></div>
+    <div v-once style="width: 100%;">
+        <div ref="heatmapElement" style="width: 100%;"></div>
     </div>
 </template>
 
@@ -55,9 +55,15 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
         this.initHeatmap();
     }
 
+    private async onResize() {
+        this.initHeatmap();
+    }
+
     private async initHeatmap() {
         if (this.data) {
             let heatmapElement: HTMLElement = this.$refs.heatmapElement as HTMLElement;
+            console.log(heatmapElement);
+            console.log("Width is now: " + heatmapElement.clientWidth);
             this.heatmap = new Heatmap(heatmapElement, this.data, this.rowLabels, this.columnLabels, {
                 width: heatmapElement.clientWidth,
                 height: 800
