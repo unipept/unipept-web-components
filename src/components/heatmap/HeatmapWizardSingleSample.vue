@@ -16,7 +16,11 @@ import {NormalizationType} from "./NormalizationType";
         <v-stepper-items>
             <v-stepper-content step="1">
                 <p>Please select the items that should be visualised on the horizontal axis of the heatmap.</p>
-                <v-select :items="dataSources" v-model="horizontalDataSource" label="Horizontal datasource" class="flex-grow-0">
+                <v-select
+                    :items="dataSources"
+                    v-model="horizontalDataSource"
+                    label="Horizontal datasource"
+                    class="flex-grow-0">
                 </v-select>
                 <div>
                     <single-assay-data-source
@@ -33,7 +37,11 @@ import {NormalizationType} from "./NormalizationType";
             </v-stepper-content>
             <v-stepper-content step="2">
                 <p>Please select the items that should be visualised on the vertical axis of the heatmap.</p>
-                <v-select :items="dataSources" v-model="verticalDataSource" label="Vertical datasource" class="flex-grow-0">
+                <v-select
+                    :items="dataSources"
+                    v-model="verticalDataSource"
+                    label="Vertical datasource"
+                    class="flex-grow-0">
                 </v-select>
                 <div>
                     <single-assay-data-source
@@ -56,7 +64,9 @@ import {NormalizationType} from "./NormalizationType";
                         :key="normalizationType"
                         style="margin-bottom: 8px;">
                         <v-radio :label="normalizationType" :value="normalizationType"></v-radio>
-                        <div style="margin-left: 32px;">{{ normalizationTypes.get(normalizationType).information }}</div>
+                        <div style="margin-left: 32px;">
+                            {{ normalizationTypes.get(normalizationType).information }}
+                        </div>
                     </div>
                 </v-radio-group>
                 <v-btn class="continue-button" color="primary" @click="computeHeatmapAndProceed()">Continue</v-btn>
