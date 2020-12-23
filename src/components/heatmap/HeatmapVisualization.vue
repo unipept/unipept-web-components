@@ -2,6 +2,7 @@
     <div style="width: 100%;">
         <h2 class="ghead">
             <span class="dir">
+                <v-btn x-small fab @click="rotate()" :elevation="0"><v-icon>mdi-format-rotate-90</v-icon></v-btn>
                 <v-btn x-small fab @click="download()" :elevation="0"><v-icon>mdi-download</v-icon></v-btn>
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
@@ -46,6 +47,7 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
     private clusterColumns: boolean;
 
     private heatmap: Heatmap;
+    private rotated: boolean = false;
 
     mounted() {
         this.initHeatmap();
@@ -72,15 +74,27 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
         this.initHeatmap();
     }
 
-    private async onResize() {
+    private rotate() {
+        this.rotated = !this.rotated;
         this.initHeatmap();
     }
 
     private async initHeatmap() {
         if (this.data) {
             let heatmapElement: HTMLElement = this.$refs.heatmapElement as HTMLElement;
+
+            const rows = this.rotated ? this.columnLabels : this.rowLabels;
+            const columns = this.rotated ? this.rowLabels : this.columnLabels;
+
+            let data;
+            if (this.rotated) {
+                data = this.data[0].map((_, colIndex) => this.data.map(row => row[colIndex]));
+            } else {
+                data = this.data;
+            }
+
             //@ts-ignore
-            this.heatmap = new Heatmap(heatmapElement, this.data, this.rowLabels, this.columnLabels, {
+            this.heatmap = new Heatmap(heatmapElement, data, rows, columns, {
                 width: heatmapElement.clientWidth,
                 height: 600
             });
