@@ -38,6 +38,7 @@ import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import htmlToImage from "html-to-image-no-fonts";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
+import { toDataURL } from "html-to-image-no-fonts/lib/utils";
 
 @Component
 export default class ImageDownloadModal extends Vue {
@@ -50,8 +51,6 @@ export default class ImageDownloadModal extends Vue {
 
     private svgDataURL: string = "";
     private pngDataURL: string = "";
-
-    private imageKey: number = 0;
 
     async downloadSVG(baseFileName, selector) {
         this.svgDownload = true;
@@ -73,10 +72,24 @@ export default class ImageDownloadModal extends Vue {
         this.preparingImage = true;
         this.downloadDialogOpen = true;
 
-        this.pngDataURL =  await this.dom2pngDataURL(selector);
+        this.pngDataURL = await this.dom2pngDataURL(selector);
         this.svgDataURL = await htmlToImage.toSvgDataURL($(selector).get(0));
 
         this.preparingImage = false;
+    }
+
+    async downloadCanvas(baseFileName, canvasElement: HTMLCanvasElement) {
+        this.svgDownload = false;
+        this.baseFileName = baseFileName;
+
+        this.preparingImage = true;
+        this.downloadDialogOpen = true;
+
+        this.pngDataURL = await this.canvas2pngDataURL(canvasElement);
+        this.svgDataURL = await htmlToImage.toSvgDataURL(canvasElement);
+
+        this.preparingImage = false;
+
     }
 
     private async savePNG() {
@@ -138,12 +151,15 @@ export default class ImageDownloadModal extends Vue {
      * @param {string} selector The DOM selector
      * @returns {string} A dataURL containing the resulting PNG
     */
-    async dom2pngDataURL(selector: string) : Promise<string> {
+    async dom2pngDataURL(selector: string): Promise<string> {
         // Use html2canvas to convert selected element to canvas,
         // then convert that canvas to a dataURL
         const element = $(selector).get(0);
-        const dataUrl: string = await htmlToImage.toPng(element);
-        return dataUrl;
+        return await htmlToImage.toPng(element);
+    }
+
+    async canvas2pngDataURL(element: HTMLCanvasElement): Promise<string> {
+        return element.toDataURL();
     }
 }
 </script>

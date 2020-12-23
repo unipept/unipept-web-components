@@ -79,11 +79,10 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
     private async initHeatmap() {
         if (this.data) {
             let heatmapElement: HTMLElement = this.$refs.heatmapElement as HTMLElement;
-            console.log(heatmapElement);
-            console.log("Width is now: " + heatmapElement.clientWidth);
+            //@ts-ignore
             this.heatmap = new Heatmap(heatmapElement, this.data, this.rowLabels, this.columnLabels, {
                 width: heatmapElement.clientWidth,
-                height: 800
+                height: 600
             });
 
             let clusterType: "all" | "columns" | "rows" | "none" = "all";
@@ -103,7 +102,10 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
     private async download() {
         AnalyticsUtil.logToGoogle("Comparative analysis", "Save Image", "Heatmap");
         const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-        await imageDownloadModal.downloadSVG("unipept_comparative_heatmap", ".heatmap svg")
+        await imageDownloadModal.downloadPNG(
+            "unipept_comparative_heatmap",
+            document.getElementsByTagName("canvas").item(0)
+        );
     }
 }
 </script>
