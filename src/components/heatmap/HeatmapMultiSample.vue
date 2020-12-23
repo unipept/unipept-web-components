@@ -2,20 +2,24 @@
     <div v-if="selectedItems.length === 0">
         Please select at least one item for both axis of the heatmap.
     </div>
-    <div v-else class="reorder-heatmap-buttons">
+    <div v-else style="width: 100%;">
         <div
             v-if="heatmapLoading"
             style="display: flex; justify-content: center;">
             <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </div>
-        <heatmap-visualization v-else :data="heatmapData"></heatmap-visualization>
+        <heatmap-visualization
+            v-else
+            :data="heatmapData"
+            :row-labels="heatmapRows"
+            :column-labels="heatmapColumns">
+        </heatmap-visualization>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { HeatmapData, HeatmapElement } from "unipept-heatmap/heatmap/input";
 import MultiAssayDataSourceItem from "./MultiAssayDataSourceItem";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
 import Normalizer from "./../../business/normalisation/Normalizer";
@@ -36,7 +40,9 @@ export default class HeatmapMultiSample extends Vue {
     @Prop({ required: true })
     private assays: ProteomicsAssay[];
 
-    private heatmapData: HeatmapData = null;
+    private heatmapData: number[][] = [];
+    private heatmapRows: string[] = [];
+    private heatmapColumns: string[] = [];
     // Keeps track of a hash of the previously computed data for the heatmap
     private previouslyComputed: string = "";
     private heatmapLoading: boolean = false;
@@ -58,19 +64,19 @@ export default class HeatmapMultiSample extends Vue {
         this.heatmapLoading = true;
         this.previouslyComputed = newHash;
 
-        let rows: HeatmapElement[] = [];
-        let cols: HeatmapElement[] = [];
+        let rows: string[] = [];
+        let cols: string[] = [];
 
         let grid: number[][] = [];
 
         for (let i = 0; i < this.selectedItems.length; i++) {
             let item: MultiAssayDataSourceItem = this.selectedItems[i];
-            rows.push({ id: i.toString(), name: item.name });
+            rows.push(item.name);
         }
 
         for (let i = 0; i < this.assays.length; i++) {
             let item: ProteomicsAssay = this.assays[i];
-            cols.push({ id: i.toString(), name: item.getName() });
+            cols.push(item.getName());
         }
 
         for (let item of this.selectedItems) {
@@ -82,11 +88,12 @@ export default class HeatmapMultiSample extends Vue {
             grid.push(gridRow);
         }
 
-        this.heatmapData = {
-            rows: rows,
-            columns: cols,
-            values: this.normalizer.normalize(grid)
-        };
+        this.heatmapRows.splice(0, this.heatmapRows.length);
+        this.heatmapRows.push(...rows);
+        this.heatmapColumns.splice(0, this.heatmapColumns.length);
+        this.heatmapColumns.push(...cols);
+        this.heatmapData.splice(0, this.heatmapData.length);
+        this.heatmapData.push(...this.normalizer.normalize(grid));
         this.heatmapLoading = false;
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="downloadDialogOpen" max-width="800">
+    <v-dialog v-model="downloadDialogOpen" max-width="820">
         <v-card v-if="preparingImage">
             <v-card-title>
                 Please wait while we are preparing your image
@@ -10,21 +10,31 @@
             </v-card-text>
         </v-card>
         <v-card v-else>
-            <v-btn icon @click="downloadDialogOpen = false" class="float-right">
-                <v-icon>mdi-close</v-icon>
-            </v-btn>
-            <img v-if="!svgDownload" :src="pngDataURL" style="max-width: 800px;" />
-            <v-img v-else class="white--text align-end" :src="pngDataURL" />
+            <div class="d-flex justify-end">
+                <v-btn icon @click="downloadDialogOpen = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </div>
+            <div class="text-center">
+                <img :src="pngDataURL" style="max-width: 800px; max-height: 400px; padding: 8px; border: 1px solid #80808069; border-radius: 4px;" />
+            </div>
             <v-card-actions class="justify-center">
-                <v-btn @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
-                <v-btn @click="savePNG()" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
+                <v-btn @click="saveSVG()" id="download-svg-btn" color="primary">
+                    <v-icon left>mdi-download</v-icon>Download as SVG
+                </v-btn>
+                <v-btn @click="savePNG()" id="download-png-btn" color="primary">
+                    <v-icon left>mdi-download</v-icon>Download as PNG
+                </v-btn>
             </v-card-actions>
             <v-divider/>
             <v-card-text>
                 <br>
                 If you use this figure in a publication, please cite:
                 <br>
-                Mesuere et al. (2015) Proteomics <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">doi:10.1002/pmic.201400361</a>
+                Mesuere et al. (2015) Proteomics
+                <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">
+                    doi:10.1002/pmic.201400361
+                </a>
             </v-card-text>
         </v-card>
     </v-dialog>
@@ -37,6 +47,7 @@ import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import htmlToImage from "html-to-image-no-fonts";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
+import { toDataURL } from "html-to-image-no-fonts/lib/utils";
 
 @Component
 export default class ImageDownloadModal extends Vue {
@@ -49,8 +60,6 @@ export default class ImageDownloadModal extends Vue {
 
     private svgDataURL: string = "";
     private pngDataURL: string = "";
-
-    private imageKey: number = 0;
 
     async downloadSVG(baseFileName, selector) {
         this.svgDownload = true;
@@ -72,15 +81,24 @@ export default class ImageDownloadModal extends Vue {
         this.preparingImage = true;
         this.downloadDialogOpen = true;
 
-        this.pngDataURL =  await this.dom2pngDataURL(selector);
+        this.pngDataURL = await this.dom2pngDataURL(selector);
         this.svgDataURL = await htmlToImage.toSvgDataURL($(selector).get(0));
 
         this.preparingImage = false;
     }
 
+    async downloadCanvas(baseFileName, canvasElement: HTMLCanvasElement) {
+        this.svgDownload = false;
+        this.baseFileName = baseFileName;
 
-    private  sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        this.preparingImage = true;
+        this.downloadDialogOpen = true;
+
+        this.pngDataURL = await this.canvas2pngDataURL(canvasElement);
+        this.svgDataURL = await htmlToImage.toSvgDataURL(canvasElement);
+
+        this.preparingImage = false;
+
     }
 
     private async savePNG() {
@@ -119,7 +137,7 @@ export default class ImageDownloadModal extends Vue {
 
         // automatically size canvas to svg element and render
         const canvgInstance = await Canvg.from(canvas.getContext("2d"), el.outerHTML, presets.offscreen());
-        canvgInstance.resize(canvas.width * 2, canvas.height * 2);
+        canvgInstance.resize(canvas.width * 4, canvas.height * 4);
 
         await canvgInstance.render();
 
@@ -142,12 +160,15 @@ export default class ImageDownloadModal extends Vue {
      * @param {string} selector The DOM selector
      * @returns {string} A dataURL containing the resulting PNG
     */
-    async dom2pngDataURL(selector: string) : Promise<string> {
+    async dom2pngDataURL(selector: string): Promise<string> {
         // Use html2canvas to convert selected element to canvas,
         // then convert that canvas to a dataURL
         const element = $(selector).get(0);
-        const dataUrl: string = await htmlToImage.toPng(element);
-        return dataUrl;
+        return await htmlToImage.toPng(element);
+    }
+
+    async canvas2pngDataURL(element: HTMLCanvasElement): Promise<string> {
+        return element.toDataURL();
     }
 }
 </script>
