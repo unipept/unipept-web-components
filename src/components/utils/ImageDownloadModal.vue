@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="downloadDialogOpen" max-width="800">
+    <v-dialog v-model="downloadDialogOpen" max-width="820">
         <v-card v-if="preparingImage">
             <v-card-title>
                 Please wait while we are preparing your image
@@ -10,22 +10,31 @@
             </v-card-text>
         </v-card>
         <v-card v-else>
-            <v-btn icon @click="downloadDialogOpen = false" class="float-right">
-                <v-icon>mdi-close</v-icon>
-            </v-btn>
-            <div class="d-flex justify-center">
-                <img :src="pngDataURL" style="max-width: 800px; max-height: 400px;" />
+            <div class="d-flex justify-end">
+                <v-btn icon @click="downloadDialogOpen = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </div>
+            <div class="text-center">
+                <img :src="pngDataURL" style="max-width: 800px; max-height: 400px; padding: 8px; border: 1px solid #80808069; border-radius: 4px;" />
             </div>
             <v-card-actions class="justify-center">
-                <v-btn @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
-                <v-btn @click="savePNG()" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
+                <v-btn @click="saveSVG()" id="download-svg-btn" color="primary">
+                    <v-icon left>mdi-download</v-icon>Download as SVG
+                </v-btn>
+                <v-btn @click="savePNG()" id="download-png-btn" color="primary">
+                    <v-icon left>mdi-download</v-icon>Download as PNG
+                </v-btn>
             </v-card-actions>
             <v-divider/>
             <v-card-text>
                 <br>
                 If you use this figure in a publication, please cite:
                 <br>
-                Mesuere et al. (2015) Proteomics <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">doi:10.1002/pmic.201400361</a>
+                Mesuere et al. (2015) Proteomics
+                <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">
+                    doi:10.1002/pmic.201400361
+                </a>
             </v-card-text>
         </v-card>
     </v-dialog>
