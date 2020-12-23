@@ -209,6 +209,10 @@ const assayMutations: MutationTree<AssayState> = {
     SET_NCBI_FILTER(state: AssayState, [assay, taxon]: [ProteomicsAssay, NcbiTaxon]) {
         const assayData = state.assayData.find(a => a.assay.id === assay.id);
         assayData.taxonFilter = taxon;
+    },
+
+    REMOVE_ALL_ASSAYS(state: AssayState) {
+        state.assayData.splice(0, state.assayData.length);
     }
 };
 
@@ -227,6 +231,14 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
         async removeAssay(store: ActionContext<AssayState, any>, assay: ProteomicsAssay) {
             await store.dispatch("cancelAnalysis", assay);
             store.commit("REMOVE_ASSAY", assay);
+            store.dispatch("resetActiveAssay");
+        },
+
+        async removeAllAssays(store: ActionContext<AssayState, any>) {
+            for (const assayData of store.getters.assays) {
+                await store.dispatch("cancelAnalysis", assayData.assay);
+            }
+            store.commit("REMOVE_ALL_ASSAYS");
             store.dispatch("resetActiveAssay");
         },
 

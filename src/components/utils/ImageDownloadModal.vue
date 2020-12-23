@@ -13,8 +13,9 @@
             <v-btn icon @click="downloadDialogOpen = false" class="float-right">
                 <v-icon>mdi-close</v-icon>
             </v-btn>
-            <img v-if="!svgDownload" :src="pngDataURL" style="max-width: 800px;" />
-            <v-img v-else class="white--text align-end" :src="pngDataURL" />
+            <div class="d-flex justify-center">
+                <img :src="pngDataURL" style="max-width: 800px; max-height: 400px;" />
+            </div>
             <v-card-actions class="justify-center">
                 <v-btn @click="saveSVG()" id="download-svg-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as SVG</v-btn>
                 <v-btn @click="savePNG()" id="download-png-btn" color="primary"><v-icon left>mdi-download</v-icon>Download as PNG</v-btn>
@@ -78,11 +79,6 @@ export default class ImageDownloadModal extends Vue {
         this.preparingImage = false;
     }
 
-
-    private  sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     private async savePNG() {
         NetworkUtils.downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
     }
@@ -119,7 +115,7 @@ export default class ImageDownloadModal extends Vue {
 
         // automatically size canvas to svg element and render
         const canvgInstance = await Canvg.from(canvas.getContext("2d"), el.outerHTML, presets.offscreen());
-        canvgInstance.resize(canvas.width * 2, canvas.height * 2);
+        canvgInstance.resize(canvas.width * 4, canvas.height * 4);
 
         await canvgInstance.render();
 

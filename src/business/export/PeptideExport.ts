@@ -61,7 +61,6 @@ export default class PeptideExport {
             searchConfiguration,
             communicationSource
         );
-        console.log(ncbiOntology);
         const goOntology = await PeptideExport.computeFunctionalOntology(
             new GoCountTableProcessor(peptideCountTable, searchConfiguration, communicationSource, 0),
             new GoOntologyProcessor(communicationSource)
