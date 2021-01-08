@@ -12,6 +12,7 @@ export default class Pept2DataCommunicator {
     static PEPTDATA_BATCH_SIZE: number;
     static MISSED_CLEAVAGE_BATCH: number;
     static PEPTDATA_ENDPOINT: string;
+    static NETWORK_ERROR_TIMEOUT: number;
     private cancelled;
     /**
      * Look up all peptide data in the Unipept API for each peptide in the given count table. It is guaranteed that
@@ -37,6 +38,6 @@ export default class Pept2DataCommunicator {
      * @return The data that was retrieved through Unipept's API if the peptide is known. Returns undefined otherwise.
      */
     getPeptideResponse(peptide: string, configuration: SearchConfiguration): PeptideData;
-    getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<Peptide, PeptideData>;
+    getPeptideResponseMap(configuration: SearchConfiguration): ShareableMap<string, PeptideData>;
     private getUnprocessedPeptides;
 }

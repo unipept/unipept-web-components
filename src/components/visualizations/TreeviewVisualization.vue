@@ -4,17 +4,28 @@
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
-            <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
+            <span class="dir text">
+                Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root
+            </span>
         </h2>
-        <treeview ref="treeview" :data="data" :autoResize="this.autoResize" :width="this.width" :height="this.height" :enableAutoExpand="true" :tooltip="tooltipFunction" :colors="colors" :rerootCallback="rerootCallback"></treeview>
-        <image-download-modal ref="imageDownloadModal" />
+        <treeview
+            ref="treeview"
+            :data="data"
+            :autoResize="autoResize"
+            :width="width"
+            :height="height"
+            :enableAutoExpand="true"
+            :tooltip="tooltipFunction"
+            :colors="colors"
+            :rerootCallback="rerootCallback"
+        >
+        </treeview>
     </div>
 </template>
 
 <script lang="ts">
 import * as d3 from "d3";
 import * as d3Scale from "d3-scale";
-import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { tooltipContent } from "./VisualizationHelper";
@@ -22,20 +33,16 @@ import VisualizationMixin from "./VisualizationMixin.vue";
 import Treeview from "./Treeview.vue";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
-import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
-import ImageDownloadModal from "./../utils/ImageDownloadModal.vue";
 
 @Component({
     components: {
-        Treeview,
-        ImageDownloadModal
+        Treeview
     }
 })
 export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     $refs: {
         treeview: Treeview
         treeviewWrapper: Element
-        imageDownloadModal: ImageDownloadModal
     }
 
     @Prop({ required: true })
@@ -47,12 +54,12 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     private fullScreen: boolean;
     @Prop({ required: false, default: false })
     private autoResize: boolean;
-    @Prop({ required: false, default: -1 })
-    private width: number;
     @Prop({ required: false, default: 600 })
     private height: number;
     @Prop({ required: false, default: null })
     private tooltip: (d: any) => string;
+
+    private width: number = 0;
 
     private colors: (d: any) => string = (d: any) => {
         if (d.name === "Bacteria") return "#1565C0"; // blue
@@ -87,7 +94,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     }
 
     private async initTreeview() {
-        this.width = this.width === -1 ? this.$refs.treeviewWrapper.clientWidth : this.width;
+        this.width = this.$refs.treeviewWrapper.clientWidth;
         if (this.tree) {
             this.data = this.tree.getRoot();
         }

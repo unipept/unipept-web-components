@@ -9,7 +9,12 @@
             <span class="dir text">Scroll to zoom, drag to pan.</span>
         </h2>
         <div ref="heatmapElement" style="width: 100%" v-once></div>
-        <image-download-modal ref="imageDownloadModal" />
+        <image-download-modal
+            v-model="downloadModalOpen"
+            base-file-name="unipept_comparative_heatmap"
+            :png-source="pngDataSource"
+            :svg-string="svgString"
+        />
     </div>
 </template>
 
@@ -18,9 +23,10 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import VisualizationMixin from "../visualizations/VisualizationMixin.vue";
-import { Heatmap, HeatmapSettings } from "unipept-heatmap";
+import { Heatmap } from "unipept-heatmap";
 import ImageDownloadModal from "./../utils/ImageDownloadModal.vue";
 import AnalyticsUtil from "@/business/analytics/AnalyticsUtil";
+import SvgStringToPngSource from "@/business/image/SvgStringToPngSource";
 
 @Component({
     components: {
@@ -30,7 +36,6 @@ import AnalyticsUtil from "@/business/analytics/AnalyticsUtil";
 export default class HeatmapVisualization extends mixins(VisualizationMixin) {
     $refs: {
         heatmapElement: any,
-        imageDownloadModal: ImageDownloadModal
     }
 
     @Prop({ default: false })
@@ -48,6 +53,10 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
 
     private heatmap: Heatmap;
     private rotated: boolean = false;
+
+    private downloadModalOpen: boolean = false;
+    private svgString: string = "";
+    private pngDataSource: SvgStringToPngSource = null;
 
     mounted() {
         this.initHeatmap();
@@ -115,11 +124,10 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
 
     private async download() {
         AnalyticsUtil.logToGoogle("Comparative analysis", "Save Image", "Heatmap");
-        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-        await imageDownloadModal.downloadPNG(
-            "unipept_comparative_heatmap",
-            document.getElementsByTagName("canvas").item(0)
-        );
+        this.svgString = this.heatmap.toSVG()
+        this.pngDataSource = new SvgStringToPngSource(this.svgString);
+
+        this.downloadModalOpen = true;
     }
 }
 </script>

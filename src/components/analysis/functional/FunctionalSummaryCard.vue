@@ -169,7 +169,6 @@
             </v-tabs-items>
         </v-card>
         <div id="tooltip" class="tip"></div>
-        <image-download-modal ref="imageDownloadModal"/>
     </div>
 </template>
 
@@ -183,21 +182,14 @@ import IndeterminateProgressBar from "../../custom/IndeterminateProgressBar.vue"
 import CardHeader from "../../custom/CardHeader.vue";
 import QuickGoCard from "./QuickGoCard.vue";
 
-import ImageDownloadModal from "../../utils/ImageDownloadModal.vue";
-
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
-import SearchConfiguration from "./../../../business/configuration/SearchConfiguration";
 import LcaCountTableProcessor from "./../../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
-import PeptideCountTableProcessor from "./../../../business/processors/raw/PeptideCountTableProcessor";
-import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import Tree from "./../../../business/ontology/taxonomic/Tree";
-import TreeNode from "./../../../business/ontology/taxonomic/TreeNode";
 import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
-import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 import { Ontology } from "./../../../business/ontology/Ontology";
 
@@ -210,12 +202,10 @@ import { Ontology } from "./../../../business/ontology/Ontology";
         IndeterminateProgressBar,
         FilterFunctionalAnnotationsDropdown,
         QuickGoCard,
-        ImageDownloadModal,
     }
 })
 export default class FunctionalSummaryCard extends Vue {
     $refs!: {
-        imageDownloadModal: ImageDownloadModal,
         goSummaryCard: MultiGoSummaryCard,
         ecSummaryCard: MultiEcSummaryCard,
         interproSummaryCard: MultiInterproSummaryCard
