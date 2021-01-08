@@ -90,7 +90,12 @@
                             </v-card-text>
                         </div>
                     </v-card>
-<!--                    <image-download-modal ref="imageDownloadModal" />-->
+                    <image-download-modal
+                        :base-file-name="imageBaseName"
+                        :svg-string="svgImageData"
+                        :png-source="pngSource"
+                        v-model="downloadImageDialogOpen"
+                    />
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
@@ -119,8 +124,7 @@
                         <treeview-visualization
                             ref="treeview"
                             :autoResize="true"
-                            :width="600"
-                            :height="350"
+                            :height="500"
                             :full-screen="isFullScreen"
                             v-if="tree"
                             :tree="tree"
@@ -201,12 +205,13 @@ import fullscreen from "vue-fullscreen";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../business/counts/CountTable";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import LcaCountTableProcessor from "./../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
-import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 import ProteomicsAssay from "./../../business/entities/assay/ProteomicsAssay";
+import PngSource from "@/business/image/PngSource";
+import SvgUtils from "@/business/image/SvgUtils";
+import SvgElementToPngSource from "@/business/image/SvgElementToPngSource";
+import DomElementToPngSource from "@/business/image/DomElementToPngSource";
 
 
 @Component({
@@ -247,6 +252,11 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     private placeholderText = "Please select at least one assay for analysis.";
     private isFullScreen: boolean = false;
     private dialogOpen: boolean = false;
+
+    private svgImageData: string = "";
+    private pngSource: PngSource = null;
+    private imageBaseName: string = "";
+    private downloadImageDialogOpen: boolean = false;
 
     private tab = null;
 
@@ -291,17 +301,40 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private async prepareImage() {
         this.exitFullScreen();
-        // const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
         AnalyticsUtil.logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
         if (this.tabs[this.tab] === "Sunburst") {
             d3.selectAll(".toHide").attr("class", "arc hidden");
-            // await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
+            const svgElements = document
+                .getElementById("sunburstWrapper")
+                .getElementsByClassName("unipept-sunburst")
+                .item(0)
+                .getElementsByTagName("svg");
+            const svgElement = svgElements
+                .item(svgElements.length - 1);
+            this.svgImageData = SvgUtils.elementToSvgDataUrl(svgElement);
+            this.pngSource = new SvgElementToPngSource(svgElement);
+            this.imageBaseName = "unipept_sunburst";
+            this.downloadImageDialogOpen = true;
             d3.selectAll(".hidden").attr("class", "arc toHide");
         } else if (this.tabs[this.tab] === "Treemap") {
-            // await imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
+            this.svgImageData = "";
+            const domElement = document
+                .getElementById("treemapWrapper")
+                .getElementsByTagName("div")
+                .item(0);
+            this.pngSource = new DomElementToPngSource(domElement);
+            this.imageBaseName = "unipept_treemap";
+            this.downloadImageDialogOpen = true;
         } else {
-            // await imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
+            const svgElement = document
+                .getElementById("treeviewWrapper")
+                .getElementsByTagName("svg")
+                .item(0);
+            this.svgImageData = SvgUtils.elementToSvgDataUrl(svgElement);
+            this.pngSource = new SvgElementToPngSource(svgElement);
+            this.imageBaseName = "unipept_treeview";
+            this.downloadImageDialogOpen = true;
         }
     }
 

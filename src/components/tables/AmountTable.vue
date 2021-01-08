@@ -161,7 +161,7 @@ import SvgElementToPngSource from "@/business/image/SvgElementToPngSource";
 })
 export default class AmountTable extends Vue {
     $refs!: {
-        imageDownloadModal: ImageDownloadModal
+        dataTable: Vue
     }
 
     /*******************************************************************************************************************
@@ -342,7 +342,7 @@ export default class AmountTable extends Vue {
     private saveImage(term: AmountTableItem): void {
         AnalyticsUtil.logToGoogle("Multi peptide", "Save Image for FA");
         const svgElement = document.getElementById(`${this.treeViewId(term)}`)
-            .getElementsByTagName<SVGElement>("svg")
+            .getElementsByTagName("svg")
             .item(0);
         this.imageSvg = SvgUtils.elementToSvgDataUrl(svgElement);
         this.imagePngSource = new SvgElementToPngSource(svgElement);

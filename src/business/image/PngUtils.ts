@@ -1,9 +1,9 @@
-import htmlToImage from "html-to-image-no-fonts";
+import { toPng } from "html-to-image";
 import Canvg, { presets } from "canvg";
 
 export default class PngUtils {
-    public static async htmlElementToPngDataUrl(element: HTMLElement): Promise<string> {
-        return await htmlToImage.toPng(element);
+    public static async htmlElementToPngDataUrl(element: HTMLElement, scalingFactor: number): Promise<string> {
+        return await toPng(element, { pixelRatio: scalingFactor });
     }
 
     public static async svgElementToPngDataUrl(element: SVGElement, scalingFactor: number): Promise<string> {
