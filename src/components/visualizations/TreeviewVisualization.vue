@@ -7,14 +7,12 @@
             <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
         </h2>
         <treeview ref="treeview" :data="data" :autoResize="this.autoResize" :width="this.width" :height="this.height" :enableAutoExpand="true" :tooltip="tooltipFunction" :colors="colors" :rerootCallback="rerootCallback"></treeview>
-        <image-download-modal ref="imageDownloadModal" />
     </div>
 </template>
 
 <script lang="ts">
 import * as d3 from "d3";
 import * as d3Scale from "d3-scale";
-import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { tooltipContent } from "./VisualizationHelper";
@@ -22,20 +20,16 @@ import VisualizationMixin from "./VisualizationMixin.vue";
 import Treeview from "./Treeview.vue";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
-import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
-import ImageDownloadModal from "./../utils/ImageDownloadModal.vue";
 
 @Component({
     components: {
-        Treeview,
-        ImageDownloadModal
+        Treeview
     }
 })
 export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     $refs: {
         treeview: Treeview
         treeviewWrapper: Element
-        imageDownloadModal: ImageDownloadModal
     }
 
     @Prop({ required: true })

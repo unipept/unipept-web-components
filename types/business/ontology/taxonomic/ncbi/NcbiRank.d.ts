@@ -8,10 +8,12 @@ export declare enum NcbiRank {
     Superclass = "superclass",
     Class = "class",
     Subclass = "subclass",
+    Infraclass = "infraclass",
     Superorder = "superorder",
     Order = "order",
     Suborder = "suborder",
     Infraorder = "infraorder",
+    Parvorder = "parvorder",
     Superfamily = "superfamily",
     Family = "family",
     Subfamily = "subfamily",
@@ -23,7 +25,6 @@ export declare enum NcbiRank {
     SpeciesSubgroup = "species subgroup",
     Species = "species",
     Subspecies = "subspecies",
-    Strain = "strain",
     Varietas = "varietas",
     Forma = "forma"
 }

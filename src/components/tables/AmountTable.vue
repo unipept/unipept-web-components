@@ -79,7 +79,7 @@
                 </tooltip>
             </template>
         </v-data-table>
-        <image-download-modal ref="imageDownloadModal"/>
+<!--        <image-download-modal ref="imageDownloadModal"/>-->
     </div>
 </template>
 
@@ -321,11 +321,11 @@ export default class AmountTable extends Vue {
 
     private saveImage(term: AmountTableItem): void {
         AnalyticsUtil.logToGoogle("Multi peptide", "Save Image for FA");
-        const downloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-        downloadModal.downloadSVG(
-            "unipept_treeview_" + term.code.replace(":", "_"),
-            "#" + this.treeViewId(term) + " svg"
-        );
+        // const downloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+        // downloadModal.downloadSVG(
+        //     "unipept_treeview_" + term.code.replace(":", "_"),
+        //     "#" + this.treeViewId(term) + " svg"
+        // );
     }
 
     private async saveTableAsCsv(): Promise<void> {

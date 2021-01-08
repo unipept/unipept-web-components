@@ -90,7 +90,7 @@
                             </v-card-text>
                         </div>
                     </v-card>
-                    <image-download-modal ref="imageDownloadModal" />
+<!--                    <image-download-modal ref="imageDownloadModal" />-->
                 </v-tab-item>
                 <v-tab-item>
                     <v-card flat>
@@ -291,17 +291,17 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     private async prepareImage() {
         this.exitFullScreen();
-        const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
+        // const imageDownloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
 
         AnalyticsUtil.logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
         if (this.tabs[this.tab] === "Sunburst") {
             d3.selectAll(".toHide").attr("class", "arc hidden");
-            await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
+            // await imageDownloadModal.downloadSVG("unipept_sunburst", "#sunburstWrapper > .unipept-sunburst > svg")
             d3.selectAll(".hidden").attr("class", "arc toHide");
         } else if (this.tabs[this.tab] === "Treemap") {
-            await imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
+            // await imageDownloadModal.downloadPNG("unipept_treemap", "#treemapWrapper > div")
         } else {
-            await imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
+            // await imageDownloadModal.downloadSVG("unipept_treeview", "#treeviewWrapper svg")
         }
     }
 

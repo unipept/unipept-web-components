@@ -40,7 +40,6 @@
                     :enableAutoExpand="true">
                 </treeview>
             </v-card>
-            <image-download-modal ref="imageDownloadModal"></image-download-modal>
         </v-card-text>
     </v-card>
 </template>
@@ -79,10 +78,9 @@ import CommunicationSource from "@/business/communication/source/CommunicationSo
 import TreeViewNode from "@/components/visualizations/TreeViewNode";
 import Treeview from "@/components/visualizations/Treeview.vue";
 import AmountTable from "@/components/tables/AmountTable.vue";
-import ImageDownloadModal from "@/components/utils/ImageDownloadModal.vue";
 
 @Component({
-    components: { FilterFunctionalAnnotationsDropdown, Treeview, AmountTable, ImageDownloadModal }
+    components: { FilterFunctionalAnnotationsDropdown, Treeview, AmountTable }
 })
 export default class MultiEcSummaryCard extends Vue {
     @Prop({ required: true })

@@ -35,7 +35,7 @@
         "jquery": "^3.4.1",
         "observable-fns": "^0.5.1",
         "shared-memory-datastructures": "0.1.9",
-        "unipept-heatmap": "^2.0.0-beta.5",
+        "unipept-heatmap": "^2.0.0-beta.6",
         "unipept-visualizations": "^1.7.3",
         "uuid": "^3.4.0",
         "vue": "^2.6.11",

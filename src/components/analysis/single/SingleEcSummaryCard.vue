@@ -36,7 +36,6 @@
                     :enableAutoExpand="true">
                 </treeview>
             </v-card>
-            <image-download-modal ref="imageDownloadModal"></image-download-modal>
         </v-card-text>
     </v-card>
 </template>
@@ -56,12 +55,11 @@ import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriev
 import AmountTable from "@/components/tables/AmountTable.vue";
 import SingleAmountTableItemRetriever from "@/components/analysis/single/SingleAmountTableItemRetriever";
 import Treeview from "@/components/visualizations/Treeview.vue";
-import ImageDownloadModal from "@/components/utils/ImageDownloadModal.vue";
 import { CountTable, Ontology } from "@/business";
 import TreeViewNode from "@/components/visualizations/TreeViewNode";
 
 @Component({
-    components: { AmountTable, Treeview, ImageDownloadModal }
+    components: { AmountTable, Treeview }
 })
 export default class SingleEcSummaryCard extends Vue {
     @Prop({ required: true })

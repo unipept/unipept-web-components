@@ -6,7 +6,7 @@
             </v-card-title>
             <v-card-text>
                 Loading preview...
-                <v-progress-linear indeterminate rounded/>
+                <v-progress-linear indeterminate rounded />
             </v-card-text>
         </v-card>
         <v-card v-else>
@@ -16,14 +16,46 @@
                 </v-btn>
             </div>
             <div class="text-center">
-                <img :src="pngDataURL" style="max-width: 800px; max-height: 400px; padding: 8px; border: 1px solid #80808069; border-radius: 4px;" />
+                <img
+                    :src="pngDataURL"
+                    style="max-width: 800px; max-height: 400px; padding: 8px; border: 1px solid #80808069; border-radius: 4px;" />
+            </div>
+            <div class="ma-4">
+                <div class="d-flex justify-start align-center">
+                    <span class="mr-2" style="position: relative; top: 3px;">Image format</span>
+                    <v-select
+                        :items="formatValues"
+                        item-text="label"
+                        v-model="formatValue"
+                        dense
+                        hide-details>
+                    </v-select>
+                </div>
+                <div class="d-flex justify-start align-center">
+                    <span class="mr-2" style="position: relative; top: 3px;">Scaling factor</span>
+                    <v-select
+                        :items="enlargementValues"
+                        item-text="label"
+                        v-model="scalingValue"
+                        dense
+                        hide-details
+                        :disabled="formatValue === 'SVG'">
+                    </v-select>
+                </div>
+                <div class="mt-4" v-if="formatValue === 'SVG'">
+                    <span>SVG images are vector-based and are thus resolution independent.</span>
+                </div>
+                <div class="mt-4" v-else>
+                    <span>
+                        Resulting resolution:
+                        {{ resolutionWidth * scalingValue }}x{{ resolutionHeight * scalingValue }}
+                        px
+                    </span>
+                </div>
             </div>
             <v-card-actions class="justify-center">
-                <v-btn @click="saveSVG()" id="download-svg-btn" color="primary">
-                    <v-icon left>mdi-download</v-icon>Download as SVG
-                </v-btn>
-                <v-btn @click="savePNG()" id="download-png-btn" color="primary">
-                    <v-icon left>mdi-download</v-icon>Download as PNG
+                <v-btn @click="saveImage()" id="download-png-btn" color="primary">
+                    <v-icon left>mdi-download</v-icon>Download image
                 </v-btn>
             </v-card-actions>
             <v-divider/>
@@ -42,133 +74,113 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Canvg, { presets } from "canvg";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import htmlToImage from "html-to-image-no-fonts";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
-import { toDataURL } from "html-to-image-no-fonts/lib/utils";
+import PngSource from "@/business/image/PngSource";
 
 @Component
 export default class ImageDownloadModal extends Vue {
+    /**
+     * Filename that should be given to the downloaded file.
+     */
+    @Prop({ required: true })
+    private baseFileName: string;
+
+    /**
+     * SVG-string that corresponds to a valid SVG file (and that can directly be downloaded as such, if required).
+     */
+    @Prop({ required: false })
+    private svgString: string;
+
+    @Prop({ required: true })
+    private pngSource: PngSource;
+
+    @Prop({ required: true })
+    private value: boolean;
+
+    // Internal variable to keep track of whether the dialog is open or not
     private downloadDialogOpen: boolean = false;
-    private preparingImage: boolean = false;
+    private preparingImage: boolean = true;
 
-    private svgDownload: boolean = false;
-
-    private baseFileName: string = "";
-
-    private svgDataURL: string = "";
     private pngDataURL: string = "";
 
-    async downloadSVG(baseFileName, selector) {
-        this.svgDownload = true;
-        this.baseFileName = baseFileName;
+    private resolutionWidth: number = 0;
+    private resolutionHeight: number = 0;
 
-        this.preparingImage = true;
-        this.downloadDialogOpen = true;
+    private enlargementValues: { value: number, label: string }[] = [
+        {
+            value: 0.5,
+            label: "50%"
+        },
+        {
+            value: 1,
+            label: "100%"
+        },
+        {
+            value: 2,
+            label: "200%"
+        },
+        {
+            value: 5,
+            label: "500%"
+        },
+        {
+            value: 10,
+            label: "1000%"
+        }
+    ];
+    private scalingValue: number = 1;
 
-        this.svgDataURL = await this.svg2svgDataURL(selector);
-        this.pngDataURL = await this.svg2pngDataURL(selector);
+    private formatValues: string[] = ["SVG", "PNG"];
+    private formatValue: string = "SVG";
 
-        this.preparingImage = false;
+    @Watch("value")
+    private valueChanged() {
+        this.downloadDialogOpen = this.value;
     }
 
-    async downloadPNG(baseFileName, selector) {
-        this.svgDownload = false;
-        this.baseFileName = baseFileName;
+    @Watch("downloadDialogOpen")
+    private async onDownloadDialogOpenChanged() {
+        if (this.downloadDialogOpen !== this.value) {
+            this.$emit("input", this.downloadDialogOpen)
+        }
 
-        this.preparingImage = true;
-        this.downloadDialogOpen = true;
+        if (this.downloadDialogOpen) {
+            // Process the thumbnail images
+            this.preparingImage = true;
 
-        this.pngDataURL = await this.dom2pngDataURL(selector);
-        this.svgDataURL = await htmlToImage.toSvgDataURL($(selector).get(0));
+            if (!this.svgString) {
+                this.formatValues = ["PNG"];
+                this.formatValue = "PNG";
+            } else {
+                this.formatValues = ["SVG", "PNG"];
+                this.formatValue = "SVG";
+            }
 
-        this.preparingImage = false;
+            this.resolutionWidth = this.pngSource.getOriginalWidth();
+            this.resolutionHeight = this.pngSource.getOriginalHeight();
+            this.pngDataURL = await this.pngSource.toDataUrl(1);
+
+            this.preparingImage = false;
+        }
     }
 
-    async downloadCanvas(baseFileName, canvasElement: HTMLCanvasElement) {
-        this.svgDownload = false;
-        this.baseFileName = baseFileName;
-
-        this.preparingImage = true;
-        this.downloadDialogOpen = true;
-
-        this.pngDataURL = await this.canvas2pngDataURL(canvasElement);
-        this.svgDataURL = await htmlToImage.toSvgDataURL(canvasElement);
-
-        this.preparingImage = false;
-
-    }
-
-    private async savePNG() {
-        NetworkUtils.downloadDataByLink(this.pngDataURL, this.baseFileName + ".png")
+    async saveImage() {
+        if (this.formatValue === "SVG") {
+            this.saveSVG();
+        } else if (this.formatValue === "PNG") {
+            this.savePNG();
+        }
     }
 
     private async saveSVG() {
-        NetworkUtils.downloadDataByLink(this.svgDataURL, this.baseFileName + ".svg")
+        NetworkUtils.downloadDataByLink(this.svgString, this.baseFileName + ".svg")
     }
 
-
-    /**
-     * Use canvg to convert an inline svg element to a PNG DataURL
-     * @param {string} svgSelector The DOM selector of the SVG or jQuery object
-     * @returns {string} A dataURL containing the resulting PNG
-    */
-    async svg2pngDataURL(svgSelector: string) : Promise<string> {
-        const el = $(svgSelector).get(0);
-
-        let canvas;
-
-        if (window.OffscreenCanvas) {
-            canvas = new OffscreenCanvas(el.clientWidth, el.clientHeight);
-        } else {
-            const cnvs = document.createElement("canvas");
-            cnvs.width = el.clientWidth;
-            cnvs.height = el.clientHeight;
-
-            cnvs["convertToBlob"] = async() => {
-                return new Promise(resolve => {
-                    cnvs.toBlob(resolve);
-                });
-            };
-            canvas = cnvs;
-        }
-
-        // automatically size canvas to svg element and render
-        const canvgInstance = await Canvg.from(canvas.getContext("2d"), el.outerHTML, presets.offscreen());
-        canvgInstance.resize(canvas.width * 4, canvas.height * 4);
-
-        await canvgInstance.render();
-
-        const blob = await canvas.convertToBlob();
-        return URL.createObjectURL(blob);
-    }
-
-    svg2svgDataURL(svgSelector: string) {
-        const el = $(svgSelector).get(0);
-        const svgString = new XMLSerializer().serializeToString(el);
-        const decoded = unescape(encodeURIComponent(svgString));
-        // convert the svg to base64
-        const base64 = btoa(decoded);
-        return `data:image/svg+xml;base64,${base64}`;
-    }
-
-    /**
-     * Uses html2canvas to convert canvas to a PNG.
-     *
-     * @param {string} selector The DOM selector
-     * @returns {string} A dataURL containing the resulting PNG
-    */
-    async dom2pngDataURL(selector: string): Promise<string> {
-        // Use html2canvas to convert selected element to canvas,
-        // then convert that canvas to a dataURL
-        const element = $(selector).get(0);
-        return await htmlToImage.toPng(element);
-    }
-
-    async canvas2pngDataURL(element: HTMLCanvasElement): Promise<string> {
-        return element.toDataURL();
+    private async savePNG() {
+        const resizedPngDataUrl = await this.pngSource.toDataUrl(this.scalingValue);
+        NetworkUtils.downloadDataByLink(resizedPngDataUrl, this.baseFileName + ".png")
     }
 }
 </script>
