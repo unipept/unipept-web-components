@@ -1,5 +1,4 @@
 import PngSource from "@/business/image/PngSource";
-import SvgUtils from "@/business/image/SvgUtils";
 import PngUtils from "@/business/image/PngUtils";
 
 export default class SvgStringToPngSource implements PngSource {
@@ -24,8 +23,6 @@ export default class SvgStringToPngSource implements PngSource {
     }
 
     public toDataUrl(scaling: number): Promise<string> {
-        console.log(this.getOriginalHeight());
-        console.log(this.getOriginalWidth());
         return PngUtils.svgStringToPngDataUrl(
             this.svgString,
             this.getOriginalWidth(),

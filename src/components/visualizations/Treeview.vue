@@ -124,6 +124,8 @@ export default class Treeview extends Vue {
                 enableAutoExpand: this.enableAutoExpand,
             }
 
+            console.log(settings);
+
             // Only these settings that are explicitly filled in should to be passed as an option
             for (let [settingsName, funcName] of this.settingNames) {
                 if (this[funcName]) {

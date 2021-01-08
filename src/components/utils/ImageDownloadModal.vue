@@ -179,6 +179,7 @@ export default class ImageDownloadModal extends Vue {
     }
 
     private async savePNG() {
+        console.log("Scaling value: " + this.scalingValue);
         const resizedPngDataUrl = await this.pngSource.toDataUrl(this.scalingValue);
         NetworkUtils.downloadDataByLink(resizedPngDataUrl, this.baseFileName + ".png")
     }

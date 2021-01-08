@@ -4,9 +4,22 @@
             <span class="dir">
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
             </span>
-            <span class="dir text">Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root</span>
+            <span class="dir text">
+                Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root
+            </span>
         </h2>
-        <treeview ref="treeview" :data="data" :autoResize="this.autoResize" :width="this.width" :height="this.height" :enableAutoExpand="true" :tooltip="tooltipFunction" :colors="colors" :rerootCallback="rerootCallback"></treeview>
+        <treeview
+            ref="treeview"
+            :data="data"
+            :autoResize="autoResize"
+            :width="width"
+            :height="height"
+            :enableAutoExpand="true"
+            :tooltip="tooltipFunction"
+            :colors="colors"
+            :rerootCallback="rerootCallback"
+        >
+        </treeview>
     </div>
 </template>
 
@@ -41,12 +54,12 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     private fullScreen: boolean;
     @Prop({ required: false, default: false })
     private autoResize: boolean;
-    @Prop({ required: false, default: -1 })
-    private width: number;
     @Prop({ required: false, default: 600 })
     private height: number;
     @Prop({ required: false, default: null })
     private tooltip: (d: any) => string;
+
+    private width: number = 0;
 
     private colors: (d: any) => string = (d: any) => {
         if (d.name === "Bacteria") return "#1565C0"; // blue
@@ -81,7 +94,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     }
 
     private async initTreeview() {
-        this.width = this.width === -1 ? this.$refs.treeviewWrapper.clientWidth : this.width;
+        this.width = this.$refs.treeviewWrapper.clientWidth;
         if (this.tree) {
             this.data = this.tree.getRoot();
         }

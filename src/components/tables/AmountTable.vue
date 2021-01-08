@@ -9,7 +9,8 @@
             :options.sync="options"
             item-key="code"
             :show-expand="itemsToPeptides !== undefined && taxaToPeptides !== undefined && tree !== undefined"
-            :expanded.sync="expandedItemsList">
+            :expanded.sync="expandedItemsList"
+            ref="dataTable">
             <template v-slot:header.action>
                 <tooltip message="Download table as CSV">
                     <v-icon @click="saveTableAsCsv()">mdi-download</v-icon>
@@ -32,8 +33,8 @@
                             :id="treeViewId(item)"
                             :data="treeAvailable.get(item)"
                             :autoResize="true"
-                            :width="650"
-                            :height="230"
+                            :height="300"
+                            :width="visualizationWidth"
                             :tooltip="tooltip"
                             :colors="highlightColorFunc"
                             :enableAutoExpand="true"
@@ -79,7 +80,12 @@
                 </tooltip>
             </template>
         </v-data-table>
-<!--        <image-download-modal ref="imageDownloadModal"/>-->
+        <image-download-modal
+            v-model="downloadImageModalOpen"
+            :svg-string="imageSvg"
+            :png-source="imagePngSource"
+            :base-file-name="imageBaseName"
+        />
     </div>
 </template>
 
@@ -102,6 +108,9 @@ import { FunctionalCode } from "@/business";
 import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
 import AmountTableItem from "@/components/tables/AmountTableItem";
 import Tooltip from "@/components/custom/Tooltip.vue";
+import PngSource from "@/business/image/PngSource";
+import SvgUtils from "@/business/image/SvgUtils";
+import SvgElementToPngSource from "@/business/image/SvgElementToPngSource";
 
 @Component({
     components: {
@@ -252,6 +261,13 @@ export default class AmountTable extends Vue {
     private treeAvailable = new Map<AmountTableItem, TreeNode>();
     private computedTrees: string[] = [];
 
+    private imageSvg: string = "";
+    private imagePngSource: PngSource = null;
+    private downloadImageModalOpen = false;
+    private imageBaseName: string = "";
+
+    private visualizationWidth: number = 0;
+
     private options = {};
 
     // All settings for each Treeview that remain the same
@@ -262,6 +278,10 @@ export default class AmountTable extends Vue {
     private expandedItemsList = [];
 
     private highlightedTreeProcessor: HighlightedTreeProcessor = new HighlightedTreeProcessor();
+
+    private mounted() {
+        this.visualizationWidth = this.$refs.dataTable.$el.clientWidth;
+    }
 
     @Watch("tree")
     private onTreeChanged() {
@@ -321,11 +341,13 @@ export default class AmountTable extends Vue {
 
     private saveImage(term: AmountTableItem): void {
         AnalyticsUtil.logToGoogle("Multi peptide", "Save Image for FA");
-        // const downloadModal = this.$refs.imageDownloadModal as ImageDownloadModal;
-        // downloadModal.downloadSVG(
-        //     "unipept_treeview_" + term.code.replace(":", "_"),
-        //     "#" + this.treeViewId(term) + " svg"
-        // );
+        const svgElement = document.getElementById(`${this.treeViewId(term)}`)
+            .getElementsByTagName<SVGElement>("svg")
+            .item(0);
+        this.imageSvg = SvgUtils.elementToSvgDataUrl(svgElement);
+        this.imagePngSource = new SvgElementToPngSource(svgElement);
+        this.imageBaseName = "unipept_treeview_" + term.code.replace(":", "_");
+        this.downloadImageModalOpen = true;
     }
 
     private async saveTableAsCsv(): Promise<void> {

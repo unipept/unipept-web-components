@@ -24,11 +24,11 @@ export default class PngUtils {
         let canvas;
 
         if (window.OffscreenCanvas) {
-            canvas = new OffscreenCanvas(originalWidth, originalHeight);
+            canvas = new OffscreenCanvas(originalWidth * scalingFactor, originalHeight * scalingFactor);
         } else {
             const cnvs = document.createElement("canvas");
-            cnvs.width = originalWidth;
-            cnvs.height = originalHeight;
+            cnvs.width = originalWidth * scalingFactor;
+            cnvs.height = originalHeight * scalingFactor;
 
             cnvs["convertToBlob"] = async() => {
                 return new Promise(resolve => {
@@ -38,11 +38,15 @@ export default class PngUtils {
             canvas = cnvs;
         }
 
+        // Apparently we need to modify the SVG-file itself to make sure that the PNG is rendered at the requested
+        // scaling factor.
+        svgString = svgString
+            .replace(/width="[0-9]*%?"/, `width="${originalWidth * scalingFactor}"`)
+            .replace(/height="[0-9]*%?"/, `height="${originalHeight * scalingFactor}"`)
+            .replace(/viewBox="[^"]*"/, "")
+            .replace("svg", `svg viewBox="0 0 ${originalWidth} ${originalHeight}"`);
+
         const canvgInstance = await Canvg.fromString(canvas.getContext("2d"), svgString, presets.offscreen());
-        canvgInstance.resize(
-            canvas.width * scalingFactor,
-            canvas.height * scalingFactor
-        );
 
         await canvgInstance.render();
 
