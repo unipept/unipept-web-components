@@ -13,6 +13,7 @@ import { Ontology } from "./../business/ontology/Ontology";
 import AssayProcessor from "./../business/processors/AssayProcessor";
 import ProgressListener from "./../business/progress/ProgressListener";
 import FunctionalCountTableProcessor from "./../business/processors/functional/FunctionalCountTableProcessor";
+import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 
 export type AnalysisStatus = "healthy" | "cancelled" | "error";
 
@@ -271,7 +272,10 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
             store.commit("CANCEL_ASSAY", assay);
         },
 
-        async processAssay(store: ActionContext<AssayState, any>, [assay, forceUpdate]: [ProteomicsAssay, boolean]) {
+        async processAssay(
+            store: ActionContext<AssayState, any>,
+            [assay, forceUpdate, searchSettings]: [ProteomicsAssay, boolean, SearchConfiguration]
+        ) {
             store.commit("RESET_ASSAY", assay);
             store.commit("RESET_ASSAY_METADATA", assay);
 
@@ -279,7 +283,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 const countTableProcessor = new PeptideCountTableProcessor();
                 const countTable = await countTableProcessor.getPeptideCountTable(
                     assay.getPeptides(),
-                    assay.getSearchConfiguration()
+                    searchSettings
                 );
 
                 const assayProcessor = assayProcessorFactory(store, assay, {
@@ -290,7 +294,7 @@ const createAssayActions: (assayProcessorFactory: (store: ActionContext<AssaySta
                 });
 
                 store.commit("SET_ASSAY_PROCESSOR", [assay, assayProcessor]);
-                const communicationSource = await assayProcessor.processAssay(countTable, forceUpdate);
+                const communicationSource = await assayProcessor.processAssay(countTable, forceUpdate, searchSettings);
 
                 if (!assayProcessor.isCancelled()) {
                     store.commit("SET_COMMUNICATION_SOURCE", [assay, communicationSource]);
