@@ -365,4 +365,8 @@ export default class AmountTable extends Vue {
 
 <style lang="less" scoped>
     @import './../../assets/style/amount-table.css.less';
+
+    td.item-treeview {
+        padding: 0 !important;
+    }
 </style>
