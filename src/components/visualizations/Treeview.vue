@@ -158,7 +158,15 @@ export default class Treeview extends Vue {
     }
 
    .treeview-container svg {
-        width: 100% !important;
-        max-height: 600px !important;
+        width: 100%;
+        max-height: 600px;
     }
+
+   .fullscreen .treeview-container svg {
+       max-height: 100%;
+   }
+
+   .fullscreen .treeview-container {
+       height: 100%;
+   }
 </style>

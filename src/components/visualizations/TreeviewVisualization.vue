@@ -1,26 +1,33 @@
 <template>
-    <div id="treeviewWrapper" ref="treeviewWrapper" style="height: 100%;">
-        <h2 class="ghead">
-            <span class="dir">
-                <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
-            </span>
-            <span class="dir text">
-                Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root
-            </span>
-        </h2>
-        <treeview
-            ref="treeview"
-            :data="data"
-            :autoResize="autoResize"
-            :width="width"
-            :height="height"
-            :enableAutoExpand="true"
-            :tooltip="tooltipFunction"
-            :colors="colors"
-            :rerootCallback="rerootCallback"
-        >
-        </treeview>
-    </div>
+    <fullscreen ref="fullscreen">
+        <div id="treeviewWrapper" ref="treeviewWrapper" style="height: 100%;">
+            <h2 class="ghead">
+                <span class="dir">
+                    <v-btn x-small fab @click="enableFullscreen()" :elevation="0">
+                        <v-icon>mdi-fullscreen</v-icon>
+                    </v-btn>
+                </span>
+                <span class="dir">
+                    <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
+                </span>
+                <span class="dir text">
+                    Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root
+                </span>
+            </h2>
+            <treeview
+                ref="treeview"
+                :data="data"
+                :autoResize="autoResize"
+                :width="width"
+                :height="height"
+                :enableAutoExpand="true"
+                :tooltip="tooltipFunction"
+                :colors="colors"
+                :rerootCallback="rerootCallback"
+            >
+            </treeview>
+        </div>
+    </fullscreen>
 </template>
 
 <script lang="ts">
@@ -42,7 +49,8 @@ import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
 export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     $refs: {
         treeview: Treeview
-        treeviewWrapper: Element
+        treeviewWrapper: Element,
+        fullscreen: any
     }
 
     @Prop({ required: true })
@@ -99,14 +107,26 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
             this.data = this.tree.getRoot();
         }
     }
+
+    private enableFullscreen() {
+        this.$refs.fullscreen.toggle();
+    }
 }
 </script>
 
 <style lang="less">
     @import './../../assets/style/visualizations.css.less';
 
-    .treeviewWrapper svg {
-        width: 100% !important;
-        max-height: 600px !important;
+    #treeviewWrapper {
+        background: white;
+    }
+
+    #treeviewWrapper svg {
+        width: 100%;
+        max-height: 600px;
+    }
+
+    .fullscreen #treeviewWrapper svg {
+        max-height: 100%;
     }
 </style>
