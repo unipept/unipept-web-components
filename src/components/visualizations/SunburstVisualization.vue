@@ -1,47 +1,57 @@
 <template>
-    <div id="sunburstWrapper" ref="sunburstWrapper" v-if="active">
-        <h2 class="ghead">
-            <span class="dir">
-                <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
-            </span>
-            <span class="dir">
-                <v-menu>
-                    <template v-slot:activator="{ on }">
-                        <v-btn fab x-small v-on="on" :elevation="0">
-                            <v-icon>mdi-cog-outline</v-icon>
-                        </v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item>
-                            <v-list-item-action>
-                                <v-checkbox v-model="isFixedColors" color="primary"></v-checkbox>
-                            </v-list-item-action>
+    <fullscreen ref="fullscreen">
+        <div id="sunburstWrapper" ref="sunburstWrapper" v-if="active">
+            <h2 class="ghead">
+                <span class="dir">
+                    <v-btn x-small fab @click="enableFullscreen()" :elevation="0">
+                        <v-icon>mdi-fullscreen</v-icon>
+                    </v-btn>
+                </span>
+                <span class="dir">
+                    <v-btn x-small fab @click="reset()" :elevation="0">
+                        <v-icon>mdi-restore</v-icon>
+                    </v-btn>
+                </span>
+                <span class="dir">
+                    <v-menu>
+                        <template v-slot:activator="{ on }">
+                            <v-btn fab x-small v-on="on" :elevation="0">
+                                <v-icon>mdi-cog-outline</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-checkbox v-model="isFixedColors" color="primary"></v-checkbox>
+                                </v-list-item-action>
 
-                            <v-list-item-content>
-                                <v-list-item-title>Use fixed colors</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </span>
-            <span class="dir text">Click a slice to zoom in and the center node to zoom out</span>
-        </h2>
-        <div v-once ref="visualization"></div>
-    </div>
-    <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-        <div class="error-container">
-            <v-icon x-large>
-                mdi-alert-circle-outline
-            </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
-            </p>
+                                <v-list-item-content>
+                                    <v-list-item-title>Use fixed colors</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </span>
+                <span class="dir text">Click a slice to zoom in and the center node to zoom out</span>
+            </h2>
+            <div v-once ref="visualization"></div>
         </div>
-    </v-container>
+        <v-container fluid v-else class="error-container mt-2 d-flex align-center">
+            <div class="error-container">
+                <v-icon x-large>
+                    mdi-alert-circle-outline
+                </v-icon>
+                <p>
+                    You're trying to visualise a very large sample. This will work in most cases, but it could take
+                    some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
+                </p>
+            </div>
+        </v-container>
+    </fullscreen>
 </template>
 
 <script lang="ts">
+import fullscreen from "vue-fullscreen";
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
@@ -51,11 +61,15 @@ import Tree from "./../../business/ontology/taxonomic/Tree";
 
 @Component
 export default class SunburstVisualization extends mixins(VisualizationMixin) {
+    $refs!: {
+        sunburstWrapper: any,
+        fullscreen: any,
+        visualization: any
+    }
+
     // Make field non-reactive by not setting it here, but only after created has been called for the first time.
     sunburst!: any;
 
-    @Prop({ default: false })
-    private fullScreen: false;
     @Prop({ required: true })
     private tree: Tree;
     @Prop({ required: false, default: false })
@@ -86,11 +100,6 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
     @Watch("tree")
     private async onTreeChanged() {
         await this.initTree();
-    }
-
-    @Watch("fullScreen")
-    private onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
-        this.sunburst.setFullScreen(newFullScreen)
     }
 
     @Watch("isFixedColors")
@@ -139,6 +148,10 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
             svgEl.setAttribute("width", "100%")
         }
     }
+
+    private enableFullscreen() {
+        this.$refs.fullscreen.toggle();
+    }
 }
 </script>
 
@@ -170,7 +183,15 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         text-align: center;
     }
 
+    #sunburstWrapper {
+        background: white;
+    }
+
     #sunburstWrapper > .unipept-sunburst > svg {
         max-height: 800px;
+    }
+
+    .fullscreen #sunburstWrapper > .unipept-sunburst > svg {
+        max-height: calc(100% - 43px);
     }
 </style>

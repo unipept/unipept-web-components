@@ -1,188 +1,147 @@
--<template>
-    <fullscreen ref="fullScreenContainer" @change="fullScreenChange">
-        <v-card style="overflow: hidden; min-height: 100%;" :class="{'full-screen': isFullScreen, 'full-screen-container': true}">
-            <v-tabs :slider-color="isFullScreen ? 'white' : tabsSliderColor" :dark="isDark" :background-color="tabsColor" :fixed-tabs="isFullScreen" v-model="tab">
-                <div v-if="isFullScreen" class="unipept-logo">
-                    <img src="/images/trans_logo.png" alt="logo" width="40" height="40">
-                </div>
-                <v-tab>
-                    Sunburst
-                </v-tab>
-                <v-tab>
-                    Treemap
-                </v-tab>
-                <v-tab>
-                    Treeview
-                </v-tab>
-                <v-tab v-if="!isFullScreen">
-                    Hierarchical Outline
-                </v-tab>
-                <v-tab v-if="!isFullScreen">
-                    Heatmap
-                </v-tab>
-                <v-spacer>
-                </v-spacer>
-                <v-menu v-if="!isFullScreen && this.tab < 3" bottom left :disabled="!this.assay">
-                    <template v-slot:activator="{ on }">
-                        <v-btn text class="align-self-center mr-4" v-on="on">
-                            More
-                            <v-icon right>mdi-menu-down</v-icon>
-                        </v-btn>
-                    </template>
+<template>
+    <v-card style="overflow: hidden; min-height: 100%;" >
+        <v-tabs :slider-color="tabsSliderColor" :dark="isDark" :background-color="tabsColor" v-model="tab">
+            <v-tab>
+                Sunburst
+            </v-tab>
+            <v-tab>
+                Treemap
+            </v-tab>
+            <v-tab>
+                Treeview
+            </v-tab>
+            <v-tab>
+                Hierarchical Outline
+            </v-tab>
+            <v-tab>
+                Heatmap
+            </v-tab>
 
-                    <v-list class="grey lighten-3">
-                        <v-list-item key="enter-full-screen" @click="switchToFullScreen()" >
-                            <v-list-item-title>
-                                <v-icon>
-                                    mdi-fullscreen
-                                </v-icon>
-                                Enter full screen
-                            </v-list-item-title>
-                        </v-list-item>
-                        <v-list-item key="save-as-image" @click="prepareImage()">
-                            <v-list-item-title>
-                                <v-icon>
-                                    mdi-download
-                                </v-icon>
-                                Save as image
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-                <div v-if="isFullScreen" class="fullscreen-buttons-container">
-                    <v-btn icon text @click="reset()">
-                        <v-icon color="white">
-                            mdi-restore
-                        </v-icon>
-                    </v-btn>
-                    <v-btn icon text @click="prepareImage()">
-                        <v-icon color="white">
-                            mdi-download
-                        </v-icon>
-                    </v-btn>
-                    <v-btn icon text @click="exitFullScreen()">
-                        <v-icon color="white">
-                            mdi-fullscreen-exit
-                        </v-icon>
-                    </v-btn>
-                </div>
-            </v-tabs>
-            <v-tabs-items v-model="tab">
-                <v-tab-item>
-                    <v-card flat>
-                        <sunburst-visualization
-                            ref="sunburst"
-                            :autoResize="true"
-                            :full-screen="isFullScreen"
-                            v-if="tree"
-                            :tree="tree"
-                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
-                        </sunburst-visualization>
-                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            </v-progress-circular>
-                        </div>
-                        <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
-                        </div>
-                    </v-card>
-                    <image-download-modal
-                        :base-file-name="imageBaseName"
-                        :svg-string="svgImageData"
-                        :png-source="pngSource"
-                        v-model="downloadImageDialogOpen"
-                    />
-                </v-tab-item>
-                <v-tab-item>
-                    <v-card flat>
-                        <treemap-visualization
-                            ref="treemap"
-                            :full-screen="isFullScreen"
-                            v-if="tree"
-                            :tree="tree"
-                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
-                        </treemap-visualization>
-                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            </v-progress-circular>
-                        </div>
-                        <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
-                        </div>
-                    </v-card>
-                </v-tab-item>
-                <v-tab-item>
-                    <v-card flat>
-                        <treeview-visualization
-                            ref="treeview"
-                            :autoResize="true"
-                            :height="500"
-                            :full-screen="isFullScreen"
-                            v-if="tree"
-                            :tree="tree"
-                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
-                        </treeview-visualization>
-                        <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            </v-progress-circular>
-                        </div>
-                        <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
-                        </div>
-                    </v-card>
-                </v-tab-item>
-                <v-tab-item>
-                    <v-card flat>
+            <v-spacer>
+            </v-spacer>
+
+            <div style="padding-right: 16px;" class="d-flex align-center">
+                <v-btn depressed @click="prepareImage" color="primary">
+                    <v-icon>mdi-download</v-icon>
+                    Save as image
+                </v-btn>
+            </div>
+        </v-tabs>
+        <v-tabs-items v-model="tab">
+            <v-tab-item>
+                <v-card flat>
+                    <sunburst-visualization
+                        ref="sunburst"
+                        :autoResize="true"
+                        :full-screen="isFullScreen"
+                        v-if="tree"
+                        :tree="tree"
+                        v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                    </sunburst-visualization>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
                         <v-card-text>
-                            <hierarchical-outline-visualization
-                                v-if="tree"
-                                :tree="tree"
-                                :search-configuration="searchConfiguration"
-                                v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
-                            </hierarchical-outline-visualization>
-                            <div v-else-if="this.analysisInProgress" class="mpa-waiting">
-                                <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                                </v-progress-circular>
-                            </div>
-                            <div v-else>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
                             </div>
                         </v-card-text>
-                    </v-card>
-                </v-tab-item>
-                <v-tab-item>
-                    <v-card flat>
-                        <heatmap-wizard-single-sample v-if="assay" :assay="assay"></heatmap-wizard-single-sample>
+                    </div>
+                </v-card>
+                <image-download-modal
+                    :base-file-name="imageBaseName"
+                    :svg-string="svgImageData"
+                    :png-source="pngSource"
+                    v-model="downloadImageDialogOpen"
+                />
+            </v-tab-item>
+            <v-tab-item>
+                <v-card flat>
+                    <treemap-visualization
+                        ref="treemap"
+                        :full-screen="isFullScreen"
+                        v-if="tree"
+                        :tree="tree"
+                        v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                    </treemap-visualization>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
+                    </div>
+                </v-card>
+            </v-tab-item>
+            <v-tab-item>
+                <v-card flat>
+                    <treeview-visualization
+                        ref="treeview"
+                        :autoResize="true"
+                        :height="500"
+                        :full-screen="isFullScreen"
+                        v-if="tree"
+                        :tree="tree"
+                        v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                    </treeview-visualization>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
+                    </div>
+                </v-card>
+            </v-tab-item>
+            <v-tab-item>
+                <v-card flat>
+                    <v-card-text>
+                        <hierarchical-outline-visualization
+                            v-if="tree"
+                            :tree="tree"
+                            :search-configuration="searchConfiguration"
+                            v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
+                        </hierarchical-outline-visualization>
                         <div v-else-if="this.analysisInProgress" class="mpa-waiting">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
                         </div>
                         <div v-else>
-                            <v-card-text>
-                                <div class="placeholder-text">
-                                    {{ placeholderText }}
-                                </div>
-                            </v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
                         </div>
-                    </v-card>
-                </v-tab-item>
-            </v-tabs-items>
-        </v-card>
-    </fullscreen>
+                    </v-card-text>
+                </v-card>
+            </v-tab-item>
+            <v-tab-item>
+                <v-card flat>
+                    <heatmap-wizard-single-sample v-if="assay" :assay="assay"></heatmap-wizard-single-sample>
+                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                        </v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <v-card-text>
+                            <div class="placeholder-text">
+                                {{ placeholderText }}
+                            </div>
+                        </v-card-text>
+                    </div>
+                </v-card>
+            </v-tab-item>
+        </v-tabs-items>
+    </v-card>
 </template>
 
 <script lang="ts">
@@ -201,7 +160,6 @@ import $ from "jquery";
 import CardHeader from "../custom/CardHeader.vue";
 
 //@ts-ignore
-import fullscreen from "vue-fullscreen";
 import { Peptide } from "./../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../business/counts/CountTable";
 import Tree from "./../../business/ontology/taxonomic/Tree";
@@ -228,7 +186,6 @@ import DomElementToPngSource from "@/business/image/DomElementToPngSource";
 })
 export default class SingleDatasetVisualizationsCard extends Vue {
     $refs!: {
-        fullScreenContainer: fullscreen,
         sunburst: SunburstVisualization,
         treeview: TreeviewVisualization,
         treemap: TreemapVisualization,
@@ -274,34 +231,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
         return this.assay?.getSearchConfiguration();
     }
 
-    private switchToFullScreen() {
-        // @ts-ignore
-        if (!this.isFullScreen && window.fullScreenApi.supportsFullScreen) {
-            this.isFullScreen = true;
-            this.$refs.fullScreenContainer.enter();
-            // @ts-ignore
-            AnalyticsUtil.logToGoogle("Multi Peptide", "Full Screen", this.tabs[this.tab]);
-            $(".tip").appendTo(".full-screen-container");
-        }
-    }
-
-    private exitFullScreen() {
-        this.isFullScreen = false;
-        this.$refs.fullScreenContainer.exit();
-        $(".tip").appendTo("body");
-    }
-
-    private fullScreenChange(state: boolean) {
-        if (!state) {
-            this.exitFullScreen();
-        } else {
-            this.switchToFullScreen();
-        }
-    }
-
     private async prepareImage() {
-        this.exitFullScreen();
-
         AnalyticsUtil.logToGoogle("Multi Peptide", "Save Image", this.tabs[this.tab]);
         if (this.tabs[this.tab] === "Sunburst") {
             d3.selectAll(".toHide").attr("class", "arc hidden");

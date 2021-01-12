@@ -1,21 +1,24 @@
 <template>
-    <div style="width: 100%;">
-        <h2 class="ghead">
+    <fullscreen ref="fullscreen">
+        <div style="width: 100%;" class="heatmap-wrapper">
+            <h2 class="ghead">
             <span class="dir">
                 <v-btn x-small fab @click="rotate()" :elevation="0"><v-icon>mdi-format-rotate-90</v-icon></v-btn>
                 <v-btn x-small fab @click="download()" :elevation="0"><v-icon>mdi-download</v-icon></v-btn>
                 <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
+                <v-btn x-small fab @click="enableFullscreen()" :elevation="0"><v-icon>mdi-fullscreen</v-icon></v-btn>
             </span>
-            <span class="dir text">Scroll to zoom, drag to pan.</span>
-        </h2>
-        <div ref="heatmapElement" style="width: 100%" v-once></div>
-        <image-download-modal
-            v-model="downloadModalOpen"
-            base-file-name="unipept_comparative_heatmap"
-            :png-source="pngDataSource"
-            :svg-string="svgString"
-        />
-    </div>
+                <span class="dir text">Scroll to zoom, drag to pan.</span>
+            </h2>
+            <div ref="heatmapElement" style="width: 100%" v-once></div>
+            <image-download-modal
+                v-model="downloadModalOpen"
+                base-file-name="unipept_comparative_heatmap"
+                :png-source="pngDataSource"
+                :svg-string="svgString"
+            />
+        </div>
+    </fullscreen>
 </template>
 
 <script lang="ts">
@@ -36,6 +39,7 @@ import SvgStringToPngSource from "@/business/image/SvgStringToPngSource";
 export default class HeatmapVisualization extends mixins(VisualizationMixin) {
     $refs: {
         heatmapElement: any,
+        fullscreen: any
     }
 
     @Prop({ default: false })
@@ -66,10 +70,6 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
         if (this.heatmap){
             this.heatmap.reset();
         }
-    }
-
-    @Watch("fullScreen") onFullScreenChanged(newFullScreen: boolean, oldFullScreen: boolean) {
-        this.heatmap.setFullScreen(newFullScreen)
     }
 
     @Watch("data")
@@ -129,8 +129,25 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
 
         this.downloadModalOpen = true;
     }
+
+    private async enableFullscreen() {
+        this.$refs.fullscreen.toggle();
+        if (await this.$refs.fullscreen.getState()) {
+            let heatmapElement: HTMLElement = this.$refs.heatmapElement as HTMLElement;
+            this.heatmap.resize(heatmapElement.clientWidth, 600);
+        } else {
+            this.heatmap.resize(window.innerWidth, window.innerHeight);
+        }
+    }
 }
 </script>
 
-<style scoped>
+<style>
+    .heatmap-wrapper {
+        background: white;
+    }
+
+    .fullscreen .heatmap-wrapper {
+        height: 100%;
+    }
 </style>

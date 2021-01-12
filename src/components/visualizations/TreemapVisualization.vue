@@ -1,24 +1,31 @@
 <template>
-    <div id="treemapWrapper" ref="treemapWrapper" style="height: 100%;" v-if="active">
-        <h2 class="ghead">
-            <span class="dir">
-                <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
-            </span>
-            <span class="dir text">Click a square to zoom in and right click to zoom out</span>
-        </h2>
-        <div v-once ref="visualization"></div>
-    </div>
-    <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-        <div class="error-container">
-            <v-icon x-large>
-                mdi-alert-circle-outline
-            </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
-            </p>
+    <fullscreen ref="fullscreen">
+        <div id="treemapWrapper" ref="treemapWrapper" style="height: 100%;" v-if="active">
+            <h2 class="ghead">
+                <span class="dir">
+                    <v-btn x-small fab @click="enableFullscreen()" :elevation="0">
+                        <v-icon>mdi-fullscreen</v-icon>
+                    </v-btn>
+                </span>
+                <span class="dir">
+                    <v-btn x-small fab @click="reset()" :elevation="0"><v-icon>mdi-restore</v-icon></v-btn>
+                </span>
+                <span class="dir text">Click a square to zoom in and right click to zoom out</span>
+            </h2>
+            <div v-once ref="visualization"></div>
         </div>
-    </v-container>
+        <v-container fluid v-else class="error-container mt-2 d-flex align-center">
+            <div class="error-container">
+                <v-icon x-large>
+                    mdi-alert-circle-outline
+                </v-icon>
+                <p>
+                    You're trying to visualise a very large sample. This will work in most cases, but it could take
+                    some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
+                </p>
+            </div>
+        </v-container>
+    </fullscreen>
 </template>
 
 <script lang="ts">
@@ -32,6 +39,11 @@ import { NcbiRank } from "./../../business/ontology/taxonomic/ncbi/NcbiRank";
 
 @Component
 export default class TreemapVisualization extends mixins(VisualizationMixin) {
+    $refs!: {
+        fullscreen: any,
+        treemapWrapper: any
+    }
+
     // Make field non-reactive by not setting the value here, but only after created() has been fired.
     treemap!: any;
 
@@ -99,6 +111,10 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
             rerootCallback: d => this.search(d.id, d.name, 1000)
         });
     }
+
+    private enableFullscreen() {
+        this.$refs.fullscreen.toggle();
+    }
 }
 </script>
 
@@ -112,4 +128,10 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         flex-direction: column;
         text-align: center;
     }
+
+    #treemapWrapper {
+        background: white;
+    }
+
+
 </style>
