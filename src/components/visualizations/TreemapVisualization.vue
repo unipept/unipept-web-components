@@ -36,6 +36,7 @@ import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import { NcbiRank } from "./../../business/ontology/taxonomic/ncbi/NcbiRank";
+import { Treemap } from "unipept-visualizations";
 
 @Component
 export default class TreemapVisualization extends mixins(VisualizationMixin) {
@@ -97,19 +98,22 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         this.active = true;
 
         await this.$nextTick();
-        const data = JSON.stringify(this.tree.getRoot());
 
         // @ts-ignore
-        this.treemap = $(this.$refs.visualization).treemap(JSON.parse(data), {
-            width: this.width === -1 ? (this.$refs.treemapWrapper as Element).clientWidth : this.width,
-            height: this.height,
-            levels: this.levels,
-            getBreadcrumbTooltip: d => d.rank,
-            getTooltip: tooltipContent,
-            getLabel: d => `${d.name} (${d.data.self_count}/${d.data.count})`,
-            getLevel: d => Object.values(NcbiRank).indexOf(d.rank),
-            rerootCallback: d => this.search(d.id, d.name, 1000)
-        });
+        this.treemap = new Treemap(
+            this.$refs.visualization,
+            this.tree.getRoot().toDataNodeLike(),
+            {
+                width: this.width === -1 ? (this.$refs.treemapWrapper as Element).clientWidth : this.width,
+                height: this.height,
+                levels: this.levels,
+                getBreadcrumbTooltip: d => d.extra.rank,
+                getTooltipText: tooltipContent,
+                getLabel: d => `${d.name} (${d.selfCount}/${d.count})`,
+                getLevel: d => Object.values(NcbiRank).indexOf(d.data.extra.rank),
+                rerootCallback: d => this.search(d.id, d.name, 1000)
+            }
+        );
     }
 
     private enableFullscreen() {

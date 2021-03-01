@@ -93,6 +93,8 @@ export default class TreeNode {
 
     public toDataNodeLike(): DataNodeLike {
         const children: DataNodeLike[] = this.children.map(c => c.toDataNodeLike());
-        return new DataNodeLike(this.id, this.name, children, this.data.count, this.data.self_count);
+        return new DataNodeLike(this.id, this.name, children, this.data.count, this.data.self_count, {
+            rank: this.rank
+        });
     }
 }
