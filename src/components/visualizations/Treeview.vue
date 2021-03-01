@@ -22,12 +22,12 @@
 import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import TreeViewNode from "./TreeViewNode";
+import { DataNode, DataNodeLike, Treeview as UnipeptTreeview, TreeviewSettings } from "unipept-visualizations";
 
 @Component
 export default class Treeview extends Vue {
     @Prop({ required: true })
-    private data: TreeViewNode;
+    private data: DataNodeLike;
     @Prop({ required: false, default: false })
     private autoResize;
     @Prop({ required: false, default: 100 })
@@ -37,7 +37,9 @@ export default class Treeview extends Vue {
     @Prop({ required: false, default: false })
     private loading: boolean;
     @Prop()
-    private tooltip: (d: any) => string;
+    private tooltip: (d: DataNode) => string;
+    @Prop()
+    private tooltipText: (d: DataNode) => string;
     @Prop({ default: false })
     private enableAutoExpand: number | boolean;
     @Prop()
@@ -53,6 +55,7 @@ export default class Treeview extends Vue {
 
     private settingNames: [string, string][] = [
         ["getTooltip", "tooltip"],
+        ["getTooltipText", "tooltipText"],
         ["colors", "colors"],
         ["rerootCallback", "rerootCallback"],
         ["linkStrokeColor", "linkStrokeColor"],
@@ -98,7 +101,7 @@ export default class Treeview extends Vue {
         }
     }
 
-    private getAmountOfNodes(tree: TreeViewNode): number {
+    private getAmountOfNodes(tree: DataNodeLike): number {
         return tree.children.reduce((acc, child) => acc + this.getAmountOfNodes(child), 0) + tree.children.length;
     }
 
@@ -106,6 +109,7 @@ export default class Treeview extends Vue {
     @Watch("width")
     @Watch("height")
     @Watch("tooltip")
+    @Watch("tooltipText")
     @Watch("enableAutoExpand")
     @Watch("colors")
     @Watch("rerootCallback")
@@ -120,11 +124,8 @@ export default class Treeview extends Vue {
 
             let settings = {
                 width: this.width,
-                height: this.height,
-                enableAutoExpand: this.enableAutoExpand,
+                height: this.height
             }
-
-            console.log(settings);
 
             // Only these settings that are explicitly filled in should to be passed as an option
             for (let [settingsName, funcName] of this.settingNames) {
@@ -133,8 +134,11 @@ export default class Treeview extends Vue {
                 }
             }
 
-            // @ts-ignore
-            this.treeview = $(this.$refs.visualization).html("").treeview(JSON.parse(JSON.stringify(this.data)), settings);
+            this.treeview = new UnipeptTreeview(
+                this.$refs.visualization as HTMLElement,
+                this.data,
+                settings as TreeviewSettings
+            )
 
             if (this.autoResize) {
                 let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg");

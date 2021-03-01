@@ -336,7 +336,7 @@ export default class HeatmapWizardSingleSample extends Vue {
 
                 if ("rank" in definition) {
                     category = definition["rank"];
-                    count = this.tree.nodes.get(id)?.data.count;
+                    count = this.tree.nodes.get(id)?.count;
                 } else {
                     category = (definition as unknown as FunctionalDefinition).namespace;
                     count = countTable.getCounts(id);

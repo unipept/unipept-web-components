@@ -50,7 +50,7 @@ export default class Tree {
                     currentNode = newNode;
                 }
             }
-            currentNode.data.self_count = taxaCountTable.getCounts(ontologyId);
+            currentNode.selfCount = taxaCountTable.getCounts(ontologyId);
         }
 
         this.nodes.set(id, this.root);

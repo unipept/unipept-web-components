@@ -21,7 +21,7 @@
                 :width="width"
                 :height="height"
                 :enableAutoExpand="true"
-                :tooltip="tooltipFunction"
+                :tooltip-text="tooltipFunction"
                 :colors="colors"
                 :rerootCallback="rerootCallback"
             >
@@ -38,7 +38,7 @@ import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
 import Treeview from "./Treeview.vue";
 import Tree from "./../../business/ontology/taxonomic/Tree";
-import TreeNode from "./../../business/ontology/taxonomic/TreeNode";
+import { DataNodeLike } from "unipept-visualizations";
 
 @Component({
     components: {
@@ -78,7 +78,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
     };
 
     private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);
-    private data: TreeNode = null;
+    private data: DataNodeLike = null;
     private tooltipFunction: (d: any) => string = null;
 
     mounted() {

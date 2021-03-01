@@ -110,7 +110,8 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
                 // @ts-ignore
                 {
                     width: heatmapElement.clientWidth,
-                    height: 600
+                    height: 600,
+                    dendrogramEnabled: true
                 }
             );
 

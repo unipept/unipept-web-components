@@ -1,6 +1,6 @@
 <template>
     <fullscreen ref="fullscreen">
-        <div id="treemapWrapper" ref="treemapWrapper" style="height: 100%;" v-if="active">
+        <div id="treemapWrapper" ref="treemapWrapper" style="height: 100%;">
             <h2 class="ghead">
                 <span class="dir">
                     <v-btn x-small fab @click="enableFullscreen()" :elevation="0">
@@ -14,17 +14,6 @@
             </h2>
             <div v-once ref="visualization"></div>
         </div>
-        <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-            <div class="error-container">
-                <v-icon x-large>
-                    mdi-alert-circle-outline
-                </v-icon>
-                <p>
-                    You're trying to visualise a very large sample. This will work in most cases, but it could take
-                    some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
-                </p>
-            </div>
-        </v-container>
     </fullscreen>
 </template>
 
@@ -36,13 +25,14 @@ import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
 import Tree from "./../../business/ontology/taxonomic/Tree";
 import { NcbiRank } from "./../../business/ontology/taxonomic/ncbi/NcbiRank";
-import { Treemap } from "unipept-visualizations";
+import { Treemap, TreemapSettings } from "unipept-visualizations";
 
 @Component
 export default class TreemapVisualization extends mixins(VisualizationMixin) {
     $refs!: {
         fullscreen: any,
-        treemapWrapper: any
+        treemapWrapper: any,
+        visualization: HTMLElement
     }
 
     // Make field non-reactive by not setting the value here, but only after created() has been fired.
@@ -58,8 +48,6 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
     private height: number;
     @Prop({ required: false, default: 28 })
     private levels: number;
-
-    private active: boolean = true;
 
     mounted() {
         this.initTreeMap();
@@ -86,23 +74,16 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
     @Watch("tree")
     private async initTreeMap() {
         if (this.tree != null) {
-            if (this.tree.nodes.size > 600) {
-                this.active = false;
-            } else {
-                await this.showVisualization();
-            }
+            await this.showVisualization();
         }
     }
 
     private async showVisualization() {
-        this.active = true;
-
         await this.$nextTick();
 
-        // @ts-ignore
         this.treemap = new Treemap(
             this.$refs.visualization,
-            this.tree.getRoot().toDataNodeLike(),
+            this.tree.getRoot(),
             {
                 width: this.width === -1 ? (this.$refs.treemapWrapper as Element).clientWidth : this.width,
                 height: this.height,
@@ -112,7 +93,7 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
                 getLabel: d => `${d.name} (${d.selfCount}/${d.count})`,
                 getLevel: d => Object.values(NcbiRank).indexOf(d.data.extra.rank),
                 rerootCallback: d => this.search(d.id, d.name, 1000)
-            }
+            } as TreemapSettings
         );
     }
 
