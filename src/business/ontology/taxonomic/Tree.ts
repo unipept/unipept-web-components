@@ -139,5 +139,4 @@ export default class Tree {
 
         return s;
     }
-
 }

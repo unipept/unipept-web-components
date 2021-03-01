@@ -32,7 +32,6 @@
 
 <script lang="ts">
 import * as d3 from "d3";
-import * as d3Scale from "d3-scale";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import { tooltipContent } from "./VisualizationHelper";
@@ -75,7 +74,7 @@ export default class TreeviewVisualization extends mixins(VisualizationMixin) {
         if (d.name === "Eukaryota") return "#2E7D32"; // green
         if (d.name === "Viruses") return "#C62828"; // red
         // @ts-ignore
-        return d3Scale.scaleOrdinal(d3.schemeCategory10).call(this, d);
+        return d3.scaleOrdinal(d3.schemeCategory10).call(this, d);
     };
 
     private rerootCallback: (d: any) => void  = (d: any) => this.search(d.id, d.name, 1000);

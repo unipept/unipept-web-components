@@ -1,3 +1,5 @@
+import { DataNodeLike } from "unipept-visualizations";
+
 export default class TreeNode {
     public children: TreeNode[] = [];
     public data: { count: number, self_count: number } = { count: undefined, self_count: 0 };
@@ -87,5 +89,10 @@ export default class TreeNode {
                 c.callRecursivelyPostOder(f));
         }
         return f(this, childResults);
+    }
+
+    public toDataNodeLike(): DataNodeLike {
+        const children: DataNodeLike[] = this.children.map(c => c.toDataNodeLike());
+        return new DataNodeLike(this.id, this.name, children, this.data.count, this.data.self_count);
     }
 }
