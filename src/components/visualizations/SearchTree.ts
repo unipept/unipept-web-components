@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import * as d3Select from "d3-selection";
 import $ from "jquery";
 import * as clipboard from "clipboard-polyfill"
 import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
@@ -49,13 +48,13 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         resetinfoPandAndClick();
 
         // Add the nested unordered lists to the page based on the data array
-        tree = d3Select.select("#searchtree");
+        tree = d3.select("#searchtree");
         tree = tree.append("ul").append("li").attr("class", "root not").append("ul");
         // $("li.root").prepend($("#treeSearchDiv"));
         items = tree.selectAll("li").data([data])
             .enter()
             .append("li")
-            .html(d => `<span>${d.name} (${d.data.self_count}/${d.data.count})</span>`)
+            .html(d => `<span>${d.name} (${d.selfCount}/${d.count})</span>`)
             .attr("title", d => d.rank)
             .attr("class", "collapsibleListOpen")
             .attr("data-search", d => d.name.toLowerCase())
@@ -64,7 +63,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             items = items.selectAll("li").data(d => d.children)
                 .enter()
                 .append("li")
-                .html(d => `<span>${d.name} (${d.data.self_count}/${d.data.count})</span>`)
+                .html(d => `<span>${d.name} (${d.selfCount}/${d.count})</span>`)
                 .attr("title", d => d.rank)
                 .attr("class", function(d) {
                     if (!d.children.length) {
@@ -91,7 +90,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         // Add click action
         $("#searchtree li span").click(clickAction);
         $("#searchtree li span").dblclick(function() {
-            rerootCallback(Object.assign({}, d3Select.select(this.parentElement).datum()));
+            rerootCallback(Object.assign({}, d3.select(this.parentElement).datum()));
         });
 
         // add search
@@ -125,7 +124,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
     function clickAction() {
         AnalyticsUtil.logToGoogle("Multi Peptide", "tree", "Peptides", null);
 
-        let d = d3Select.select(this.parentElement).datum(),
+        let d = d3.select(this.parentElement).datum(),
             margin = this.offsetTop - 9,
             ownSequences,
             allSequences,

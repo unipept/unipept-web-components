@@ -36,8 +36,7 @@
                     :autoResize="true"
                     :height="300"
                     :width="800"
-                    :tooltip="ecTreeTooltip"
-                    :enableAutoExpand="true">
+                    :tooltip-text="ecTreeTooltip">
                 </treeview>
             </v-card>
         </v-card-text>
@@ -68,16 +67,16 @@ import {
     PeptideCountTableProcessor,
     FunctionalSummaryProcessor,
     NetworkUtils,
-    CsvUtils
+    CsvUtils, TreeNode
 } from "@/business";
 
 import MultiAmountTableItemRetriever from "@/components/analysis/multi/MultiAmountTableItemRetriever";
 import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
 import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCountTableProcessor";
 import CommunicationSource from "@/business/communication/source/CommunicationSource";
-import TreeViewNode from "@/components/visualizations/TreeViewNode";
 import Treeview from "@/components/visualizations/Treeview.vue";
 import AmountTable from "@/components/tables/AmountTable.vue";
+import { DataNodeLike } from "unipept-visualizations";
 
 @Component({
     components: { FilterFunctionalAnnotationsDropdown, Treeview, AmountTable }
@@ -91,7 +90,7 @@ export default class MultiEcSummaryCard extends Vue {
     private itemRetriever: AmountTableItemRetriever<EcCode, EcDefinition> = null;
     private itemsToPeptides: Map<EcCode, Peptide[]> = null;
     private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
-    private ecTree: TreeViewNode = null;
+    private ecTree: DataNodeLike = null;
 
     private trust: FunctionalTrust = null;
     private trustLine: string = "";
@@ -223,15 +222,15 @@ export default class MultiEcSummaryCard extends Vue {
         const fullCode = (d.name + ".-.-.-.-").split(".").splice(0, 4).join(".");
         let tip = "";
         tip += `<div class="tooltip-fa-text">
-                    <strong>${d.data.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
+                    <strong>${d.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
 
-        if (d.data.self_count == 0) {
+        if (d.selfCount == 0) {
             tip += "no specific annotations";
         } else {
-            if (d.data.self_count == d.data.count) {
+            if (d.selfCount == d.count) {
                 tip += " <strong>all specifically</strong> for this number";
             } else {
-                tip += ` <strong>${d.data.self_count} specifically</strong> for this number`;
+                tip += ` <strong>${d.selfCount} specifically</strong> for this number`;
             }
         }
 
@@ -242,40 +241,43 @@ export default class MultiEcSummaryCard extends Vue {
     private async computeEcTree(
         ecCountTable: CountTable<EcCode>,
         ecOntology: Ontology<EcCode, EcDefinition>
-    ): Promise<TreeViewNode> {
-        const codeNodeMap = new Map<EcCode, TreeViewNode>();
+    ): Promise<DataNodeLike> {
+        const codeNodeMap = new Map<EcCode, DataNodeLike>();
 
-        codeNodeMap.set("-.-.-.-", {
-            id: 0,
-            name: "-.-.-.-",
-            children: [],
-            data: {
-                self_count: 0,
+        codeNodeMap.set(
+            "-.-.-.-",
+            {
+                name: "-.-.-.-",
                 count: 0,
-                data: {
+                selfCount: 0,
+                children: [],
+                extra: {
                     sequences: Object.create(null),
                     self_sequences: Object.create(null),
-                },
-            },
-        });
+                    id: 0
+                }
+            }
+        );
 
         const getOrNew = (key) => {
             if (!codeNodeMap.has(key)) {
-                codeNodeMap.set(key, {
-                    id: key.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
-                    name: key.split(".").filter((x) => x !== "-").join("."),
-                    children: [],
-                    data: {
-                        self_count: 0,
+                codeNodeMap.set(
+                    key,
+                    {
+                        name: key.split(".").filter((x) => x !== "-").join("."),
                         count: 0,
-                        data: {
+                        selfCount: 0,
+                        children: [],
+                        extra: {
                             code: key,
                             value: 0,
                             sequences: Object.create(null),
                             self_sequences: Object.create(null),
+                            id: key.split(".").map((x) => ("0000" + x).slice(-4)).join(".")
                         }
-                    },
-                });
+                    }
+                );
+
                 const ancestors = EcDefinition.computeAncestors(key, true);
                 getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
             }
@@ -290,13 +292,13 @@ export default class MultiEcSummaryCard extends Vue {
 
         for (const ecDef of sortedEcs) {
             const toInsert = {
-                id: ecDef.code.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
                 name: ecDef.code.split(".").filter((x) => x !== "-").join("."),
+                count: ecCountTable.getCounts(ecDef.code),
+                selfCount: ecCountTable.getCounts(ecDef.code),
                 children: [],
-                data: {
-                    self_count: ecCountTable.getCounts(ecDef.code),
-                    count: ecCountTable.getCounts(ecDef.code),
-                    data: ecDef,
+                extra: {
+                    definition: ecDef,
+                    id: ecDef.code.split(".").map((x) => ("0000" + x).slice(-4)).join(".")
                 },
             };
 
@@ -305,13 +307,13 @@ export default class MultiEcSummaryCard extends Vue {
             const ancestors = EcDefinition.computeAncestors(ecDef.code, true);
             getOrNew(ancestors[0]).children.push(toInsert);
             for (const a of ancestors) {
-                getOrNew(a).data.count += toInsert.data.count;
+                getOrNew(a).count += toInsert.count;
             }
         }
 
         // Order the nodes by their id (order by EC number)
         for (const val of codeNodeMap.values()) {
-            val.children.sort((a, b) => a.id.localeCompare(b.id));
+            val.children.sort((a, b) => a.extra.id.localeCompare(b.extra.id));
         }
 
         return codeNodeMap.get("-.-.-.-");

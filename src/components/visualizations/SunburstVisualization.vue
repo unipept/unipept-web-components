@@ -1,6 +1,6 @@
 <template>
     <fullscreen ref="fullscreen">
-        <div id="sunburstWrapper" ref="sunburstWrapper" v-if="active">
+        <div id="sunburstWrapper" ref="sunburstWrapper">
             <h2 class="ghead">
                 <span class="dir">
                     <v-btn x-small fab @click="enableFullscreen()" :elevation="0">
@@ -36,17 +36,6 @@
             </h2>
             <div v-once ref="visualization"></div>
         </div>
-        <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-            <div class="error-container">
-                <v-icon x-large>
-                    mdi-alert-circle-outline
-                </v-icon>
-                <p>
-                    You're trying to visualise a very large sample. This will work in most cases, but it could take
-                    some time to render. Are you sure you want to <a @click="showVisualization()">continue</a>?
-                </p>
-            </div>
-        </v-container>
     </fullscreen>
 </template>
 
@@ -58,6 +47,7 @@ import { Prop, Watch } from "vue-property-decorator";
 import { tooltipContent } from "./VisualizationHelper";
 import VisualizationMixin from "./VisualizationMixin.vue";
 import Tree from "./../../business/ontology/taxonomic/Tree";
+import { Sunburst } from "unipept-visualizations"
 
 @Component
 export default class SunburstVisualization extends mixins(VisualizationMixin) {
@@ -82,9 +72,6 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
     private radius: number;
 
     private isFixedColors: boolean = false;
-    // If we notice that a very large Tree is passed to this component, it will automatically be disabled and requires
-    // the users permission to start loading the visualisation.
-    private active: boolean = true;
 
     mounted() {
         this.initTree();
@@ -116,31 +103,27 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
     private async initTree() {
         if (this.tree != null) {
-            if (this.tree.nodes.size > 600) {
-                this.active = false;
-            } else {
-                await this.showVisualization();
-            }
+            await this.showVisualization();
         }
     }
 
     private async showVisualization() {
-        this.active = true;
-
         await this.$nextTick();
 
-        const data = JSON.stringify(this.tree.getRoot());
-
-        // @ts-ignore
-        this.sunburst = $(this.$refs.visualization).sunburst(JSON.parse(data), {
-            width: this.width,
-            height: this.height,
-            radius: this.radius,
-            getTooltip: tooltipContent,
-            getTitleText: d => `${d.name} (${d.rank})`,
-            rerootCallback: d => this.search(d.id, d.name, 500),
-            useFixedColors: this.isFixedColors
-        });
+        this.sunburst = new Sunburst(
+            this.$refs.visualization as HTMLElement,
+            this.tree.getRoot(),
+            // @ts-ignore
+            {
+                width: this.width,
+                height: this.height,
+                radius: this.radius,
+                getTooltipText: tooltipContent,
+                getTitleText: d => `${d.name} (${d.extra.rank})`,
+                rerootCallback: d => this.search(d.id, d.name, 500),
+                useFixedColors: this.isFixedColors
+            }
+        );
 
         if (this.autoResize) {
             let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")
@@ -158,7 +141,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 <style lang="less">
     @import './../../assets/style/visualizations.css.less';
 
-    .full-screen #sunburstWrapper > .unipept-sunburst > svg {
+    .full-screen #sunburstWrapper > .sunburst > svg {
         position: relative;
         left: -245px;
     }
@@ -171,7 +154,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         height: calc(100% - 48px);
     }
 
-    .unipept-sunburst {
+    .sunburst {
         width: 100% !important;
     }
 
@@ -187,11 +170,16 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         background: white;
     }
 
-    #sunburstWrapper > .unipept-sunburst > svg {
+    #sunburstWrapper > .sunburst > svg {
         max-height: 800px;
     }
 
-    .fullscreen #sunburstWrapper > .unipept-sunburst > svg {
+    .fullscreen #sunburstWrapper > .sunburst > svg {
         max-height: calc(100% - 43px);
+    }
+
+    .sunburst {
+        display: flex;
+        flex-direction: row-reverse;
     }
 </style>

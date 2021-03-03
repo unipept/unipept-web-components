@@ -32,7 +32,7 @@
                     :autoResize="true"
                     :height="300"
                     :width="800"
-                    :tooltip="ecTreeTooltip"
+                    :tooltip-text="ecTreeTooltip"
                     :enableAutoExpand="true">
                 </treeview>
             </v-card>
@@ -56,7 +56,7 @@ import AmountTable from "@/components/tables/AmountTable.vue";
 import SingleAmountTableItemRetriever from "@/components/analysis/single/SingleAmountTableItemRetriever";
 import Treeview from "@/components/visualizations/Treeview.vue";
 import { CountTable, Ontology } from "@/business";
-import TreeViewNode from "@/components/visualizations/TreeViewNode";
+import { DataNodeLike } from "unipept-visualizations";
 
 @Component({
     components: { AmountTable, Treeview }
@@ -70,7 +70,7 @@ export default class SingleEcSummaryCard extends Vue {
     private communicationSource: CommunicationSource;
 
     private itemRetriever: AmountTableItemRetriever<EcCode, EcDefinition>;
-    private ecTree: TreeViewNode = null;
+    private ecTree: DataNodeLike = null;
 
     private trust: FunctionalTrust = null;
     private trustLine: string = "";
@@ -141,40 +141,42 @@ export default class SingleEcSummaryCard extends Vue {
     private async computeEcTree(
         ecCountTable: CountTable<EcCode>,
         ecOntology: Ontology<EcCode, EcDefinition>
-    ): Promise<TreeViewNode> {
-        const codeNodeMap = new Map<EcCode, TreeViewNode>();
+    ): Promise<DataNodeLike> {
+        const codeNodeMap = new Map<EcCode, DataNodeLike>();
 
-        codeNodeMap.set("-.-.-.-", {
-            id: 0,
-            name: "-.-.-.-",
-            children: [],
-            data: {
-                self_count: 0,
+        codeNodeMap.set("-.-.-.-",
+            {
+                name: "-.-.-.-",
+                children: [],
                 count: 0,
-                data: {
+                selfCount: 0,
+                extra:
+                {
                     sequences: Object.create(null),
                     self_sequences: Object.create(null),
-                },
-            },
-        });
+                    id: 0
+                }
+            }
+        );
 
         const getOrNew = (key) => {
             if (!codeNodeMap.has(key)) {
-                codeNodeMap.set(key, {
-                    id: key.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
-                    name: key.split(".").filter((x) => x !== "-").join("."),
-                    children: [],
-                    data: {
-                        self_count: 0,
+                codeNodeMap.set(
+                    key,
+                    {
+                        name: key.split(".").filter((x) => x !== "-").join("."),
                         count: 0,
-                        data: {
+                        selfCount: 0,
+                        children: [],
+                        extra: {
                             code: key,
                             value: 0,
                             sequences: Object.create(null),
                             self_sequences: Object.create(null),
+                            id: key.split(".").map((x) => ("0000" + x).slice(-4)).join(".")
                         }
-                    },
-                });
+                    }
+                );
                 const ancestors = EcDefinition.computeAncestors(key, true);
                 getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
             }
@@ -189,13 +191,13 @@ export default class SingleEcSummaryCard extends Vue {
 
         for (const ecDef of sortedEcs) {
             const toInsert = {
-                id: ecDef.code.split(".").map((x) => ("0000" + x).slice(-4)).join("."),
                 name: ecDef.code.split(".").filter((x) => x !== "-").join("."),
+                count: ecCountTable.getCounts(ecDef.code),
+                selfCount: ecCountTable.getCounts(ecDef.code),
                 children: [],
-                data: {
-                    self_count: ecCountTable.getCounts(ecDef.code),
-                    count: ecCountTable.getCounts(ecDef.code),
-                    data: ecDef,
+                extra: {
+                    definition: ecDef,
+                    id: ecDef.code.split(".").map((x) => ("0000" + x).slice(-4)).join(".")
                 },
             };
 
@@ -204,13 +206,13 @@ export default class SingleEcSummaryCard extends Vue {
             const ancestors = EcDefinition.computeAncestors(ecDef.code, true);
             getOrNew(ancestors[0]).children.push(toInsert);
             for (const a of ancestors) {
-                getOrNew(a).data.count += toInsert.data.count;
+                getOrNew(a).count += toInsert.count;
             }
         }
 
         // Order the nodes by their id (order by EC number)
         for (const val of codeNodeMap.values()) {
-            val.children.sort((a, b) => a.id.localeCompare(b.id));
+            val.children.sort((a, b) => a.extra.id.localeCompare(b.extra.id));
         }
 
         return codeNodeMap.get("-.-.-.-");

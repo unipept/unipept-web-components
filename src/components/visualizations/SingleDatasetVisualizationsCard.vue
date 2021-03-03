@@ -237,7 +237,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             d3.selectAll(".toHide").attr("class", "arc hidden");
             const svgElements = document
                 .getElementById("sunburstWrapper")
-                .getElementsByClassName("unipept-sunburst")
+                .getElementsByClassName("sunburst")
                 .item(0)
                 .getElementsByTagName("svg");
             const svgElement = svgElements

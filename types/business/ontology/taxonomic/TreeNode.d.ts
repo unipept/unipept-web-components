@@ -1,12 +1,11 @@
-export default class TreeNode {
+import { DataNodeLike } from "unipept-visualizations";
+export default class TreeNode implements DataNodeLike {
     readonly id: number;
     readonly name: string;
-    readonly rank: string;
     children: TreeNode[];
-    data: {
-        count: number;
-        self_count: number;
-    };
+    count: number;
+    selfCount: number;
+    extra: any;
     /**
      * Creates a node based on a mandatory id. Name and rank are optional.
      *

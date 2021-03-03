@@ -26,10 +26,10 @@ import Vue from "vue";
 import Component, { mixins } from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import VisualizationMixin from "../visualizations/VisualizationMixin.vue";
-import { Heatmap } from "unipept-heatmap";
 import ImageDownloadModal from "./../utils/ImageDownloadModal.vue";
 import AnalyticsUtil from "@/business/analytics/AnalyticsUtil";
 import SvgStringToPngSource from "@/business/image/SvgStringToPngSource";
+import { Heatmap } from "unipept-visualizations";
 
 @Component({
     components: {
@@ -102,11 +102,18 @@ export default class HeatmapVisualization extends mixins(VisualizationMixin) {
                 data = this.data;
             }
 
-            //@ts-ignore
-            this.heatmap = new Heatmap(heatmapElement, data, rows, columns, {
-                width: heatmapElement.clientWidth,
-                height: 600
-            });
+            this.heatmap = new Heatmap(
+                heatmapElement,
+                data,
+                rows,
+                columns,
+                // @ts-ignore
+                {
+                    width: heatmapElement.clientWidth,
+                    height: 600,
+                    dendrogramEnabled: true
+                }
+            );
 
             let clusterType: "all" | "columns" | "rows" | "none" = "all";
 

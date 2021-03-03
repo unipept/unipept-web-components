@@ -111,6 +111,7 @@ import Tooltip from "@/components/custom/Tooltip.vue";
 import PngSource from "@/business/image/PngSource";
 import SvgUtils from "@/business/image/SvgUtils";
 import SvgElementToPngSource from "@/business/image/SvgElementToPngSource";
+import { DataNode, DataNodeLike } from "unipept-visualizations";
 
 @Component({
     components: {
@@ -258,7 +259,7 @@ export default class AmountTable extends Vue {
     private items: AmountTableItem[] = [];
     private totalItems: number = 0;
 
-    private treeAvailable = new Map<AmountTableItem, TreeNode>();
+    private treeAvailable = new Map<AmountTableItem, DataNodeLike>();
     private computedTrees: string[] = [];
 
     private imageSvg: string = "";
@@ -273,8 +274,8 @@ export default class AmountTable extends Vue {
     // All settings for each Treeview that remain the same
     private tooltip: (d: any) => string = tooltipContent;
     private highlightColor: string = "#ffc107";
-    private highlightColorFunc: (d: any) => string = d => d.included ? this.highlightColor : "lightgrey";
-    private linkStrokeColor: (d: any) => string = ({ target: d }) => this.highlightColorFunc(d);
+    private highlightColorFunc: (d: DataNode) => string = d => d.extra.included ? this.highlightColor : "lightgrey";
+    private linkStrokeColor: (d: d3.HierarchyRectangularLink<DataNode>) => string = ({ target: d }) => this.highlightColorFunc(d.data);
     private expandedItemsList = [];
 
     private highlightedTreeProcessor: HighlightedTreeProcessor = new HighlightedTreeProcessor();

@@ -1,6 +1,12 @@
-export default class TreeNode {
+import { DataNodeLike } from "unipept-visualizations";
+
+export default class TreeNode implements DataNodeLike {
     public children: TreeNode[] = [];
-    public data: { count: number, self_count: number } = { count: undefined, self_count: 0 };
+
+    public count: number = undefined;
+    public selfCount: number = 0;
+
+    public extra: any = {};
 
     /**
      * Creates a node based on a mandatory id. Name and rank are optional.
@@ -12,8 +18,10 @@ export default class TreeNode {
     constructor(
         public readonly id: number,
         public readonly name: string = "",
-        public readonly rank: string = "no rank"
-    ) {}
+        rank: string = "no rank"
+    ) {
+        this.extra.rank = rank;
+    }
 
     /**
      * Searches for a node with the given taxon id in its children. Returns null if it is not found.
@@ -51,13 +59,13 @@ export default class TreeNode {
      * @return The number of peptides.
      */
     public getCounts(): number {
-        if (this.data.count === undefined) {
-            this.data.count = this.data.self_count;
+        if (this.count === undefined) {
+            this.count = this.selfCount;
             if (this.getChildCount() !== 0) {
-                this.data.count += this.children.reduce((sum, c) => sum + c.getCounts(), 0);
+                this.count += this.children.reduce((sum, c) => sum + c.getCounts(), 0);
             }
         }
-        return this.data.count;
+        return this.count;
     }
 
     /**
