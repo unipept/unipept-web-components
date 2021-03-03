@@ -54,7 +54,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
         items = tree.selectAll("li").data([data])
             .enter()
             .append("li")
-            .html(d => `<span>${d.name} (${d.data.self_count}/${d.data.count})</span>`)
+            .html(d => `<span>${d.name} (${d.selfCount}/${d.count})</span>`)
             .attr("title", d => d.rank)
             .attr("class", "collapsibleListOpen")
             .attr("data-search", d => d.name.toLowerCase())
@@ -63,7 +63,7 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
             items = items.selectAll("li").data(d => d.children)
                 .enter()
                 .append("li")
-                .html(d => `<span>${d.name} (${d.data.self_count}/${d.data.count})</span>`)
+                .html(d => `<span>${d.name} (${d.selfCount}/${d.count})</span>`)
                 .attr("title", d => d.rank)
                 .attr("class", function(d) {
                     if (!d.children.length) {
