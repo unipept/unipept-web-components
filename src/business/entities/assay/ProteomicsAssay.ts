@@ -2,16 +2,14 @@ import Assay from "./Assay";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import AssayVisitor from "./AssayVisitor";
 import { Peptide } from "./../../ontology/raw/Peptide";
+import AnalysisSource from "@/business/communication/analysis/AnalysisSource";
 
 export default class ProteomicsAssay extends Assay {
     protected amountOfPeptides: number = 0;
 
     private searchConfiguration: SearchConfiguration = new SearchConfiguration();
     private peptides: Peptide[] = [];
-    // Which endpoint was used the last time this assay was analyzed?
-    private endpoint: string = "";
-    // Which version of the Unipept database was last used for the analysis of this assay?
-    private databaseVersion: string = "";
+    private analysisSource: AnalysisSource;
 
     constructor(public id: string) {
         super(id);
@@ -63,28 +61,8 @@ export default class ProteomicsAssay extends Assay {
         }
     }
 
-    public getEndpoint(): string {
-        return this.endpoint;
-    }
-
-    public setEndpoint(endpoint: string): void {
-        const oldEndpoint = this.endpoint;
-        this.endpoint = endpoint;
-        if (this.endpoint !== oldEndpoint) {
-            super.onUpdate("endpoint", oldEndpoint, endpoint);
-        }
-    }
-
-    public getDatabaseVersion(): string {
-        return this.databaseVersion;
-    }
-
-    public setDatabaseVersion(databaseVersion: string): void {
-        const oldVersion = databaseVersion;
-        this.databaseVersion = databaseVersion;
-        if (this.databaseVersion !== oldVersion) {
-            super.onUpdate("databaseVersion", oldVersion, databaseVersion);
-        }
+    public getAnalysisSource(): AnalysisSource {
+        return this.analysisSource;
     }
 
     async accept(visitor: AssayVisitor): Promise<void> {

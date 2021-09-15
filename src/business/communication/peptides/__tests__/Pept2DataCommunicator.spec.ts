@@ -37,25 +37,26 @@ describe("Pept2DataCommunicator", () => {
     })
 
     it("correctly computes the PeptideTrust for a list of peptides", async(done) => {
-        const peptideCountTable = new CountTable<Peptide>(counts)
-
-        // This request should be performed by the communicator. We answer by returning data for only 3 of the 5 given
-        // peptides. This means that the peptide trust should be 3 matched, 2 missed peptides.
-        setupNock(Array.from(counts.keys()), JSON.stringify({
-            peptides: [AAAAA, AALTER, FATSDLNDLYR]
-        }));
-
-        const communicationSource = new DefaultCommunicationSource();
-        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
-
-        await pept2DataCommunicator.process(peptideCountTable, searchConfig);
-        const trust = await pept2DataCommunicator.getPeptideTrust(peptideCountTable, searchConfig);
-
-        expect(trust.missedPeptides).toEqual(["YVVIQPGVK", "ELASLHGTK"]);
-        expect(trust.matchedPeptides).toBe(3);
-        expect(trust.searchedPeptides).toBe(5);
-
-        done();
+        // TODO migrate to separate test for PeptideTrustProcessor
+        // const peptideCountTable = new CountTable<Peptide>(counts)
+        //
+        // // This request should be performed by the communicator. We answer by returning data for only 3 of the 5 given
+        // // peptides. This means that the peptide trust should be 3 matched, 2 missed peptides.
+        // setupNock(Array.from(counts.keys()), JSON.stringify({
+        //     peptides: [AAAAA, AALTER, FATSDLNDLYR]
+        // }));
+        //
+        // const communicationSource = new DefaultCommunicationSource("");
+        // const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
+        //
+        // await pept2DataCommunicator.process(peptideCountTable, searchConfig);
+        // const trust = await pept2DataCommunicator.getPeptideTrust(peptideCountTable, searchConfig);
+        //
+        // expect(trust.missedPeptides).toEqual(["YVVIQPGVK", "ELASLHGTK"]);
+        // expect(trust.matchedPeptides).toBe(3);
+        // expect(trust.searchedPeptides).toBe(5);
+        //
+        // done();
     });
 
     it("correctly parses a response from the API", async(done) => {
@@ -65,11 +66,11 @@ describe("Pept2DataCommunicator", () => {
             peptides: [AAAAA, AALTER, FATSDLNDLYR]
         }));
 
-        const communicationSource = new DefaultCommunicationSource();
+        const communicationSource = new DefaultCommunicationSource(NetworkConfiguration.BASE_URL);
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
 
-        await pept2DataCommunicator.process(peptideCountTable, searchConfig);
-        const response = pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig).toPeptideDataResponse();
+        const pept2data = await pept2DataCommunicator.process(peptideCountTable, searchConfig);
+        const response = pept2data.get("AAAAA").toPeptideDataResponse();
         response["sequence"] = "AAAAA";
 
         expect(response).toEqual(AAAAA);
@@ -96,7 +97,7 @@ describe("Pept2DataCommunicator", () => {
             peptides: [AAAAA, AALTER]
         }));
 
-        const communicationSource = new DefaultCommunicationSource();
+        const communicationSource = new DefaultCommunicationSource(NetworkConfiguration.BASE_URL);
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
 
         // First we call the communicator with a small set of peptides and let him process them.
@@ -125,38 +126,6 @@ describe("Pept2DataCommunicator", () => {
         await pept2DataCommunicator.process(largeCountTable, searchConfig);
 
         expect(interceptorCalled).toBeTruthy();
-        done();
-    });
-
-    /**
-     * This test checks if responses are only returned for the search configuration for which they were requested. The
-     * API returns a different result for different search settings, and thus the returned results need to be cached per
-     * search configuration.
-     */
-    it("correctly identifies search configurations", async(done) => {
-        const countTable = new CountTable<Peptide>(counts);
-
-        setupNock(Array.from(counts.keys()), JSON.stringify({
-            peptides: [AAAAA, AALTER, FATSDLNDLYR]
-        }));
-
-        // Only the missing cleavage handling is considered when caching the results, since this is the only parameter
-        // that's passed on to the server.
-        const searchConfig1 = new SearchConfiguration(true, true, false);
-        const searchConfig2 = new SearchConfiguration(true, true, true);
-
-        const communicationSource = new DefaultCommunicationSource();
-        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
-
-        await pept2DataCommunicator.process(countTable, searchConfig1);
-
-        expect(pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig1)).toBeTruthy();
-        expect(pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig2)).toBeFalsy();
-
-        // Also make sure that 2 different objects that represent the same search config are considered to be the same.
-        const searchConfig3 = new SearchConfiguration(true, true, false);
-        expect(pept2DataCommunicator.getPeptideResponse("AAAAA", searchConfig3)).toBeTruthy();
-
         done();
     });
 });

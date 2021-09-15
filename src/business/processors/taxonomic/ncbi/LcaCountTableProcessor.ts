@@ -5,8 +5,9 @@ import {
     NcbiId,
     ProteomicsCountTableProcessor,
     CommunicationSource,
-    Peptide
+    Peptide, PeptideData
 } from "@/business";
+import { ShareableMap } from "shared-memory-datastructures";
 
 export default class LcaCountTableProcessor implements ProteomicsCountTableProcessor<NcbiId> {
     private countTable: CountTable<NcbiId>;
@@ -15,7 +16,7 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
     constructor(
         private readonly peptideCountTable: CountTable<Peptide>,
         private readonly configuration: SearchConfiguration,
-        private readonly communicationSource: CommunicationSource
+        private readonly pept2Data: ShareableMap<Peptide, PeptideData>
     ) {}
 
     public cancel() {
@@ -26,26 +27,20 @@ export default class LcaCountTableProcessor implements ProteomicsCountTableProce
         return false;
     }
 
-    public async getCountTable(): Promise<CountTable<NcbiId>> {
-        await this.compute();
+    public getCountTable(): CountTable<NcbiId> {
         return this.countTable;
     }
 
-    public async getAnnotationPeptideMapping(): Promise<Map<NcbiId, Peptide[]>> {
-        await this.compute();
+    public getAnnotationPeptideMapping(): Map<NcbiId, Peptide[]> {
         return this.lca2Peptides;
     }
 
-    protected async compute(): Promise<void> {
+    public async compute(): Promise<void> {
         if (this.countTable) {
             return;
         }
 
-        const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
-        await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
-
-        const pept2DataResponse = pept2DataCommunicator.getPeptideResponseMap(this.configuration);
-        const buffers = pept2DataResponse.getBuffers();
+        const buffers = this.pept2Data.getBuffers();
 
         const [countsPerLca, lca2Peptides] = await QueueManager.getLongRunningQueue().pushTask<
             [Map<NcbiId, number>, Map<NcbiId, Peptide[]>],

@@ -6,31 +6,34 @@ import {
     OntologyProcessor,
     NcbiTaxon,
     NcbiId,
-    CommunicationSource
+    CommunicationSource,
+    NcbiResponseCommunicator
 } from "@/business";
 
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {
-    constructor(private readonly comSource: CommunicationSource) {}
+    constructor(private readonly ncbiCommunicator: NcbiResponseCommunicator) {}
 
     public async getOntology(table: CountTable<NcbiId>): Promise<Ontology<NcbiId, NcbiTaxon>> {
         return await this.getOntologyByIds(table.getOntologyIds());
     }
 
-    public async getOntologyByIds(ids: NcbiId[]): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        const communicator = this.comSource.getNcbiCommunicator();
-        await communicator.process(ids);
+    /**
+     * @param ids The NCBI id's for which all associated taxa information should be retrieved.
+     * @param withLineage Should all taxa that are a child of one of the given NCBI id's also be retrieved?
+     */
+    public async getOntologyByIds(ids: NcbiId[], withLineage: boolean = true): Promise<Ontology<NcbiId, NcbiTaxon>> {
+        await this.ncbiCommunicator.process(ids);
 
         const result: Map<NcbiId, NcbiTaxon> = await QueueManager.getLongRunningQueue().pushTask<
-            Map<NcbiId, NcbiTaxon>, [NcbiId[], Map<NcbiId, NcbiResponse>]
-        >("computeNcbiOntology", [ids, communicator.getResponseMap()]);
+            Map<NcbiId, NcbiTaxon>, [NcbiId[], Map<NcbiId, NcbiResponse>, boolean]
+        >("computeNcbiOntology", [ids, this.ncbiCommunicator.getResponseMap(), withLineage]);
 
         return new Ontology<NcbiId, NcbiTaxon>(result);
     }
 
     public async getDefinition(id: NcbiId): Promise<NcbiTaxon> {
-        const communicator = this.comSource.getNcbiCommunicator();
-        await communicator.process([id]);
-        const response = communicator.getResponse(id);
+        await this.ncbiCommunicator.process([id]);
+        const response = this.ncbiCommunicator.getResponse(id);
         if (response) {
             return new NcbiTaxon(id, response.name, response.rank, response.lineage);
         } else {

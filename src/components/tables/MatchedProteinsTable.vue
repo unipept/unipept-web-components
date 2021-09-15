@@ -297,16 +297,22 @@ export default class MatchedProteinsTable extends Vue {
 
             const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
 
-            await pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
-            this.peptideData = pept2DataCommunicator.getPeptideResponse(
-                this.peptide,
+            const pept2data = await pept2DataCommunicator.process(
+                new CountTable<Peptide>(new Map([[this.peptide, 1]])),
                 searchConfig
             );
+            this.peptideData = pept2data.get(this.peptide);
 
-            const ecOntologyProcessor = new EcOntologyProcessor(this.communicationSource);
-            const goOntologyProcessor = new GoOntologyProcessor(this.communicationSource);
-            const interproOntologyProcessor = new InterproOntologyProcessor(this.communicationSource);
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
+            const ecOntologyProcessor = new EcOntologyProcessor(
+                this.communicationSource.getEcCommunicator()
+            );
+            const goOntologyProcessor = new GoOntologyProcessor(
+                this.communicationSource.getGoCommunicator()
+            );
+            const interproOntologyProcessor = new InterproOntologyProcessor(
+                this.communicationSource.getInterproCommunicator()
+            );
+            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource.getNcbiCommunicator());
 
             const ecOntology = await ecOntologyProcessor.getOntologyByIds(ecNumbers);
             const goOntology = await goOntologyProcessor.getOntologyByIds(goTerms);

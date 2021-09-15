@@ -128,7 +128,7 @@ export default class SinglePeptideSummary extends Vue {
             const lca = await proteinProcessor.getLcaByPeptide(this.peptide, this.equateIl);
             const commonLineage = await proteinProcessor.getCommonLineageByPeptide(this.peptide, this.equateIl);
 
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
+            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource.getNcbiCommunicator());
             const ontology = await ncbiOntologyProcessor.getOntologyByIds([lca, ...commonLineage]);
 
             this.lca = ontology.getDefinition(lca);

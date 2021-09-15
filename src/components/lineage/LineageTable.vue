@@ -112,7 +112,7 @@ export default class LineageTable extends Vue {
 
             const organismIds = proteins.map(p => p.organism);
 
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
+            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource.getNcbiCommunicator());
             const ontology = await ncbiOntologyProcessor.getOntologyByIds(organismIds);
 
             this.organisms.length = 0;

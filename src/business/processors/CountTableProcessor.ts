@@ -3,5 +3,5 @@ import { OntologyIdType } from "../ontology/Ontology";
 import Cancellable from "../progress/Cancellable";
 
 export default interface CountTableProcessor<OntologyId extends OntologyIdType> extends Cancellable {
-    getCountTable(): Promise<CountTable<OntologyId>>;
+    getCountTable(): CountTable<OntologyId>;
 }

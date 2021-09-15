@@ -76,7 +76,7 @@ export default class Mock {
 
     public async mockRealisticNcbiOntology(): Promise<Ontology<NcbiId, NcbiTaxon>> {
         const lcaCounts = await this.mockRealisticLcaCountTable();
-        const ontologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource());
+        const ontologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource().getNcbiCommunicator());
         return await ontologyProcessor.getOntology(lcaCounts);
     }
 

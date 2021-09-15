@@ -30,6 +30,7 @@ export default abstract class FunctionalCountTableProcessor<
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
      * @param configuration The search configuration that should be applied while processing the peptides.
+     * @param pept2Data Mapping between all unique peptides and the corresponding functional and taxonomic information.
      * @param percentage Threshold for determining if a functional annotation should be included in the output or not.
      * @param peptideData2ProteinCount Property of the PeptideDataResponse object that can be used to extract protein
      * count.
@@ -39,7 +40,7 @@ export default abstract class FunctionalCountTableProcessor<
     protected constructor(
         protected readonly peptideCountTable: CountTable<Peptide>,
         protected readonly configuration: SearchConfiguration,
-        protected readonly communicationSource: CommunicationSource,
+        protected readonly pept2Data: ShareableMap<Peptide, PeptideData>,
         protected readonly percentage: number = FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE,
         private readonly peptideData2ProteinCount: string,
         private readonly termPrefix: string
@@ -55,10 +56,9 @@ export default abstract class FunctionalCountTableProcessor<
      * peptides in which it was found, taking into account the percentage constraints set in the constructor of this
      * class.
      */
-    public async getCountTable(
+    public getCountTable(
         namespace?: FunctionalNamespace
-    ): Promise<CountTable<OntologyId>> {
-        await this.compute();
+    ): CountTable<OntologyId> {
         if (namespace) {
             return this.countTables.get(namespace);
         } else {
@@ -79,12 +79,10 @@ export default abstract class FunctionalCountTableProcessor<
      * annotation.
      */
     public async getTrust(): Promise<FunctionalTrust> {
-        await this.compute();
         return this.trust;
     }
 
-    public async getAnnotationPeptideMapping(): Promise<Map<OntologyId, Peptide[]>> {
-        await this.compute();
+    public getAnnotationPeptideMapping(): Map<OntologyId, Peptide[]> {
         return this.item2Peptides;
     }
 
@@ -92,18 +90,12 @@ export default abstract class FunctionalCountTableProcessor<
      * Do compute both the count table and trust output. Both processing results are stored as part of this object, and
      * can be safely used after this function finishes.
      */
-    protected async compute(): Promise<void> {
+    public async compute(): Promise<void> {
         if (this.countTables.size > 0) {
             return;
         }
 
-        const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
-        await pept2DataCommunicator.process(this.peptideCountTable, this.configuration);
-
-        const peptideResponseMap = pept2DataCommunicator.getPeptideResponseMap(
-            this.configuration
-        ) as ShareableMap<Peptide, PeptideData>;
-        const buffers = peptideResponseMap.getBuffers();
+        const buffers = this.pept2Data.getBuffers();
 
         const [countsPerCode, item2Peptides, annotatedCount] = await QueueManager.getLongRunningQueue().pushTask<[
             Map<OntologyId, number>,
@@ -156,7 +148,7 @@ export default abstract class FunctionalCountTableProcessor<
         this.trust = new FunctionalTrust(annotatedCount, this.peptideCountTable.totalCount);
     }
 
-    protected abstract async getOntology(
+    protected abstract getOntology(
         countTable: CountTable<OntologyId>
     ): Promise<Ontology<OntologyId, DefinitionType>>;
 

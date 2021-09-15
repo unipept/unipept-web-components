@@ -8,6 +8,10 @@ export default class MetaDataCommunicator {
     private lastChecked: Date;
     private currentUniProtVersion: string;
 
+    public constructor(
+        private readonly endpointUrl: string
+    ) {}
+
     /**
      * Connects with Unipept's private API and requests what UniProt version is currently set.
      *
@@ -22,7 +26,7 @@ export default class MetaDataCommunicator {
         ) {
             try {
                 const response = await NetworkUtils.getJSON(
-                    NetworkConfiguration.BASE_URL + MetaDataCommunicator.VERSION_API_ENDPOINT
+                    this.endpointUrl + MetaDataCommunicator.VERSION_API_ENDPOINT
                 );
 
                 this.currentUniProtVersion = response.uniprot_version;

@@ -49,6 +49,6 @@ export default abstract class Assay implements Visitable<AssayVisitor> {
         }
     }
 
-    abstract async accept(visitor: AssayVisitor): Promise<void>;
+    abstract accept(visitor: AssayVisitor): Promise<void>;
 }
 

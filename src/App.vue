@@ -14,20 +14,5 @@ import { CountTable, Peptide } from "@/business";
 @Component({
     components: {  }
 })
-export default class App extends Vue {
-  private selectedDatasets = [];
-
-  async mounted() {
-      const pept2DataComm = new Pept2DataCommunicator();
-      const countTable = new CountTable<Peptide>(new Map<Peptide, number>(
-          [
-              ["SGIVLPGQAQEKPQQAEVVAVGPGGVVDGK", 1],
-              ["MEVAVGDKVIYSK", 1],
-              ["WESGYNTR", 1],
-              ["ATNYNAGDR", 1]
-          ]
-      ))
-      await pept2DataComm.process(countTable, new SearchConfiguration());
-  }
-}
+export default class App extends Vue {}
 </script>

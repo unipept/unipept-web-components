@@ -70,7 +70,7 @@ export default class LineageTree extends Vue {
 
             const taxaCountTable = new CountTable<NcbiId>(taxaCounts);
 
-            const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
+            const taxaOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource.getNcbiCommunicator());
             const taxaOntology = await taxaOntologyProcessor.getOntology(taxaCountTable);
 
             this.tree = new Tree(taxaCountTable, taxaOntology);

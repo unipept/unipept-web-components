@@ -99,23 +99,23 @@ export default class MultiEcSummaryCard extends Vue {
     private isComputing: boolean = false;
 
     get ecCountTableProcessor(): EcCountTableProcessor {
-        return this.$store.getters["ec/filteredData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay)?.ecCountTableProcessor;
     }
 
     get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+        return this.$store.getters.assayData(this.assay)?.peptideCountTable;
     }
 
     get ecOntology(): Ontology<EcCode, EcDefinition> {
-        return this.$store.getters["ec/ontology"](this.assay);
+        return this.$store.getters.assayData(this.assay)?.ecOntology;
     }
 
     get tree(): Tree {
-        return this.$store.getters["ncbi/tree"](this.assay);
+        return this.$store.getters.assayData(this.assay)?.tree;
     }
 
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay)?.ncbiCountTableProcessor;
     }
 
     get filterPercentage(): number {
