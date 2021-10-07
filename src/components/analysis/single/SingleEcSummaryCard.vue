@@ -1,9 +1,3 @@
-<docs>
-    A variant of the EcSummaryCard that's specifically designed for the analysis of a single peptide. This variant works
-    with a peptide as input and provides the counted EC-numbers in function of the amount of proteins associated with
-    it.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text>
@@ -94,7 +88,7 @@ export default class SingleEcSummaryCard extends Vue {
 
             const functionalCountTable = await ecProteinProcessor.getCountTable();
 
-            const ontologyProcessor = new EcOntologyProcessor(this.communicationSource);
+            const ontologyProcessor = new EcOntologyProcessor(this.communicationSource.getEcCommunicator());
             const ontology = await ontologyProcessor.getOntology(functionalCountTable);
 
             this.trust = await ecProteinProcessor.getTrust();

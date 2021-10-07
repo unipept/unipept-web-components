@@ -24,11 +24,12 @@ export default class InterproProteinCountTableProcessor extends FunctionalProtei
     }
 
     protected getNamespaces(): FunctionalNamespace[] {
-        return Object.values(InterproNamespace);
+        // @ts-ignore
+        return Object.values(InterproNamespace) as FunctionalNamespace[];
     }
 
     protected async getOntology(countTable: CountTable<InterproCode>): Promise<Ontology<InterproCode, InterproDefinition>> {
-        const processor = new InterproOntologyProcessor(this.communicationSource);
+        const processor = new InterproOntologyProcessor(this.communicationSource.getInterproCommunicator());
         return await processor.getOntology(countTable);
     }
 

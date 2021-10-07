@@ -22,8 +22,7 @@ export default abstract class FunctionalProteinCountTableProcessor<
         protected readonly itemPrefix: string = ""
     ) {}
 
-    public async getCountTable(namespace?: FunctionalNamespace): Promise<CountTable<OntologyId>> {
-        await this.compute();
+    public getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId> {
         if (namespace) {
             return this.countTables.get(namespace);
         } else {

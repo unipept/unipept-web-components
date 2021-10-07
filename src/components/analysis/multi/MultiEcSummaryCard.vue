@@ -67,7 +67,7 @@ import {
     PeptideCountTableProcessor,
     FunctionalSummaryProcessor,
     NetworkUtils,
-    CsvUtils, TreeNode
+    CsvUtils, TreeNode, PeptideData, NcbiTaxon
 } from "@/business";
 
 import MultiAmountTableItemRetriever from "@/components/analysis/multi/MultiAmountTableItemRetriever";
@@ -77,6 +77,7 @@ import CommunicationSource from "@/business/communication/source/CommunicationSo
 import Treeview from "@/components/visualizations/Treeview.vue";
 import AmountTable from "@/components/tables/AmountTable.vue";
 import { DataNodeLike } from "unipept-visualizations";
+import { ShareableMap } from "shared-memory-datastructures";
 
 @Component({
     components: { FilterFunctionalAnnotationsDropdown, Treeview, AmountTable }
@@ -98,40 +99,40 @@ export default class MultiEcSummaryCard extends Vue {
 
     private isComputing: boolean = false;
 
-    get ecCountTableProcessor(): EcCountTableProcessor {
-        return this.$store.getters.assayData(this.assay)?.ecCountTableProcessor;
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
     }
 
-    get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.peptideCountTable;
+    get ecCountTableProcessor(): EcCountTableProcessor {
+        return this.$store.getters["assayData"](this.assay)?.filteredData.ecCountTableProcessor;
     }
 
     get ecOntology(): Ontology<EcCode, EcDefinition> {
-        return this.$store.getters.assayData(this.assay)?.ecOntology;
+        return this.$store.getters["assayData"](this.assay)?.ecOntology;
     }
 
     get tree(): Tree {
-        return this.$store.getters.assayData(this.assay)?.tree;
+        return this.$store.getters["assayData"](this.assay)?.originalData.tree;
     }
 
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters.assayData(this.assay)?.ncbiCountTableProcessor;
+        return this.$store.getters["assayData"](this.assay)?.originalData.ncbiCountTableProcessor
     }
 
     get filterPercentage(): number {
-        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+        return this.$store.getters["assayData"](this.assay)?.filteredData.percentage;
     }
 
     get communicationSource(): CommunicationSource {
-        return this.$store.getters.assayData(this.assay)?.communicationSource;
+        return this.assay.getAnalysisSource().getCommunicationSource();
     }
 
-    get pept2DataCommunicator(): Pept2DataCommunicator {
-        return this.$store.getters.assayData(this.assay)?.pept2dataCommunicator;
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters["assayData"](this.assay)?.pept2data;
     }
 
-    get ncbiOntologyProcessor(): NcbiOntologyProcessor {
-        return this.$store.getters["ncbi/ontology"](this.assay)?.processor;
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters["assayData"](this.assay)?.ncbiOntology;
     }
 
     private mounted() {
@@ -171,7 +172,8 @@ export default class MultiEcSummaryCard extends Vue {
                 const ecProcessor = new EcCountTableProcessor(
                     this.peptideCountTable,
                     this.assay.getSearchConfiguration(),
-                    this.communicationSource,
+                    this.pept2data,
+                    this.communicationSource.getEcCommunicator(),
                     this.filterPercentage
                 );
 
@@ -206,9 +208,8 @@ export default class MultiEcSummaryCard extends Vue {
         const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
             this.ecOntology.getDefinition(code),
             peptideCounts,
-            this.assay.getSearchConfiguration(),
-            this.pept2DataCommunicator,
-            this.ncbiOntologyProcessor
+            this.pept2data,
+            this.ncbiOntology
         );
 
         await NetworkUtils.downloadDataByForm(

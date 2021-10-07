@@ -1,9 +1,3 @@
-<docs>
-    This component represents a table that displays all metadata about a certain functional or taxonomical annotation.
-    The table consists out of 3 different columns that respectively display the name, the identifier (or category)
-    and the amount of associated peptides of an annotation.
-</docs>
-
 <template>
     <data-source
         :items="items"

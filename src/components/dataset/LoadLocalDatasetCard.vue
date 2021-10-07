@@ -1,8 +1,3 @@
- <docs>
-The `LoadLocalDatasetCard` displays a list of all assays that are persistently stored on the user's local computer. The
-component provides him with the option to select one of these assays for analysis.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text v-if="storedAssays.length === 0">

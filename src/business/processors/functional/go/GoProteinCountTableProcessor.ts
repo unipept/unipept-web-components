@@ -23,11 +23,12 @@ export default class GoProteinCountTableProcessor extends FunctionalProteinCount
     }
 
     protected getNamespaces(): FunctionalNamespace[] {
-        return Object.values(GoNamespace);
+        // @ts-ignore
+        return Object.values(GoNamespace) as FunctionalNamespace[];
     }
 
     protected async getOntology(countTable: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {
-        const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
+        const ontologyProcessor = new GoOntologyProcessor(this.communicationSource.getGoCommunicator());
         return await ontologyProcessor.getOntology(countTable);
     }
 }

@@ -1,9 +1,3 @@
-<docs>
-    The MatchedProteinsTable is a component that displays a list of all proteins that are associated with a given
-    peptide. This table shows the UniProt ID's, protein name, organism in which the protein occurs and all associated
-    functional annotations.
-</docs>
-
 <template>
     <v-card>
         <v-card-title>

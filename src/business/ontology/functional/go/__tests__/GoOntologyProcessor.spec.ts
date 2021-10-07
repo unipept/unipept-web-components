@@ -20,7 +20,7 @@ describe("GoOntologyProcessor", () => {
     it("returns a correct ontology for an Gene Ontology count table", async() => {
         const goCounts = new CountTable<GoCode>(goCodes);
 
-        const goProcessor = new GoOntologyProcessor(new DefaultCommunicationSource());
+        const goProcessor = new GoOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getGoCommunicator());
         const ontology = await goProcessor.getOntology(goCounts);
 
         expect(ontology.getDefinition("GO:0000122")).toBeTruthy();
@@ -41,7 +41,7 @@ describe("GoOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const goProcessor = new GoOntologyProcessor(new DefaultCommunicationSource());
+        const goProcessor = new GoOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getGoCommunicator());
         let definition = await goProcessor.getDefinition("GO:0000122");
 
         expect(definition).toEqual({

@@ -6,9 +6,10 @@ export enum GoNamespace {
 
 export function convertStringToGoNamespace(input: string): GoNamespace {
     input = input.toLowerCase();
-    for (const space of Object.values(GoNamespace)) {
+    // @ts-ignore
+    for (const space of Object.values(GoNamespace).map(x => x.toString())) {
         if (space === input) {
-            return space;
+            return space as GoNamespace;
         }
     }
     return null;

@@ -2,6 +2,8 @@ import { CountTable } from "./../counts/CountTable";
 import { Peptide } from "./../ontology/raw/Peptide";
 import SearchConfiguration from "./../configuration/SearchConfiguration";
 import CommunicationSource from "./../communication/source/CommunicationSource";
+import { PeptideData } from "@/business";
+import { ShareableMap } from "shared-memory-datastructures";
 export default class PeptideExport {
     /**
      * Produces a CSV that contains one row per peptide (these rows are duplicated for peptides that occur multiple
@@ -12,7 +14,7 @@ export default class PeptideExport {
      * present in the generated export.
      * @param searchConfiguration The particular configuration settings that are used for processing the peptides
      * present in the count table.
-     * @param communicationSource
+     * @param pept2data
      * @param separator The delimiter used to separate columns in the CSV. Use comma for international format, and semi-
      * colon for the European version.
      * @param secondarySeparator The delimiter used to separate multiple functional annotations from each other. Some
@@ -20,7 +22,7 @@ export default class PeptideExport {
      * character different from the default separator.
      * @param lineEnding The line terminator that should be used.
      */
-    static exportSummaryAsCsv(peptideCountTable: CountTable<Peptide>, searchConfiguration: SearchConfiguration, communicationSource: CommunicationSource, separator?: string, secondarySeparator?: string, lineEnding?: string): Promise<string>;
+    static exportSummaryAsCsv(peptideCountTable: CountTable<Peptide>, searchConfiguration: SearchConfiguration, pept2data: ShareableMap<Peptide, PeptideData>, communicationSource: CommunicationSource, separator?: string, secondarySeparator?: string, lineEnding?: string): Promise<string>;
     private static sortAnnotations;
     /**
      * @return The default set of columns that's part of the generated export.

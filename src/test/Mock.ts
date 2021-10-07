@@ -10,6 +10,7 @@ import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCoun
 import { Ontology } from "@/business/ontology/Ontology";
 import NcbiOntologyProcessor from "@/business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import { Pept2DataCommunicator } from "@/business";
 
 export default class Mock {
     /**
@@ -66,17 +67,22 @@ export default class Mock {
     }
 
     public async mockRealisticLcaCountTable(): Promise<CountTable<NcbiId>> {
+        const peptideCountTable = await this.mockRealisticPeptideCountTable();
+
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(peptideCountTable, new SearchConfiguration());
+
         const lcaCountTableProcessor = new LcaCountTableProcessor(
             await this.mockRealisticPeptideCountTable(),
             new SearchConfiguration(),
-            new DefaultCommunicationSource()
+            pept2data
         );
-        return await lcaCountTableProcessor.getCountTable();
+        return lcaCountTableProcessor.getCountTable();
     }
 
     public async mockRealisticNcbiOntology(): Promise<Ontology<NcbiId, NcbiTaxon>> {
         const lcaCounts = await this.mockRealisticLcaCountTable();
-        const ontologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource().getNcbiCommunicator());
+        const ontologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getNcbiCommunicator());
         return await ontologyProcessor.getOntology(lcaCounts);
     }
 

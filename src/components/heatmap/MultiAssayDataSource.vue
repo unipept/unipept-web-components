@@ -1,9 +1,3 @@
-<docs>
-    This component is designed to display information about taxonomic or functional annotations for multiple assays.
-    Both the total number of peptides (over multiple assays) that are annotated with a specific annotation and the
-    amount of assays in which the annotation occurs are shown (as well as the annotation's name and category or id).
-</docs>
-
 <template>
     <div>
         <!-- By passing the datasource model as a prop here, the template in the component filling it in, can

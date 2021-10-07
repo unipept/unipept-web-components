@@ -5,6 +5,7 @@ import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import { EcNamespace } from "@/business/ontology/functional/ec/EcNamespace";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import { Pept2DataCommunicator } from "@/business";
 
 const counts = new Map([
     ["YVVLQPGVK", 1],
@@ -38,11 +39,15 @@ describe("FunctionalCountTableProcessor", () => {
     });
 
     it("correctly computes the trust for a count table", async(done) => {
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+
         // First test if the trust is correct without performing a filter on percentage and using a simple count table.
         let ecCountProcessor = new EcCountTableProcessor(
             countTable,
             new SearchConfiguration(),
-            new DefaultCommunicationSource(),
+            pept2data,
+            new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator(),
             0
         );
 
@@ -55,7 +60,8 @@ describe("FunctionalCountTableProcessor", () => {
         ecCountProcessor = new EcCountTableProcessor(
             multiCountTable,
             new SearchConfiguration(true, false, false),
-            new DefaultCommunicationSource(),
+            pept2data,
+            new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator(),
             0
         );
 
@@ -67,10 +73,14 @@ describe("FunctionalCountTableProcessor", () => {
     });
 
     it("correctly returns counts over all namespaces", async(done) => {
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+
         let ecCountProcessor = new EcCountTableProcessor(
             countTable,
             new SearchConfiguration(),
-            new DefaultCommunicationSource(),
+            pept2data,
+            new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator(),
             0
         );
         let table = await ecCountProcessor.getCountTable();
@@ -85,7 +95,8 @@ describe("FunctionalCountTableProcessor", () => {
         ecCountProcessor = new EcCountTableProcessor(
             multiCountTable,
             new SearchConfiguration(true, false, false),
-            new DefaultCommunicationSource(),
+            pept2data,
+            new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator(),
             0
         );
         table = await ecCountProcessor.getCountTable();
@@ -99,10 +110,14 @@ describe("FunctionalCountTableProcessor", () => {
     });
 
     it("correctly returns counts for a specific namespace", async(done) => {
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+
         let ecCountProcessor = new EcCountTableProcessor(
             countTable,
             new SearchConfiguration(),
-            new DefaultCommunicationSource(),
+            pept2data,
+            new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator(),
             0
         );
         // Namespace associated with 2.x.x.x EC-numbers
@@ -127,10 +142,14 @@ describe("FunctionalCountTableProcessor", () => {
      * computed.
      */
     it("correctly maps annotations onto their associated peptides", async(done) => {
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+
         const ecCountProcessor = new EcCountTableProcessor(
             countTable,
             new SearchConfiguration(),
-            new DefaultCommunicationSource(),
+            pept2data,
+            new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator(),
             0
         );
         const mapping = await ecCountProcessor.getAnnotationPeptideMapping();

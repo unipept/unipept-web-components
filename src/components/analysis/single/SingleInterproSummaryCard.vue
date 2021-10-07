@@ -1,7 +1,3 @@
-<docs>
-    A variant of the InterproSummaryCard that's specifically designed for the analysis of a single peptide.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text>
@@ -53,7 +49,10 @@ export default class SingleInterproSummaryCard extends Vue {
     private trustLine: string = "";
     private isComputing: boolean = false;
 
-    private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).sort());
+    // @ts-ignore
+    private namespaceValues: string[] = ["all"].concat(
+        Object.values(InterproNamespace).map(x => x.toString()).sort()
+    );
     private selectedNamespace: string = "all";
 
     private computedItems: {
@@ -99,7 +98,7 @@ export default class SingleInterproSummaryCard extends Vue {
                     countTable = await interproProteinProcessor.getCountTable(ns as InterproNamespace);
                 }
 
-                const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
+                const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource.getInterproCommunicator());
                 const ontology = await ontologyProcessor.getOntology(countTable);
 
                 const itemRetriever = new SingleAmountTableItemRetriever(

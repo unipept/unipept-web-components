@@ -42,12 +42,12 @@ import {
     InterproCode,
     InterproDefinition, InterproNamespace,
     NcbiId,
-    NcbiOntologyProcessor,
+    NcbiOntologyProcessor, NcbiTaxon,
     NetworkUtils,
     Ontology,
     Pept2DataCommunicator,
     Peptide,
-    PeptideCountTableProcessor,
+    PeptideCountTableProcessor, PeptideData,
     Tree
 } from "@/business";
 import LcaCountTableProcessor from "@/business/processors/taxonomic/ncbi/LcaCountTableProcessor";
@@ -56,6 +56,7 @@ import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriev
 import MultiAmountTableItemRetriever from "@/components/analysis/multi/MultiAmountTableItemRetriever";
 import AmountTable from "@/components/tables/AmountTable.vue";
 import { convertStringToInterproNamespace } from "@/business/ontology/functional/interpro/InterproNamespace";
+import { ShareableMap } from "shared-memory-datastructures";
 
 @Component({
     components: { FilterFunctionalAnnotationsDropdown, AmountTable }
@@ -74,47 +75,48 @@ export default class MultiInterproSummaryCard extends Vue {
     private itemsToPeptides: Map<InterproCode, Peptide[]> = null;
     private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
 
-    private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).sort());
+    // @ts-ignore
+    private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).map(x => x.toString()).sort());
     private selectedNamespace: string = "all";
 
     private trustLine: string = "";
     private isComputing: boolean = false;
     private percentSettings: string = "5";
 
-    get interproCountTableProcessor(): InterproCountTableProcessor {
-        return this.$store.getters["interpro/filteredData"](this.assay)?.processor;
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
     }
 
-    get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+    get interproCountTableProcessor(): InterproCountTableProcessor {
+        return this.$store.getters["assayData"](this.assay)?.filteredData.interproCountTableProcessor;
     }
 
     get interproOntology(): Ontology<InterproCode, InterproDefinition> {
-        return this.$store.getters["interpro/ontology"](this.assay);
+        return this.$store.getters["assayData"](this.assay)?.interproOntology;
     }
 
     get tree(): Tree {
-        return this.$store.getters["ncbi/tree"](this.assay);
+        return this.$store.getters["assayData"](this.assay)?.originalData.tree;
     }
 
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+        return this.$store.getters["assayData"](this.assay)?.originalData.ncbiCountTableProcessor
     }
 
     get filterPercentage(): number {
-        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+        return this.$store.getters["assayData"](this.assay)?.filteredData.percentage;
     }
 
     get communicationSource(): CommunicationSource {
-        return this.$store.getters.assayData(this.assay)?.communicationSource;
+        return this.assay.getAnalysisSource().getCommunicationSource();
     }
 
-    get pept2DataCommunicator(): Pept2DataCommunicator {
-        return this.$store.getters.assayData(this.assay)?.pept2dataCommunicator;
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters["assayData"](this.assay)?.pept2data;
     }
 
-    get ncbiOntologyProcessor(): NcbiOntologyProcessor {
-        return this.$store.getters["ncbi/ontology"](this.assay)?.processor;
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters["assayData"](this.assay)?.ncbiOntology;
     }
 
     private created() {
@@ -161,7 +163,8 @@ export default class MultiInterproSummaryCard extends Vue {
                     const iprProcessor = new InterproCountTableProcessor(
                         this.peptideCountTable,
                         this.assay.getSearchConfiguration(),
-                        this.communicationSource,
+                        this.pept2data,
+                        this.communicationSource.getInterproCommunicator(),
                         this.filterPercentage
                     );
 
@@ -200,9 +203,8 @@ export default class MultiInterproSummaryCard extends Vue {
         const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
             this.interproOntology.getDefinition(code),
             peptideCounts,
-            this.assay.getSearchConfiguration(),
-            this.pept2DataCommunicator,
-            this.ncbiOntologyProcessor
+            this.pept2data,
+            this.ncbiOntology
         );
 
         await NetworkUtils.downloadDataByForm(

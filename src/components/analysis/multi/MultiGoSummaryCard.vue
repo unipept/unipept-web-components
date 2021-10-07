@@ -1,9 +1,3 @@
-<docs>
-    A variant of the GoSummaryCard specifically designed for the analysis of multiple peptides. This variant works
-    with a PeptideCountTable as input and provides the counted GO-terms in function of the amount of peptides associated
-    with it.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text>
@@ -41,19 +35,19 @@ import GoSummary from "./../functional/GoSummary.vue";
 import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
 import {
     CountTable,
-    CsvUtils,
+    CsvUtils, FunctionalNamespace,
     FunctionalSummaryProcessor,
     FunctionalTrust,
     GoCode,
     GoDefinition,
     GoNamespace,
     NcbiId,
-    NcbiOntologyProcessor,
+    NcbiOntologyProcessor, NcbiTaxon,
     NetworkUtils,
     Ontology,
     Pept2DataCommunicator,
     Peptide,
-    PeptideCountTableProcessor,
+    PeptideCountTableProcessor, PeptideData,
     ProteomicsAssay,
     Tree
 } from "@/business";
@@ -63,6 +57,7 @@ import CommunicationSource from "@/business/communication/source/CommunicationSo
 import FunctionalCountTableProcessor from "@/business/processors/functional/FunctionalCountTableProcessor";
 import MultiAmountTableItemRetriever from "@/components/analysis/multi/MultiAmountTableItemRetriever";
 import { FunctionalUtils } from "@/components/analysis/functional/FunctionalUtils";
+import { ShareableMap } from "shared-memory-datastructures";
 
 @Component({
     components: {
@@ -91,43 +86,44 @@ export default class MultiGoSummaryCard extends Vue {
     private itemsToPeptides: Map<GoCode, Peptide[]> = null;
 
     get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
     }
 
     get goCountTableProcessor(): GoCountTableProcessor {
-        return this.$store.getters["go/filteredData"](this.assay)?.processor;
+        return this.$store.getters["assayData"](this.assay)?.filteredData.goCountTableProcessor;
     }
 
     get goOntology(): Ontology<GoCode, GoDefinition> {
-        return this.$store.getters["go/ontology"](this.assay);
+        return this.$store.getters["assayData"](this.assay)?.goOntology;
     }
 
     get tree(): Tree {
-        return this.$store.getters["ncbi/tree"](this.assay);
+        return this.$store.getters["assayData"](this.assay)?.originalData.tree;
     }
 
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+        return this.$store.getters["assayData"](this.assay)?.originalData.ncbiCountTableProcessor
     }
 
     get filterPercentage(): number {
-        return this.$store.getters.assayData(this.assay)?.filterPercentage;
+        return this.$store.getters["assayData"](this.assay)?.filteredData.percentage;
     }
 
     get communicationSource(): CommunicationSource {
-        return this.$store.getters.assayData(this.assay)?.communicationSource;
+        return this.assay.getAnalysisSource().getCommunicationSource();
     }
 
-    get pept2DataCommunicator(): Pept2DataCommunicator {
-        return this.$store.getters.assayData(this.assay)?.pept2dataCommunicator;
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters["assayData"](this.assay)?.pept2data;
     }
 
-    get ncbiOntologyProcessor(): NcbiOntologyProcessor {
-        return this.$store.getters["ncbi/ontology"](this.assay)?.processor;
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters["assayData"](this.assay)?.ncbiOntology;
     }
 
-    private mounted() {
-        for (const namespace of Object.values(GoNamespace).sort()) {
+    private created() {
+        // @ts-ignore
+        for (const namespace of Object.values(GoNamespace).map(x => x.toString()).sort()) {
             this.computedItems.push({
                 itemRetriever: undefined,
                 definitions: [],
@@ -158,23 +154,25 @@ export default class MultiGoSummaryCard extends Vue {
         }
 
         if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
-            for (const [idx, namespace] of Object.values(GoNamespace).sort().entries()) {
+            // @ts-ignore
+            for (const [idx, namespace] of Object.values(GoNamespace).map(x => x.toString()).sort().entries()) {
                 let goCountTable: CountTable<GoCode>;
                 let trust: FunctionalTrust;
 
                 if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
-                    goCountTable = await this.goCountTableProcessor.getCountTable(namespace);
+                    goCountTable = await this.goCountTableProcessor.getCountTable(namespace as FunctionalNamespace);
                     this.itemsToPeptides = await this.goCountTableProcessor.getAnnotationPeptideMapping();
                     trust = await this.goCountTableProcessor.getTrust();
                 } else {
                     const goProcessor = new GoCountTableProcessor(
                         this.peptideCountTable,
                         this.assay.getSearchConfiguration(),
-                        this.communicationSource,
+                        this.pept2data,
+                        this.communicationSource.getGoCommunicator(),
                         this.filterPercentage
                     );
 
-                    goCountTable = await goProcessor.getCountTable(namespace);
+                    goCountTable = await goProcessor.getCountTable(namespace as FunctionalNamespace);
                     this.itemsToPeptides = await goProcessor.getAnnotationPeptideMapping();
                     trust = await this.goCountTableProcessor.getTrust();
                 }
@@ -210,9 +208,8 @@ export default class MultiGoSummaryCard extends Vue {
         const data = await functionalSummaryProcessor.summarizeFunctionalAnnotation(
             this.goOntology.getDefinition(code),
             peptideCounts,
-            this.assay.getSearchConfiguration(),
-            this.pept2DataCommunicator,
-            this.ncbiOntologyProcessor
+            this.pept2data,
+            this.ncbiOntology
         );
 
         await NetworkUtils.downloadDataByForm(

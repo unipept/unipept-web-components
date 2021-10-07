@@ -1,8 +1,3 @@
-<docs>
-    A variant of the GoSummaryCard that's specifically designed for the analysis of a single peptide. This variant works
-    with a peptide as input and provides the counted GO-terms in function of the amount of proteins associated with it.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text>
@@ -24,7 +19,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { Peptide, GoNamespace, GoDefinition, GoCode } from "@/business";
+import { Peptide, GoNamespace, GoDefinition, GoCode, FunctionalNamespace } from "@/business";
 import GoProteinCountTableProcessor from "./../../../business/processors/functional/go/GoProteinCountTableProcessor";
 import GoOntologyProcessor from "./../../../business/ontology/functional/go/GoOntologyProcessor";
 import { FunctionalUtils } from "./../functional/FunctionalUtils";
@@ -88,10 +83,11 @@ export default class SingleGoSummaryCard extends Vue {
             this.trust = await goProteinProcessor.getTrust();
             this.trustLine = FunctionalUtils.computeTrustLine(this.trust, "GO-term", "protein");
 
+            // @ts-ignore
             for (const [idx, namespace] of Object.values(GoNamespace).sort().entries()) {
-                const functionalCountTable = await goProteinProcessor.getCountTable(namespace);
+                const functionalCountTable = await goProteinProcessor.getCountTable(namespace as FunctionalNamespace);
 
-                const ontologyProcessor = new GoOntologyProcessor(this.communicationSource);
+                const ontologyProcessor = new GoOntologyProcessor(this.communicationSource.getGoCommunicator());
                 const ontology = await ontologyProcessor.getOntology(functionalCountTable);
 
                 const itemRetriever = new SingleAmountTableItemRetriever(

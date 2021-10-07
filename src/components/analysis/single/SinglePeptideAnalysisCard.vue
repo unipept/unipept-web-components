@@ -1,8 +1,3 @@
-<docs>
-    A card with 5 different tabs that each present a different view on the matched proteins information for a single
-    peptide.
-</docs>
-
 <template>
     <v-card>
         <v-tabs slider-color="secondary" background-color="primary" dark v-model="currentTab">

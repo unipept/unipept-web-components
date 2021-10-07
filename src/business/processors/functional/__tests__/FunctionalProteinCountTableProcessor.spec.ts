@@ -10,7 +10,7 @@ describe("FunctionalProteinCountTableProcessor", () => {
     });
 
     it("correctly computes the trust for a peptide", async() => {
-        const goCountProcessor = new GoProteinCountTableProcessor("ATSST", true, new DefaultCommunicationSource());
+        const goCountProcessor = new GoProteinCountTableProcessor("ATSST", true, new DefaultCommunicationSource("http://unipept.ugent.be"));
 
         let trust = await goCountProcessor.getTrust();
 
@@ -20,7 +20,7 @@ describe("FunctionalProteinCountTableProcessor", () => {
     });
 
     it("correctly returns counts over all namespaces", async() => {
-        const goCountProcessor = new GoProteinCountTableProcessor("ATSST", true, new DefaultCommunicationSource());
+        const goCountProcessor = new GoProteinCountTableProcessor("ATSST", true, new DefaultCommunicationSource("http://unipept.ugent.be"));
         const table = await goCountProcessor.getCountTable();
 
         expect(table.getCounts("GO:0005737")).toBe(2);
@@ -29,7 +29,7 @@ describe("FunctionalProteinCountTableProcessor", () => {
     });
 
     it("correctly returns counts for one namespace", async() => {
-        const goCountProcessor = new GoProteinCountTableProcessor("ATSST", true, new DefaultCommunicationSource());
+        const goCountProcessor = new GoProteinCountTableProcessor("ATSST", true, new DefaultCommunicationSource("http://unipept.ugent.be"));
         const table = await goCountProcessor.getCountTable(GoNamespace.CellularComponent);
 
         expect(table.getCounts("GO:0005737")).toBe(2);

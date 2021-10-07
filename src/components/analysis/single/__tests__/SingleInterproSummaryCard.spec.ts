@@ -29,7 +29,7 @@ describe("SingleInterproSummaryCard", () => {
             propsData: {
                 peptide: "AALTER",
                 equateIl: true,
-                communicationSource: new DefaultCommunicationSource()
+                communicationSource: new DefaultCommunicationSource("http://unipept.ugent.be")
             }
         });
 
@@ -60,7 +60,7 @@ describe("SingleInterproSummaryCard", () => {
             propsData: {
                 peptide: "AALTER",
                 equateIl: true,
-                communicationSource: new DefaultCommunicationSource()
+                communicationSource: new DefaultCommunicationSource("http://unipept.ugent.be")
             }
         });
 

@@ -24,11 +24,12 @@ export default class EcProteinCountTableProcessor extends FunctionalProteinCount
     }
 
     protected getNamespaces(): FunctionalNamespace[] {
-        return Object.values(EcNamespace);
+        // @ts-ignore
+        return Object.values(EcNamespace) as FunctionalNamespace[];
     }
 
     protected async getOntology(countTable: CountTable<EcCode>): Promise<Ontology<EcCode, EcDefinition>> {
-        const processor = new EcOntologyProcessor(this.communicationSource);
+        const processor = new EcOntologyProcessor(this.communicationSource.getEcCommunicator());
         return await processor.getOntology(countTable);
     }
 }

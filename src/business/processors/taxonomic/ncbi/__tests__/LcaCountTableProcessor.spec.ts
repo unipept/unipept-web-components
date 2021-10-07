@@ -5,6 +5,7 @@ import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import Setup from "@/test/Setup";
 import flushPromises from "flush-promises";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import { Pept2DataCommunicator } from "@/business";
 
 const counts = new Map([
     ["YVVLQPGVK", 1],
@@ -32,10 +33,13 @@ describe("LcaCountTableProcessor", () => {
     });
 
     it("correctly computes counts", async(done) => {
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+
         let lcaProcessor = new LcaCountTableProcessor(
             countTable,
             new SearchConfiguration(false, false, false),
-            new DefaultCommunicationSource()
+            pept2data
         );
         let lcaTable = await lcaProcessor.getCountTable();
 
@@ -52,7 +56,7 @@ describe("LcaCountTableProcessor", () => {
         lcaProcessor = new LcaCountTableProcessor(
             multiCountTable,
             new SearchConfiguration(false, false, false),
-            new DefaultCommunicationSource()
+            pept2data
         );
         lcaTable = await lcaProcessor.getCountTable();
 
@@ -65,10 +69,13 @@ describe("LcaCountTableProcessor", () => {
     });
 
     it("correctly computes lca -> peptide mapping", async(done) => {
+        const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
+        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+
         const lcaProcessor = new LcaCountTableProcessor(
             countTable,
             new SearchConfiguration(false, false, false),
-            new DefaultCommunicationSource()
+            pept2data
         );
         const mapping = await lcaProcessor.getAnnotationPeptideMapping();
 
