@@ -10,3 +10,4 @@ export * from "./pride";
 export * from "./protein";
 export * from "./source";
 export * from "./taxonomic";
+export * from "./analysis";

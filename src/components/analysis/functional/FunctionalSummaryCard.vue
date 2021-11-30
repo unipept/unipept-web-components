@@ -246,19 +246,24 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     get filteredCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+        console.log(this.$store.getters.assayData(this.assay));
+        console.log(this.$store.getters.assayData(this.assay)?.filteredData);
+        console.log(this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable);
+        return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
     }
 
     get lcaProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay)?.originalData?.ncbiCountTableProcessor;
     }
 
     get lcaOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters["ncbi/ontology"](this.assay)?.ontology;
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
     }
 
     get filteredNcbiTaxon(): NcbiTaxon {
-        return this.$store.getters.assayData(this.assay)?.taxonFilter;
+        // TODO replace placeholder with real taxon.
+        return new NcbiTaxon(1, "root", "root", []);
+        // return this.$store.getters.assayData(this.assay)?.taxonFilter;
     }
 
     @Watch("filteredCountTable")

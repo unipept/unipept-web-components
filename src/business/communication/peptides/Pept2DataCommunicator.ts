@@ -20,7 +20,7 @@ export default class Pept2DataCommunicator {
     private cancelled: boolean = false;
 
     public constructor(
-        private readonly serviceUrl: string
+        public readonly serviceUrl: string
     ) {}
 
     public async process(

@@ -224,7 +224,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     get tree(): Tree {
-        return this.$store.getters["ncbi/tree"](this.assay);
+        return this.$store.getters.assayData(this.assay)?.originalData?.tree;
     }
 
     get searchConfiguration(): SearchConfiguration {

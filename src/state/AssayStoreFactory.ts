@@ -20,34 +20,29 @@ import {
     Pept2DataCommunicator,
     Peptide,
     PeptideCountTableProcessor,
-    PeptideData,
+    PeptideData, PeptideTrust,
     ProteomicsAssay,
     Tree,
     TreeNode
 } from "@/business";
 
+import { ProgressReport } from "./../business/progress/ProgressReport";
+
 import { ShareableMap } from "shared-memory-datastructures";
 import { ActionContext, ActionTree, GetterTree, Module, MutationTree } from "vuex";
+import PeptideTrustProcessor from "@/business/processors/raw/PeptideTrustProcessor";
 
 export type AssayAnalysisStatus = {
     assay: ProteomicsAssay,
     // Progress value ([0 - 100]) or -1 if indeterminate
-    progress: {
-        // Current progress value of the analysis (should be a number between 0 and 100 or -1 for indeterminate).
-        value: number,
-        // Description of the current step in the analysis process.
-        step: string,
-        // Time at which the current analysis step started.
-        startProcessingTime: number,
-        // Estimated time it will still take to finish this analysis step.
-        eta: number
-    },
+    progress: ProgressReport,
     // All information related to errors that could have occurred during the analysis process.
     error: {
         // Did an error occur?
         status: boolean,
         // Message describing what went wrong during the analysis.
-        message: string
+        message: string,
+        object: Error
     },
     // Is the analysis currently in progress? This value is false if the analysis has not been started yet, or if
     // it ended (either successfully or unsuccessfully).
@@ -78,6 +73,7 @@ export type AssayAnalysisStatus = {
     // A mapping containing all information that was found in the analysis source associated with the assay (organised
     // per peptide).
     pept2Data: ShareableMap<Peptide, PeptideData>,
+    peptideTrust: PeptideTrust,
     // All known information for each GO-term that occurs in the GO count table
     goOntology: Ontology<GoCode, GoDefinition>
     // All known information for each EC-number that occurs in the EC count table
@@ -97,6 +93,21 @@ export default class AssayStoreFactory {
     constructor() {}
 
     public constructAssayStore(): Module<AssayStoreState, any>  {
+        // All of the different steps that are passed when analysing a specific assay.
+        const progressSteps: string[] = [
+            "Analysing peptides",
+            "Computing GO count table",
+            "Computing GO ontology",
+            "Computing EC count table",
+            "Computing EC ontology",
+            "Computing InterPro count table",
+            "Computing InterPro ontology",
+            "Computing lowest common ancestors",
+            "Computing NCBI ontology",
+            "Computing taxonomic tree",
+            "Applying filter"
+        ];
+
         const state = {
             assays: [],
             activeAssay: undefined
@@ -111,6 +122,10 @@ export default class AssayStoreFactory {
             store: ActionContext<AssayStoreState, any>
         ) => {
             const assay = assayStatus.assay;
+
+            if (!store.getters.activeAssay) {
+                store.commit("ACTIVATE_ASSAY", assayStatus.assay);
+            }
 
             // Analysis of the assay started and we should update the status flag accordingly.
             store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, true]);
@@ -134,13 +149,16 @@ export default class AssayStoreFactory {
                         onProgressUpdate(progress: number) {
                             store.commit(
                                 "UPDATE_PROGRESS",
-                                [assay, Math.round(progress * 100), "Analysing peptides"]
+                                [assay, Math.round(progress * 100), 0]
                             );
                         }
                     }
                 );
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing GO count table"]);
+                const peptideTrustProcessor = new PeptideTrustProcessor();
+                const peptideTrust = peptideTrustProcessor.getPeptideTrust(peptideCountTable, pept2Data);
+
+                store.commit("UPDATE_PROGRESS", [assay, -1, 1]);
                 const goCountTableProcessor = new GoCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -150,11 +168,11 @@ export default class AssayStoreFactory {
                 // Preload all GO-related data
                 await goCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing GO ontology"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 2]);
                 const goOntologyProcessor = new GoOntologyProcessor(communicationSource.getGoCommunicator());
                 const goOntology = await goOntologyProcessor.getOntology(goCountTableProcessor.getCountTable());
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing EC count table"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 3]);
                 const ecCountTableProcessor = new EcCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -164,12 +182,12 @@ export default class AssayStoreFactory {
                 // Preload all EC-related data
                 await ecCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing EC ontology"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 4]);
                 const ecOntologyProcessor = new EcOntologyProcessor(communicationSource.getEcCommunicator());
                 const ecOntology = await ecOntologyProcessor.getOntology(ecCountTableProcessor.getCountTable());
 
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing InterPro count table"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 5]);
                 const interproCountTableProcessor = new InterproCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -179,12 +197,12 @@ export default class AssayStoreFactory {
                 // Preload all EC-related data
                 await interproCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing InterPro ontology"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 6]);
                 const iprOntologyProcessor = new InterproOntologyProcessor(communicationSource.getInterproCommunicator());
                 const iprOntology = await iprOntologyProcessor.getOntology(interproCountTableProcessor.getCountTable());
 
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing lowest common ancestors"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 7]);
                 const lcaCountTableProcessor = new LcaCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -192,11 +210,11 @@ export default class AssayStoreFactory {
                 );
                 await lcaCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing NCBI ontology"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 8]);
                 const ncbiOntologyProcessor = new NcbiOntologyProcessor(communicationSource.getNcbiCommunicator());
                 const ncbiOntology = await ncbiOntologyProcessor.getOntology(lcaCountTableProcessor.getCountTable());
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Computing taxonomic tree"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 9]);
                 const tree = new Tree(
                     lcaCountTableProcessor.getCountTable(),
                     ncbiOntology,
@@ -208,6 +226,7 @@ export default class AssayStoreFactory {
                     assay,
                     peptideCountTable,
                     pept2Data,
+                    peptideTrust,
                     goCountTableProcessor,
                     goOntology,
                     ecCountTableProcessor,
@@ -219,7 +238,7 @@ export default class AssayStoreFactory {
                     tree
                 ]);
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, "Applying filter"]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 10]);
                 store.commit("UPDATE_FILTER_DATA", [
                     assay,
                     peptideCountTable,
@@ -231,14 +250,16 @@ export default class AssayStoreFactory {
                     5
                 ]);
 
-                store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
             } catch (err) {
+                console.error(err);
+
                 // If an error occurs during one of the analysis steps, we will directly inform the user and stop the
                 // analysis process.
-                store.commit("UPDATE_ERROR", [assay, true, err.message]);
+                store.commit("UPDATE_ERROR", [assay, true, err.message, err]);
             } finally {
                 // The analysis for this assay is over.
                 store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
+                store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
             }
         }
 
@@ -269,15 +290,18 @@ export default class AssayStoreFactory {
                     assay,
 
                     progress: {
-                        value: -1,
-                        step: "",
-                        startProcessingTime: new Date().getTime(),
+                        steps: progressSteps,
+                        startTimes: new Array(progressSteps.length).fill(0),
+                        endTimes: new Array(progressSteps.length).fill(0),
+                        currentStep: 0,
+                        currentValue: -1,
                         eta: 0
                     },
 
                     error: {
                         status: false,
-                        message: ""
+                        message: "",
+                        object: undefined
                     },
 
                     originalData: {
@@ -300,6 +324,7 @@ export default class AssayStoreFactory {
                     analysisInProgress: false,
                     analysisReady: false,
                     pept2Data: null,
+                    peptideTrust: null,
                     goOntology: null,
                     ecOntology: null,
                     interproOntology: null,
@@ -314,6 +339,11 @@ export default class AssayStoreFactory {
                 }
             },
 
+            REMOVE_ALL_ASSAYS(state: AssayStoreState) {
+                state.activeAssay = undefined;
+                state.assays.splice(0, state.assays.length);
+            },
+
             ACTIVATE_ASSAY(state: AssayStoreState, assay: ProteomicsAssay) {
                 const idx = findAssayIndex(assay, state.assays);
                 state.activeAssay = state.assays[idx];
@@ -321,40 +351,58 @@ export default class AssayStoreFactory {
 
             UPDATE_PROGRESS(
                 state: AssayStoreState,
-                [assay, value, step]: [ProteomicsAssay, number, string]
+                [assay, value, step]: [ProteomicsAssay, number, number]
             ) {
                 const idx = findAssayIndex(assay, state.assays);
 
                 const progressObj = state.assays[idx].progress;
+                progressObj.currentValue = value;
+                progressObj.currentStep = step;
 
-                if (progressObj.step !== step) {
-                    // Reset the timer
-                    progressObj.startProcessingTime = new Date().getTime();
+                const time = new Date().getTime();
+
+                // Update the end time for all the previous steps
+                for (let i = step - 1; i >= 0; i--) {
+                    if (progressObj.endTimes[i] === 0) {
+                        progressObj.endTimes[i] = time;
+                    }
+
+                    if (progressObj.startTimes[i] === 0) {
+                        progressObj.startTimes[i] = time;
+                    }
                 }
 
-                if (value !== -1) {
-                    // We can only calculate an ETA if a valid progress value has been given.
-                    const elapsedTime = new Date().getTime() - progressObj.startProcessingTime;
+                if (progressObj.startTimes[step] === 0) {
+                    progressObj.startTimes[step] = time;
+                    progressObj.eta = -1;
+                } else if (value !== -1) {
+                    // This is already at least the second time that a progress value for this step is reported. This
+                    // means that we can start to calculate an ETA (if a valid progress value has been given).
+                    const elapsedTime = time - progressObj.startTimes[step];
+
+                    console.log("Elapsed time: " + elapsedTime);
 
                     if (elapsedTime > 500) {
                         const progressToDo = 100 - value;
                         const multiplier = progressToDo / value;
-                        progressObj.eta = (elapsedTime * multiplier) / 1000;
+                        progressObj.eta = elapsedTime * multiplier;
+                    } else {
+                        progressObj.eta = -1;
                     }
+                } else {
+                    progressObj.eta = -1;
                 }
-
-                progressObj.value = value;
-                progressObj.step = step;
             },
 
             UPDATE_ERROR(
                 state: AssayStoreState,
-                [assay, errorStatus, errorMessage]: [ProteomicsAssay, boolean, string]
+                [assay, errorStatus, errorMessage, error]: [ProteomicsAssay, boolean, string, Error]
             ) {
                 const idx = findAssayIndex(assay, state.assays);
 
                 state.assays[idx].error.status = errorStatus;
                 state.assays[idx].error.message = errorMessage;
+                state.assays[idx].error.object = error;
             },
 
             UPDATE_ANALYSIS_IN_PROGRESS(
@@ -371,6 +419,31 @@ export default class AssayStoreFactory {
             ) {
                 const idx = findAssayIndex(assay, state.assays);
                 state.assays[idx].analysisReady = analysisReady;
+
+                const progressObj = state.assays[idx].progress;
+
+                const time = new Date().getTime();
+
+                if (analysisReady) {
+                    progressObj.currentStep = 11;
+
+                    // Store end time for the last progress
+                    for (let i = 0; i < progressObj.steps.length; i++) {
+                        if (progressObj.startTimes[i] === 0) {
+                            progressObj.startTimes[i] = time;
+                        }
+
+                        if (progressObj.endTimes[i] === 0) {
+                            progressObj.endTimes[i] = time;
+                        }
+                    }
+                } else {
+                    // Reset progress values
+                    for (let i = 0; i < progressObj.steps.length; i++) {
+                        progressObj.startTimes[i] = 0;
+                        progressObj.endTimes[i] = 0;
+                    }
+                }
             },
 
             UPDATE_ORIGINAL_DATA(
@@ -379,6 +452,7 @@ export default class AssayStoreFactory {
                     assay,
                     peptideCountTable,
                     pept2Data,
+                    peptideTrust,
                     goProcessor,
                     goOntology,
                     ecProcessor,
@@ -392,6 +466,7 @@ export default class AssayStoreFactory {
                     ProteomicsAssay,
                     CountTable<Peptide>,
                     ShareableMap<Peptide, PeptideData>,
+                    PeptideTrust,
                     GoCountTableProcessor,
                     Ontology<GoCode, GoDefinition>,
                     EcCountTableProcessor,
@@ -409,6 +484,7 @@ export default class AssayStoreFactory {
 
                 originalAssayData.peptideCountTable = peptideCountTable;
                 assayData.pept2Data = pept2Data;
+                assayData.peptideTrust = peptideTrust;
                 originalAssayData.goCountTableProcessor = goProcessor;
                 assayData.goOntology = goOntology;
                 originalAssayData.ecCountTableProcessor = ecProcessor;
@@ -496,15 +572,22 @@ export default class AssayStoreFactory {
              * @param assay The assay that should be added and for which the analysis should be executed.
              */
             addAssay(store: ActionContext<AssayStoreState, any>, assay: ProteomicsAssay) {
-                // First add the assay to the store.
                 store.commit("ADD_ASSAY", assay);
+            },
 
+            analyseAssay(store: ActionContext<AssayStoreState, any>, assay: ProteomicsAssay) {
+                store.commit("UPDATE_ERROR", [assay, false, "", undefined]);
+                store.commit("UPDATE_ANALYSIS_READY", [assay, false]);
+            },
+
+            removeAllAssays(store: ActionContext<AssayStoreState, any>) {
+                store.commit("REMOVE_ALL_ASSAYS");
             },
 
             async filterAssay(store: ActionContext<AssayStoreState, any>, [assay, taxonId, percentage]: [ProteomicsAssay, NcbiId, number]) {
                 store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, true]);
                 store.commit("UPDATE_ANALYSIS_READY", [assay, false]);
-                store.commit("UPDATE_ERROR", [assay, false, ""]);
+                store.commit("UPDATE_ERROR", [assay, false, "", undefined]);
 
                 const getOwnAndChildrenSequences = async function(
                     taxonId: NcbiId,
@@ -578,7 +661,6 @@ export default class AssayStoreFactory {
                     );
                     await iprCountTableProcessor.compute();
 
-
                     store.commit("UPDATE_FILTER_DATA", [
                         assay,
                         filteredCountTable,
@@ -587,12 +669,11 @@ export default class AssayStoreFactory {
                         iprCountTableProcessor,
                         percentage
                     ]);
-
-                    store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
                 } catch (error) {
                     store.commit("UPDATE_ERROR", [assay, true, error.message]);
                 } finally {
                     store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
+                    store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
                 }
             }
         }

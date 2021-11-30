@@ -1,17 +1,14 @@
 import { CountTable, EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData, ProteomicsAssay, TreeNode } from "@/business";
+import { ProgressReport } from "./../business/progress/ProgressReport";
 import { ShareableMap } from "shared-memory-datastructures";
 import { Module } from "vuex";
 export declare type AssayAnalysisStatus = {
     assay: ProteomicsAssay;
-    progress: {
-        value: number;
-        step: string;
-        startProcessingTime: number;
-        eta: number;
-    };
+    progress: ProgressReport;
     error: {
         status: boolean;
         message: string;
+        object: Error;
     };
     analysisInProgress: boolean;
     analysisReady: boolean;

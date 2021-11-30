@@ -11,7 +11,7 @@ export default class OnlineAnalysisSource implements AnalysisSource {
      * @param endpoint An URL that points to a valid online Unipept service instance.
      */
     constructor(
-        private readonly endpoint: string
+        public readonly endpoint: string
     ) {}
 
     getCommunicationSource(): CommunicationSource {

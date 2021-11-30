@@ -1,3 +1,3 @@
 export * from "./ConfigurationStore";
-import AssayStoreFactory from "./AssayStoreFactory";
-export { AssayStoreFactory };
+import AssayStoreFactory, { AssayAnalysisStatus } from "./AssayStoreFactory";
+export { AssayStoreFactory, AssayAnalysisStatus };

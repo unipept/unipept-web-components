@@ -2,14 +2,14 @@ import Assay from "./Assay";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import AssayVisitor from "./AssayVisitor";
 import { Peptide } from "./../../ontology/raw/Peptide";
-import AnalysisSource from "@/business/communication/analysis/AnalysisSource";
+import AnalysisSource from "./../../communication/analysis/AnalysisSource";
 export default class ProteomicsAssay extends Assay {
     id: string;
     protected amountOfPeptides: number;
     private searchConfiguration;
     private peptides;
     private analysisSource;
-    constructor(id: string);
+    constructor(id?: string);
     getSearchConfiguration(): SearchConfiguration;
     setSearchConfiguration(value: SearchConfiguration): void;
     getPeptides(): Peptide[];
@@ -17,5 +17,6 @@ export default class ProteomicsAssay extends Assay {
     getAmountOfPeptides(): number;
     setAmountOfPeptides(amount: number): void;
     getAnalysisSource(): AnalysisSource;
+    setAnalysisSource(source: AnalysisSource): void;
     accept(visitor: AssayVisitor): Promise<void>;
 }
