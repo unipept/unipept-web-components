@@ -47,12 +47,14 @@ export default class MultiAmountTableItemRetriever<
             for (const code of codes.slice(start, end)) {
                 const definition: F = this.ontology.getDefinition(code);
 
-                items.push(new AmountTableItem(
-                    this.functionalCountTable.getCounts(code),
-                    this.functionalCountTable.getCounts(code) / this.peptideCountTable.totalCount,
-                    definition.name,
-                    definition.code
-                ));
+                if (definition) {
+                    items.push(new AmountTableItem(
+                        this.functionalCountTable.getCounts(code),
+                        this.functionalCountTable.getCounts(code) / this.peptideCountTable.totalCount,
+                        definition.name,
+                        definition.code
+                    ));
+                }
             }
         } else {
             // General case, create all table items and sort by the specified key.
@@ -60,12 +62,14 @@ export default class MultiAmountTableItemRetriever<
             for (const [code, currentCount] of this.functionalCountTable.toMap()) {
                 const definition: F = this.ontology.getDefinition(code);
 
-                allItems.push(new AmountTableItem(
-                    currentCount,
-                    currentCount / this.peptideCountTable.totalCount,
-                    definition.name,
-                    definition.code
-                ));
+                if (definition) {
+                    allItems.push(new AmountTableItem(
+                        currentCount,
+                        currentCount / this.peptideCountTable.totalCount,
+                        definition.name,
+                        definition.code
+                    ));
+                }
             }
 
             allItems.sort((a: AmountTableItem, b: AmountTableItem) => {
