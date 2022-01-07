@@ -1,4 +1,5 @@
-import { CountTable, Peptide, PeptideData, ProgressListener, SearchConfiguration } from "@/business";
+import { CountTable, PeptideData, PeptideTrust, ProgressListener, SearchConfiguration } from "@/business";
+import { Peptide } from "./../../ontology/raw/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
 export default class Pept2DataCommunicator {
     readonly serviceUrl: string;
@@ -7,6 +8,6 @@ export default class Pept2DataCommunicator {
     static PEPTDATA_ENDPOINT: string;
     private cancelled;
     constructor(serviceUrl: string);
-    process(countTable: CountTable<Peptide>, configuration: SearchConfiguration, progressListener?: ProgressListener): Promise<ShareableMap<Peptide, PeptideData>>;
+    process(countTable: CountTable<Peptide>, configuration: SearchConfiguration, progressListener?: ProgressListener): Promise<[ShareableMap<Peptide, PeptideData>, PeptideTrust]>;
     cancel(): void;
 }

@@ -142,7 +142,7 @@ export default class AssayStoreFactory {
                     assay.getSearchConfiguration()
                 );
 
-                const pept2Data = await communicationSource.getPept2DataCommunicator().process(
+                const [pept2Data, peptideTrust] = await communicationSource.getPept2DataCommunicator().process(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
                     {
@@ -154,9 +154,6 @@ export default class AssayStoreFactory {
                         }
                     }
                 );
-
-                const peptideTrustProcessor = new PeptideTrustProcessor();
-                const peptideTrust = peptideTrustProcessor.getPeptideTrust(peptideCountTable, pept2Data);
 
                 store.commit("UPDATE_PROGRESS", [assay, -1, 1]);
                 const goCountTableProcessor = new GoCountTableProcessor(
@@ -257,9 +254,9 @@ export default class AssayStoreFactory {
                 // analysis process.
                 store.commit("UPDATE_ERROR", [assay, true, err.message, err]);
             } finally {
+                await store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
                 // The analysis for this assay is over.
-                store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
-                store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
+                await store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
             }
         }
 
@@ -337,6 +334,9 @@ export default class AssayStoreFactory {
                 if (idx >= 0) {
                     state.assays.splice(idx, 1);
                 }
+                if (state.activeAssay?.assay?.getId() === assay.getId()) {
+                    state.activeAssay = state.assays.length > 0 ? state.assays[0] : undefined;
+                }
             },
 
             REMOVE_ALL_ASSAYS(state: AssayStoreState) {
@@ -379,8 +379,6 @@ export default class AssayStoreFactory {
                     // This is already at least the second time that a progress value for this step is reported. This
                     // means that we can start to calculate an ETA (if a valid progress value has been given).
                     const elapsedTime = time - progressObj.startTimes[step];
-
-                    console.log("Elapsed time: " + elapsedTime);
 
                     if (elapsedTime > 500) {
                         const progressToDo = 100 - value;
@@ -584,6 +582,10 @@ export default class AssayStoreFactory {
                 store.commit("REMOVE_ALL_ASSAYS");
             },
 
+            removeAssay(store: ActionContext<AssayStoreState, any>, assay: ProteomicsAssay) {
+                store.commit("REMOVE_ASSAY", assay);
+            },
+
             async filterAssay(store: ActionContext<AssayStoreState, any>, [assay, taxonId, percentage]: [ProteomicsAssay, NcbiId, number]) {
                 store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, true]);
                 store.commit("UPDATE_ANALYSIS_READY", [assay, false]);
@@ -672,8 +674,8 @@ export default class AssayStoreFactory {
                 } catch (error) {
                     store.commit("UPDATE_ERROR", [assay, true, error.message]);
                 } finally {
-                    store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
                     store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
+                    store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
                 }
             }
         }

@@ -246,35 +246,14 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     get filteredCountTable(): CountTable<Peptide> {
-        console.log(this.$store.getters.assayData(this.assay));
-        console.log(this.$store.getters.assayData(this.assay)?.filteredData);
-        console.log(this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable);
         return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
     }
 
-    get lcaProcessor(): LcaCountTableProcessor {
-        return this.$store.getters.assayData(this.assay)?.originalData?.ncbiCountTableProcessor;
-    }
-
-    get lcaOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
-    }
 
     get filteredNcbiTaxon(): NcbiTaxon {
         // TODO replace placeholder with real taxon.
         return new NcbiTaxon(1, "root", "root", []);
         // return this.$store.getters.assayData(this.assay)?.taxonFilter;
-    }
-
-    @Watch("filteredCountTable")
-    @Watch("lcaProcessor")
-    @Watch("lcaOntology")
-    private async computeTree() {
-        if (this.filteredCountTable && this.lcaProcessor && this.lcaOntology) {
-            this.taxaToPeptidesMapping = await this.lcaProcessor.getAnnotationPeptideMapping();
-            const taxaCounts = await this.lcaProcessor.getCountTable();
-            this.tree = new Tree(taxaCounts, this.lcaOntology);
-        }
     }
 
     private enableRelativeCounts(): void {

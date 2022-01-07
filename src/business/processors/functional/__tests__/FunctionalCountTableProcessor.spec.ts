@@ -40,7 +40,7 @@ describe("FunctionalCountTableProcessor", () => {
 
     it("correctly computes the trust for a count table", async(done) => {
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
         // First test if the trust is correct without performing a filter on percentage and using a simple count table.
         let ecCountProcessor = new EcCountTableProcessor(
@@ -74,7 +74,7 @@ describe("FunctionalCountTableProcessor", () => {
 
     it("correctly returns counts over all namespaces", async(done) => {
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
         let ecCountProcessor = new EcCountTableProcessor(
             countTable,
@@ -111,7 +111,7 @@ describe("FunctionalCountTableProcessor", () => {
 
     it("correctly returns counts for a specific namespace", async(done) => {
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
         let ecCountProcessor = new EcCountTableProcessor(
             countTable,
@@ -143,7 +143,7 @@ describe("FunctionalCountTableProcessor", () => {
      */
     it("correctly maps annotations onto their associated peptides", async(done) => {
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
         const ecCountProcessor = new EcCountTableProcessor(
             countTable,

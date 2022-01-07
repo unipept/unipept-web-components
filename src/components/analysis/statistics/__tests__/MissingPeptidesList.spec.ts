@@ -65,11 +65,9 @@ describe("MissingPeptidesList", () => {
 
         const communicationSource = new DefaultCommunicationSource("http://unipept.ugent.be");
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
-        const trustProcessor = new PeptideTrustProcessor();
-
-        missedPeptides = trustProcessor.getPeptideTrust(countTable, pept2data).missedPeptides;
+        missedPeptides = peptideTrust.missedPeptides;
     });
 
     it("correctly renders all peptides", async(done) => {

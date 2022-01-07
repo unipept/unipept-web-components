@@ -12,7 +12,7 @@
                 annotation-name="EC-number"
                 :item-retriever="itemRetriever"
                 :external-url-constructor="getUrl"
-                :loading="isComputing || ecOntology === undefined || ecCountTableProcessor === undefined"
+                :loading="isComputing"
                 :items-to-peptides="itemsToPeptides"
                 :taxa-to-peptides="taxaToPeptides"
                 :tree="tree"
@@ -89,109 +89,118 @@ export default class MultiEcSummaryCard extends Vue {
     private showPercentage: boolean;
 
     private itemRetriever: AmountTableItemRetriever<EcCode, EcDefinition> = null;
-    private itemsToPeptides: Map<EcCode, Peptide[]> = null;
-    private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
     private ecTree: DataNodeLike = null;
 
-    private trust: FunctionalTrust = null;
     private trustLine: string = "";
     private percentSettings: string = "5";
 
     private isComputing: boolean = false;
 
-    get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
-    }
-
-    get ecCountTableProcessor(): EcCountTableProcessor {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.ecCountTableProcessor;
-    }
-
-    get ecOntology(): Ontology<EcCode, EcDefinition> {
-        return this.$store.getters["assayData"](this.assay)?.ecOntology;
-    }
-
-    get tree(): Tree {
-        return this.$store.getters["assayData"](this.assay)?.originalData.tree;
-    }
-
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["assayData"](this.assay)?.originalData.ncbiCountTableProcessor
-    }
-
-    get filterPercentage(): number {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.percentage;
-    }
-
-    get communicationSource(): CommunicationSource {
-        return this.assay.getAnalysisSource().getCommunicationSource();
-    }
-
-    get pept2data(): ShareableMap<Peptide, PeptideData> {
-        return this.$store.getters["assayData"](this.assay)?.pept2data;
+        return this.$store.getters.assayData(this.assay)?.originalData?.ncbiCountTableProcessor;
     }
 
     get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters["assayData"](this.assay)?.ncbiOntology;
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
     }
 
-    private mounted() {
-        this.onNcbiCountTableChanged();
-        this.recompute();
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters.assayData(this.assay)?.pept2Data;
     }
 
-    @Watch("ncbiCountTableProcessor")
-    private async onNcbiCountTableChanged() {
-        if (this.ncbiCountTableProcessor) {
-            this.taxaToPeptides = await this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
-        }
+    get taxaToPeptides(): Map<NcbiId, Peptide[]> {
+        return this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
     }
 
-    @Watch("ecCountTableProcessor")
-    @Watch("peptideCountTable")
-    @Watch("ecOntology")
-    @Watch("filterPercentage")
-    private async recompute() {
+    get ecCountTableProcessor(): EcCountTableProcessor {
+        return this.$store.getters.assayData(this.assay)?.originalData?.ecCountTableProcessor;
+    }
+
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters.assayData(this.assay)?.ecOntology;
+    }
+
+    get itemsToPeptides(): Map<EcCode, Peptide[]> {
+        return this.ecCountTableProcessor.getAnnotationPeptideMapping();
+    }
+
+    get tree(): Tree {
+        return this.$store.getters.assayData(this.assay)?.originalData?.tree;
+    }
+
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
+    }
+
+    private async created() {
         this.isComputing = true;
-        this.itemRetriever = null;
 
-        if (this.peptideCountTable && this.ecCountTableProcessor && this.ecOntology) {
-            this.trust = await this.ecCountTableProcessor.getTrust();
-            this.trustLine = FunctionalUtils.computeTrustLine(
-                this.trust,
-                "EC number",
-                "peptide"
-            );
+        const ecCountTable = this.ecCountTableProcessor.getCountTable();
 
-            let ecCountTable: CountTable<EcCode>;
+        this.itemRetriever = new MultiAmountTableItemRetriever(
+            this.ecCountTableProcessor.getCountTable(),
+            this.peptideCountTable,
+            this.ecOntology
+        );
 
-            if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
-                ecCountTable = await this.ecCountTableProcessor.getCountTable();
-                this.itemsToPeptides = await this.ecCountTableProcessor.getAnnotationPeptideMapping();
-            } else {
-                const ecProcessor = new EcCountTableProcessor(
-                    this.peptideCountTable,
-                    this.assay.getSearchConfiguration(),
-                    this.pept2data,
-                    this.communicationSource.getEcCommunicator(),
-                    this.filterPercentage
-                );
+        this.ecTree = await this.computeEcTree(ecCountTable, this.ecOntology);
 
-                ecCountTable = await ecProcessor.getCountTable();
-                this.itemsToPeptides = await ecProcessor.getAnnotationPeptideMapping();
-            }
-
-            this.ecTree = await this.computeEcTree(ecCountTable, this.ecOntology);
-
-            this.itemRetriever = new MultiAmountTableItemRetriever(
-                ecCountTable,
-                this.peptideCountTable,
-                this.ecOntology
-            );
-        }
+        const trust = this.ecCountTableProcessor.getTrust();
+        this.trustLine = FunctionalUtils.computeTrustLine(
+            trust,
+            "EC number",
+            "peptide"
+        );
 
         this.isComputing = false;
     }
+
+
+    // @Watch("ecCountTableProcessor")
+    // @Watch("peptideCountTable")
+    // @Watch("ecOntology")
+    // @Watch("filterPercentage")
+    // private async recompute() {
+    //     this.isComputing = true;
+    //     this.itemRetriever = null;
+    //
+    //     if (this.peptideCountTable && this.ecCountTableProcessor && this.ecOntology) {
+    //         this.trust = await this.ecCountTableProcessor.getTrust();
+    //         this.trustLine = FunctionalUtils.computeTrustLine(
+    //             this.trust,
+    //             "EC number",
+    //             "peptide"
+    //         );
+    //
+    //         let ecCountTable: CountTable<EcCode>;
+    //
+    //         if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+    //             ecCountTable = await this.ecCountTableProcessor.getCountTable();
+    //             this.itemsToPeptides = await this.ecCountTableProcessor.getAnnotationPeptideMapping();
+    //         } else {
+    //             const ecProcessor = new EcCountTableProcessor(
+    //                 this.peptideCountTable,
+    //                 this.assay.getSearchConfiguration(),
+    //                 this.pept2data,
+    //                 this.communicationSource.getEcCommunicator(),
+    //                 this.filterPercentage
+    //             );
+    //
+    //             ecCountTable = await ecProcessor.getCountTable();
+    //             this.itemsToPeptides = await ecProcessor.getAnnotationPeptideMapping();
+    //         }
+    //
+    //         this.ecTree = await this.computeEcTree(ecCountTable, this.ecOntology);
+    //
+    //         this.itemRetriever = new MultiAmountTableItemRetriever(
+    //             ecCountTable,
+    //             this.peptideCountTable,
+    //             this.ecOntology
+    //         );
+    //     }
+    //
+    //     this.isComputing = false;
+    // }
 
     private getUrl(code: string): string {
         return `https://www.uniprot.org/uniprot/?query=${code}`

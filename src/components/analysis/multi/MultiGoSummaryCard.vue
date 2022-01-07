@@ -18,7 +18,7 @@
                 :taxa-to-peptides="taxaToPeptides"
                 :tree="tree"
                 :show-percentage="showPercentage"
-                :loading="isComputing || goOntology === undefined || goCountTableProcessor === undefined"
+                :loading="isComputing"
                 :item-to-csv-summary="saveSummaryAsCsv">
             </go-summary>
         </v-card-text>
@@ -80,122 +80,126 @@ export default class MultiGoSummaryCard extends Vue {
         itemRetriever: AmountTableItemRetriever<GoCode, GoDefinition>,
         definitions: GoDefinition[],
         namespace: string
-    }[] = [];
-
-    private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
-    private itemsToPeptides: Map<GoCode, Peptide[]> = null;
-
-    get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
-    }
-
-    get goCountTableProcessor(): GoCountTableProcessor {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.goCountTableProcessor;
-    }
-
-    get goOntology(): Ontology<GoCode, GoDefinition> {
-        return this.$store.getters["assayData"](this.assay)?.goOntology;
-    }
-
-    get tree(): Tree {
-        return this.$store.getters["assayData"](this.assay)?.originalData.tree;
-    }
+    }[];
 
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["assayData"](this.assay)?.originalData.ncbiCountTableProcessor
-    }
-
-    get filterPercentage(): number {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.percentage;
-    }
-
-    get communicationSource(): CommunicationSource {
-        return this.assay.getAnalysisSource().getCommunicationSource();
-    }
-
-    get pept2data(): ShareableMap<Peptide, PeptideData> {
-        return this.$store.getters["assayData"](this.assay)?.pept2data;
+        return this.$store.getters.assayData(this.assay)?.originalData?.ncbiCountTableProcessor;
     }
 
     get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters["assayData"](this.assay)?.ncbiOntology;
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
+    }
+
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters.assayData(this.assay)?.pept2Data;
+    }
+
+    get taxaToPeptides(): Map<NcbiId, Peptide[]> {
+        return this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
+    }
+
+    get goCountTableProcessor(): GoCountTableProcessor {
+        return this.$store.getters.assayData(this.assay)?.originalData?.goCountTableProcessor;
+    }
+
+    get goOntology(): Ontology<GoCode, GoDefinition> {
+        return this.$store.getters.assayData(this.assay)?.goOntology;
+    }
+
+    get itemsToPeptides(): Map<GoCode, Peptide[]> {
+        return this.goCountTableProcessor.getAnnotationPeptideMapping();
+    }
+
+    get tree(): Tree {
+        return this.$store.getters.assayData(this.assay)?.originalData?.tree;
+    }
+
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
     }
 
     private created() {
+        this.isComputing = true;
+        this.computedItems = [];
+
         // @ts-ignore
         for (const namespace of Object.values(GoNamespace).map(x => x.toString()).sort()) {
+            const goCountTable = this.goCountTableProcessor.getCountTable(namespace as FunctionalNamespace);
+
+            const itemRetriever = new MultiAmountTableItemRetriever(
+                goCountTable,
+                this.peptideCountTable,
+                this.goOntology
+            );
+
             this.computedItems.push({
-                itemRetriever: undefined,
-                definitions: [],
+                itemRetriever: itemRetriever,
+                definitions: goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id)),
                 namespace: namespace
             });
-        }
 
-        this.onInputsChanged();
-        this.onNcbiCountTableChanged();
-    }
-
-    @Watch("ncbiCountTableProcessor")
-    private async onNcbiCountTableChanged() {
-        if (this.ncbiCountTableProcessor) {
-            this.taxaToPeptides = await this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
-        }
-    }
-
-    @Watch("goCountTableProcessor")
-    @Watch("peptideCountTable")
-    @Watch("goOntology")
-    @Watch("filterPercentage")
-    private async onInputsChanged() {
-        this.isComputing = true;
-
-        for (const item of this.computedItems) {
-            item.itemRetriever = null;
-        }
-
-        if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
-            // @ts-ignore
-            for (const [idx, namespace] of Object.values(GoNamespace).map(x => x.toString()).sort().entries()) {
-                let goCountTable: CountTable<GoCode>;
-                let trust: FunctionalTrust;
-
-                if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
-                    goCountTable = await this.goCountTableProcessor.getCountTable(namespace as FunctionalNamespace);
-                    this.itemsToPeptides = await this.goCountTableProcessor.getAnnotationPeptideMapping();
-                    trust = await this.goCountTableProcessor.getTrust();
-                } else {
-                    const goProcessor = new GoCountTableProcessor(
-                        this.peptideCountTable,
-                        this.assay.getSearchConfiguration(),
-                        this.pept2data,
-                        this.communicationSource.getGoCommunicator(),
-                        this.filterPercentage
-                    );
-
-                    goCountTable = await goProcessor.getCountTable(namespace as FunctionalNamespace);
-                    this.itemsToPeptides = await goProcessor.getAnnotationPeptideMapping();
-                    trust = await this.goCountTableProcessor.getTrust();
-                }
-
-                const itemRetriever = new MultiAmountTableItemRetriever(
-                    goCountTable,
-                    this.peptideCountTable,
-                    this.goOntology
-                );
-
-                const currentObj = this.computedItems[idx];
-                currentObj.itemRetriever = itemRetriever;
-                currentObj.definitions.splice(0, currentObj.definitions.length);
-                currentObj.definitions.push(
-                    ...goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id))
-                );
-
-                this.trustLine = FunctionalUtils.computeTrustLine(trust, "GO-term", "peptide");
-            }
+            const trust = this.goCountTableProcessor.getTrust();
+            this.trustLine = FunctionalUtils.computeTrustLine(trust, "GO-term", "peptide");
         }
 
         this.isComputing = false;
     }
+
+
+    // @Watch("goCountTableProcessor")
+    // @Watch("peptideCountTable")
+    // @Watch("goOntology")
+    // @Watch("filterPercentage")
+    // private async onInputsChanged() {
+    //     this.isComputing = true;
+    //
+    //     for (const item of this.computedItems) {
+    //         item.itemRetriever = null;
+    //     }
+    //
+    //     if (this.peptideCountTable && this.goCountTableProcessor && this.goOntology) {
+    //         // @ts-ignore
+    //         for (const [idx, namespace] of Object.values(GoNamespace).map(x => x.toString()).sort().entries()) {
+    //             let goCountTable: CountTable<GoCode>;
+    //             let trust: FunctionalTrust;
+    //
+    //             if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+    //                 goCountTable = await this.goCountTableProcessor.getCountTable(namespace as FunctionalNamespace);
+    //                 this.itemsToPeptides = await this.goCountTableProcessor.getAnnotationPeptideMapping();
+    //                 trust = await this.goCountTableProcessor.getTrust();
+    //             } else {
+    //                 const goProcessor = new GoCountTableProcessor(
+    //                     this.peptideCountTable,
+    //                     this.assay.getSearchConfiguration(),
+    //                     this.pept2data,
+    //                     this.communicationSource.getGoCommunicator(),
+    //                     this.filterPercentage
+    //                 );
+    //
+    //                 goCountTable = await goProcessor.getCountTable(namespace as FunctionalNamespace);
+    //                 this.itemsToPeptides = await goProcessor.getAnnotationPeptideMapping();
+    //                 trust = await this.goCountTableProcessor.getTrust();
+    //             }
+    //
+    //             const itemRetriever = new MultiAmountTableItemRetriever(
+    //                 goCountTable,
+    //                 this.peptideCountTable,
+    //                 this.goOntology
+    //             );
+    //
+    //             const currentObj = this.computedItems[idx];
+    //             currentObj.itemRetriever = itemRetriever;
+    //             currentObj.definitions.splice(0, currentObj.definitions.length);
+    //             currentObj.definitions.push(
+    //                 ...goCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id))
+    //             );
+    //
+    //             this.trustLine = FunctionalUtils.computeTrustLine(trust, "GO-term", "peptide");
+    //         }
+    //     }
+    //
+    //     this.isComputing = false;
+    // }
 
     private async saveSummaryAsCsv(code: GoCode): Promise<void> {
         const peptideTableProcessor = new PeptideCountTableProcessor();

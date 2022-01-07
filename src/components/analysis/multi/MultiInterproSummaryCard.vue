@@ -13,7 +13,7 @@
                 annotation-name="InterPro-entry"
                 :item-retriever="getSelectedItemRetriever()"
                 :external-url-constructor="getUrl"
-                :loading="isComputing || interproOntology === undefined || interproCountTableProcessor === undefined"
+                :loading="isComputing"
                 :items-to-peptides="itemsToPeptides"
                 :taxa-to-peptides="taxaToPeptides"
                 :tree="tree"
@@ -37,8 +37,8 @@ import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay"
 import {
     CountTable,
     CsvUtils,
-    FunctionalCountTableProcessor,
-    FunctionalSummaryProcessor,
+    FunctionalCountTableProcessor, FunctionalNamespace,
+    FunctionalSummaryProcessor, GoCode,
     InterproCode,
     InterproDefinition, InterproNamespace,
     NcbiId,
@@ -72,9 +72,6 @@ export default class MultiInterproSummaryCard extends Vue {
         namespace: string
     }[] = [];
 
-    private itemsToPeptides: Map<InterproCode, Peptide[]> = null;
-    private taxaToPeptides: Map<NcbiId, Peptide[]> = null;
-
     // @ts-ignore
     private namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).map(x => x.toString()).sort());
     private selectedNamespace: string = "all";
@@ -83,110 +80,121 @@ export default class MultiInterproSummaryCard extends Vue {
     private isComputing: boolean = false;
     private percentSettings: string = "5";
 
-    get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
-    }
-
-    get interproCountTableProcessor(): InterproCountTableProcessor {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.interproCountTableProcessor;
-    }
-
-    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
-        return this.$store.getters["assayData"](this.assay)?.interproOntology;
-    }
-
-    get tree(): Tree {
-        return this.$store.getters["assayData"](this.assay)?.originalData.tree;
-    }
-
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["assayData"](this.assay)?.originalData.ncbiCountTableProcessor
-    }
-
-    get filterPercentage(): number {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.percentage;
-    }
-
-    get communicationSource(): CommunicationSource {
-        return this.assay.getAnalysisSource().getCommunicationSource();
-    }
-
-    get pept2data(): ShareableMap<Peptide, PeptideData> {
-        return this.$store.getters["assayData"](this.assay)?.pept2data;
+        return this.$store.getters.assayData(this.assay)?.originalData?.ncbiCountTableProcessor;
     }
 
     get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters["assayData"](this.assay)?.ncbiOntology;
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
+    }
+
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters.assayData(this.assay)?.pept2Data;
+    }
+
+    get taxaToPeptides(): Map<NcbiId, Peptide[]> {
+        return this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
+    }
+
+    get interproCountTableProcessor(): InterproCountTableProcessor {
+        return this.$store.getters.assayData(this.assay)?.originalData?.interproCountTableProcessor;
+    }
+
+    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
+        return this.$store.getters.assayData(this.assay)?.interproOntology;
+    }
+
+    get itemsToPeptides(): Map<InterproCode, Peptide[]> {
+        return this.interproCountTableProcessor.getAnnotationPeptideMapping();
+    }
+
+    get tree(): Tree {
+        return this.$store.getters.assayData(this.assay)?.originalData?.tree;
+    }
+
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
     }
 
     private created() {
+        this.isComputing = true;
+
         for (const namespace of this.namespaceValues) {
+            const functionalCountTable = this.interproCountTableProcessor.getCountTable(
+                namespace === "all" ? undefined : convertStringToInterproNamespace(namespace)
+            );
+
+            const itemRetriever = new MultiAmountTableItemRetriever(
+                functionalCountTable,
+                this.peptideCountTable,
+                this.interproOntology
+            )
+
             this.computedItems.push({
-                itemRetriever: undefined,
+                itemRetriever: itemRetriever,
                 namespace: namespace
             });
         }
-        this.onNcbiCountTableChanged();
-        this.recompute();
-    }
 
-    @Watch("ncbiCountTableProcessor")
-    private async onNcbiCountTableChanged() {
-        if (this.ncbiCountTableProcessor) {
-            this.taxaToPeptides = await this.ncbiCountTableProcessor.getAnnotationPeptideMapping();
-        }
-    }
-
-    @Watch("interproCountTableProcessor")
-    @Watch("peptideCountTable")
-    @Watch("interproOntology")
-    @Watch("filterPercentage")
-    public async recompute(): Promise<void> {
-        this.isComputing = true;
-
-        if (this.peptideCountTable && this.interproCountTableProcessor && this.interproOntology) {
-            this.trustLine = FunctionalUtils.computeTrustLine(
-                await this.interproCountTableProcessor.getTrust(),
-                "InterPro-entry",
-                "peptide"
-            );
-
-            for (const [idx, namespace] of this.namespaceValues.entries()) {
-                let iprCountTable: CountTable<InterproCode>;
-
-                if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
-                    iprCountTable = await this.interproCountTableProcessor.getCountTable(
-                        namespace === "all" ? undefined : convertStringToInterproNamespace(namespace)
-                    );
-                    this.itemsToPeptides = await this.interproCountTableProcessor.getAnnotationPeptideMapping();
-                } else {
-                    const iprProcessor = new InterproCountTableProcessor(
-                        this.peptideCountTable,
-                        this.assay.getSearchConfiguration(),
-                        this.pept2data,
-                        this.communicationSource.getInterproCommunicator(),
-                        this.filterPercentage
-                    );
-
-                    iprCountTable = await iprProcessor.getCountTable(
-                        namespace === "all" ? undefined : convertStringToInterproNamespace(namespace)
-                    );
-                    this.itemsToPeptides = await iprProcessor.getAnnotationPeptideMapping();
-                }
-
-                const itemRetriever = new MultiAmountTableItemRetriever(
-                    iprCountTable,
-                    this.peptideCountTable,
-                    this.interproOntology
-                );
-
-                const currentObj = this.computedItems[idx];
-                currentObj.itemRetriever = itemRetriever;
-            }
-        }
+        this.trustLine = FunctionalUtils.computeTrustLine(
+            this.interproCountTableProcessor.getTrust(),
+            "InterPro-entry",
+            "peptide"
+        );
 
         this.isComputing = false;
     }
+
+    // @Watch("interproCountTableProcessor")
+    // @Watch("peptideCountTable")
+    // @Watch("interproOntology")
+    // @Watch("filterPercentage")
+    // public async recompute(): Promise<void> {
+    //     this.isComputing = true;
+    //
+    //     if (this.peptideCountTable && this.interproCountTableProcessor && this.interproOntology) {
+    //         this.trustLine = FunctionalUtils.computeTrustLine(
+    //             await this.interproCountTableProcessor.getTrust(),
+    //             "InterPro-entry",
+    //             "peptide"
+    //         );
+    //
+    //         for (const [idx, namespace] of this.namespaceValues.entries()) {
+    //             let iprCountTable: CountTable<InterproCode>;
+    //
+    //             if (this.filterPercentage === FunctionalCountTableProcessor.DEFAULT_FILTER_PERCENTAGE) {
+    //                 iprCountTable = await this.interproCountTableProcessor.getCountTable(
+    //                     namespace === "all" ? undefined : convertStringToInterproNamespace(namespace)
+    //                 );
+    //                 this.itemsToPeptides = await this.interproCountTableProcessor.getAnnotationPeptideMapping();
+    //             } else {
+    //                 const iprProcessor = new InterproCountTableProcessor(
+    //                     this.peptideCountTable,
+    //                     this.assay.getSearchConfiguration(),
+    //                     this.pept2data,
+    //                     this.communicationSource.getInterproCommunicator(),
+    //                     this.filterPercentage
+    //                 );
+    //
+    //                 iprCountTable = await iprProcessor.getCountTable(
+    //                     namespace === "all" ? undefined : convertStringToInterproNamespace(namespace)
+    //                 );
+    //                 this.itemsToPeptides = await iprProcessor.getAnnotationPeptideMapping();
+    //             }
+    //
+    //             const itemRetriever = new MultiAmountTableItemRetriever(
+    //                 iprCountTable,
+    //                 this.peptideCountTable,
+    //                 this.interproOntology
+    //             );
+    //
+    //             const currentObj = this.computedItems[idx];
+    //             currentObj.itemRetriever = itemRetriever;
+    //         }
+    //     }
+    //
+    //     this.isComputing = false;
+    // }
 
     private getSelectedItemRetriever(): AmountTableItemRetriever<InterproCode, InterproDefinition> {
         return this.computedItems.filter(i => i.namespace === this.selectedNamespace)[0].itemRetriever;

@@ -282,6 +282,7 @@ export default class AmountTable extends Vue {
 
     private mounted() {
         this.visualizationWidth = this.$refs.dataTable.$el.clientWidth;
+        this.onItemRetrieverChanged();
     }
 
     @Watch("tree")

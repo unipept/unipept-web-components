@@ -34,7 +34,7 @@ describe("LcaCountTableProcessor", () => {
 
     it("correctly computes counts", async(done) => {
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
         let lcaProcessor = new LcaCountTableProcessor(
             countTable,
@@ -70,7 +70,7 @@ describe("LcaCountTableProcessor", () => {
 
     it("correctly computes lca -> peptide mapping", async(done) => {
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
         const lcaProcessor = new LcaCountTableProcessor(
             countTable,

@@ -70,7 +70,7 @@ export default class Mock {
         const peptideCountTable = await this.mockRealisticPeptideCountTable();
 
         const pept2DataCommunicator = new Pept2DataCommunicator("http://unipept.ugent.be");
-        const pept2data = await pept2DataCommunicator.process(peptideCountTable, new SearchConfiguration());
+        const [pept2data, trust] = await pept2DataCommunicator.process(peptideCountTable, new SearchConfiguration());
 
         const lcaCountTableProcessor = new LcaCountTableProcessor(
             await this.mockRealisticPeptideCountTable(),

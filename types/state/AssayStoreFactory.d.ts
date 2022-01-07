@@ -1,4 +1,4 @@
-import { CountTable, EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData, ProteomicsAssay, TreeNode } from "@/business";
+import { CountTable, EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData, PeptideTrust, ProteomicsAssay, TreeNode } from "@/business";
 import { ProgressReport } from "./../business/progress/ProgressReport";
 import { ShareableMap } from "shared-memory-datastructures";
 import { Module } from "vuex";
@@ -28,6 +28,7 @@ export declare type AssayAnalysisStatus = {
         percentage: number;
     };
     pept2Data: ShareableMap<Peptide, PeptideData>;
+    peptideTrust: PeptideTrust;
     goOntology: Ontology<GoCode, GoDefinition>;
     ecOntology: Ontology<EcCode, EcDefinition>;
     interproOntology: Ontology<InterproCode, InterproDefinition>;

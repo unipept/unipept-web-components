@@ -2,7 +2,7 @@ import NetworkUtils from "./../NetworkUtils";
 import NetworkConfiguration from "@/business/communication/NetworkConfiguration";
 
 export default class MetaDataCommunicator {
-    public static VERSION_API_ENDPOINT = "version.json";
+    public static VERSION_API_ENDPOINT = "/private_api/metadata.json";
 
     // We'll only check the version information from the private API once a day.
     private lastChecked: Date;
@@ -25,7 +25,7 @@ export default class MetaDataCommunicator {
             new Date().getTime() - this.lastChecked.getTime() > 24 * 60 * 60 * 1000
         ) {
             try {
-                const response = await NetworkUtils.getJSON(
+                const response: { uniprot_version: string } = await NetworkUtils.getJSON(
                     this.endpointUrl + MetaDataCommunicator.VERSION_API_ENDPOINT
                 );
 

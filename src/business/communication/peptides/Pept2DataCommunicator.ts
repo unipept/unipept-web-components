@@ -1,11 +1,11 @@
 import {
     CountTable, NetworkConfiguration, NetworkUtils,
-    Peptide,
     PeptideData,
-    PeptideDataSerializer, PeptideTrust,
+    PeptideDataSerializer, PeptideTrust, PeptideTrustProcessor,
     ProgressListener,
     SearchConfiguration
 } from "@/business";
+import { Peptide } from "./../../ontology/raw/Peptide"
 import { ShareableMap } from "shared-memory-datastructures";
 import { parallelLimit } from "async";
 import AnalysisCancelledException from "@/business/exceptions/AnalysisCancelledException";
@@ -27,7 +27,7 @@ export default class Pept2DataCommunicator {
         countTable: CountTable<Peptide>,
         configuration: SearchConfiguration,
         progressListener?: ProgressListener
-    ): Promise<ShareableMap<Peptide, PeptideData>> {
+    ): Promise<[ShareableMap<Peptide, PeptideData>, PeptideTrust]> {
         const peptidesToProcess = countTable.getOntologyIds();
 
         const result = new ShareableMap<Peptide, PeptideData>(undefined, undefined, new PeptideDataSerializer());
@@ -80,7 +80,9 @@ export default class Pept2DataCommunicator {
         // Now perform the actual requests.
         try {
             await parallelLimit(requests, NetworkConfiguration.PARALLEL_API_REQUESTS);
-            return result;
+            const trustProcessor = new PeptideTrustProcessor();
+            const trust = trustProcessor.getPeptideTrust(countTable, result);
+            return [result, trust];
         } catch (err) {
             // Something went wrong during the analysis. Either the analysis was cancelled, or some other exception
             // occurred.

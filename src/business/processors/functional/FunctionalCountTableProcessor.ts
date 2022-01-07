@@ -78,7 +78,7 @@ export default abstract class FunctionalCountTableProcessor<
      * @return A trust-object that describes how many of the given peptides are in fact associated with at least one
      * annotation.
      */
-    public async getTrust(): Promise<FunctionalTrust> {
+    public getTrust(): FunctionalTrust {
         return this.trust;
     }
 
@@ -121,6 +121,18 @@ export default abstract class FunctionalCountTableProcessor<
 
         // Now fetch all definitions for the terms that we just processed
         const ontology = await this.getOntology(new CountTable<OntologyId>(countsPerCode));
+
+        // We will only keep all of the codes that do also have an associated definition in the static database.
+        const toRemove = [];
+        for (const [term, counts] of countsPerCode) {
+            if (!ontology.getDefinition(term)) {
+                toRemove.push(term);
+            }
+        }
+
+        for (const item of toRemove) {
+            countsPerCode.delete(item);
+        }
 
         // Split all the counts per namespace.
         const tablePerNamespace = new Map<FunctionalNamespace, Map<OntologyId, number>>();

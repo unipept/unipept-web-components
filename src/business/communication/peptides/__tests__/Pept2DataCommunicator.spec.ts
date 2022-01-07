@@ -69,7 +69,7 @@ describe("Pept2DataCommunicator", () => {
         const communicationSource = new DefaultCommunicationSource(NetworkConfiguration.BASE_URL);
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
 
-        const pept2data = await pept2DataCommunicator.process(peptideCountTable, searchConfig);
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(peptideCountTable, searchConfig);
         const response = pept2data.get("AAAAA").toPeptideDataResponse();
         response["sequence"] = "AAAAA";
 
