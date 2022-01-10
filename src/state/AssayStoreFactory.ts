@@ -818,8 +818,12 @@ export default class AssayStoreFactory {
                 store.commit("REMOVE_ASSAY", assay);
             },
 
-            filterAssay(store: ActionContext<AssayStoreState, any>, [assay, taxonId, percentage = 5]: [ProteomicsAssay, NcbiId, number]) {
+            filterAssayByTaxon(store: ActionContext<AssayStoreState, any>, [assay, taxonId]: [ProteomicsAssay, NcbiId]) {
                 store.commit("UPDATE_FILTER_RANK", [assay, taxonId]);
+                store.commit("UPDATE_FILTER_READY", [assay, false]);
+            },
+
+            filterAssayByPercentage(store: ActionContext<AssayStoreState, any>, [assay, percentage]: [ProteomicsAssay, number]) {
                 store.commit("UPDATE_FILTER_PERCENTAGE", [assay, percentage]);
                 store.commit("UPDATE_FILTER_READY", [assay, false]);
             }

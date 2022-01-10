@@ -147,12 +147,12 @@
                 </v-tab-item>
                 <v-tab-item>
                     <multi-interpro-summary-card
-                        v-if="filterInProgress"
+                        v-if="!filterInProgress"
                         ref="interproSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-interpro-summary-card>
-                    <div v-else-if="!this.filterInProgress">
+                    <div v-else-if="this.filterInProgress">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -186,7 +186,6 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import LcaCountTableProcessor from "./../../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
-import Tree from "./../../../business/ontology/taxonomic/Tree";
 import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
@@ -218,20 +217,13 @@ export default class FunctionalSummaryCard extends Vue {
     private selectedTaxonId: NcbiId = 1;
 
     private selectedSortTypeName: string = "Peptides";
-    private relativeCounts: number = 0;
 
     private taxonId: number = 1;
-
-    private selectedNCBITaxon: NcbiTaxon = null;
 
     private currentTab: number = 0;
     private dialogOpen: boolean = false;
 
-    private faCalculationsInProgress: boolean = false;
     private showPercentage: boolean = false;
-
-    private tree: Tree = null;
-    private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
 
     private placeholderText = "Please select at least one assay for analysis.";
 
@@ -279,7 +271,7 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     private resetFilter(): void {
-        this.$store.dispatch("filterAssay", [this.assay, 1]);
+        this.$store.dispatch("filterAssayByTaxon", [this.assay, 1]);
     }
 }
 </script>

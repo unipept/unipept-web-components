@@ -97,7 +97,7 @@ export default class MultiInterproSummaryCard extends Vue {
     }
 
     get interproCountTableProcessor(): InterproCountTableProcessor {
-        return this.$store.getters.assayData(this.assay)?.originalData?.interproCountTableProcessor;
+        return this.$store.getters.assayData(this.assay)?.filteredData?.interproCountTableProcessor;
     }
 
     get interproOntology(): Ontology<InterproCode, InterproDefinition> {

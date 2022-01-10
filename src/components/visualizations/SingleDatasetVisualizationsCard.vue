@@ -280,7 +280,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
     }
 
     private onUpdateSelectedTaxonId(id: string): void {
-        this.$store.dispatch("filterAssay", [this.assay, Number.parseInt(id)]);
+        this.$store.dispatch("filterAssayByTaxon", [this.assay, Number.parseInt(id)]);
     }
 }
 </script>

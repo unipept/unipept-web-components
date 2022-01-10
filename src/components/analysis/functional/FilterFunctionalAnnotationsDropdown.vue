@@ -41,10 +41,11 @@ import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay"
     computed: {
         model: {
             get() {
-                return this.$store.getters["assayData"](this.activeAssay)?.filterPercentage;
+                return this.$store.getters["assayData"](this.activeAssay.assay)?.filterPercentage;
             },
+
             set(val) {
-                this.$store.dispatch("filterByPercentage", [this.activeAssay, parseInt(val)]);
+                this.$store.dispatch("filterAssayByPercentage", [this.activeAssay.assay, parseInt(val)]);
             }
         }
     }

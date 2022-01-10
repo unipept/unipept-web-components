@@ -113,7 +113,7 @@ export default class MultiEcSummaryCard extends Vue {
     }
 
     get ecCountTableProcessor(): EcCountTableProcessor {
-        return this.$store.getters.assayData(this.assay)?.originalData?.ecCountTableProcessor;
+        return this.$store.getters.assayData(this.assay)?.filteredData?.ecCountTableProcessor;
     }
 
     get ecOntology(): Ontology<EcCode, EcDefinition> {

@@ -99,7 +99,7 @@ export default class MultiGoSummaryCard extends Vue {
     }
 
     get goCountTableProcessor(): GoCountTableProcessor {
-        return this.$store.getters.assayData(this.assay)?.originalData?.goCountTableProcessor;
+        return this.$store.getters.assayData(this.assay)?.filteredData?.goCountTableProcessor;
     }
 
     get goOntology(): Ontology<GoCode, GoDefinition> {
