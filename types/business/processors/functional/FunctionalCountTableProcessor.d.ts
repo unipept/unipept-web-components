@@ -41,7 +41,7 @@ export default abstract class FunctionalCountTableProcessor<OntologyId extends O
      * @return A trust-object that describes how many of the given peptides are in fact associated with at least one
      * annotation.
      */
-    getTrust(): Promise<FunctionalTrust>;
+    getTrust(): FunctionalTrust;
     getAnnotationPeptideMapping(): Map<OntologyId, Peptide[]>;
     /**
      * Do compute both the count table and trust output. Both processing results are stored as part of this object, and

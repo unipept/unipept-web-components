@@ -124,7 +124,7 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                     return data;
                 },
                 getTitleText: d => `${d.name} (${d.extra.rank})`,
-                rerootCallback: d => this.search(d.id, d.name, 500),
+                rerootCallback: d => this.search(d.id, d.name, 50),
                 useFixedColors: this.isFixedColors
             }
         );

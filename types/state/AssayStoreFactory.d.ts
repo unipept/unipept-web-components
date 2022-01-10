@@ -4,7 +4,7 @@ import { ShareableMap } from "shared-memory-datastructures";
 import { Module } from "vuex";
 export declare type AssayAnalysisStatus = {
     assay: ProteomicsAssay;
-    progress: ProgressReport;
+    originalProgress: ProgressReport;
     error: {
         status: boolean;
         message: string;

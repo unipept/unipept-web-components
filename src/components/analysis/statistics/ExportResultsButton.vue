@@ -68,7 +68,7 @@ export default class ExportResultsButton extends Vue {
     }
 
     get progress(): number {
-        return this.$store.getters["assayData"](this.assay)?.progress.value;
+        return this.$store.getters["assayData"](this.assay)?.originalProgress.value;
     }
 
     private async downloadCsv(separator: string = ",", functionalSeparator: string = ";"): Promise<void> {

@@ -83,7 +83,7 @@
                 </v-menu>
             </v-tabs>
             <v-alert
-                v-if="this.filteredNcbiTaxon"
+                v-if="this.filteredNcbiId !== 1"
                 dense
                 colored-border
                 id="filtered-taxon-information">
@@ -105,12 +105,12 @@
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <multi-go-summary-card
-                        v-if="filteredCountTable"
+                        v-if="!filterInProgress"
                         ref="goSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-go-summary-card>
-                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                    <div v-else-if="this.filterInProgress" class="mpa-waiting">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -126,12 +126,12 @@
                 </v-tab-item>
                 <v-tab-item>
                     <multi-ec-summary-card
-                        v-if="filteredCountTable"
+                        v-if="!filterInProgress"
                         ref="ecSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-ec-summary-card>
-                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                    <div v-else-if="this.filterInProgress" class="mpa-waiting">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -147,12 +147,12 @@
                 </v-tab-item>
                 <v-tab-item>
                     <multi-interpro-summary-card
-                        v-if="filteredCountTable"
+                        v-if="filterInProgress"
                         ref="interproSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-interpro-summary-card>
-                    <div v-else-if="this.analysisInProgress">
+                    <div v-else-if="!this.filterInProgress">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -192,6 +192,7 @@ import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
 import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 import { Ontology } from "./../../../business/ontology/Ontology";
+import { ProgressReport } from "@/business";
 
 @Component({
     components: {
@@ -213,8 +214,6 @@ export default class FunctionalSummaryCard extends Vue {
 
     @Prop({ required: true })
     private assay: ProteomicsAssay;
-    @Prop({ required: false, default: true })
-    private analysisInProgress: boolean;
 
     private selectedTaxonId: NcbiId = 1;
 
@@ -249,11 +248,24 @@ export default class FunctionalSummaryCard extends Vue {
         return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
     }
 
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
+    }
+
+    get filteredNcbiId(): number {
+        return this.$store.getters.assayData(this.assay)?.filterId;
+    }
 
     get filteredNcbiTaxon(): NcbiTaxon {
-        // TODO replace placeholder with real taxon.
-        return new NcbiTaxon(1, "root", "root", []);
-        // return this.$store.getters.assayData(this.assay)?.taxonFilter;
+        return this.ncbiOntology.getDefinition(this.filteredNcbiId);
+    }
+
+    get filterProgress(): ProgressReport {
+        return this.$store.getters.assayData(this.assay)?.filterProgress;
+    }
+
+    get filterInProgress(): boolean {
+        return this.filterProgress.currentStep !== this.filterProgress.steps.length;
     }
 
     private enableRelativeCounts(): void {
@@ -267,7 +279,7 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     private resetFilter(): void {
-        this.$store.dispatch("filterByTaxon", [this.assay, 1]);
+        this.$store.dispatch("filterAssay", [this.assay, 1]);
     }
 }
 </script>

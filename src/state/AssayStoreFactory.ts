@@ -34,8 +34,10 @@ import PeptideTrustProcessor from "@/business/processors/raw/PeptideTrustProcess
 
 export type AssayAnalysisStatus = {
     assay: ProteomicsAssay,
-    // Progress value ([0 - 100]) or -1 if indeterminate
-    progress: ProgressReport,
+    // Current progress of calculating the original data for the assay.
+    originalProgress: ProgressReport,
+    // Current progress of calculating filtered data for the assay.
+    filterProgress: ProgressReport,
     // All information related to errors that could have occurred during the analysis process.
     error: {
         // Did an error occur?
@@ -49,6 +51,12 @@ export type AssayAnalysisStatus = {
     analysisInProgress: boolean,
     // Did the analysis process finish?
     analysisReady: boolean,
+
+    // Is the filtering process for this assay currently in progress? This value is false if the analysis has not been
+    // started yet, or if it ended (either successfully or unsuccessfully).
+    filterInProgress: boolean,
+    // Did the filtering process finish?
+    filterReady: boolean,
 
     // Keeps track of the original, unfiltered version of the data.
     originalData: {
@@ -81,7 +89,13 @@ export type AssayAnalysisStatus = {
     // All known information for each InterPro-entry that occurs in the InterPro count table
     interproOntology: Ontology<InterproCode, InterproDefinition>,
     // All known information for each NCBI taxon that occurs in the NCBI count table
-    ncbiOntology: Ontology<NcbiId, NcbiTaxon>
+    ncbiOntology: Ontology<NcbiId, NcbiTaxon>,
+
+    // ID of the rank by which we want to filter the results
+    filterId: number,
+
+    // Minimum threshold of items by which we want to filter (must be a number between 0 and 100)
+    filterPercentage: number
 }
 
 export type AssayStoreState = {
@@ -106,6 +120,14 @@ export default class AssayStoreFactory {
             "Computing NCBI ontology",
             "Computing taxonomic tree",
             "Applying filter"
+        ];
+
+        const filterSteps: string[] = [
+            "Calculating sequences subset",
+            "Filter count table",
+            "Compute filtered GO count table",
+            "Compute filtered EC count table",
+            "Compute filtered InterPro count table"
         ];
 
         const state = {
@@ -149,13 +171,13 @@ export default class AssayStoreFactory {
                         onProgressUpdate(progress: number) {
                             store.commit(
                                 "UPDATE_PROGRESS",
-                                [assay, Math.round(progress * 100), 0]
+                                [assay, Math.round(progress * 100), 0, false]
                             );
                         }
                     }
                 );
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 1]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 1, false]);
                 const goCountTableProcessor = new GoCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -165,11 +187,11 @@ export default class AssayStoreFactory {
                 // Preload all GO-related data
                 await goCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 2]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 2, false]);
                 const goOntologyProcessor = new GoOntologyProcessor(communicationSource.getGoCommunicator());
                 const goOntology = await goOntologyProcessor.getOntology(goCountTableProcessor.getCountTable());
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 3]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 3, false]);
                 const ecCountTableProcessor = new EcCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -179,12 +201,12 @@ export default class AssayStoreFactory {
                 // Preload all EC-related data
                 await ecCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 4]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 4, false]);
                 const ecOntologyProcessor = new EcOntologyProcessor(communicationSource.getEcCommunicator());
                 const ecOntology = await ecOntologyProcessor.getOntology(ecCountTableProcessor.getCountTable());
 
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 5]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 5, false]);
                 const interproCountTableProcessor = new InterproCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -194,12 +216,12 @@ export default class AssayStoreFactory {
                 // Preload all EC-related data
                 await interproCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 6]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 6, false]);
                 const iprOntologyProcessor = new InterproOntologyProcessor(communicationSource.getInterproCommunicator());
                 const iprOntology = await iprOntologyProcessor.getOntology(interproCountTableProcessor.getCountTable());
 
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 7]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 7, false]);
                 const lcaCountTableProcessor = new LcaCountTableProcessor(
                     peptideCountTable,
                     assay.getSearchConfiguration(),
@@ -207,11 +229,11 @@ export default class AssayStoreFactory {
                 );
                 await lcaCountTableProcessor.compute();
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 8]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 8, false]);
                 const ncbiOntologyProcessor = new NcbiOntologyProcessor(communicationSource.getNcbiCommunicator());
                 const ncbiOntology = await ncbiOntologyProcessor.getOntology(lcaCountTableProcessor.getCountTable());
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 9]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 9, false]);
                 const tree = new Tree(
                     lcaCountTableProcessor.getCountTable(),
                     ncbiOntology,
@@ -235,7 +257,7 @@ export default class AssayStoreFactory {
                     tree
                 ]);
 
-                store.commit("UPDATE_PROGRESS", [assay, -1, 10]);
+                store.commit("UPDATE_PROGRESS", [assay, -1, 10, false]);
                 store.commit("UPDATE_FILTER_DATA", [
                     assay,
                     peptideCountTable,
@@ -260,6 +282,115 @@ export default class AssayStoreFactory {
             }
         }
 
+        const filterAssay = async(
+            assayStatus: AssayAnalysisStatus,
+            store: ActionContext<AssayStoreState, any>
+        ) => {
+            const assay = assayStatus.assay;
+            const taxonId = assayStatus.filterId;
+            const filterPercentage = assayStatus.filterPercentage;
+
+            store.commit("UPDATE_FILTER_IN_PROGRESS", [assay, true]);
+            store.commit("UPDATE_FILTER_READY", [assay, false]);
+            store.commit("UPDATE_ERROR", [assay, false, "", undefined]);
+
+            store.commit("UPDATE_PROGRESS", [assay, -1, 0, true]);
+
+            const getOwnAndChildrenSequences = async function(
+                taxonId: NcbiId,
+                lcaProcessor: LcaCountTableProcessor,
+                ncbiOntology: Ontology<NcbiId, NcbiTaxon>
+            ): Promise<Peptide[]> {
+                const lcaCountTable = lcaProcessor.getCountTable();
+                const peptideMapping = lcaProcessor.getAnnotationPeptideMapping();
+
+                const tree = new Tree(lcaCountTable, ncbiOntology);
+
+                const sequences: Peptide[] = [];
+                const node = tree.nodes.get(taxonId);
+                const nodes: TreeNode[] = [node];
+
+                while (nodes.length > 0) {
+                    const node = nodes.pop();
+                    if (peptideMapping.has(node.id)) {
+                        sequences.push(...peptideMapping.get(node.id));
+                    }
+
+                    if (node.children) {
+                        nodes.push(...node.children);
+                    }
+                }
+
+                return sequences;
+            }
+
+            try {
+                const assayData = store.getters["assayData"](assay);
+                const lcaProcessor = assayData.originalData.ncbiCountTableProcessor;
+
+                store.commit("UPDATE_PROGRESS", [assay, -1, 1, true]);
+
+                const peptidesForTaxon = await getOwnAndChildrenSequences(
+                    taxonId,
+                    lcaProcessor,
+                    assayData.ncbiOntology
+                );
+
+                const peptideProcessor = new PeptideCountTableProcessor();
+                const filteredCountTable = await peptideProcessor.getPeptideCountTable(
+                    peptidesForTaxon,
+                    assay.getSearchConfiguration()
+                );
+
+                store.commit("UPDATE_PROGRESS", [assay, -1, 2, true]);
+
+                const goCountTableProcessor = new GoCountTableProcessor(
+                    filteredCountTable,
+                    assay.getSearchConfiguration(),
+                    assayData.pept2Data,
+                    assay.getAnalysisSource().getCommunicationSource().getGoCommunicator(),
+                    filterPercentage
+                );
+                await goCountTableProcessor.compute();
+
+                store.commit("UPDATE_PROGRESS", [assay, -1, 3, true]);
+
+                const ecCountTableProcessor = new EcCountTableProcessor(
+                    filteredCountTable,
+                    assay.getSearchConfiguration(),
+                    assayData.pept2Data,
+                    assay.getAnalysisSource().getCommunicationSource().getEcCommunicator(),
+                    filterPercentage
+                );
+                await ecCountTableProcessor.compute();
+
+                store.commit("UPDATE_PROGRESS", [assay, -1, 4, true]);
+
+                const iprCountTableProcessor = new InterproCountTableProcessor(
+                    filteredCountTable,
+                    assay.getSearchConfiguration(),
+                    assayData.pept2Data,
+                    assay.getAnalysisSource().getCommunicationSource().getInterproCommunicator(),
+                    filterPercentage
+                );
+                await iprCountTableProcessor.compute();
+
+                store.commit("UPDATE_FILTER_DATA", [
+                    assay,
+                    filteredCountTable,
+                    goCountTableProcessor,
+                    ecCountTableProcessor,
+                    iprCountTableProcessor,
+                    filterPercentage
+                ]);
+            } catch (error) {
+                store.commit("UPDATE_ERROR", [assay, true, error.message]);
+            } finally {
+                store.commit("UPDATE_FILTER_READY", [assay, true]);
+                store.commit("UPDATE_FILTER_IN_PROGRESS", [assay, false]);
+            }
+        }
+
         const assayGetters: GetterTree<AssayStoreState, any> = {
             assays(state: AssayStoreState): AssayAnalysisStatus[] {
                 return state.assays;
@@ -271,6 +402,10 @@ export default class AssayStoreFactory {
 
             analysisInProgress(state: AssayStoreState): boolean {
                 return state.assays.some(item => item.analysisInProgress);
+            },
+
+            filterInProgress(state: AssayStoreState): boolean {
+                return state.assays.some(item => item.filterInProgress);
             },
 
             assayData(state: AssayStoreState): (assay: ProteomicsAssay) => AssayAnalysisStatus {
@@ -286,10 +421,19 @@ export default class AssayStoreFactory {
                 state.assays.push({
                     assay,
 
-                    progress: {
+                    originalProgress: {
                         steps: progressSteps,
                         startTimes: new Array(progressSteps.length).fill(0),
                         endTimes: new Array(progressSteps.length).fill(0),
+                        currentStep: 0,
+                        currentValue: -1,
+                        eta: 0
+                    },
+
+                    filterProgress: {
+                        steps: filterSteps,
+                        startTimes: new Array(filterSteps.length).fill(0),
+                        endTimes: new Array(filterSteps.length).fill(0),
                         currentStep: 0,
                         currentValue: -1,
                         eta: 0
@@ -320,12 +464,19 @@ export default class AssayStoreFactory {
 
                     analysisInProgress: false,
                     analysisReady: false,
+
+                    filterInProgress: false,
+                    filterReady: false,
+
                     pept2Data: null,
                     peptideTrust: null,
                     goOntology: null,
                     ecOntology: null,
                     interproOntology: null,
                     ncbiOntology: null,
+
+                    filterId: 1,
+                    filterPercentage: 5
                 });
             },
 
@@ -351,11 +502,18 @@ export default class AssayStoreFactory {
 
             UPDATE_PROGRESS(
                 state: AssayStoreState,
-                [assay, value, step]: [ProteomicsAssay, number, number]
+                [assay, value, step, filterProgress = false]: [ProteomicsAssay, number, number, boolean]
             ) {
                 const idx = findAssayIndex(assay, state.assays);
 
-                const progressObj = state.assays[idx].progress;
+                let progressObj: ProgressReport;
+
+                if (filterProgress) {
+                    progressObj = state.assays[idx].filterProgress;
+                } else {
+                    progressObj = state.assays[idx].originalProgress;
+                }
+
                 progressObj.currentValue = value;
                 progressObj.currentStep = step;
 
@@ -418,7 +576,7 @@ export default class AssayStoreFactory {
                 const idx = findAssayIndex(assay, state.assays);
                 state.assays[idx].analysisReady = analysisReady;
 
-                const progressObj = state.assays[idx].progress;
+                const progressObj = state.assays[idx].originalProgress;
 
                 const time = new Date().getTime();
 
@@ -520,6 +678,63 @@ export default class AssayStoreFactory {
                 filterAssayData.ecCountTableProcessor = ecProcessor;
                 filterAssayData.interproCountTableProcessor = interproProcessor;
                 filterAssayData.percentage = percentage;
+            },
+
+            UPDATE_FILTER_IN_PROGRESS(
+                state: AssayStoreState,
+                [assay, inProgress]: [ProteomicsAssay, boolean]
+            ) {
+                const idx = findAssayIndex(assay, state.assays);
+                state.assays[idx].filterInProgress = inProgress;
+            },
+
+            UPDATE_FILTER_READY(
+                state: AssayStoreState,
+                [assay, filterReady]: [ProteomicsAssay, boolean]
+            ) {
+                const idx = findAssayIndex(assay, state.assays);
+                state.assays[idx].filterReady = filterReady;
+
+                const progressObj = state.assays[idx].filterProgress;
+
+                const time = new Date().getTime();
+
+                if (filterReady) {
+                    progressObj.currentStep = progressObj.steps.length;
+
+                    // Store end time for the last progress
+                    for (let i = 0; i < progressObj.steps.length; i++) {
+                        if (progressObj.startTimes[i] === 0) {
+                            progressObj.startTimes[i] = time;
+                        }
+
+                        if (progressObj.endTimes[i] === 0) {
+                            progressObj.endTimes[i] = time;
+                        }
+                    }
+                } else {
+                    // Reset progress values
+                    for (let i = 0; i < progressObj.steps.length; i++) {
+                        progressObj.startTimes[i] = 0;
+                        progressObj.endTimes[i] = 0;
+                    }
+                }
+            },
+
+            UPDATE_FILTER_RANK(
+                state: AssayStoreState,
+                [assay, rankId]: [ProteomicsAssay, number]
+            ) {
+                const idx = findAssayIndex(assay, state.assays);
+                state.assays[idx].filterId = rankId;
+            },
+
+            UPDATE_FILTER_PERCENTAGE(
+                state: AssayStoreState,
+                [assay, filterPercentage]: [ProteomicsAssay, number]
+            ) {
+                const idx = findAssayIndex(assay, state.assays);
+                state.assays[idx].filterPercentage = filterPercentage;
             }
         };
 
@@ -532,6 +747,7 @@ export default class AssayStoreFactory {
              * @param store
              */
             initializeAssayQueue(store: ActionContext<AssayStoreState, any>) {
+                // Initialize queue for normal analysis
                 setInterval(
                     async() => {
                         if (!store.getters.analysisInProgress) {
@@ -543,6 +759,22 @@ export default class AssayStoreFactory {
 
                             if (assaysInQueue.length > 0) {
                                 await analyseAssay(assaysInQueue[0], store);
+                            }
+                        }
+                    },
+                    1000
+                );
+
+                // Initialize queue for filter analysis
+                setInterval(
+                    async() => {
+                        if (!store.getters.filterInProgress) {
+                            const filtersInQueue = store.getters.assays.filter(
+                                (a: AssayAnalysisStatus) => !a.filterReady && a.analysisReady
+                            );
+
+                            if (filtersInQueue.length > 0) {
+                                await filterAssay(filtersInQueue[0], store);
                             }
                         }
                     },
@@ -586,97 +818,10 @@ export default class AssayStoreFactory {
                 store.commit("REMOVE_ASSAY", assay);
             },
 
-            async filterAssay(store: ActionContext<AssayStoreState, any>, [assay, taxonId, percentage]: [ProteomicsAssay, NcbiId, number]) {
-                store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, true]);
-                store.commit("UPDATE_ANALYSIS_READY", [assay, false]);
-                store.commit("UPDATE_ERROR", [assay, false, "", undefined]);
-
-                const getOwnAndChildrenSequences = async function(
-                    taxonId: NcbiId,
-                    lcaProcessor: LcaCountTableProcessor,
-                    ncbiOntology: Ontology<NcbiId, NcbiTaxon>
-                ): Promise<Peptide[]> {
-                    const lcaCountTable = lcaProcessor.getCountTable();
-                    const peptideMapping = lcaProcessor.getAnnotationPeptideMapping();
-
-                    const tree = new Tree(lcaCountTable, ncbiOntology);
-
-                    const sequences: Peptide[] = [];
-                    const node = tree.nodes.get(taxonId);
-                    const nodes: TreeNode[] = [node];
-
-                    while (nodes.length > 0) {
-                        const node = nodes.pop();
-                        if (peptideMapping.has(node.id)) {
-                            sequences.push(...peptideMapping.get(node.id));
-                        }
-
-                        if (node.children) {
-                            nodes.push(...node.children);
-                        }
-                    }
-
-                    return sequences;
-                }
-
-
-                try {
-                    const assayData = store.getters["assayData"](assay);
-                    const lcaProcessor = assayData.originalData.ncbiCountTableProcessor;
-
-                    const peptidesForTaxon = await getOwnAndChildrenSequences(
-                        taxonId,
-                        lcaProcessor,
-                        assayData.ncbiOntology
-                    );
-
-                    const peptideProcessor = new PeptideCountTableProcessor();
-                    const filteredCountTable = await peptideProcessor.getPeptideCountTable(
-                        peptidesForTaxon,
-                        assay.getSearchConfiguration()
-                    );
-
-                    const goCountTableProcessor = new GoCountTableProcessor(
-                        filteredCountTable,
-                        assay.getSearchConfiguration(),
-                        assayData.pept2Data,
-                        assay.getAnalysisSource().getCommunicationSource().getGoCommunicator(),
-                        percentage
-                    );
-                    await goCountTableProcessor.compute();
-
-                    const ecCountTableProcessor = new EcCountTableProcessor(
-                        filteredCountTable,
-                        assay.getSearchConfiguration(),
-                        assayData.pept2Data,
-                        assay.getAnalysisSource().getCommunicationSource().getEcCommunicator(),
-                        percentage
-                    );
-                    await ecCountTableProcessor.compute();
-
-                    const iprCountTableProcessor = new InterproCountTableProcessor(
-                        filteredCountTable,
-                        assay.getSearchConfiguration(),
-                        assayData.pept2Data,
-                        assay.getAnalysisSource().getCommunicationSource().getInterproCommunicator(),
-                        percentage
-                    );
-                    await iprCountTableProcessor.compute();
-
-                    store.commit("UPDATE_FILTER_DATA", [
-                        assay,
-                        filteredCountTable,
-                        goCountTableProcessor,
-                        ecCountTableProcessor,
-                        iprCountTableProcessor,
-                        percentage
-                    ]);
-                } catch (error) {
-                    store.commit("UPDATE_ERROR", [assay, true, error.message]);
-                } finally {
-                    store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
-                    store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);
-                }
+            filterAssay(store: ActionContext<AssayStoreState, any>, [assay, taxonId, percentage = 5]: [ProteomicsAssay, NcbiId, number]) {
+                store.commit("UPDATE_FILTER_RANK", [assay, taxonId]);
+                store.commit("UPDATE_FILTER_PERCENTAGE", [assay, percentage]);
+                store.commit("UPDATE_FILTER_READY", [assay, false]);
             }
         }
 
@@ -685,7 +830,7 @@ export default class AssayStoreFactory {
             getters: assayGetters,
             mutations: assayMutations,
             actions: assayActions
-        };
+        }
     }
 }
 
