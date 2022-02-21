@@ -9,12 +9,13 @@ import { InterproNamespace } from "./../../../ontology/functional/interpro/Inter
 import InterproOntologyProcessor from "./../../..//ontology/functional/interpro/InterproOntologyProcessor";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
+import { InterproResponseCommunicator } from "@/business";
 
 export default class InterproProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<InterproCode, InterproDefinition> {
     constructor(
         peptide: Peptide,
         equateIl: boolean,
-        private readonly communicationSource: CommunicationSource
+        private readonly interproCommunicator: InterproResponseCommunicator
     ) {
         super(peptide, equateIl, "IPR:")
     }
@@ -29,7 +30,7 @@ export default class InterproProteinCountTableProcessor extends FunctionalProtei
     }
 
     protected async getOntology(countTable: CountTable<InterproCode>): Promise<Ontology<InterproCode, InterproDefinition>> {
-        const processor = new InterproOntologyProcessor(this.communicationSource.getInterproCommunicator());
+        const processor = new InterproOntologyProcessor(this.interproCommunicator);
         return await processor.getOntology(countTable);
     }
 

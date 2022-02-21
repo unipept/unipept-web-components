@@ -7,7 +7,6 @@
                 annotation-name="InterPro-Entry"
                 :item-retriever="getSelectedItemRetriever()"
                 :external-url-constructor="getUrl"
-                :loading="isComputing"
                 :show-percentage="false"
                 :show-namespace="true"
                 :rows-per-page="10">
@@ -38,87 +37,61 @@ import SingleAmountTableItemRetriever from "@/components/analysis/single/SingleA
     components: { AmountTable }
 })
 export default class SingleInterproSummaryCard extends Vue {
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    private trust: FunctionalTrust = null;
-    private trustLine: string = "";
-    private isComputing: boolean = false;
-
     // @ts-ignore
     private namespaceValues: string[] = ["all"].concat(
         Object.values(InterproNamespace).map(x => x.toString()).sort()
     );
     private selectedNamespace: string = "all";
 
-    private computedItems: {
+    get interproProteinProcessor(): InterproProteinCountTableProcessor {
+        return this.$store.getters.peptideStatus.interproProteinCountTableProcessor;
+    }
+
+    get trust(): FunctionalTrust {
+        return this.interproProteinProcessor.getTrust();
+    }
+
+    get trustLine(): string {
+        return FunctionalUtils.computeTrustLine(this.trust, "InterPro-entry", "protein");
+    }
+
+    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
+        return this.$store.getters.peptideStatus.interproOntology;
+    }
+
+    get computedItems(): {
         itemRetriever: AmountTableItemRetriever<InterproCode, InterproDefinition>;
         namespace: string
-    }[] = [];
+    }[] {
+        const result = [];
 
-    private created() {
-        for (const ns of this.namespaceValues) {
-            this.computedItems.push({
-                itemRetriever: undefined,
+        for (const [i, ns] of this.namespaceValues.entries()) {
+            let countTable: CountTable<InterproCode>;
+
+            if (ns === "all") {
+                countTable = this.interproProteinProcessor.getCountTable();
+            } else {
+                countTable = this.interproProteinProcessor.getCountTable(ns as InterproNamespace);
+            }
+
+            const itemRetriever = new SingleAmountTableItemRetriever(
+                countTable,
+                this.interproOntology,
+                this.trust.totalAmountOfItems
+            );
+
+            result.push({
+                itemRetriever,
                 namespace: ns
             });
         }
-        this.recompute();
-    }
 
-    @Watch("peptide")
-    @Watch("equateIl")
-    private async recompute() {
-        if (this.peptide) {
-            this.isComputing = true;
-
-            const interproProteinProcessor = new InterproProteinCountTableProcessor(
-                this.peptide,
-                this.equateIl,
-                this.communicationSource
-            );
-
-            this.trust = await interproProteinProcessor.getTrust();
-            this.trustLine = FunctionalUtils.computeTrustLine(
-                this.trust,
-                "InterPro-entry",
-                "protein"
-            );
-
-            for (const [i, ns] of this.namespaceValues.entries()) {
-                let countTable: CountTable<InterproCode>;
-
-                if (ns === "all") {
-                    countTable = await interproProteinProcessor.getCountTable();
-                } else {
-                    countTable = await interproProteinProcessor.getCountTable(ns as InterproNamespace);
-                }
-
-                const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource.getInterproCommunicator());
-                const ontology = await ontologyProcessor.getOntology(countTable);
-
-                const itemRetriever = new SingleAmountTableItemRetriever(
-                    countTable,
-                    ontology,
-                    this.trust.totalAmountOfItems
-                );
-
-                const currentObj = this.computedItems[i];
-                currentObj.itemRetriever = itemRetriever;
-            }
-
-            this.isComputing = false;
-        }
+        return result;
     }
 
     private getSelectedItemRetriever(): AmountTableItemRetriever<InterproCode, InterproDefinition> {
         return this.computedItems.filter(i => i.namespace === this.selectedNamespace)[0].itemRetriever;
     }
-
 
     private getUrl(code: string): string {
         return `https://www.ebi.ac.uk/interpro/search/text/${code.substr(4)}/#table`;

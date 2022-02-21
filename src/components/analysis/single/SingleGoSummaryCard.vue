@@ -8,8 +8,7 @@
                 :item-retriever="computedItem.itemRetriever"
                 :definitions="computedItem.definitions"
                 :namespace="computedItem.namespace"
-                :show-percentage="false"
-                :loading="isComputing">
+                :show-percentage="false">
             </go-summary>
         </v-card-text>
     </v-card>
@@ -19,7 +18,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import { Peptide, GoNamespace, GoDefinition, GoCode, FunctionalNamespace } from "@/business";
+import { Peptide, GoNamespace, GoDefinition, GoCode, FunctionalNamespace, Ontology } from "@/business";
 import GoProteinCountTableProcessor from "./../../../business/processors/functional/go/GoProteinCountTableProcessor";
 import GoOntologyProcessor from "./../../../business/ontology/functional/go/GoOntologyProcessor";
 import { FunctionalUtils } from "./../functional/FunctionalUtils";
@@ -35,77 +34,46 @@ import SingleAmountTableItemRetriever from "@/components/analysis/single/SingleA
     }
 })
 export default class SingleGoSummaryCard extends Vue {
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
+    get goProteinProcessor(): GoProteinCountTableProcessor {
+        return this.$store.getters.peptideStatus.goProteinCountTableProcessor;
+    }
 
-    private trust: FunctionalTrust = null;
-    private trustLine: string = "";
-    private isComputing: boolean = false;
+    get trust(): FunctionalTrust {
+        return this.goProteinProcessor.getTrust();
+    }
 
-    private computedItems: {
+    get trustLine(): string {
+        return FunctionalUtils.computeTrustLine(this.trust, "GO-term", "protein");
+    }
+
+    get goOntology(): Ontology<GoCode, GoDefinition> {
+        return this.$store.getters.peptideStatus.goOntology;
+    }
+
+    get computedItems():  {
         itemRetriever: AmountTableItemRetriever<GoCode, GoDefinition>,
         definitions: GoDefinition[],
         namespace: string
-    }[] = [];
+    }[] {
+        const result = [];
 
-    private mounted() {
-        for (const namespace of Object.values(GoNamespace).sort()) {
-            this.computedItems.push({
-                itemRetriever: undefined,
-                definitions: [],
-                namespace: namespace
+        for (const [idx, namespace] of Object.values(GoNamespace).sort().entries()) {
+            const functionalCountTable = this.goProteinProcessor.getCountTable(namespace as FunctionalNamespace);
+
+            const itemRetriever = new SingleAmountTableItemRetriever(
+                functionalCountTable,
+                this.goOntology,
+                this.trust.totalAmountOfItems
+            );
+
+            result.push({
+                itemRetriever,
+                definitions: [...functionalCountTable.getOntologyIds().map(id => this.goOntology.getDefinition(id))],
+                namespace
             });
         }
 
-        this.recompute();
-    }
-
-    @Watch("peptide")
-    @Watch("equateIl")
-    private async recompute() {
-        for (const item of this.computedItems) {
-            item.itemRetriever = null;
-        }
-
-        if (this.peptide) {
-            this.isComputing = true;
-
-            const goProteinProcessor = new GoProteinCountTableProcessor(
-                this.peptide,
-                this.equateIl,
-                this.communicationSource
-            );
-
-            this.trust = await goProteinProcessor.getTrust();
-            this.trustLine = FunctionalUtils.computeTrustLine(this.trust, "GO-term", "protein");
-
-            // @ts-ignore
-            for (const [idx, namespace] of Object.values(GoNamespace).sort().entries()) {
-                const functionalCountTable = await goProteinProcessor.getCountTable(namespace as FunctionalNamespace);
-
-                const ontologyProcessor = new GoOntologyProcessor(this.communicationSource.getGoCommunicator());
-                const ontology = await ontologyProcessor.getOntology(functionalCountTable);
-
-                const itemRetriever = new SingleAmountTableItemRetriever(
-                    functionalCountTable,
-                    ontology,
-                    this.trust.totalAmountOfItems
-                );
-
-                const currentObj = this.computedItems[idx];
-                currentObj.itemRetriever = itemRetriever;
-                currentObj.definitions.splice(0, currentObj.definitions.length);
-                currentObj.definitions.push(
-                    ...functionalCountTable.getOntologyIds().map(id => ontology.getDefinition(id))
-                );
-            }
-
-            this.isComputing = false;
-        }
+        return result;
     }
 }
 </script>

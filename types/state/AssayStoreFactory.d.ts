@@ -5,6 +5,7 @@ import { Module } from "vuex";
 export declare type AssayAnalysisStatus = {
     assay: ProteomicsAssay;
     originalProgress: ProgressReport;
+    filterProgress: ProgressReport;
     error: {
         status: boolean;
         message: string;
@@ -12,6 +13,8 @@ export declare type AssayAnalysisStatus = {
     };
     analysisInProgress: boolean;
     analysisReady: boolean;
+    filterInProgress: boolean;
+    filterReady: boolean;
     originalData: {
         peptideCountTable: CountTable<Peptide>;
         goCountTableProcessor: GoCountTableProcessor;
@@ -33,6 +36,8 @@ export declare type AssayAnalysisStatus = {
     ecOntology: Ontology<EcCode, EcDefinition>;
     interproOntology: Ontology<InterproCode, InterproDefinition>;
     ncbiOntology: Ontology<NcbiId, NcbiTaxon>;
+    filterId: number;
+    filterPercentage: number;
 };
 export declare type AssayStoreState = {
     assays: AssayAnalysisStatus[];

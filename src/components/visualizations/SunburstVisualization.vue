@@ -120,7 +120,6 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                 radius: this.radius,
                 getTooltipText: (d) => {
                     const data = tooltipContent(d);
-                    console.log(data);
                     return data;
                 },
                 getTitleText: d => `${d.name} (${d.extra.rank})`,

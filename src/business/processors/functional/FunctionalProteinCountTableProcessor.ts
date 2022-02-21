@@ -30,8 +30,7 @@ export default abstract class FunctionalProteinCountTableProcessor<
         }
     }
 
-    public async getTrust(): Promise<FunctionalTrust> {
-        await this.compute();
+    public getTrust(): FunctionalTrust {
         return this.trust;
     }
 
@@ -41,13 +40,12 @@ export default abstract class FunctionalProteinCountTableProcessor<
         return false;
     }
 
-    private async compute(): Promise<void> {
+    public async compute(proteinProcessor: ProteinProcessor): Promise<void> {
         if (this.countTables.size > 0) {
             return;
         }
 
-        const proteinProcessor = new ProteinProcessor();
-        const proteins = await proteinProcessor.getProteinsByPeptide(this.peptide, this.equateIl);
+        const proteins = proteinProcessor.getProteins();
 
         // How many proteins are annotated with at least one item?
         let annotatedCount: number = 0;
@@ -92,7 +90,7 @@ export default abstract class FunctionalProteinCountTableProcessor<
         }
     }
 
-    protected async abstract getOntology(countTable: CountTable<OntologyId>): Promise<Ontology<OntologyId, DefinitionType>>;
+    protected abstract getOntology(countTable: CountTable<OntologyId>): Promise<Ontology<OntologyId, DefinitionType>>;
 
     protected abstract getAnnotationsFromProtein(p: ProteinDefinition): OntologyId[];
 

@@ -116,8 +116,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["ncbi/originalData"](a).processor,
-            ontology: (a: ProteomicsAssay) => this.$store.getters["ncbi/ontology"](a),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters.assayData(a).originalData.ncbiCountTableProcessor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters.assayData(a).ncbiOntology,
             categories: Object.values(NcbiRank).map(StringUtils.stringTitleize),
             showIdentifier: false,
             categoryTitle: "Rank"
@@ -125,8 +125,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["go/originalData"](a).processor,
-            ontology: (a: ProteomicsAssay) => this.$store.getters["go/ontology"](a),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters.assayData(a).originalData.goCountTableProcessor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters.assayData(a).goOntology,
             categories: Object.values(GoNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -134,8 +134,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["ec/originalData"](a).processor,
-            ontology: (a: ProteomicsAssay) => this.$store.getters["ec/ontology"](a),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters.assayData(a).originalData.ecCountTableProcessor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters.assayData(a).ecOntology,
             categories: Object.values(EcNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"
@@ -143,8 +143,8 @@ export default class MultiAssayDataSource extends Vue {
         {
             items: [],
             loading: true,
-            tableProcessor: (a: ProteomicsAssay) => this.$store.getters["interpro/originalData"](a).processor,
-            ontology: (a: ProteomicsAssay) => this.$store.getters["interpro/ontology"](a),
+            tableProcessor: (a: ProteomicsAssay) => this.$store.getters.assayData(a).originalData.interproCountTableProcessor,
+            ontology: (a: ProteomicsAssay) => this.$store.getters.assayData(a).interproOntology,
             categories: Object.values(InterproNamespace).map(StringUtils.stringTitleize),
             showIdentifier: true,
             categoryTitle: "Namespace"

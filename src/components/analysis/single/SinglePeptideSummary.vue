@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!loading">
+    <div v-if="!analysisIsLoading">
         <div class="display-1">Tryptic peptide analysis of {{ peptide }}</div>
         <div class="subtitle-1">
             {{ peptide }} was found in
@@ -40,19 +40,21 @@
             </v-col>
             <v-col :cols="6">
                 <div class="headline">Function</div>
-                <div v-if="goTrust">
-                    <span class="font-weight-bold">{{ goTrust.annotatedItems }} proteins</span>
-                    ({{ toPercentage(goTrust.annotatedItems / goTrust.totalAmountOfItems) }})
+                <div>
+                    <span class="font-weight-bold">{{ goProteinProcessor.getTrust().annotatedItems }} proteins</span>
+                    ({{ toPercentage(goProteinProcessor.getTrust().annotatedItems / goProteinProcessor.getTrust().totalAmountOfItems) }})
                     have at least one <span class="font-weight-bold">GO term</span> assigned to them.
                 </div>
-                <div v-if="ecTrust">
-                    <span class="font-weight-bold">{{ ecTrust.annotatedItems }} proteins</span>
-                    ({{ toPercentage(ecTrust.annotatedItems / ecTrust.totalAmountOfItems) }})
+
+                <div>
+                    <span class="font-weight-bold">{{ ecProteinProcessor.getTrust().annotatedItems }} proteins</span>
+                    ({{ toPercentage(ecProteinProcessor.getTrust().annotatedItems / ecProteinProcessor.getTrust().totalAmountOfItems) }})
                     have at least one <span class="font-weight-bold">EC number</span> assigned to them.
                 </div>
-                <div v-if="interproTrust">
-                    <span class="font-weight-bold">{{ interproTrust.annotatedItems }} proteins</span>
-                    ({{ toPercentage(interproTrust.annotatedItems / interproTrust.totalAmountOfItems) }})
+
+                <div>
+                    <span class="font-weight-bold">{{ interproProteinProcessor.getTrust().annotatedItems }} proteins</span>
+                    ({{ toPercentage(interproProteinProcessor.getTrust().annotatedItems / interproProteinProcessor.getTrust().totalAmountOfItems) }})
                     have at least one <span class="font-weight-bold">InterPro entry</span> assigned to them.
                 </div>
             </v-col>
@@ -67,77 +69,60 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Peptide } from "./../../../business/ontology/raw/Peptide";
-import { Prop, Watch } from "vue-property-decorator";
 import ProteinDefinition from "./../../../business/ontology/protein/ProteinDefinition";
-import FunctionalTrust from "./../../../business/processors/functional/FunctionalTrust";
 import StringUtils from "./../../../business/misc/StringUtils";
-import NcbiTaxon from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import ProteinProcessor from "./../../../business/processors/protein/ProteinProcessor";
 import GoProteinCountTableProcessor from "./../../../business/processors/functional/go/GoProteinCountTableProcessor";
 import EcProteinCountTableProcessor from "./../../../business/processors/functional/ec/EcProteinCountTableProcessor";
 import InterproProteinCountTableProcessor
     from "./../../../business/processors/functional/interpro/InterproProteinCountTableProcessor";
-import NcbiOntologyProcessor from "./../../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import { Ontology } from "@/business";
 
 @Component
 export default class SinglePeptideSummary extends Vue {
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    private proteins: ProteinDefinition[] = [];
-    private lca: NcbiTaxon = null;
-    private commonLineage: NcbiTaxon[] = [];
-
-    private goTrust: FunctionalTrust = null;
-    private ecTrust: FunctionalTrust = null;
-    private interproTrust: FunctionalTrust = null;
-
-    private loading: boolean = false;
-
-    private mounted() {
-        this.onInputsChanged();
+    get peptide(): string {
+        return this.$store.getters.peptideStatus.peptide;
     }
 
-    @Watch("peptide")
-    @Watch("equateIl")
-    private async onInputsChanged() {
-        if (this.peptide) {
-            this.loading = true;
-            const proteinProcessor = new ProteinProcessor();
-            this.proteins = await proteinProcessor.getProteinsByPeptide(this.peptide, this.equateIl);
+    get equateIl(): boolean {
+        return this.$store.getters.peptideStatus.equateIl;
+    }
 
-            const goProcessor = new GoProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
-            this.goTrust = await goProcessor.getTrust();
+    get proteinProcessor(): ProteinProcessor {
+        return this.$store.getters.peptideStatus.proteinProcessor;
+    }
 
-            const ecProcessor = new EcProteinCountTableProcessor(this.peptide, this.equateIl, this.communicationSource);
-            this.ecTrust = await ecProcessor.getTrust();
+    get goProteinProcessor(): GoProteinCountTableProcessor {
+        return this.$store.getters.peptideStatus.goProteinCountTableProcessor;
+    }
 
-            const interproProcessor = new InterproProteinCountTableProcessor(
-                this.peptide,
-                this.equateIl,
-                this.communicationSource
-            );
-            this.interproTrust = await interproProcessor.getTrust();
+    get ecProteinProcessor(): EcProteinCountTableProcessor {
+        return this.$store.getters.peptideStatus.ecProteinCountTableProcessor;
+    }
 
-            const lca = await proteinProcessor.getLcaByPeptide(this.peptide, this.equateIl);
-            const commonLineage = await proteinProcessor.getCommonLineageByPeptide(this.peptide, this.equateIl);
+    get interproProteinProcessor(): InterproProteinCountTableProcessor {
+        return this.$store.getters.peptideStatus.interproProteinCountTableProcessor;
+    }
 
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource.getNcbiCommunicator());
-            const ontology = await ncbiOntologyProcessor.getOntologyByIds([lca, ...commonLineage]);
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters.peptideStatus.ncbiOntology;
+    }
 
-            this.lca = ontology.getDefinition(lca);
+    get analysisIsLoading(): boolean {
+        return this.$store.getters.peptideStatus.analysisInProgress;
+    }
 
-            this.commonLineage.length = 0;
-            this.commonLineage.push(...commonLineage.map(c => ontology.getDefinition(c)));
+    get commonLineage(): NcbiTaxon[] {
+        return this.proteinProcessor.getCommonLineage().map(c => this.ncbiOntology.getDefinition(c));
+    }
 
-            this.loading = false;
-        }
+    get lca(): NcbiTaxon {
+        return this.ncbiOntology.getDefinition(this.proteinProcessor.getLca());
+    }
+
+    get proteins(): ProteinDefinition[] {
+        return this.proteinProcessor.getProteins();
     }
 
     private toPercentage(n: number): string {

@@ -8,14 +8,15 @@ import { FunctionalNamespace } from "./../../../ontology/functional/FunctionalNa
 import { Ontology } from "./../../../ontology/Ontology";
 import { Peptide } from "./../../../ontology/raw/Peptide";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
+import { GoResponseCommunicator } from "@/business";
 
 export default class GoProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<GoCode, GoDefinition>{
     constructor(
         peptide: Peptide,
         equateIl: boolean,
-        private readonly communicationSource: CommunicationSource
+        private readonly goCommunicator: GoResponseCommunicator
     ) {
-        super(peptide, equateIl)
+        super(peptide, equateIl);
     }
 
     protected getAnnotationsFromProtein(p: ProteinDefinition): GoCode[] {
@@ -28,7 +29,7 @@ export default class GoProteinCountTableProcessor extends FunctionalProteinCount
     }
 
     protected async getOntology(countTable: CountTable<GoCode>): Promise<Ontology<GoCode, GoDefinition>> {
-        const ontologyProcessor = new GoOntologyProcessor(this.communicationSource.getGoCommunicator());
+        const ontologyProcessor = new GoOntologyProcessor(this.goCommunicator);
         return await ontologyProcessor.getOntology(countTable);
     }
 }

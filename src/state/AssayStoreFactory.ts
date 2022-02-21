@@ -26,7 +26,7 @@ import {
     TreeNode
 } from "@/business";
 
-import { ProgressReport } from "./../business/progress/ProgressReport";
+import { ProgressReport, ProgressReportHelper } from "./../business/progress/ProgressReport";
 
 import { ShareableMap } from "shared-memory-datastructures";
 import { ActionContext, ActionTree, GetterTree, Module, MutationTree } from "vuex";
@@ -294,100 +294,124 @@ export default class AssayStoreFactory {
             store.commit("UPDATE_FILTER_READY", [assay, false]);
             store.commit("UPDATE_ERROR", [assay, false, "", undefined]);
 
-            store.commit("UPDATE_PROGRESS", [assay, -1, 0, true]);
+            // Simply reset the filter data to the original data if the default parameters have been used.
+            if (taxonId === 1 && filterPercentage === 5) {
+                store.commit("UPDATE_PROGRESS", [assay, -1, 0, true]);
 
-            const getOwnAndChildrenSequences = async function(
-                taxonId: NcbiId,
-                lcaProcessor: LcaCountTableProcessor,
-                ncbiOntology: Ontology<NcbiId, NcbiTaxon>
-            ): Promise<Peptide[]> {
-                const lcaCountTable = lcaProcessor.getCountTable();
-                const peptideMapping = lcaProcessor.getAnnotationPeptideMapping();
+                const originalAssayData = store.getters["assayData"](assay);
 
-                const tree = new Tree(lcaCountTable, ncbiOntology);
-
-                const sequences: Peptide[] = [];
-                const node = tree.nodes.get(taxonId);
-                const nodes: TreeNode[] = [node];
-
-                while (nodes.length > 0) {
-                    const node = nodes.pop();
-                    if (peptideMapping.has(node.id)) {
-                        sequences.push(...peptideMapping.get(node.id));
-                    }
-
-                    if (node.children) {
-                        nodes.push(...node.children);
-                    }
-                }
-
-                return sequences;
-            }
-
-            try {
-                const assayData = store.getters["assayData"](assay);
-                const lcaProcessor = assayData.originalData.ncbiCountTableProcessor;
-
-                store.commit("UPDATE_PROGRESS", [assay, -1, 1, true]);
-
-                const peptidesForTaxon = await getOwnAndChildrenSequences(
-                    taxonId,
-                    lcaProcessor,
-                    assayData.ncbiOntology
-                );
-
-                const peptideProcessor = new PeptideCountTableProcessor();
-                const filteredCountTable = await peptideProcessor.getPeptideCountTable(
-                    peptidesForTaxon,
-                    assay.getSearchConfiguration()
-                );
-
-                store.commit("UPDATE_PROGRESS", [assay, -1, 2, true]);
-
-                const goCountTableProcessor = new GoCountTableProcessor(
-                    filteredCountTable,
-                    assay.getSearchConfiguration(),
-                    assayData.pept2Data,
-                    assay.getAnalysisSource().getCommunicationSource().getGoCommunicator(),
-                    filterPercentage
-                );
-                await goCountTableProcessor.compute();
-
-                store.commit("UPDATE_PROGRESS", [assay, -1, 3, true]);
-
-                const ecCountTableProcessor = new EcCountTableProcessor(
-                    filteredCountTable,
-                    assay.getSearchConfiguration(),
-                    assayData.pept2Data,
-                    assay.getAnalysisSource().getCommunicationSource().getEcCommunicator(),
-                    filterPercentage
-                );
-                await ecCountTableProcessor.compute();
-
-                store.commit("UPDATE_PROGRESS", [assay, -1, 4, true]);
-
-                const iprCountTableProcessor = new InterproCountTableProcessor(
-                    filteredCountTable,
-                    assay.getSearchConfiguration(),
-                    assayData.pept2Data,
-                    assay.getAnalysisSource().getCommunicationSource().getInterproCommunicator(),
-                    filterPercentage
-                );
-                await iprCountTableProcessor.compute();
+                // TODO, we should get rid of this timeout in the future
+                await new Promise<void>((resolve) => {
+                    setTimeout(() => resolve(), 100);
+                });
 
                 store.commit("UPDATE_FILTER_DATA", [
                     assay,
-                    filteredCountTable,
-                    goCountTableProcessor,
-                    ecCountTableProcessor,
-                    iprCountTableProcessor,
+                    originalAssayData.originalData.peptideCountTable,
+                    originalAssayData.originalData.goCountTableProcessor,
+                    originalAssayData.originalData.ecCountTableProcessor,
+                    originalAssayData.originalData.interproCountTableProcessor,
                     filterPercentage
                 ]);
-            } catch (error) {
-                store.commit("UPDATE_ERROR", [assay, true, error.message]);
-            } finally {
+
                 store.commit("UPDATE_FILTER_READY", [assay, true]);
                 store.commit("UPDATE_FILTER_IN_PROGRESS", [assay, false]);
+            } else {
+                store.commit("UPDATE_PROGRESS", [assay, -1, 0, true]);
+
+                const getOwnAndChildrenSequences = async function(
+                    taxonId: NcbiId,
+                    lcaProcessor: LcaCountTableProcessor,
+                    ncbiOntology: Ontology<NcbiId, NcbiTaxon>
+                ): Promise<Peptide[]> {
+                    const lcaCountTable = lcaProcessor.getCountTable();
+                    const peptideMapping = lcaProcessor.getAnnotationPeptideMapping();
+
+                    const tree = new Tree(lcaCountTable, ncbiOntology);
+
+                    const sequences: Peptide[] = [];
+                    const node = tree.nodes.get(taxonId);
+                    const nodes: TreeNode[] = [node];
+
+                    while (nodes.length > 0) {
+                        const node = nodes.pop();
+                        if (peptideMapping.has(node.id)) {
+                            sequences.push(...peptideMapping.get(node.id));
+                        }
+
+                        if (node.children) {
+                            nodes.push(...node.children);
+                        }
+                    }
+
+                    return sequences;
+                }
+
+                try {
+                    const assayData = store.getters["assayData"](assay);
+                    const lcaProcessor = assayData.originalData.ncbiCountTableProcessor;
+
+                    store.commit("UPDATE_PROGRESS", [assay, -1, 1, true]);
+
+                    const peptidesForTaxon = await getOwnAndChildrenSequences(
+                        taxonId,
+                        lcaProcessor,
+                        assayData.ncbiOntology
+                    );
+
+                    const peptideProcessor = new PeptideCountTableProcessor();
+                    const filteredCountTable = await peptideProcessor.getPeptideCountTable(
+                        peptidesForTaxon,
+                        assay.getSearchConfiguration()
+                    );
+
+                    store.commit("UPDATE_PROGRESS", [assay, -1, 2, true]);
+
+                    const goCountTableProcessor = new GoCountTableProcessor(
+                        filteredCountTable,
+                        assay.getSearchConfiguration(),
+                        assayData.pept2Data,
+                        assay.getAnalysisSource().getCommunicationSource().getGoCommunicator(),
+                        filterPercentage
+                    );
+                    await goCountTableProcessor.compute();
+
+                    store.commit("UPDATE_PROGRESS", [assay, -1, 3, true]);
+
+                    const ecCountTableProcessor = new EcCountTableProcessor(
+                        filteredCountTable,
+                        assay.getSearchConfiguration(),
+                        assayData.pept2Data,
+                        assay.getAnalysisSource().getCommunicationSource().getEcCommunicator(),
+                        filterPercentage
+                    );
+                    await ecCountTableProcessor.compute();
+
+                    store.commit("UPDATE_PROGRESS", [assay, -1, 4, true]);
+
+                    const iprCountTableProcessor = new InterproCountTableProcessor(
+                        filteredCountTable,
+                        assay.getSearchConfiguration(),
+                        assayData.pept2Data,
+                        assay.getAnalysisSource().getCommunicationSource().getInterproCommunicator(),
+                        filterPercentage
+                    );
+                    await iprCountTableProcessor.compute();
+
+                    store.commit("UPDATE_FILTER_DATA", [
+                        assay,
+                        filteredCountTable,
+                        goCountTableProcessor,
+                        ecCountTableProcessor,
+                        iprCountTableProcessor,
+                        filterPercentage
+                    ]);
+                } catch (error) {
+                    store.commit("UPDATE_ERROR", [assay, true, error.message]);
+                } finally {
+                    store.commit("UPDATE_FILTER_READY", [assay, true]);
+                    store.commit("UPDATE_FILTER_IN_PROGRESS", [assay, false]);
+                }
             }
         }
 
@@ -421,23 +445,8 @@ export default class AssayStoreFactory {
                 state.assays.push({
                     assay,
 
-                    originalProgress: {
-                        steps: progressSteps,
-                        startTimes: new Array(progressSteps.length).fill(0),
-                        endTimes: new Array(progressSteps.length).fill(0),
-                        currentStep: 0,
-                        currentValue: -1,
-                        eta: 0
-                    },
-
-                    filterProgress: {
-                        steps: filterSteps,
-                        startTimes: new Array(filterSteps.length).fill(0),
-                        endTimes: new Array(filterSteps.length).fill(0),
-                        currentStep: 0,
-                        currentValue: -1,
-                        eta: 0
-                    },
+                    originalProgress: ProgressReportHelper.constructProgressReportObject(progressSteps),
+                    filterProgress: ProgressReportHelper.constructProgressReportObject(progressSteps),
 
                     error: {
                         status: false,

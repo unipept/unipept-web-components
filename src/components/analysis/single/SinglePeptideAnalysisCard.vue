@@ -22,45 +22,27 @@
         </v-tabs>
         <v-tabs-items v-model="currentTab">
             <v-tab-item>
-                <matched-proteins-table
-                    :communication-source="communicationSource"
-                    :peptide="peptide"
-                    :equate-il="equateIl">
+                <matched-proteins-table>
                 </matched-proteins-table>
             </v-tab-item>
             <v-tab-item>
-                <lineage-tree
-                    :communication-source="communicationSource"
-                    :peptide="peptide"
-                    :equate-il="equateIl">
+                <lineage-tree>
                 </lineage-tree>
             </v-tab-item>
             <v-tab-item>
-                <lineage-table
-                    :communication-source="communicationSource"
-                    :peptide="peptide"
-                    :equate-il="equateIl">
+                <lineage-table>
                 </lineage-table>
             </v-tab-item>
             <v-tab-item>
-                <single-go-summary-card
-                    :peptide="peptide"
-                    :equate-il="equateIl"
-                    :communication-source="communicationSource">
+                <single-go-summary-card>
                 </single-go-summary-card>
             </v-tab-item>
             <v-tab-item>
-                <single-ec-summary-card
-                    :peptide="peptide"
-                    :equate-il="equateIl"
-                    :communication-source="communicationSource">
+                <single-ec-summary-card>
                 </single-ec-summary-card>
             </v-tab-item>
             <v-tab-item>
-                <single-interpro-summary-card
-                    :peptide="peptide"
-                    :equate-il="equateIl"
-                    :communication-source="communicationSource">
+                <single-interpro-summary-card>
                 </single-interpro-summary-card>
             </v-tab-item>
         </v-tabs-items>
@@ -91,13 +73,6 @@ import CommunicationSource from "./../../../business/communication/source/Commun
     }
 })
 export default class SinglePeptideAnalysisCard extends Vue {
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
     private currentTab: number = 0;
 }
 </script>

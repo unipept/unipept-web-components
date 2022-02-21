@@ -22,3 +22,16 @@ export type ProgressReport = {
     // (ETA = Estimated Time Remaining)
     eta: number
 }
+
+export class ProgressReportHelper {
+    public static constructProgressReportObject(steps: string[]): ProgressReport {
+        return {
+            steps,
+            startTimes: new Array(steps.length).fill(0),
+            endTimes: new Array(steps.length).fill(0),
+            currentStep: 0,
+            currentValue: -1,
+            eta: 0
+        }
+    }
+}

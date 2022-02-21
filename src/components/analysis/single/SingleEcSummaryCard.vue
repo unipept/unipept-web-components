@@ -6,7 +6,6 @@
                 annotation-name="EC-number"
                 :item-retriever="itemRetriever"
                 :external-url-constructor="getUrl"
-                :loading="isComputing"
                 :show-percentage="false">
             </amount-table>
             <v-card outlined>
@@ -14,14 +13,12 @@
                     small
                     depressed
                     class="item-treeview-dl-btn"
-                    :disabled="isComputing"
                     @click="$refs.imageDownloadModal.downloadSVG('unipept_treeview', '#ec-treeview svg')">
                     <v-icon>mdi-download</v-icon>
                     Save as image
                 </v-btn>
                 <treeview
                     id="ec-treeview"
-                    :loading="isComputing"
                     :data="ecTree"
                     :autoResize="true"
                     :height="300"
@@ -56,54 +53,32 @@ import { DataNodeLike } from "unipept-visualizations";
     components: { AmountTable, Treeview }
 })
 export default class SingleEcSummaryCard extends Vue {
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    private itemRetriever: AmountTableItemRetriever<EcCode, EcDefinition>;
-    private ecTree: DataNodeLike = null;
-
-    private trust: FunctionalTrust = null;
-    private trustLine: string = "";
-    private isComputing: boolean = false;
-
-    private mounted() {
-        this.onInputsChanged();
+    get ecProteinProcessor(): EcProteinCountTableProcessor {
+        return this.$store.getters.peptideStatus.ecProteinCountTableProcessor;
     }
 
-    @Watch("peptide")
-    @Watch("equateIl")
-    private async onInputsChanged() {
-        if (this.peptide) {
-            this.isComputing = true;
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters.peptideStatus.ecOntology;
+    }
 
-            const ecProteinProcessor = new EcProteinCountTableProcessor(
-                this.peptide,
-                this.equateIl,
-                this.communicationSource
-            );
+    get trust(): FunctionalTrust {
+        return this.ecProteinProcessor.getTrust();
+    }
 
-            const functionalCountTable = await ecProteinProcessor.getCountTable();
+    get trustLine(): string {
+        return FunctionalUtils.computeTrustLine(this.trust, "EC-number", "protein");
+    }
 
-            const ontologyProcessor = new EcOntologyProcessor(this.communicationSource.getEcCommunicator());
-            const ontology = await ontologyProcessor.getOntology(functionalCountTable);
+    get itemRetriever(): AmountTableItemRetriever<EcCode, EcDefinition> {
+        return new SingleAmountTableItemRetriever(
+            this.ecProteinProcessor.getCountTable(),
+            this.ecOntology,
+            this.trust.totalAmountOfItems
+        );
+    }
 
-            this.trust = await ecProteinProcessor.getTrust();
-            this.trustLine = FunctionalUtils.computeTrustLine(this.trust, "EC-number", "protein");
-
-            this.itemRetriever = new SingleAmountTableItemRetriever(
-                functionalCountTable,
-                ontology,
-                this.trust.totalAmountOfItems
-            );
-
-            this.ecTree = await this.computeEcTree(functionalCountTable, ontology);
-
-            this.isComputing = false;
-        }
+    get ecTree(): DataNodeLike {
+        return this.$store.getters.peptideStatus.ecTree;
     }
 
     private getUrl(code: string): string {
@@ -116,100 +91,20 @@ export default class SingleEcSummaryCard extends Vue {
         const fullCode = (d.name + ".-.-.-.-").split(".").splice(0, 4).join(".");
         let tip = "";
         tip += `<div class="tooltip-fa-text">
-                    <strong>${d.data.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
+                    <strong>${d.count} peptides</strong> have at least one EC number within ${fullCode},<br>`;
 
-        if (d.data.self_count == 0) {
+        if (d.selfCount == 0) {
             tip += "no specific annotations";
         } else {
-            if (d.data.self_count == d.data.count) {
+            if (d.selfCount == d.count) {
                 tip += " <strong>all specifically</strong> for this number";
             } else {
-                tip += ` <strong>${d.data.self_count} specifically</strong> for this number`;
+                tip += ` <strong>${d.selfCount} specifically</strong> for this number`;
             }
         }
 
         tip += "</div>";
         return tip;
-    }
-
-    private async computeEcTree(
-        ecCountTable: CountTable<EcCode>,
-        ecOntology: Ontology<EcCode, EcDefinition>
-    ): Promise<DataNodeLike> {
-        const codeNodeMap = new Map<EcCode, DataNodeLike>();
-
-        codeNodeMap.set("-.-.-.-",
-            {
-                name: "-.-.-.-",
-                children: [],
-                count: 0,
-                selfCount: 0,
-                extra:
-                {
-                    sequences: Object.create(null),
-                    self_sequences: Object.create(null),
-                    id: 0
-                }
-            }
-        );
-
-        const getOrNew = (key) => {
-            if (!codeNodeMap.has(key)) {
-                codeNodeMap.set(
-                    key,
-                    {
-                        name: key.split(".").filter((x) => x !== "-").join("."),
-                        count: 0,
-                        selfCount: 0,
-                        children: [],
-                        extra: {
-                            code: key,
-                            value: 0,
-                            sequences: Object.create(null),
-                            self_sequences: Object.create(null),
-                            id: key.split(".").map((x) => ("0000" + x).slice(-4)).join(".")
-                        }
-                    }
-                );
-                const ancestors = EcDefinition.computeAncestors(key, true);
-                getOrNew(ancestors[0]).children.push(codeNodeMap.get(key));
-            }
-            return codeNodeMap.get(key);
-        };
-
-        const sortedEcs = ecCountTable.getOntologyIds()
-            .map(id => ecOntology.getDefinition(id))
-            // Only retain valid definitions
-            .filter(def => def)
-            .sort((a: EcDefinition, b: EcDefinition) => a.level - b.level);
-
-        for (const ecDef of sortedEcs) {
-            const toInsert = {
-                name: ecDef.code.split(".").filter((x) => x !== "-").join("."),
-                count: ecCountTable.getCounts(ecDef.code),
-                selfCount: ecCountTable.getCounts(ecDef.code),
-                children: [],
-                extra: {
-                    definition: ecDef,
-                    id: ecDef.code.split(".").map((x) => ("0000" + x).slice(-4)).join(".")
-                },
-            };
-
-            codeNodeMap.set(ecDef.code, toInsert);
-
-            const ancestors = EcDefinition.computeAncestors(ecDef.code, true);
-            getOrNew(ancestors[0]).children.push(toInsert);
-            for (const a of ancestors) {
-                getOrNew(a).count += toInsert.count;
-            }
-        }
-
-        // Order the nodes by their id (order by EC number)
-        for (const val of codeNodeMap.values()) {
-            val.children.sort((a, b) => a.extra.id.localeCompare(b.extra.id));
-        }
-
-        return codeNodeMap.get("-.-.-.-");
     }
 }
 </script>
