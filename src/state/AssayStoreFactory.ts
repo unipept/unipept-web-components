@@ -276,6 +276,8 @@ export default class AssayStoreFactory {
                 // analysis process.
                 store.commit("UPDATE_ERROR", [assay, true, err.message, err]);
             } finally {
+                // This assay should also not be filtered again!
+                await store.commit("UPDATE_FILTER_READY", [assay, true]);
                 await store.commit("UPDATE_ANALYSIS_READY", [assay, true]);
                 // The analysis for this assay is over.
                 await store.commit("UPDATE_ANALYSIS_IN_PROGRESS", [assay, false]);

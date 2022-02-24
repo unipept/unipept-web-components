@@ -32,6 +32,7 @@ import CommunicationSource from "./../../../business/communication/source/Commun
 import AmountTableItemRetriever from "@/components/tables/AmountTableItemRetriever";
 import AmountTable from "@/components/tables/AmountTable.vue";
 import SingleAmountTableItemRetriever from "@/components/analysis/single/SingleAmountTableItemRetriever";
+import { Ontology } from "@/business";
 
 @Component({
     components: { AmountTable }

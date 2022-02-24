@@ -248,7 +248,7 @@ export default class MatchedProteinsTable extends Vue {
         return this.$store.getters.peptideStatus.equateIl;
     }
 
-    get peptideData(): ShareableMap<Peptide, PeptideData> {
+    get peptideData(): PeptideData {
         return this.$store.getters.peptideStatus.peptideData;
     }
 

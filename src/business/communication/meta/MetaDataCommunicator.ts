@@ -5,8 +5,8 @@ export default class MetaDataCommunicator {
     public static VERSION_API_ENDPOINT = "/private_api/metadata.json";
 
     // We'll only check the version information from the private API once a day.
-    private lastChecked: Date;
-    private currentUniProtVersion: string;
+    private static lastChecked: Date;
+    private static currentUniProtVersion: string;
 
     public constructor(
         private readonly endpointUrl: string
@@ -20,22 +20,24 @@ export default class MetaDataCommunicator {
      */
     async getCurrentUniprotVersion(): Promise<string | undefined> {
         if (
-            !this.currentUniProtVersion ||
-            !this.lastChecked ||
-            new Date().getTime() - this.lastChecked.getTime() > 24 * 60 * 60 * 1000
+            !MetaDataCommunicator.currentUniProtVersion ||
+            !MetaDataCommunicator.lastChecked ||
+            new Date().getTime() - MetaDataCommunicator.lastChecked.getTime() > 24 * 60 * 60 * 1000
         ) {
             try {
-                const response: { uniprot_version: string } = await NetworkUtils.getJSON(
+                const response: { db_version: string } = await NetworkUtils.getJSON(
                     this.endpointUrl + MetaDataCommunicator.VERSION_API_ENDPOINT
                 );
 
-                this.currentUniProtVersion = response.uniprot_version;
-                this.lastChecked = new Date();
+                console.log(response);
+
+                MetaDataCommunicator.currentUniProtVersion = "UniProt " + response.db_version;
+                MetaDataCommunicator.lastChecked = new Date();
             } catch (error) {
                 console.warn(error);
                 return undefined;
             }
         }
-        return this.currentUniProtVersion;
+        return MetaDataCommunicator.currentUniProtVersion;
     }
 }
