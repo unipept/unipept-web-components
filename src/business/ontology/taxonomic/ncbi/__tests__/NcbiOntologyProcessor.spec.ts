@@ -20,7 +20,7 @@ describe("NcbiOntologyProcessor", () => {
     it("returns a correct ontology for a NCBI count table", async() => {
         const ncbiCounts = new CountTable<NcbiId>(ncbiIds);
 
-        const ncbiOntologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource());
+        const ncbiOntologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getNcbiCommunicator());
         const ontology = await ncbiOntologyProcessor.getOntology(ncbiCounts);
 
         expect(ontology.getDefinition(2)).toEqual({
@@ -136,7 +136,7 @@ describe("NcbiOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const ncbiOntologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource());
+        const ncbiOntologyProcessor = new NcbiOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getNcbiCommunicator());
 
         expect(await ncbiOntologyProcessor.getDefinition(816)).toEqual({
             id: 816,

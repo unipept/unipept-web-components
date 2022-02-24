@@ -2,7 +2,7 @@
  * This interface keeps track of all the different Communicators and returns a valid communicator-object per requested
  * type.
  */
-import EcResponseCommunicator from "./../functional/ec/EcResponseCommunicator";
+import EcResponseCommunicator from "@/business/communication/functional/ec/EcResponseCommunicator";
 import GoResponseCommunicator from "./../functional/go/GoResponseCommunicator";
 import InterproResponseCommunicator from "./../functional/interpro/InterproResponseCommunicator";
 import NcbiResponseCommunicator from "./../taxonomic/ncbi/NcbiResponseCommunicator";

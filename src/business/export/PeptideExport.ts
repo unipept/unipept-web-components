@@ -23,6 +23,8 @@ import EcDefinition from "./../ontology/functional/ec/EcDefinition";
 import GoDefinition from "./../ontology/functional/go/GoDefinition";
 import InterproDefinition from "./../ontology/functional/interpro/InterproDefinition";
 import CommunicationSource from "./../communication/source/CommunicationSource";
+import { NcbiResponseCommunicator, PeptideData } from "@/business";
+import { ShareableMap } from "shared-memory-datastructures";
 
 export default class PeptideExport {
     /**
@@ -34,7 +36,7 @@ export default class PeptideExport {
      * present in the generated export.
      * @param searchConfiguration The particular configuration settings that are used for processing the peptides
      * present in the count table.
-     * @param communicationSource
+     * @param pept2data
      * @param separator The delimiter used to separate columns in the CSV. Use comma for international format, and semi-
      * colon for the European version.
      * @param secondarySeparator The delimiter used to separate multiple functional annotations from each other. Some
@@ -45,6 +47,7 @@ export default class PeptideExport {
     public static async exportSummaryAsCsv(
         peptideCountTable: CountTable<Peptide>,
         searchConfiguration: SearchConfiguration,
+        pept2data: ShareableMap<Peptide, PeptideData>,
         communicationSource: CommunicationSource,
         separator: string = ",",
         secondarySeparator: string = ";",
@@ -53,25 +56,23 @@ export default class PeptideExport {
         const rows: string[] = [];
         rows.push(PeptideExport.getHeader().join(separator));
 
-        const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
-        await pept2DataCommunicator.process(peptideCountTable, searchConfiguration);
-
         const ncbiOntology = await PeptideExport.computeNcbiOntology(
             peptideCountTable,
             searchConfiguration,
-            communicationSource
+            pept2data,
+            communicationSource.getNcbiCommunicator()
         );
         const goOntology = await PeptideExport.computeFunctionalOntology(
-            new GoCountTableProcessor(peptideCountTable, searchConfiguration, communicationSource, 0),
-            new GoOntologyProcessor(communicationSource)
+            new GoCountTableProcessor(peptideCountTable, searchConfiguration, pept2data, communicationSource.getGoCommunicator(), 0),
+            new GoOntologyProcessor(communicationSource.getGoCommunicator())
         );
         const ecOntology = await PeptideExport.computeFunctionalOntology(
-            new EcCountTableProcessor(peptideCountTable, searchConfiguration, communicationSource, 0),
-            new EcOntologyProcessor(communicationSource)
+            new EcCountTableProcessor(peptideCountTable, searchConfiguration, pept2data, communicationSource.getEcCommunicator(), 0),
+            new EcOntologyProcessor(communicationSource.getEcCommunicator())
         );
         const interproOntology = await PeptideExport.computeFunctionalOntology(
-            new InterproCountTableProcessor(peptideCountTable, searchConfiguration, communicationSource, 0),
-            new InterproOntologyProcessor(communicationSource)
+            new InterproCountTableProcessor(peptideCountTable, searchConfiguration, pept2data, communicationSource.getInterproCommunicator(), 0),
+            new InterproOntologyProcessor(communicationSource.getInterproCommunicator())
         );
 
         const headerLength = PeptideExport.getHeader().length;
@@ -81,7 +82,7 @@ export default class PeptideExport {
 
             row.push(peptide);
 
-            const pept2DataResponse = pept2DataCommunicator.getPeptideResponse(peptide, searchConfiguration);
+            const pept2DataResponse = pept2data.get(peptide);
 
             if (!pept2DataResponse) {
                 for (let i = 0; i < headerLength - 1; i++) {
@@ -202,12 +203,13 @@ export default class PeptideExport {
     private static async computeNcbiOntology(
         peptideCountTable: CountTable<Peptide>,
         searchConfiguration: SearchConfiguration,
-        communicationSource: CommunicationSource
+        pept2Data: ShareableMap<Peptide, PeptideData>,
+        ncbiCommunicator: NcbiResponseCommunicator
     ): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        const taxaProcessor = new LcaCountTableProcessor(peptideCountTable, searchConfiguration, communicationSource);
+        const taxaProcessor = new LcaCountTableProcessor(peptideCountTable, searchConfiguration, pept2Data);
         const lcaCountTable = await taxaProcessor.getCountTable();
 
-        const ncbiOntologyProcessor = new NcbiOntologyProcessor(communicationSource);
+        const ncbiOntologyProcessor = new NcbiOntologyProcessor(ncbiCommunicator);
         return await ncbiOntologyProcessor.getOntology(lcaCountTable);
     }
 

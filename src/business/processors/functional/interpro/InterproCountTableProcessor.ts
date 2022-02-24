@@ -7,18 +7,21 @@ import { Ontology } from "./../../../ontology/Ontology";
 import InterproOntologyProcessor from "./../../../ontology/functional/interpro/InterproOntologyProcessor";
 import { InterproNamespace } from "./../../../ontology/functional/interpro/InterproNamespace";
 import CommunicationSource from "./../../../communication/source/CommunicationSource";
+import { InterproResponseCommunicator, PeptideData } from "@/business";
+import { ShareableMap } from "shared-memory-datastructures";
 
 export default class InterproCountTableProcessor extends FunctionalCountTableProcessor<InterproCode, InterproDefinition> {
     constructor(
         readonly peptideCountTable: CountTable<Peptide>,
         readonly configuration: SearchConfiguration,
-        readonly communicationSource: CommunicationSource,
+        readonly pept2data: ShareableMap<Peptide, PeptideData>,
+        readonly iprCommunicationSource: InterproResponseCommunicator,
         readonly percentage: number = 5,
     ) {
         super(
             peptideCountTable,
             configuration,
-            communicationSource,
+            pept2data,
             percentage,
             "ipr",
             "ipr"
@@ -28,7 +31,7 @@ export default class InterproCountTableProcessor extends FunctionalCountTablePro
     protected async getOntology(
         countTable: CountTable<InterproCode>
     ): Promise<Ontology<InterproCode, InterproDefinition>> {
-        const ontologyProcessor = new InterproOntologyProcessor(this.communicationSource);
+        const ontologyProcessor = new InterproOntologyProcessor(this.iprCommunicationSource);
         return await ontologyProcessor.getOntology(countTable);
     }
 

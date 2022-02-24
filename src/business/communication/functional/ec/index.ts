@@ -1,4 +1,4 @@
 import { EcResponse } from "./EcResponse";
-import EcResponseCommunicator from "./EcResponseCommunicator";
+import EcResponseCommunicator from "@/business/communication/functional/ec/EcResponseCommunicator";
 
 export { EcResponse, EcResponseCommunicator };

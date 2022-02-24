@@ -22,7 +22,7 @@ describe("InterproOntologyProcessor", () => {
     it("returns a correct ontology for an InterPro count table", async() => {
         const interproCounts = new CountTable<InterproCode>(interproIds);
 
-        const interproProcessor = new InterproOntologyProcessor(new DefaultCommunicationSource());
+        const interproProcessor = new InterproOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getInterproCommunicator());
         const ontology = await interproProcessor.getOntology(interproCounts);
 
         expect(ontology.getDefinition("IPR:IPR000180")).toBeTruthy();
@@ -52,7 +52,7 @@ describe("InterproOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const interproProcessor = new InterproOntologyProcessor(new DefaultCommunicationSource());
+        const interproProcessor = new InterproOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getInterproCommunicator());
         let definition = await interproProcessor.getDefinition("IPR:IPR003018");
 
         expect(definition).toEqual({

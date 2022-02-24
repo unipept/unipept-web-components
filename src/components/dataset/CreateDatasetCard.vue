@@ -1,9 +1,3 @@
-<docs>
-The CreateDatasetCard provides the user with a form for creating a new Assay, based on a list of peptides. The user
-can indicate it's preference to storing this card in persistent storage. Note that this component does not store or
-select assays by itself, it only emits an event with it's intended action.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text>

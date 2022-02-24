@@ -10,7 +10,8 @@ describe("ProteinProcessor", () => {
 
     it("correctly parses protein responses", async() => {
         const proteinProcessor = new ProteinProcessor();
-        const proteinDefinition: ProteinDefinition[] = await proteinProcessor.getProteinsByPeptide("AALTER", true);
+        await proteinProcessor.compute("AALTER", true);
+        const proteinDefinition: ProteinDefinition[] = proteinProcessor.getProteins();
 
         expect(proteinDefinition.length).toEqual(8);
         expect(proteinDefinition).toMatchSnapshot();

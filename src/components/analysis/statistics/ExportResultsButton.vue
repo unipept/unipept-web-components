@@ -40,6 +40,8 @@ import { Prop } from "vue-property-decorator";
 import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
+import { ShareableMap } from "shared-memory-datastructures";
+import { PeptideData } from "@/business";
 
 
 @Component({
@@ -53,16 +55,20 @@ export default class ExportResultsButton extends Vue {
 
     private exportLoading: boolean = false;
 
-    private get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.peptideCountTable;
+    get peptideCountTable(): CountTable<Peptide> {
+        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
     }
 
-    private get communicationSource(): CommunicationSource {
-        return this.$store.getters.assayData(this.assay)?.communicationSource;
+    get communicationSource(): CommunicationSource {
+        return this.assay.getAnalysisSource().getCommunicationSource();
     }
 
-    private get progress(): number {
-        return this.$store.getters.assayData(this.assay)?.analysisMetaData?.progress;
+    get pept2data(): ShareableMap<Peptide, PeptideData> {
+        return this.$store.getters["assayData"](this.assay)?.pept2data;
+    }
+
+    get progress(): number {
+        return this.$store.getters["assayData"](this.assay)?.originalProgress.value;
     }
 
     private async downloadCsv(separator: string = ",", functionalSeparator: string = ";"): Promise<void> {
@@ -71,6 +77,7 @@ export default class ExportResultsButton extends Vue {
             const csv: string = await PeptideExport.exportSummaryAsCsv(
                 this.peptideCountTable,
                 this.assay.getSearchConfiguration(),
+                this.pept2data,
                 this.communicationSource,
                 separator,
                 functionalSeparator

@@ -29,7 +29,7 @@ describe("MatchedProteinsTable", () => {
             propsData: {
                 peptide: "AVGFGGDFDGVPR",
                 equateIl: true,
-                communicationSource: new DefaultCommunicationSource()
+                communicationSource: new DefaultCommunicationSource("http://unipept.ugent.be")
             }
         });
 
@@ -83,7 +83,7 @@ describe("MatchedProteinsTable", () => {
             propsData: {
                 peptide: "AALTER",
                 equateIl: true,
-                communicationSource: new DefaultCommunicationSource()
+                communicationSource: new DefaultCommunicationSource("http://unipept.ugent.be")
             }
         });
 

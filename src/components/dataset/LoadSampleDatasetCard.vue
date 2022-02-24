@@ -1,8 +1,3 @@
-<docs>
-The `LoadSampleDatasetCard` asynchronously downloads all sample datasets that are present in the Unipept database and
-provides the user with the option to select any one of these.
-</docs>
-
 <template>
     <v-card flat>
         <v-card-text>

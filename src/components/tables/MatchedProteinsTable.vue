@@ -1,9 +1,3 @@
-<docs>
-    The MatchedProteinsTable is a component that displays a list of all proteins that are associated with a given
-    peptide. This table shows the UniProt ID's, protein name, organism in which the protein occurs and all associated
-    functional annotations.
-</docs>
-
 <template>
     <v-card>
         <v-card-title>
@@ -17,7 +11,7 @@
             :search="filter"
             :custom-filter="filterByValue"
             :expanded.sync="expanded"
-            :loading="loading"
+            :loading="isAnalysisInProgress"
             show-expand>
             <template v-slot:item.uniprotAccessionId="{ item }" >
                 <span @click="openInUniProt(item.uniprotAccessionId)" style="cursor: pointer;">
@@ -185,15 +179,16 @@ import ProteinProcessor from "./../../business/processors/protein/ProteinProcess
 import EcOntologyProcessor from "./../../business/ontology/functional/ec/EcOntologyProcessor";
 import GoOntologyProcessor from "./../../business/ontology/functional/go/GoOntologyProcessor";
 import InterproOntologyProcessor from "./../../business/ontology/functional/interpro/InterproOntologyProcessor";
-import { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
+import NcbiTaxon, { NcbiId } from "./../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import NcbiOntologyProcessor from "./../../business/ontology/taxonomic/ncbi/NcbiOntologyProcessor";
 import NetworkUtils from "./../../business/communication/NetworkUtils";
 import SearchConfiguration from "./../../business/configuration/SearchConfiguration";
 import { CountTable } from "./../../business/counts/CountTable";
 import StringUtils from "./../../business/misc/StringUtils";
-import { OntologyIdType } from "./../../business/ontology/Ontology";
+import { Ontology, OntologyIdType } from "./../../business/ontology/Ontology";
 import CommunicationSource from "./../../business/communication/source/CommunicationSource";
 import PeptideData from "./../../business/communication/peptides/PeptideData";
+import { ShareableMap } from "shared-memory-datastructures";
 
 type MatchedProtein = {
     uniprotAccessionId: UniprotAccessionId,
@@ -208,16 +203,6 @@ type MatchedProtein = {
 }
 @Component
 export default class MatchedProteinsTable extends Vue {
-    /**
-     * The peptide that's being looked up by the user and for which all associated proteins should be displayed.
-     */
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
     private headers = [
         {
             text: "UniProt ID",
@@ -251,16 +236,66 @@ export default class MatchedProteinsTable extends Vue {
         },
     ];
 
-    private items: MatchedProtein[] = [];
-    private loading: boolean = false;
-
     private filter: string = "";
-    private peptideData: PeptideData;
 
     private expanded = [];
 
-    private mounted() {
-        this.onInputsChanged();
+    get peptide(): Peptide {
+        return this.$store.getters.peptideStatus.peptide;
+    }
+
+    get equateIl(): boolean {
+        return this.$store.getters.peptideStatus.equateIl;
+    }
+
+    get peptideData(): PeptideData {
+        return this.$store.getters.peptideStatus.peptideData;
+    }
+
+    get goOntology(): Ontology<GoCode, GoDefinition> {
+        return this.$store.getters.peptideStatus.goOntology;
+    }
+
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters.peptideStatus.ecOntology;
+    }
+
+    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
+        return this.$store.getters.peptideStatus.interproOntology;
+    }
+
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters.peptideStatus.ncbiOntology;
+    }
+
+    get isAnalysisInProgress(): boolean {
+        return this.$store.getters.peptideStatus.analysisInProgress;
+    }
+
+    get proteinProcessor(): ProteinProcessor {
+        return this.$store.getters.peptideStatus.proteinProcessor;
+    }
+
+    get items(): MatchedProtein[] {
+        return this.proteinProcessor.getProteins().map(p => {
+            const organism = this.ncbiOntology.getDefinition(p.organism);
+
+            const goTerms = p.goTerms.map(term => this.goOntology.getDefinition(term)).filter(e => e);
+            const ecTerms = p.ecNumbers.map(n => this.ecOntology.getDefinition("EC:" + n)).filter(e => e);
+            const iprTerms = p.interproEntries.map(i => this.interproOntology.getDefinition("IPR:" + i)).filter(e => e);
+
+            return {
+                uniprotAccessionId: p.uniprotAccessionId,
+                name: p.name,
+                organism: organism ? organism.name : "",
+                functionalAnnotations: {
+                    go: goTerms,
+                    ec: ecTerms,
+                    interpro: iprTerms
+                },
+                totalAnnotations: goTerms.length + ecTerms.length + iprTerms.length
+            }
+        });
     }
 
     private filterByValue(value, search, item) {
@@ -274,68 +309,6 @@ export default class MatchedProteinsTable extends Vue {
             item.functionalAnnotations.go.some(e => e.name.includes(search) || e.code.includes(search)) ||
             item.functionalAnnotations.interpro.some(e => e.name.includes(search) || e.code.includes(search)) ||
             item.functionalAnnotations.ec.some(e => e.name.includes(search) || e.code.includes(search));
-    }
-
-    @Watch("peptide")
-    @Watch("equateIl")
-    private async onInputsChanged() {
-        this.items.splice(0, this.items.length);
-        if (this.peptide) {
-            this.loading = true;
-            const proteinProcessor = new ProteinProcessor();
-            const proteins = await proteinProcessor.getProteinsByPeptide(this.peptide, this.equateIl);
-
-            const [ecNumbers, goTerms, interproEntries, organisms] = proteins.reduce((acc: [EcCode[], GoCode[], InterproCode[], NcbiId[]], current: ProteinDefinition) => {
-                acc[0].push(...current.ecNumbers.map(e => "EC:" + e));
-                acc[1].push(...current.goTerms);
-                acc[2].push(...current.interproEntries.map(e => "IPR:" + e));
-                acc[3].push(current.organism);
-                return acc;
-            }, [[], [], [], []]);
-
-            const searchConfig = new SearchConfiguration(this.equateIl, false, false);
-
-            const pept2DataCommunicator = this.communicationSource.getPept2DataCommunicator();
-
-            await pept2DataCommunicator.process(new CountTable<Peptide>(new Map([[this.peptide, 1]])), searchConfig)
-            this.peptideData = pept2DataCommunicator.getPeptideResponse(
-                this.peptide,
-                searchConfig
-            );
-
-            const ecOntologyProcessor = new EcOntologyProcessor(this.communicationSource);
-            const goOntologyProcessor = new GoOntologyProcessor(this.communicationSource);
-            const interproOntologyProcessor = new InterproOntologyProcessor(this.communicationSource);
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
-
-            const ecOntology = await ecOntologyProcessor.getOntologyByIds(ecNumbers);
-            const goOntology = await goOntologyProcessor.getOntologyByIds(goTerms);
-            const interproOntology = await interproOntologyProcessor.getOntologyByIds(interproEntries);
-            const ncbiOntology = await ncbiOntologyProcessor.getOntologyByIds(organisms);
-
-            this.items.length = 0;
-            this.items.push(...proteins.map(p => {
-                const organism = ncbiOntology.getDefinition(p.organism);
-
-                const goTerms = p.goTerms.map(term => goOntology.getDefinition(term)).filter(e => e);
-                const ecTerms = p.ecNumbers.map(n => ecOntology.getDefinition("EC:" + n)).filter(e => e);
-                const iprTerms = p.interproEntries.map(i => interproOntology.getDefinition("IPR:" + i)).filter(e => e);
-
-                return {
-                    uniprotAccessionId: p.uniprotAccessionId,
-                    name: p.name,
-                    organism: organism ? organism.name : "",
-                    functionalAnnotations: {
-                        go: goTerms,
-                        ec: ecTerms,
-                        interpro: iprTerms
-                    },
-                    totalAnnotations: goTerms.length + ecTerms.length + iprTerms.length
-                }
-            }));
-
-            this.loading = false;
-        }
     }
 
     private toggleExpanded(item) {

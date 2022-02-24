@@ -1,21 +1,17 @@
 <template>
     <div class="lineage-table">
         <v-card>
-            <v-card-text v-if="loading" class="d-flex justify-center">
-                <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
-            </v-card-text>
-            <v-card-text v-else>
+            <v-card-text>
                 <p>
-                    This table shows the complete taxonomic lineages of all taxa associated with the UniProt entries whose
-                    protein sequence contains the tryptic peptide. The first column contains the taxon name extracted from the
-                    UniProt entry, followed by columns representing taxonomic ranks ordered from superkingdom on the left to
-                    forma on the right.
+                    This table shows the complete taxonomic lineages of all taxa associated with the UniProt entries
+                    whose protein sequence contains the tryptic peptide. The first column contains the taxon name
+                    extracted from the UniProt entry, followed by columns representing taxonomic ranks ordered from
+                    superkingdom on the left to forma on the right.
                 </p>
                 <v-data-table
                     dense
                     :items="organisms"
                     :headers="headers"
-                    :loading="loading"
                     :footer-props="{
                         'items-per-page-options': [10, 20, 50, 100, -1]
                     }">
@@ -83,52 +79,35 @@ import CommunicationSource from "./../../business/communication/source/Communica
     }
 })
 export default class LineageTable extends Vue {
-    @Prop({ required: true })
-    private peptide: Peptide;
-    @Prop({ required: true })
-    private equateIl: boolean;
-    @Prop({ required: true })
-    private communicationSource: CommunicationSource;
-
-    private taxonRanks: string[] = Object.values(NcbiRank);
-    private organisms: { definition: NcbiTaxon, lineage: NcbiTaxon[] }[] = [];
-
     private usedColours: Map<string, string> = new Map();
     private colourCounter: number = 0;
 
-    private loading: boolean = false;
-
-    private mounted() {
-        this.onInputChanged();
+    get peptide(): Peptide {
+        return this.$store.getters.peptideStatus.peptide;
     }
 
-    @Watch("peptide")
-    @Watch("equateIl")
-    private async onInputChanged() {
-        if (this.peptide) {
-            this.loading = true;
-            const proteinProcessor = new ProteinProcessor();
-            const proteins = await proteinProcessor.getProteinsByPeptide(this.peptide, this.equateIl);
+    get proteinProcessor(): ProteinProcessor {
+        return this.$store.getters.peptideStatus.proteinProcessor;
+    }
 
-            const organismIds = proteins.map(p => p.organism);
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters.peptideStatus.ncbiOntology;
+    }
 
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(this.communicationSource);
-            const ontology = await ncbiOntologyProcessor.getOntologyByIds(organismIds);
+    get organisms(): { definition: NcbiTaxon, lineage: NcbiTaxon[] }[] {
+        const organismResult = [];
+        for (const protein of this.proteinProcessor.getProteins()) {
+            const def = this.ncbiOntology.getDefinition(protein.organism);
 
-            this.organisms.length = 0;
-            for (const id of organismIds) {
-                const def = ontology.getDefinition(id);
-
-                if (def) {
-                    this.organisms.push({
-                        definition: def,
-                        lineage: def.lineage.map(l => ontology.getDefinition(l))
-                    });
-                }
+            if (def) {
+                organismResult.push({
+                    definition: def,
+                    lineage: def.lineage.map(l => this.ncbiOntology.getDefinition(l))
+                });
             }
-
-            this.loading = false;
         }
+
+        return organismResult;
     }
 
     private getColour(name): string {

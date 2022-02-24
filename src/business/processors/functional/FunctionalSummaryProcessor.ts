@@ -1,10 +1,8 @@
 import { Peptide } from "./../../ontology/raw/Peptide";
 import FunctionalDefinition from "./../../ontology/functional/FunctionalDefinition";
 import { CountTable } from "./../../counts/CountTable";
-import SearchConfiguration from "./../../configuration/SearchConfiguration";
-import Pept2DataCommunicator from "./../../communication/peptides/Pept2DataCommunicator";
-import NcbiOntologyProcessor from "./../../ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import CommunicationSource from "./../../communication/source/CommunicationSource";
+import { ShareableMap } from "shared-memory-datastructures";
+import { NcbiId, NcbiTaxon, Ontology, PeptideData } from "@/business";
 
 export default class FunctionalSummaryProcessor {
     /**
@@ -13,20 +11,19 @@ export default class FunctionalSummaryProcessor {
      *
      * @param element The functional annotation for which a summary should be made.
      * @param peptideTable A count table for the peptides that are annotated with the given functional definition.
-     * @param configuration The configuration that's currently being used
-     * @param pept2DataCommunicator A Pept2DataCommunicator that processed the given peptideTable before.
-     * @param ncbiOntologyProcessor A valid NcbiOntologyProcessor that processed the given peptideTable before.
+     * @param pept2data A mapping between the different peptides and all of their associated data.
+     * @param ncbiOntology An Ontology that maps taxon id's onto the corresponding taxon objects. All of the taxa id's
+     * that are present in the pept2data table should be available in this ontology.
      */
     public async summarizeFunctionalAnnotation(
         element: FunctionalDefinition,
         peptideTable: CountTable<Peptide>,
-        configuration: SearchConfiguration,
-        pept2DataCommunicator: Pept2DataCommunicator,
-        ncbiOntologyProcessor: NcbiOntologyProcessor
+        pept2data: ShareableMap<Peptide, PeptideData>,
+        ncbiOntology: Ontology<NcbiId, NcbiTaxon>
     ): Promise<string[][]> {
         const processedPeptides: string[][] = peptideTable.getOntologyIds().map(peptide => {
             let peptideCount = peptideTable.getCounts(peptide);
-            let peptideData = pept2DataCommunicator.getPeptideResponse(peptide, configuration);
+            let peptideData =  pept2data.get(peptide);
             const ecs = peptideData.ec;
             let ecProteinCount = element.code in ecs ? ecs[element.code] : 0
 
@@ -38,7 +35,7 @@ export default class FunctionalSummaryProcessor {
                 totalCount,
                 ecProteinCount,
                 100 * (ecProteinCount / totalCount),
-                ncbiOntologyProcessor.getDefinition(peptideData.lca)
+                ncbiOntology.getDefinition(peptideData.lca)
             ]
         })
 

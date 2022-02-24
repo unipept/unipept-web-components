@@ -1,8 +1,3 @@
-<docs>
-    This component provides 4 different slots that can be filled in to display the GO-terms associated with a specific
-    item. The component automatically displays a loading state when the `loading` prop has been properly set.
-</docs>
-
 <template>
     <div class="go-table-container">
         <h2>{{ titleize(namespace) }}</h2>

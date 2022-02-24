@@ -87,9 +87,15 @@ export default class DatasetForm extends Vue {
     @Prop({ required: false, default: true })
     private showSave: boolean;
 
-    private peptidesData: string = this.peptides;
-    private nameData: string = this.name;
-    private saveData: boolean = this.save;
+    private peptidesData: string = "";
+    private nameData: string = "";
+    private saveData: boolean = false;
+
+    mounted() {
+        this.peptidesData = this.peptides;
+        this.nameData = this.name;
+        this.saveData = this.save;
+    }
 
     @Watch("peptides")
     private onPeptidesChange(newPeptides: string, oldPeptides: string) {

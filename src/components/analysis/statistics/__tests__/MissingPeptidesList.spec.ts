@@ -10,6 +10,7 @@ import Setup from "@/test/Setup";
 import { Peptide } from "@/business/ontology/raw/Peptide";
 import SearchConfiguration from "@/business/configuration/SearchConfiguration";
 import DefaultCommunicationSource from "@/business/communication/source/DefaultCommunicationSource";
+import PeptideTrustProcessor from "@/business/processors/raw/PeptideTrustProcessor";
 
 jest.mock("./../../../custom/Utils");
 
@@ -62,13 +63,11 @@ describe("MissingPeptidesList", () => {
         const mock: Mock = new Mock();
         const countTable = await mock.mockRealisticPeptideCountTable();
 
-        const communicationSource = new DefaultCommunicationSource();
+        const communicationSource = new DefaultCommunicationSource("http://unipept.ugent.be");
         const pept2DataCommunicator = communicationSource.getPept2DataCommunicator();
+        const [pept2data, peptideTrust] = await pept2DataCommunicator.process(countTable, new SearchConfiguration());
 
-        missedPeptides = (await pept2DataCommunicator.getPeptideTrust(
-            countTable,
-            new SearchConfiguration()
-        )).missedPeptides;
+        missedPeptides = peptideTrust.missedPeptides;
     });
 
     it("correctly renders all peptides", async(done) => {

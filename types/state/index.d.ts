@@ -1,7 +1,4 @@
-export * from "./AssayStore";
 export * from "./ConfigurationStore";
-export * from "./FilterStore";
-export * from "./FunctionalOntologyStoreFactory";
-export * from "./LcaOntologyStore";
-import FunctionalOntologyStoreFactory from "./FunctionalOntologyStoreFactory";
-export { FunctionalOntologyStoreFactory };
+import AssayStoreFactory, { AssayAnalysisStatus } from "./AssayStoreFactory";
+import SinglePeptideStoreFactory from "./SinglePeptideStoreFactory";
+export { AssayStoreFactory, AssayAnalysisStatus, SinglePeptideStoreFactory };

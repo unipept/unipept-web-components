@@ -83,7 +83,7 @@
                 </v-menu>
             </v-tabs>
             <v-alert
-                v-if="this.filteredNcbiTaxon"
+                v-if="this.filteredNcbiId !== 1"
                 dense
                 colored-border
                 id="filtered-taxon-information">
@@ -105,12 +105,12 @@
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <multi-go-summary-card
-                        v-if="filteredCountTable"
+                        v-if="!filterInProgress"
                         ref="goSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-go-summary-card>
-                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                    <div v-else-if="this.filterInProgress" class="mpa-waiting">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -126,12 +126,12 @@
                 </v-tab-item>
                 <v-tab-item>
                     <multi-ec-summary-card
-                        v-if="filteredCountTable"
+                        v-if="!filterInProgress"
                         ref="ecSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-ec-summary-card>
-                    <div v-else-if="this.analysisInProgress" class="mpa-waiting">
+                    <div v-else-if="this.filterInProgress" class="mpa-waiting">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -147,12 +147,12 @@
                 </v-tab-item>
                 <v-tab-item>
                     <multi-interpro-summary-card
-                        v-if="filteredCountTable"
+                        v-if="!filterInProgress"
                         ref="interproSummaryCard"
                         :assay="assay"
                         :show-percentage="showPercentage">
                     </multi-interpro-summary-card>
-                    <div v-else-if="this.analysisInProgress">
+                    <div v-else-if="this.filterInProgress">
                         <v-card-text class="d-flex justify-center">
                             <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                             </v-progress-circular>
@@ -186,12 +186,12 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import NcbiTaxon, { NcbiId } from "./../../../business/ontology/taxonomic/ncbi/NcbiTaxon";
 import LcaCountTableProcessor from "./../../../business/processors/taxonomic/ncbi/LcaCountTableProcessor";
-import Tree from "./../../../business/ontology/taxonomic/Tree";
 import MultiGoSummaryCard from "./../multi/MultiGoSummaryCard.vue";
 import MultiEcSummaryCard from "./../multi/MultiEcSummaryCard.vue";
 import MultiInterproSummaryCard from "./../multi/MultiInterproSummaryCard.vue";
 import ProteomicsAssay from "./../../../business/entities/assay/ProteomicsAssay";
 import { Ontology } from "./../../../business/ontology/Ontology";
+import { ProgressReport } from "@/business";
 
 @Component({
     components: {
@@ -213,26 +213,17 @@ export default class FunctionalSummaryCard extends Vue {
 
     @Prop({ required: true })
     private assay: ProteomicsAssay;
-    @Prop({ required: false, default: true })
-    private analysisInProgress: boolean;
 
     private selectedTaxonId: NcbiId = 1;
 
     private selectedSortTypeName: string = "Peptides";
-    private relativeCounts: number = 0;
 
     private taxonId: number = 1;
-
-    private selectedNCBITaxon: NcbiTaxon = null;
 
     private currentTab: number = 0;
     private dialogOpen: boolean = false;
 
-    private faCalculationsInProgress: boolean = false;
     private showPercentage: boolean = false;
-
-    private tree: Tree = null;
-    private taxaToPeptidesMapping: Map<NcbiId, Peptide[]> = null;
 
     private placeholderText = "Please select at least one assay for analysis.";
 
@@ -246,30 +237,27 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     get filteredCountTable(): CountTable<Peptide> {
-        return this.$store.getters.assayData(this.assay)?.filteredPeptideCountTable;
+        return this.$store.getters.assayData(this.assay)?.filteredData?.peptideCountTable;
     }
 
-    get lcaProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
     }
 
-    get lcaOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters["ncbi/ontology"](this.assay)?.ontology;
+    get filteredNcbiId(): number {
+        return this.$store.getters.assayData(this.assay)?.filterId;
     }
 
     get filteredNcbiTaxon(): NcbiTaxon {
-        return this.$store.getters.assayData(this.assay)?.taxonFilter;
+        return this.ncbiOntology.getDefinition(this.filteredNcbiId);
     }
 
-    @Watch("filteredCountTable")
-    @Watch("lcaProcessor")
-    @Watch("lcaOntology")
-    private async computeTree() {
-        if (this.filteredCountTable && this.lcaProcessor && this.lcaOntology) {
-            this.taxaToPeptidesMapping = await this.lcaProcessor.getAnnotationPeptideMapping();
-            const taxaCounts = await this.lcaProcessor.getCountTable();
-            this.tree = new Tree(taxaCounts, this.lcaOntology);
-        }
+    get filterProgress(): ProgressReport {
+        return this.$store.getters.assayData(this.assay)?.filterProgress;
+    }
+
+    get filterInProgress(): boolean {
+        return this.filterProgress.currentStep !== this.filterProgress.steps.length;
     }
 
     private enableRelativeCounts(): void {
@@ -283,7 +271,7 @@ export default class FunctionalSummaryCard extends Vue {
     }
 
     private resetFilter(): void {
-        this.$store.dispatch("filterByTaxon", [this.assay, 1]);
+        this.$store.dispatch("filterAssayByTaxon", [this.assay, 1]);
     }
 }
 </script>

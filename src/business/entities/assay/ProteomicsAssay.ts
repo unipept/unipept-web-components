@@ -2,18 +2,19 @@ import Assay from "./Assay";
 import SearchConfiguration from "./../../configuration/SearchConfiguration";
 import AssayVisitor from "./AssayVisitor";
 import { Peptide } from "./../../ontology/raw/Peptide";
+import AnalysisSource from "./../../communication/analysis/AnalysisSource";
+import { v4 as uuidv4 } from "uuid";
 
 export default class ProteomicsAssay extends Assay {
     protected amountOfPeptides: number = 0;
 
     private searchConfiguration: SearchConfiguration = new SearchConfiguration();
     private peptides: Peptide[] = [];
-    // Which endpoint was used the last time this assay was analyzed?
-    private endpoint: string = "";
-    // Which version of the Unipept database was last used for the analysis of this assay?
-    private databaseVersion: string = "";
+    private analysisSource: AnalysisSource;
 
-    constructor(public id: string) {
+    constructor(
+        public id: string = uuidv4()
+    ) {
         super(id);
     }
 
@@ -22,12 +23,7 @@ export default class ProteomicsAssay extends Assay {
     }
 
     public setSearchConfiguration(value: SearchConfiguration) {
-        const oldConfig = this.searchConfiguration;
         this.searchConfiguration = value;
-
-        if (oldConfig.toString() !== value.toString()) {
-            super.onUpdate("searchConfiguration", oldConfig, value);
-        }
     }
 
     public getPeptides(): Peptide[] {
@@ -35,20 +31,8 @@ export default class ProteomicsAssay extends Assay {
     }
 
     public setPeptides(peptides: Peptide[]): void {
-        const oldPeptides = this.peptides;
         this.amountOfPeptides = peptides.length;
         this.peptides = peptides;
-
-        const equalPeptides: boolean =
-            oldPeptides &&
-            oldPeptides.length === peptides.length &&
-            (oldPeptides === peptides || oldPeptides.every(
-                (oldPept, idx) => oldPept === peptides[idx])
-            );
-
-        if  (equalPeptides) {
-            super.onUpdate("peptides", oldPeptides, peptides);
-        }
     }
 
     public getAmountOfPeptides(): number {
@@ -56,38 +40,18 @@ export default class ProteomicsAssay extends Assay {
     }
 
     public setAmountOfPeptides(amount: number): void {
-        const oldAmount = this.amountOfPeptides;
         this.amountOfPeptides = amount;
-        if (this.amountOfPeptides !== amount) {
-            super.onUpdate("amountOfPeptides", oldAmount, amount);
-        }
     }
 
-    public getEndpoint(): string {
-        return this.endpoint;
+    public getAnalysisSource(): AnalysisSource {
+        return this.analysisSource;
     }
 
-    public setEndpoint(endpoint: string): void {
-        const oldEndpoint = this.endpoint;
-        this.endpoint = endpoint;
-        if (this.endpoint !== oldEndpoint) {
-            super.onUpdate("endpoint", oldEndpoint, endpoint);
-        }
+    public setAnalysisSource(source: AnalysisSource): void {
+        this.analysisSource = source;
     }
 
-    public getDatabaseVersion(): string {
-        return this.databaseVersion;
-    }
-
-    public setDatabaseVersion(databaseVersion: string): void {
-        const oldVersion = databaseVersion;
-        this.databaseVersion = databaseVersion;
-        if (this.databaseVersion !== oldVersion) {
-            super.onUpdate("databaseVersion", oldVersion, databaseVersion);
-        }
-    }
-
-    async accept(visitor: AssayVisitor): Promise<void> {
-        await visitor.visitProteomicsAssay(this);
+    public accept(visitor: AssayVisitor): Promise<void> {
+        return visitor.visitProteomicsAssay(this);
     }
 }

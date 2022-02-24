@@ -237,43 +237,43 @@ export default class HeatmapWizardSingleSample extends Vue {
     }
 
     get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters["assayData"](this.assay)?.peptideCountTable;
+        return this.$store.getters.assayData(this.assay).originalData.peptideCountTable;
     }
 
     get ncbiCountTableProcessor(): LcaCountTableProcessor {
-        return this.$store.getters["ncbi/originalData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay).originalData.ncbiCountTableProcessor;
     }
 
     get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
-        return this.$store.getters["ncbi/ontology"](this.assay);
+        return this.$store.getters.assayData(this.assay).ncbiOntology;
     }
 
     get goCountTableProcessor(): GoCountTableProcessor {
-        return this.$store.getters["go/originalData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay).originalData.goCountTableProcessor;
     }
 
     get goOntology(): Ontology<GoCode, GoDefinition> {
-        return this.$store.getters["go/ontology"](this.assay);
+        return this.$store.getters.assayData(this.assay).goOntology;
     }
 
     get ecCountTableProcessor(): EcCountTableProcessor {
-        return this.$store.getters["ec/originalData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay).originalData.ecCountTableProcessor;
     }
 
     get ecOntology(): Ontology<EcCode, EcDefinition> {
-        return this.$store.getters["ec/ontology"](this.assay);
+        return this.$store.getters.assayData(this.assay).ecOntology;
     }
 
     get interproCountTableProcessor(): InterproCountTableProcessor {
-        return this.$store.getters["interpro/originalData"](this.assay)?.processor;
+        return this.$store.getters.assayData(this.assay).originalData.interproCountTableProcessor;
     }
 
     get interproOntology(): Ontology<InterproCode, InterproDefinition> {
-        return this.$store.getters["interpro/ontology"](this.assay);
+        return this.$store.getters.assayData(this.assay).interproOntology;
     }
 
     get tree(): Tree {
-        return this.$store.getters["ncbi/tree"](this.assay);
+        return this.$store.getters.assayData(this.assay).originalData.tree;
     }
 
     @Watch("peptideCountTable", { immediate: true })
@@ -320,8 +320,8 @@ export default class HeatmapWizardSingleSample extends Vue {
         if (this.peptideCountTable) {
             dataItem.loading = true;
 
-            const countTable = await countProcessor.getCountTable();
-            const peptideMapping = await countProcessor.getAnnotationPeptideMapping();
+            const countTable = countProcessor.getCountTable();
+            const peptideMapping = countProcessor.getAnnotationPeptideMapping();
 
             const items = [];
             for (const id of countTable.getOntologyIds()) {

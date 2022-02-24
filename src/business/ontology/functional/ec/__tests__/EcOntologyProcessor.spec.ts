@@ -20,7 +20,7 @@ describe("EcOntologyProcessor", () => {
     it("returns a correct ontology for an Enzyme Commission count table", async() => {
         const ecCounts = new CountTable<EcCode>(ecCodes);
 
-        const ecOntologyProcessor = new EcOntologyProcessor(new DefaultCommunicationSource());
+        const ecOntologyProcessor = new EcOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator());
         const ontology = await ecOntologyProcessor.getOntology(ecCounts);
 
         expect(ontology.getDefinition("EC:1.4.1.4")).toEqual({
@@ -34,7 +34,7 @@ describe("EcOntologyProcessor", () => {
     });
 
     it("correctly fetches one definition at a time if requested", async() => {
-        const ecProcessor = new EcOntologyProcessor(new DefaultCommunicationSource());
+        const ecProcessor = new EcOntologyProcessor(new DefaultCommunicationSource("http://unipept.ugent.be").getEcCommunicator());
 
         expect(await ecProcessor.getDefinition("EC:1.4.-.-")).toEqual({
             code: "EC:1.4.-.-",
