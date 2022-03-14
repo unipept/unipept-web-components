@@ -2,14 +2,19 @@ import { PeptideDataResponse } from "./PeptideDataResponse";
 import StringUtils from "./../../misc/StringUtils";
 
 export default class PeptideData {
+    public static readonly ENCODING_VERSION: number = 1;
+
+    public static readonly ENCODING_VERSION_OFFSET: number = 0;
+    public static readonly ENCODING_VERSION_SIZE: number = 4;
+
     // Offsets and lengths of the data fields in bytes.
-    public static readonly LCA_OFFSET: number = 0;
+    public static readonly LCA_OFFSET: number = PeptideData.ENCODING_VERSION_OFFSET + PeptideData.ENCODING_VERSION_SIZE;
     public static readonly LCA_SIZE: number = 4;
 
     // At what position in the array does the lineage array start.
     public static readonly LINEAGE_OFFSET: number = PeptideData.LCA_OFFSET + PeptideData.LCA_SIZE;
-    public static readonly RANK_COUNT: number = 28;
-    // 28 NCBI ranks at this moment (TODO should not be hardcoded)
+    public static readonly RANK_COUNT: number = 27;
+    // 28 NCBI ranks at this moment
     public static readonly LINEAGE_SIZE: number = 4 * PeptideData.RANK_COUNT;
 
     // How many bytes are reserved for the counts of each functional annotation type?
@@ -60,6 +65,10 @@ export default class PeptideData {
 
         // Now convert all the data into a binary format
         const dataView = new DataView(dataBuffer);
+
+        // Set peptide data version
+        dataView.setUint32(this.ENCODING_VERSION_OFFSET, this.ENCODING_VERSION);
+
         dataView.setUint32(this.LCA_OFFSET, response.lca);
 
         // Copy the lineage array

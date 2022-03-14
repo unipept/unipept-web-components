@@ -2,27 +2,12 @@ import { CountTable } from "./../counts/CountTable";
 import { Peptide } from "./../ontology/raw/Peptide";
 import { NcbiRank } from "./../ontology/taxonomic/ncbi/NcbiRank";
 import { GoNamespace } from "./..//ontology/functional/go/GoNamespace";
-import Pept2DataCommunicator from "./../communication/peptides/Pept2DataCommunicator";
-import SearchConfiguration from "./../configuration/SearchConfiguration";
 import NcbiTaxon, { NcbiId } from "./../ontology/taxonomic/ncbi/NcbiTaxon";
 import { Ontology, OntologyIdType } from "./../ontology/Ontology";
-import LcaCountTableProcessor from "./../processors/taxonomic/ncbi/LcaCountTableProcessor";
-import NcbiOntologyProcessor from "./../ontology/taxonomic/ncbi/NcbiOntologyProcessor";
-import GoCountTableProcessor from "./../processors/functional/go/GoCountTableProcessor";
-import GoOntologyProcessor from "./../ontology/functional/go/GoOntologyProcessor";
-import EcCountTableProcessor from "./../processors/functional/ec/EcCountTableProcessor";
-import FunctionalCountTableProcessor from "./../processors/functional/FunctionalCountTableProcessor";
-import FunctionalDefinition from "./../ontology/functional/FunctionalDefinition";
-import OntologyProcessor from "./../ontology/OntologyProcessor";
-import EcOntologyProcessor from "./../ontology/functional/ec/EcOntologyProcessor";
-import InterproCountTableProcessor from "./../processors/functional/interpro/InterproCountTableProcessor";
-import InterproOntologyProcessor from "./../ontology/functional/interpro/InterproOntologyProcessor";
 import StringUtils from "./../misc/StringUtils";
-import { PeptideDataResponse } from "./../communication/peptides/PeptideDataResponse";
-import EcDefinition from "./../ontology/functional/ec/EcDefinition";
-import GoDefinition from "./../ontology/functional/go/GoDefinition";
-import InterproDefinition from "./../ontology/functional/interpro/InterproDefinition";
-import CommunicationSource from "./../communication/source/CommunicationSource";
+import EcDefinition, { EcCode } from "./../ontology/functional/ec/EcDefinition";
+import GoDefinition, { GoCode } from "./../ontology/functional/go/GoDefinition";
+import InterproDefinition, { InterproCode } from "./../ontology/functional/interpro/InterproDefinition";
 import { NcbiResponseCommunicator, PeptideData } from "@/business";
 import { ShareableMap } from "shared-memory-datastructures";
 
@@ -34,9 +19,12 @@ export default class PeptideExport {
      *
      * @param peptideCountTable Count table that contains all peptides and their associated counts that should be
      * present in the generated export.
-     * @param searchConfiguration The particular configuration settings that are used for processing the peptides
-     * present in the count table.
-     * @param pept2data
+     * @param pept2data Mapping between peptide and all of its associated functional annotations (as well as the
+     * taxonomic information).
+     * @param goOntology
+     * @param ecOntology
+     * @param iprOntology
+     * @param ncbiOntology
      * @param separator The delimiter used to separate columns in the CSV. Use comma for international format, and semi-
      * colon for the European version.
      * @param secondarySeparator The delimiter used to separate multiple functional annotations from each other. Some
@@ -46,34 +34,17 @@ export default class PeptideExport {
      */
     public static async exportSummaryAsCsv(
         peptideCountTable: CountTable<Peptide>,
-        searchConfiguration: SearchConfiguration,
         pept2data: ShareableMap<Peptide, PeptideData>,
-        communicationSource: CommunicationSource,
+        goOntology: Ontology<GoCode, GoDefinition>,
+        ecOntology: Ontology<EcCode, EcDefinition>,
+        iprOntology: Ontology<InterproCode, InterproDefinition>,
+        ncbiOntology: Ontology<NcbiId, NcbiTaxon>,
         separator: string = ",",
         secondarySeparator: string = ";",
         lineEnding: string = "\n"
     ): Promise<string> {
         const rows: string[] = [];
         rows.push(PeptideExport.getHeader().join(separator));
-
-        const ncbiOntology = await PeptideExport.computeNcbiOntology(
-            peptideCountTable,
-            searchConfiguration,
-            pept2data,
-            communicationSource.getNcbiCommunicator()
-        );
-        const goOntology = await PeptideExport.computeFunctionalOntology(
-            new GoCountTableProcessor(peptideCountTable, searchConfiguration, pept2data, communicationSource.getGoCommunicator(), 0),
-            new GoOntologyProcessor(communicationSource.getGoCommunicator())
-        );
-        const ecOntology = await PeptideExport.computeFunctionalOntology(
-            new EcCountTableProcessor(peptideCountTable, searchConfiguration, pept2data, communicationSource.getEcCommunicator(), 0),
-            new EcOntologyProcessor(communicationSource.getEcCommunicator())
-        );
-        const interproOntology = await PeptideExport.computeFunctionalOntology(
-            new InterproCountTableProcessor(peptideCountTable, searchConfiguration, pept2data, communicationSource.getInterproCommunicator(), 0),
-            new InterproOntologyProcessor(communicationSource.getInterproCommunicator())
-        );
 
         const headerLength = PeptideExport.getHeader().length;
 
@@ -98,7 +69,7 @@ export default class PeptideExport {
 
                 // Now add information about the EC-numbers.
                 // This list contains the (EC-code, protein count)-mapping, sorted descending on counts.
-                const ecNumbers = await PeptideExport.sortAnnotations(pept2DataResponse.ec);
+                const ecNumbers = PeptideExport.sortAnnotations(pept2DataResponse.ec);
                 row.push(
                     ecNumbers
                         .map(a => `${a[0].substr(3)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.faCounts.ec)})`)
@@ -116,7 +87,7 @@ export default class PeptideExport {
                 for (const ns of Object.values(GoNamespace)) {
                     const gos = pept2DataResponse.go;
                     const goAnnotations = Object.keys(gos).filter(
-                        x => goOntology.getDefinition(x).namespace === ns
+                        x => goOntology.getDefinition(x) && goOntology.getDefinition(x).namespace === ns
                     );
 
                     const goTerms = {};
@@ -141,14 +112,14 @@ export default class PeptideExport {
                 }
 
                 // Now process the InterPro-terms
-                const interproNumbers = await PeptideExport.sortAnnotations(pept2DataResponse.ipr);
+                const interproNumbers = PeptideExport.sortAnnotations(pept2DataResponse.ipr);
                 row.push(
                     interproNumbers
                         .map(a => `${a[0].substr(4)} (${StringUtils.numberToPercent(a[1] / pept2DataResponse.faCounts.ipr)})`)
                         .join(secondarySeparator)
                 );
 
-                const interproDefinitions: [InterproDefinition, number][] = interproNumbers.map(i => [interproOntology.getDefinition(i[0]), i[1]]);
+                const interproDefinitions: [InterproDefinition, number][] = interproNumbers.map(i => [iprOntology.getDefinition(i[0]), i[1]]);
                 row.push(interproDefinitions.map(
                     i => `${i && i[0] ? i[0].name : ""} (${StringUtils.numberToPercent(i[1] / pept2DataResponse.faCounts.ipr)})`
                 ).join(secondarySeparator));
@@ -192,32 +163,5 @@ export default class PeptideExport {
         headers.push("InterPro");
         headers.push("InterPro - names");
         return headers;
-    }
-
-    /**
-     * @param peptideCountTable The count table with all peptides for whom associated peptide counts must be looked up.
-     * @param searchConfiguration Search settings needed to process the peptide count table.
-     * @return An ontology that contains information about all NCBI-taxa that are associated with the given peptide
-     * count table.
-     */
-    private static async computeNcbiOntology(
-        peptideCountTable: CountTable<Peptide>,
-        searchConfiguration: SearchConfiguration,
-        pept2Data: ShareableMap<Peptide, PeptideData>,
-        ncbiCommunicator: NcbiResponseCommunicator
-    ): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        const taxaProcessor = new LcaCountTableProcessor(peptideCountTable, searchConfiguration, pept2Data);
-        const lcaCountTable = await taxaProcessor.getCountTable();
-
-        const ncbiOntologyProcessor = new NcbiOntologyProcessor(ncbiCommunicator);
-        return await ncbiOntologyProcessor.getOntology(lcaCountTable);
-    }
-
-    private static async computeFunctionalOntology<OntologyId extends OntologyIdType, OntologyDefinition extends FunctionalDefinition>(
-        countProcessor: FunctionalCountTableProcessor<OntologyId, OntologyDefinition>,
-        ontologyProcessor: OntologyProcessor<OntologyId, OntologyDefinition>
-    ): Promise<Ontology<OntologyId, OntologyDefinition>> {
-        const countTable = await countProcessor.getCountTable();
-        return await ontologyProcessor.getOntology(countTable);
     }
 }

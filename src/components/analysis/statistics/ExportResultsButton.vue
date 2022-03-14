@@ -2,7 +2,7 @@
     <tooltip message="Download a CSV-file with the results of this analysis.">
         <v-menu offset-y bottom left origin="top right">
             <template v-slot:activator="{ on }">
-                <v-btn min-width="187" :disabled="progress !== 1 || exportLoading" v-on="on" color="default">
+                <v-btn min-width="187" :disabled="analysisLoading || exportLoading" v-on="on" color="default">
                     <div v-if="!exportLoading">
                         <v-icon>
                             mdi-download
@@ -41,7 +41,16 @@ import { Peptide } from "./../../../business/ontology/raw/Peptide";
 import { CountTable } from "./../../../business/counts/CountTable";
 import CommunicationSource from "./../../../business/communication/source/CommunicationSource";
 import { ShareableMap } from "shared-memory-datastructures";
-import { PeptideData } from "@/business";
+import {
+    EcCode,
+    EcDefinition,
+    GoCode,
+    GoDefinition,
+    InterproCode,
+    InterproDefinition, NcbiId, NcbiTaxon,
+    Ontology,
+    PeptideData
+} from "@/business";
 
 
 @Component({
@@ -56,19 +65,31 @@ export default class ExportResultsButton extends Vue {
     private exportLoading: boolean = false;
 
     get peptideCountTable(): CountTable<Peptide> {
-        return this.$store.getters["assayData"](this.assay)?.filteredData.peptideCountTable;
+        return this.$store.getters.assayData(this.assay)?.filteredData.peptideCountTable;
     }
 
-    get communicationSource(): CommunicationSource {
-        return this.assay.getAnalysisSource().getCommunicationSource();
+    get goOntology(): Ontology<GoCode, GoDefinition> {
+        return this.$store.getters.assayData(this.assay)?.goOntology;
+    }
+
+    get ecOntology(): Ontology<EcCode, EcDefinition> {
+        return this.$store.getters.assayData(this.assay)?.ecOntology;
+    }
+
+    get interproOntology(): Ontology<InterproCode, InterproDefinition> {
+        return this.$store.getters.assayData(this.assay)?.interproOntology;
+    }
+
+    get ncbiOntology(): Ontology<NcbiId, NcbiTaxon> {
+        return this.$store.getters.assayData(this.assay)?.ncbiOntology;
     }
 
     get pept2data(): ShareableMap<Peptide, PeptideData> {
-        return this.$store.getters["assayData"](this.assay)?.pept2data;
+        return this.$store.getters.assayData(this.assay)?.pept2Data;
     }
 
-    get progress(): number {
-        return this.$store.getters["assayData"](this.assay)?.originalProgress.value;
+    get analysisLoading(): number {
+        return this.$store.getters.assayData(this.assay).originalProgress.analysisInProgress;
     }
 
     private async downloadCsv(separator: string = ",", functionalSeparator: string = ";"): Promise<void> {
@@ -76,9 +97,11 @@ export default class ExportResultsButton extends Vue {
             this.exportLoading = true;
             const csv: string = await PeptideExport.exportSummaryAsCsv(
                 this.peptideCountTable,
-                this.assay.getSearchConfiguration(),
                 this.pept2data,
-                this.communicationSource,
+                this.goOntology,
+                this.ecOntology,
+                this.interproOntology,
+                this.ncbiOntology,
                 separator,
                 functionalSeparator
             );
