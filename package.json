@@ -34,7 +34,7 @@
         "jquery": "^3.4.1",
         "observable-fns": "^0.5.1",
         "shared-memory-datastructures": "0.1.9",
-        "unipept-visualizations": "^2.0.8",
+        "unipept-visualizations": "^2.1.0",
         "uuid": "^3.4.0",
         "vue": "^2.6.11",
         "vue-class-component": "^7.0.2",
