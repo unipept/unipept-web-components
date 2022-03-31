@@ -65,7 +65,8 @@ export type AssayAnalysisStatus = {
         ecCountTableProcessor: EcCountTableProcessor,
         interproCountTableProcessor: InterproCountTableProcessor,
         ncbiCountTableProcessor: LcaCountTableProcessor,
-        tree: TreeNode
+        tree: TreeNode,
+        trust: PeptideTrust
     },
 
     // All the different count tables and associated actions, according to the currently active filtering parameters.
@@ -75,13 +76,13 @@ export type AssayAnalysisStatus = {
         ecCountTableProcessor: EcCountTableProcessor,
         interproCountTableProcessor: InterproCountTableProcessor,
         // Percentage that was used to filter all of the above count tables on.
-        percentage: number
+        percentage: number,
+        trust: PeptideTrust
     },
 
     // A mapping containing all information that was found in the analysis source associated with the assay (organised
     // per peptide).
     pept2Data: ShareableMap<Peptide, PeptideData>,
-    peptideTrust: PeptideTrust,
     // All known information for each GO-term that occurs in the GO count table
     goOntology: Ontology<GoCode, GoDefinition>
     // All known information for each EC-number that occurs in the EC count table
@@ -205,7 +206,6 @@ export default class AssayStoreFactory {
                 const ecOntologyProcessor = new EcOntologyProcessor(communicationSource.getEcCommunicator());
                 const ecOntology = await ecOntologyProcessor.getOntology(ecCountTableProcessor.getCountTable());
 
-
                 store.commit("UPDATE_PROGRESS", [assay, -1, 5, false]);
                 const interproCountTableProcessor = new InterproCountTableProcessor(
                     peptideCountTable,
@@ -219,7 +219,6 @@ export default class AssayStoreFactory {
                 store.commit("UPDATE_PROGRESS", [assay, -1, 6, false]);
                 const iprOntologyProcessor = new InterproOntologyProcessor(communicationSource.getInterproCommunicator());
                 const iprOntology = await iprOntologyProcessor.getOntology(interproCountTableProcessor.getCountTable());
-
 
                 store.commit("UPDATE_PROGRESS", [assay, -1, 7, false]);
                 const lcaCountTableProcessor = new LcaCountTableProcessor(
@@ -266,7 +265,8 @@ export default class AssayStoreFactory {
                     interproCountTableProcessor,
                     lcaCountTableProcessor,
                     tree,
-                    5
+                    5,
+                    peptideTrust
                 ]);
 
             } catch (err) {
@@ -313,7 +313,8 @@ export default class AssayStoreFactory {
                     originalAssayData.originalData.goCountTableProcessor,
                     originalAssayData.originalData.ecCountTableProcessor,
                     originalAssayData.originalData.interproCountTableProcessor,
-                    filterPercentage
+                    filterPercentage,
+                    originalAssayData.originalData.trust
                 ]);
 
                 store.commit("UPDATE_FILTER_READY", [assay, true]);
@@ -367,6 +368,9 @@ export default class AssayStoreFactory {
                         assay.getSearchConfiguration()
                     );
 
+                    const trustProcessor = new PeptideTrustProcessor();
+                    const filteredTrust = trustProcessor.getPeptideTrust(filteredCountTable, assayData.pept2Data);
+
                     store.commit("UPDATE_PROGRESS", [assay, -1, 2, true]);
 
                     const goCountTableProcessor = new GoCountTableProcessor(
@@ -406,7 +410,8 @@ export default class AssayStoreFactory {
                         goCountTableProcessor,
                         ecCountTableProcessor,
                         iprCountTableProcessor,
-                        filterPercentage
+                        filterPercentage,
+                        filteredTrust
                     ]);
                 } catch (error) {
                     store.commit("UPDATE_ERROR", [assay, true, error.message]);
@@ -462,7 +467,8 @@ export default class AssayStoreFactory {
                         ecCountTableProcessor: null,
                         interproCountTableProcessor: null,
                         ncbiCountTableProcessor: null,
-                        tree: null
+                        tree: null,
+                        trust: null
                     },
 
                     filteredData: {
@@ -470,7 +476,8 @@ export default class AssayStoreFactory {
                         goCountTableProcessor: null,
                         ecCountTableProcessor: null,
                         interproCountTableProcessor: null,
-                        percentage: 5
+                        percentage: 5,
+                        trust: null
                     },
 
                     analysisInProgress: false,
@@ -480,7 +487,6 @@ export default class AssayStoreFactory {
                     filterReady: false,
 
                     pept2Data: null,
-                    peptideTrust: null,
                     goOntology: null,
                     ecOntology: null,
                     interproOntology: null,
@@ -651,7 +657,7 @@ export default class AssayStoreFactory {
 
                 originalAssayData.peptideCountTable = peptideCountTable;
                 assayData.pept2Data = pept2Data;
-                assayData.peptideTrust = peptideTrust;
+                originalAssayData.trust = peptideTrust;
                 originalAssayData.goCountTableProcessor = goProcessor;
                 assayData.goOntology = goOntology;
                 originalAssayData.ecCountTableProcessor = ecProcessor;
@@ -671,14 +677,16 @@ export default class AssayStoreFactory {
                     goProcessor,
                     ecProcessor,
                     interproProcessor,
-                    percentage
+                    percentage,
+                    peptideTrust
                 ]: [
                     ProteomicsAssay,
                     CountTable<Peptide>,
                     GoCountTableProcessor,
                     EcCountTableProcessor,
                     InterproCountTableProcessor,
-                    number
+                    number,
+                    PeptideTrust
                 ]
             ) {
                 const idx = findAssayIndex(assay, state.assays);
@@ -689,6 +697,7 @@ export default class AssayStoreFactory {
                 filterAssayData.ecCountTableProcessor = ecProcessor;
                 filterAssayData.interproCountTableProcessor = interproProcessor;
                 filterAssayData.percentage = percentage;
+                filterAssayData.trust = peptideTrust;
             },
 
             UPDATE_FILTER_IN_PROGRESS(
