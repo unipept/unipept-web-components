@@ -5,6 +5,9 @@ import { Prop, Watch } from "vue-property-decorator";
 
 @Component
 export default class VisualizationMixin extends Vue {
+    // The event here should only be fired the second time `search` is invoked (not on the first time).
+    private fired: boolean = false;
+
     /**
      * Propagate selections in the visualisation to the search tree and
      * The functional analysis data.
@@ -16,14 +19,17 @@ export default class VisualizationMixin extends Vue {
     public search(id: number, searchTerm, timeout = 500) {
         setTimeout(() => {
             /**
-             * Fired after the user indicated that he soehow wants to filter the currently visible results in the
+             * Fired after the user indicated that he somehow wants to filter the currently visible results in the
              * application.
              *
              * @event update-selected-taxon-id
              * @property {string} id The id of the taxon to which results should be restricted. Note that alle taxa
              * that are (both direct and indirect) children of this taxon should also be present in the filtering.
              */
-            this.$emit("update-selected-taxon-id", id);
+            if (this.fired) {
+                this.$emit("update-selected-taxon-id", id);
+            }
+            this.fired = true;
         }, timeout);
     }
 }

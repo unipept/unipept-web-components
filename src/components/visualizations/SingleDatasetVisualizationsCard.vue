@@ -36,6 +36,7 @@
                         :full-screen="isFullScreen"
                         v-if="tree"
                         :tree="tree"
+                        :filter-id="filterId"
                         v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                     </sunburst-visualization>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
@@ -64,6 +65,7 @@
                         :full-screen="isFullScreen"
                         v-if="tree"
                         :tree="tree"
+                        :filter-id="filterId"
                         v-on:update-selected-taxon-id="onUpdateSelectedTaxonId">
                     </treemap-visualization>
                     <div v-else-if="this.analysisInProgress" class="mpa-waiting">
@@ -195,6 +197,8 @@ export default class SingleDatasetVisualizationsCard extends Vue {
 
     @Prop({ required: true })
     private assay: ProteomicsAssay;
+    @Prop({ required: true })
+    private filterId: number;
     @Prop({ required: false, default: true })
     private analysisInProgress: boolean;
     @Prop({ required: false, default: "primary" })
@@ -266,13 +270,6 @@ export default class SingleDatasetVisualizationsCard extends Vue {
             this.imageBaseName = "unipept_treeview";
             this.downloadImageDialogOpen = true;
         }
-    }
-
-    private reset() {
-        (this.$refs.sunburst as SunburstVisualization).reset();
-        (this.$refs.treeview as TreeviewVisualization).reset();
-        (this.$refs.treemap as TreemapVisualization).reset();
-        (this.$refs.heatmap as HeatmapVisualization).reset();
     }
 
     private openHeatmapWizard(): void {

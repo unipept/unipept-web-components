@@ -62,6 +62,8 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
 
     @Prop({ required: true })
     private tree: Tree;
+    @Prop({ required: false, default: 1 })
+    private filterId: number;
     @Prop({ required: false, default: false })
     private autoResize: boolean;
     @Prop({ required: false, default: 740 })
@@ -101,6 +103,13 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
         }
     }
 
+    @Watch("filterId")
+    public reroot(id: number) {
+        if (this.sunburst) {
+            this.sunburst.reroot(id, false);
+        }
+    }
+
     private async initTree() {
         if (this.tree != null) {
             await this.showVisualization();
@@ -127,6 +136,8 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
                 useFixedColors: this.isFixedColors
             }
         );
+
+        this.sunburst.reroot(this.filterId);
 
         if (this.autoResize) {
             let svgEl = (this.$refs.visualization as HTMLElement).querySelector("svg")

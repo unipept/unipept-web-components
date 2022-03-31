@@ -42,6 +42,8 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
     private fullScreen: boolean;
     @Prop({ required: true })
     private tree: Tree;
+    @Prop({ required: false, default: 1 })
+    private filterId: number;
     @Prop({ required: false, default: -1 })
     private width: number;
     @Prop({ required: false, default: 600 })
@@ -71,6 +73,13 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
         }
     }
 
+    @Watch("filterId")
+    reroot(id: number) {
+        if (this.treemap) {
+            this.treemap.reroot(id, false);
+        }
+    }
+
     @Watch("tree")
     private async initTreeMap() {
         if (this.tree != null) {
@@ -95,6 +104,8 @@ export default class TreemapVisualization extends mixins(VisualizationMixin) {
                 rerootCallback: d => this.search(d.id, d.name, 1000)
             } as TreemapSettings
         );
+
+        this.reroot(this.filterId);
     }
 
     private enableFullscreen() {
