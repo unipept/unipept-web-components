@@ -82,26 +82,7 @@
                     </v-list>
                 </v-menu>
             </v-tabs>
-            <v-alert
-                v-if="this.filteredNcbiId !== 1"
-                dense
-                colored-border
-                id="filtered-taxon-information">
-                <v-row dense align="center">
-                    <v-col class="grow">
-                        <b>
-                            Filtered results
-                        </b>
-                        : These results are limited to the {{ this.filteredCountTable.totalCount }} peptides specific to
-                        <b>
-                            {{ this.filteredNcbiTaxon.name }} ({{this.filteredNcbiTaxon.rank}})
-                        </b>.
-                    </v-col>
-                    <v-col class="shrink">
-                        <v-btn @click="resetFilter">Reset filter</v-btn>
-                    </v-col>
-                </v-row>
-            </v-alert>
+
             <v-tabs-items v-model="currentTab">
                 <v-tab-item>
                     <multi-go-summary-card
@@ -268,10 +249,6 @@ export default class FunctionalSummaryCard extends Vue {
     private disableRelativeCounts(): void {
         this.showPercentage = false;
         this.selectedSortTypeName = "Peptides";
-    }
-
-    private resetFilter(): void {
-        this.$store.dispatch("filterAssayByTaxon", [this.assay, 1]);
     }
 }
 </script>
