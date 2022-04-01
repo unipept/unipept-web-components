@@ -1,6 +1,9 @@
 import { PeptideDataResponse } from "./PeptideDataResponse";
 export default class PeptideData {
     readonly buffer: ArrayBuffer;
+    static readonly ENCODING_VERSION: number;
+    static readonly ENCODING_VERSION_OFFSET: number;
+    static readonly ENCODING_VERSION_SIZE: number;
     static readonly LCA_OFFSET: number;
     static readonly LCA_SIZE: number;
     static readonly LINEAGE_OFFSET: number;

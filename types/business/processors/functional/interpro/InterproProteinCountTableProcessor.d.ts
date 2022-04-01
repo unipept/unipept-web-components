@@ -5,10 +5,10 @@ import { FunctionalNamespace } from "./../../../ontology/functional/FunctionalNa
 import { CountTable } from "./../../../counts/CountTable";
 import { Ontology } from "./../../../ontology/Ontology";
 import { Peptide } from "./../../../ontology/raw/Peptide";
-import CommunicationSource from "./../../../communication/source/CommunicationSource";
+import { InterproResponseCommunicator } from "@/business";
 export default class InterproProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<InterproCode, InterproDefinition> {
-    private readonly communicationSource;
-    constructor(peptide: Peptide, equateIl: boolean, communicationSource: CommunicationSource);
+    private readonly interproCommunicator;
+    constructor(peptide: Peptide, equateIl: boolean, interproCommunicator: InterproResponseCommunicator);
     protected getAnnotationsFromProtein(p: ProteinDefinition): InterproCode[];
     protected getNamespaces(): FunctionalNamespace[];
     protected getOntology(countTable: CountTable<InterproCode>): Promise<Ontology<InterproCode, InterproDefinition>>;

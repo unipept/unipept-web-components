@@ -4,6 +4,7 @@ import { FunctionalNamespace } from "./../../ontology/functional/FunctionalNames
 import { CountTable } from "./../../counts/CountTable";
 import FunctionalTrust from "./FunctionalTrust";
 import { Peptide } from "./../../ontology/raw/Peptide";
+import ProteinProcessor from "./../protein/ProteinProcessor";
 import ProteinDefinition from "./../../ontology/protein/ProteinDefinition";
 import { Ontology, OntologyIdType } from "./../../ontology/Ontology";
 export default abstract class FunctionalProteinCountTableProcessor<OntologyId extends OntologyIdType, DefinitionType extends FunctionalDefinition> implements CountTableProcessor<OntologyId> {
@@ -15,10 +16,10 @@ export default abstract class FunctionalProteinCountTableProcessor<OntologyId ex
     private trust;
     protected constructor(peptide: Peptide, equateIl: boolean, itemPrefix?: string);
     getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId>;
-    getTrust(): Promise<FunctionalTrust>;
+    getTrust(): FunctionalTrust;
     cancel(): void;
     isCancelled(): boolean;
-    private compute;
+    compute(proteinProcessor: ProteinProcessor): Promise<void>;
     protected abstract getOntology(countTable: CountTable<OntologyId>): Promise<Ontology<OntologyId, DefinitionType>>;
     protected abstract getAnnotationsFromProtein(p: ProteinDefinition): OntologyId[];
     protected abstract getNamespaces(): FunctionalNamespace[];

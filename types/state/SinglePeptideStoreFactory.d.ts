@@ -1,6 +1,6 @@
-import { AnalysisSource, EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData, ProgressReport } from "@/business";
+import { AnalysisSource, EcCode, EcDefinition, EcProteinCountTableProcessor, GoCode, GoDefinition, GoProteinCountTableProcessor, InterproCode, InterproDefinition, InterproProteinCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData, ProgressReport, ProteinProcessor, Tree } from "@/business";
 import { Module } from "vuex";
-import { ShareableMap } from "shared-memory-datastructures";
+import { DataNodeLike } from "unipept-visualizations";
 export declare type SinglePeptideAnalysisStatus = {
     peptide: Peptide;
     equateIl: boolean;
@@ -11,15 +11,17 @@ export declare type SinglePeptideAnalysisStatus = {
         message: string;
         object: Error;
     };
-    peptideData: ShareableMap<Peptide, PeptideData>;
-    ncbiCountTableProcessor: LcaCountTableProcessor;
-    goCountTableProcessor: GoCountTableProcessor;
-    ecCountTableProcessor: EcCountTableProcessor;
-    interproCountTableProcessor: InterproCountTableProcessor;
+    peptideData: PeptideData;
+    proteinProcessor: ProteinProcessor;
+    goProteinCountTableProcessor: GoProteinCountTableProcessor;
+    ecProteinCountTableProcessor: EcProteinCountTableProcessor;
+    interproProteinCountTableProcessor: InterproProteinCountTableProcessor;
     ncbiOntology: Ontology<NcbiId, NcbiTaxon>;
     goOntology: Ontology<GoCode, GoDefinition>;
     ecOntology: Ontology<EcCode, EcDefinition>;
     interproOntology: Ontology<InterproCode, InterproDefinition>;
+    taxaTree: Tree;
+    ecTree: DataNodeLike;
 };
 export declare type SinglePeptideStoreState = {
     peptideStatus: SinglePeptideAnalysisStatus;

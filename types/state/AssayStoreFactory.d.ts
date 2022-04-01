@@ -22,6 +22,7 @@ export declare type AssayAnalysisStatus = {
         interproCountTableProcessor: InterproCountTableProcessor;
         ncbiCountTableProcessor: LcaCountTableProcessor;
         tree: TreeNode;
+        trust: PeptideTrust;
     };
     filteredData: {
         peptideCountTable: CountTable<Peptide>;
@@ -29,9 +30,9 @@ export declare type AssayAnalysisStatus = {
         ecCountTableProcessor: EcCountTableProcessor;
         interproCountTableProcessor: InterproCountTableProcessor;
         percentage: number;
+        trust: PeptideTrust;
     };
     pept2Data: ShareableMap<Peptide, PeptideData>;
-    peptideTrust: PeptideTrust;
     goOntology: Ontology<GoCode, GoDefinition>;
     ecOntology: Ontology<EcCode, EcDefinition>;
     interproOntology: Ontology<InterproCode, InterproDefinition>;

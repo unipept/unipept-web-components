@@ -6,7 +6,7 @@ import { Prop, Watch } from "vue-property-decorator";
 @Component
 export default class VisualizationMixin extends Vue {
     // The event here should only be fired the second time `search` is invoked (not on the first time).
-    private fired: boolean = false;
+    protected fired: boolean = false;
 
     /**
      * Propagate selections in the visualisation to the search tree and

@@ -92,9 +92,10 @@ export default class SunburstVisualization extends mixins(VisualizationMixin) {
     }
 
     @Watch("isFixedColors")
-    private onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
-        this.sunburst.settings.useFixedColors = newFixedColors;
-        this.sunburst.redrawColors();
+    private async onIsFixedColorsChanged(newFixedColors: boolean, oldFixedColors: boolean) {
+        this.fired = false;
+        await this.showVisualization();
+        this.reroot(this.filterId);
     }
 
     public reset() {

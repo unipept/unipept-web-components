@@ -1,7 +1,10 @@
 import { CountTable } from "./../counts/CountTable";
 import { Peptide } from "./../ontology/raw/Peptide";
-import SearchConfiguration from "./../configuration/SearchConfiguration";
-import CommunicationSource from "./../communication/source/CommunicationSource";
+import NcbiTaxon, { NcbiId } from "./../ontology/taxonomic/ncbi/NcbiTaxon";
+import { Ontology } from "./../ontology/Ontology";
+import EcDefinition, { EcCode } from "./../ontology/functional/ec/EcDefinition";
+import GoDefinition, { GoCode } from "./../ontology/functional/go/GoDefinition";
+import InterproDefinition, { InterproCode } from "./../ontology/functional/interpro/InterproDefinition";
 import { PeptideData } from "@/business";
 import { ShareableMap } from "shared-memory-datastructures";
 export default class PeptideExport {
@@ -12,9 +15,12 @@ export default class PeptideExport {
      *
      * @param peptideCountTable Count table that contains all peptides and their associated counts that should be
      * present in the generated export.
-     * @param searchConfiguration The particular configuration settings that are used for processing the peptides
-     * present in the count table.
-     * @param pept2data
+     * @param pept2data Mapping between peptide and all of its associated functional annotations (as well as the
+     * taxonomic information).
+     * @param goOntology
+     * @param ecOntology
+     * @param iprOntology
+     * @param ncbiOntology
      * @param separator The delimiter used to separate columns in the CSV. Use comma for international format, and semi-
      * colon for the European version.
      * @param secondarySeparator The delimiter used to separate multiple functional annotations from each other. Some
@@ -22,18 +28,10 @@ export default class PeptideExport {
      * character different from the default separator.
      * @param lineEnding The line terminator that should be used.
      */
-    static exportSummaryAsCsv(peptideCountTable: CountTable<Peptide>, searchConfiguration: SearchConfiguration, pept2data: ShareableMap<Peptide, PeptideData>, communicationSource: CommunicationSource, separator?: string, secondarySeparator?: string, lineEnding?: string): Promise<string>;
+    static exportSummaryAsCsv(peptideCountTable: CountTable<Peptide>, pept2data: ShareableMap<Peptide, PeptideData>, goOntology: Ontology<GoCode, GoDefinition>, ecOntology: Ontology<EcCode, EcDefinition>, iprOntology: Ontology<InterproCode, InterproDefinition>, ncbiOntology: Ontology<NcbiId, NcbiTaxon>, separator?: string, secondarySeparator?: string, lineEnding?: string): Promise<string>;
     private static sortAnnotations;
     /**
      * @return The default set of columns that's part of the generated export.
      */
     private static getHeader;
-    /**
-     * @param peptideCountTable The count table with all peptides for whom associated peptide counts must be looked up.
-     * @param searchConfiguration Search settings needed to process the peptide count table.
-     * @return An ontology that contains information about all NCBI-taxa that are associated with the given peptide
-     * count table.
-     */
-    private static computeNcbiOntology;
-    private static computeFunctionalOntology;
 }
