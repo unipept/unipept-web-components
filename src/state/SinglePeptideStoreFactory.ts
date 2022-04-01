@@ -198,104 +198,111 @@ export default class SinglePeptideStoreFactory {
             peptideStatus: SinglePeptideAnalysisStatus,
             store: ActionContext<SinglePeptideStoreState, any>
         ) => {
+            store.commit("UPDATE_PEPTIDE_ERROR", [false, "", null]);
             store.commit("UPDATE_PEPTIDE_ANALYSIS_IN_PROGRESS", true);
 
-            const peptideMap = new Map<Peptide, number>();
-            peptideMap.set(peptideStatus.peptide, 1);
+            try {
+                const peptideMap = new Map<Peptide, number>();
+                peptideMap.set(peptideStatus.peptide, 1);
 
-            const peptideCountTable = new CountTable<Peptide>(peptideMap);
-            const searchConfig = new SearchConfiguration(false, peptideStatus.equateIl, false);
+                const peptideCountTable = new CountTable<Peptide>(peptideMap);
+                const searchConfig = new SearchConfiguration(false, peptideStatus.equateIl, false);
 
-            const [pept2Data, trust] = await state.analysisSource
-                .getCommunicationSource()
-                .getPept2DataCommunicator()
-                .process(
-                    peptideCountTable,
-                    searchConfig
+                const [pept2Data, trust] = await state.analysisSource
+                    .getCommunicationSource()
+                    .getPept2DataCommunicator()
+                    .process(
+                        peptideCountTable,
+                        searchConfig
+                    );
+
+                const proteinProcessor = new ProteinProcessor();
+                await proteinProcessor.compute(peptideStatus.peptide, peptideStatus.equateIl);
+
+                const ncbiCounts = new Map<NcbiId, number>();
+                for (const protein of proteinProcessor.getProteins()) {
+                    ncbiCounts.set(protein.organism, 1);
+                }
+
+                ncbiCounts.set(proteinProcessor.getLca(), 1);
+
+                for (const organismId of proteinProcessor.getCommonLineage()) {
+                    ncbiCounts.set(organismId, 1);
+                }
+
+                const ncbiOntologyProcessor = new NcbiOntologyProcessor(
+                    state.analysisSource.getCommunicationSource().getNcbiCommunicator()
+                );
+                const ncbiOntology = await ncbiOntologyProcessor.getOntology(new CountTable<NcbiId>(ncbiCounts));
+
+                const taxaCounts = new Map<NcbiId, number>();
+
+                for (const protein of proteinProcessor.getProteins()) {
+                    taxaCounts.set(protein.organism, (taxaCounts.get(protein.organism) || 0) + 1);
+                }
+
+                const taxaCountTable = new CountTable<NcbiId>(taxaCounts);
+
+                const taxaTree = new Tree(taxaCountTable, ncbiOntology);
+
+                const goProteinProcessor = new GoProteinCountTableProcessor(
+                    peptideStatus.peptide,
+                    peptideStatus.equateIl,
+                    state.analysisSource.getCommunicationSource().getGoCommunicator()
+                );
+                await goProteinProcessor.compute(proteinProcessor);
+
+                const goOntologyProcessor = new GoOntologyProcessor(
+                    state.analysisSource.getCommunicationSource().getGoCommunicator()
+                );
+                const goOntology = await goOntologyProcessor.getOntology(goProteinProcessor.getCountTable());
+
+                const ecProteinProcessor = new EcProteinCountTableProcessor(
+                    peptideStatus.peptide,
+                    peptideStatus.equateIl,
+                    state.analysisSource.getCommunicationSource().getEcCommunicator()
+                );
+                await ecProteinProcessor.compute(proteinProcessor);
+
+                const ecOntologyProcessor = new EcOntologyProcessor(
+                    state.analysisSource.getCommunicationSource().getEcCommunicator()
+                );
+                const ecOntology = await ecOntologyProcessor.getOntology(ecProteinProcessor.getCountTable());
+
+                const ecTree = computeEcTree(ecProteinProcessor.getCountTable(), ecOntology);
+
+                const interproProteinProcessor = new InterproProteinCountTableProcessor(
+                    peptideStatus.peptide,
+                    peptideStatus.equateIl,
+                    state.analysisSource.getCommunicationSource().getInterproCommunicator()
+                );
+                await interproProteinProcessor.compute(proteinProcessor);
+
+                const interproOntologyProcessor = new InterproOntologyProcessor(
+                    state.analysisSource.getCommunicationSource().getInterproCommunicator()
+                );
+                const interproOntology = await interproOntologyProcessor.getOntology(
+                    interproProteinProcessor.getCountTable()
                 );
 
-            const proteinProcessor = new ProteinProcessor();
-            await proteinProcessor.compute(peptideStatus.peptide, peptideStatus.equateIl);
-
-            const ncbiCounts = new Map<NcbiId, number>();
-            for (const protein of proteinProcessor.getProteins()) {
-                ncbiCounts.set(protein.organism, 1);
+                store.commit("UPDATE_PEPTIDE_DATA", [
+                    pept2Data.get(peptideStatus.peptide),
+                    ncbiOntology,
+                    proteinProcessor,
+                    goProteinProcessor,
+                    goOntology,
+                    ecProteinProcessor,
+                    ecOntology,
+                    interproProteinProcessor,
+                    interproOntology,
+                    taxaTree,
+                    ecTree
+                ]);
+            } catch (error) {
+                store.commit("UPDATE_PEPTIDE_ERROR", [true, error.message, error]);
+            } finally {
+                store.commit("UPDATE_PEPTIDE_ANALYSIS_IN_PROGRESS", false);
             }
-
-            ncbiCounts.set(proteinProcessor.getLca(), 1);
-
-            for (const organismId of proteinProcessor.getCommonLineage()) {
-                ncbiCounts.set(organismId, 1);
-            }
-
-            const ncbiOntologyProcessor = new NcbiOntologyProcessor(
-                state.analysisSource.getCommunicationSource().getNcbiCommunicator()
-            );
-            const ncbiOntology = await ncbiOntologyProcessor.getOntology(new CountTable<NcbiId>(ncbiCounts));
-
-            const taxaCounts = new Map<NcbiId, number>();
-
-            for (const protein of proteinProcessor.getProteins()) {
-                taxaCounts.set(protein.organism, (taxaCounts.get(protein.organism) || 0) + 1);
-            }
-
-            const taxaCountTable = new CountTable<NcbiId>(taxaCounts);
-
-            const taxaTree = new Tree(taxaCountTable, ncbiOntology);
-
-            const goProteinProcessor = new GoProteinCountTableProcessor(
-                peptideStatus.peptide,
-                peptideStatus.equateIl,
-                state.analysisSource.getCommunicationSource().getGoCommunicator()
-            );
-            await goProteinProcessor.compute(proteinProcessor);
-
-            const goOntologyProcessor = new GoOntologyProcessor(
-                state.analysisSource.getCommunicationSource().getGoCommunicator()
-            );
-            const goOntology = await goOntologyProcessor.getOntology(goProteinProcessor.getCountTable());
-
-            const ecProteinProcessor = new EcProteinCountTableProcessor(
-                peptideStatus.peptide,
-                peptideStatus.equateIl,
-                state.analysisSource.getCommunicationSource().getEcCommunicator()
-            );
-            await ecProteinProcessor.compute(proteinProcessor);
-
-            const ecOntologyProcessor = new EcOntologyProcessor(
-                state.analysisSource.getCommunicationSource().getEcCommunicator()
-            );
-            const ecOntology = await ecOntologyProcessor.getOntology(ecProteinProcessor.getCountTable());
-
-            const ecTree = computeEcTree(ecProteinProcessor.getCountTable(), ecOntology);
-
-            const interproProteinProcessor = new InterproProteinCountTableProcessor(
-                peptideStatus.peptide,
-                peptideStatus.equateIl,
-                state.analysisSource.getCommunicationSource().getInterproCommunicator()
-            );
-            await interproProteinProcessor.compute(proteinProcessor);
-
-            const interproOntologyProcessor = new InterproOntologyProcessor(
-                state.analysisSource.getCommunicationSource().getInterproCommunicator()
-            );
-            const interproOntology = await interproOntologyProcessor.getOntology(interproProteinProcessor.getCountTable());
-
-            store.commit("UPDATE_PEPTIDE_DATA", [
-                pept2Data.get(peptideStatus.peptide),
-                ncbiOntology,
-                proteinProcessor,
-                goProteinProcessor,
-                goOntology,
-                ecProteinProcessor,
-                ecOntology,
-                interproProteinProcessor,
-                interproOntology,
-                taxaTree,
-                ecTree
-            ]);
-
-            store.commit("UPDATE_PEPTIDE_ANALYSIS_IN_PROGRESS", false);
         }
 
         const peptideGetters: GetterTree<SinglePeptideStoreState, any> = {
@@ -320,6 +327,15 @@ export default class SinglePeptideStoreFactory {
             UPDATE_PEPTIDE_PROGRESS(state: SinglePeptideStoreState, [value, step]: [number, number]) {
                 state.peptideStatus.progress.currentStep = step;
                 state.peptideStatus.progress.currentValue = value;
+            },
+
+            UPDATE_PEPTIDE_ERROR(
+                state: SinglePeptideStoreState,
+                [status, errorMessage, error]: [boolean, string, Error]
+            ) {
+                state.peptideStatus.error.status = status;
+                state.peptideStatus.error.message = errorMessage;
+                state.peptideStatus.error.object = error;
             },
 
             UPDATE_PEPTIDE_DATA(state: SinglePeptideStoreState, [
@@ -362,7 +378,10 @@ export default class SinglePeptideStoreFactory {
         }
 
         const peptideActions: ActionTree<SinglePeptideStoreState, any> = {
-            analyseSinglePeptide(store: ActionContext<SinglePeptideStoreState, any>, [peptide, equateIl]: [Peptide, boolean]) {
+            analyseSinglePeptide(
+                store: ActionContext<SinglePeptideStoreState, any>,
+                [peptide, equateIl]: [Peptide, boolean]
+            ) {
                 store.commit("UPDATE_PEPTIDE", peptide);
                 store.commit("UPDATE_PEPTIDE_CONFIGURATION", equateIl);
 
