@@ -12,9 +12,14 @@ import Dexie from "dexie";
  */
 export default class RequestCacheNetworkManager implements NetworkManager {
     private indexedDb: CacheIndexedDatabase;
+    private uniprotVersion: string;
+    // Epoch time at which the UniProt database version was last checked
+    private uniprotVersionLastChecked: number;
 
     // Max amount of entries in the request cache.
     private static readonly MAX_REQUEST_CACHE_SIZE = 5000;
+    // The current UniProt-version must be revalidated every 30 seconds
+    private static readonly UNIPROT_VERSION_INVALIDATE_MS = 30 * 1000;
 
     constructor(
         private readonly baseUrl: string
@@ -24,9 +29,7 @@ export default class RequestCacheNetworkManager implements NetworkManager {
 
     public async postJSON(url: string, data: any): Promise<any> {
         try {
-            const dbVersion: string = JSON.parse(
-                await NetworkUtils.get(this.baseUrl + "/private_api/metadata")
-            ).db_version;
+            const dbVersion: string = await this.getUniprotDBVersion();
 
             const dataHash: string = sha256(this.baseUrl + url + JSON.stringify(data) + dbVersion).toString();
 
@@ -47,9 +50,7 @@ export default class RequestCacheNetworkManager implements NetworkManager {
 
     public async getJSON(url: string): Promise<any> {
         try {
-            const dbVersion: string = JSON.parse(
-                await NetworkUtils.get(this.baseUrl + "/private_api/metadata")
-            ).db_version;
+            const dbVersion: string = await this.getUniprotDBVersion();
 
             const dataHash: string = sha256(this.baseUrl + url + dbVersion).toString();
 
@@ -107,6 +108,23 @@ export default class RequestCacheNetworkManager implements NetworkManager {
 
     private async getEstimatedQuota(): Promise<StorageEstimate | undefined> {
         return await navigator.storage && navigator.storage.estimate ? navigator.storage.estimate() : undefined;
+    }
+
+    private async getUniprotDBVersion(): Promise<string> {
+        const currentEpoch = new Date().getTime();
+
+        if (
+            !this.uniprotVersion ||
+            currentEpoch - this.uniprotVersionLastChecked > RequestCacheNetworkManager.UNIPROT_VERSION_INVALIDATE_MS
+        ) {
+            this.uniprotVersion = JSON.parse(
+                await NetworkUtils.get(this.baseUrl + "/private_api/metadata")
+            ).db_version;
+
+            this.uniprotVersionLastChecked = currentEpoch;
+        }
+
+        return this.uniprotVersion;
     }
 }
 
