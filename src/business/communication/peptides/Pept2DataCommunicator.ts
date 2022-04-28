@@ -9,6 +9,7 @@ import { Peptide } from "./../../ontology/raw/Peptide"
 import { ShareableMap } from "shared-memory-datastructures";
 import { parallelLimit } from "async";
 import AnalysisCancelledException from "@/business/exceptions/AnalysisCancelledException";
+import RequestCacheNetworkManager from "@/business/communication/RequestCacheNetworkManager";
 
 export default class Pept2DataCommunicator {
     public static PEPTDATA_BATCH_SIZE = 100;
@@ -38,6 +39,8 @@ export default class Pept2DataCommunicator {
         const batchSize = configuration.enableMissingCleavageHandling ?
             Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
 
+        const networkManager = new RequestCacheNetworkManager(this.serviceUrl);
+
         const requests = [];
         for (let i = 0; i < peptidesToProcess.length; i += batchSize) {
             requests.push(async(done: (val: any) => void) => {
@@ -54,7 +57,7 @@ export default class Pept2DataCommunicator {
                 });
 
                 try {
-                    const response = await NetworkUtils.postJSON(
+                    const response = await networkManager.postJSON(
                         this.serviceUrl + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
                         requestData
                     );
