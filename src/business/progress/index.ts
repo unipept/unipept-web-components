@@ -1,5 +1,5 @@
 import Cancellable from "./Cancellable";
 import ProgressListener from "./ProgressListener";
-import { ProgressReport } from "./ProgressReport";
+import { ProgressReport, ProgressReportHelper } from "./ProgressReport";
 
-export { Cancellable, ProgressListener, ProgressReport };
+export { Cancellable, ProgressListener, ProgressReport, ProgressReportHelper };

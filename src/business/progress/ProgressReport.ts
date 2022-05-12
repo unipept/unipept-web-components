@@ -20,7 +20,9 @@ export type ProgressReport = {
     currentValue: number,
     // How many seconds will it probably still take to finish the current step. Use -1 if no ETA is available.
     // (ETA = Estimated Time Remaining)
-    eta: number
+    eta: number,
+    // Contains the output of a process that should be shown as "advanced output"
+    logs: string[]
 }
 
 export class ProgressReportHelper {
@@ -31,7 +33,8 @@ export class ProgressReportHelper {
             endTimes: new Array(steps.length).fill(0),
             currentStep: 0,
             currentValue: -1,
-            eta: 0
+            eta: 0,
+            logs: []
         }
     }
 }

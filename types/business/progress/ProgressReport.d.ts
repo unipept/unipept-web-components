@@ -11,6 +11,7 @@ export declare type ProgressReport = {
     currentStep: number;
     currentValue: number;
     eta: number;
+    logs: string[];
 };
 export declare class ProgressReportHelper {
     static constructProgressReportObject(steps: string[]): ProgressReport;
