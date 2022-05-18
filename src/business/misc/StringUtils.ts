@@ -61,4 +61,12 @@ export default class StringUtils {
             return "0 seconds";
         }
     }
+
+    /**
+     * Convert a (potentially) large number to a string in which a space is added after each group of 3 digits.
+     * @param n Number that should be converted into a nice, human readable string.
+     */
+    public static toHumanReadableNumber(n: number): string {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 }

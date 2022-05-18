@@ -23,4 +23,9 @@ export default class StringUtils {
      * @param seconds
      */
     static secondsToTimeString(seconds: number): string;
+    /**
+     * Convert a (potentially) large number to a string in which a space is added after each group of 3 digits.
+     * @param n Number that should be converted into a nice, human readable string.
+     */
+    static toHumanReadableNumber(n: number): string;
 }
