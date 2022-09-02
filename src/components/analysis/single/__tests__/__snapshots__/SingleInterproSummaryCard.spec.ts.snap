@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`SingleInterproSummaryCard displays the correct trust line 1`] = `"<span class=\\"interpro-trust\\"><strong>All proteins</strong> have at least one InterPro-entry assigned to them. </span>"`;
