@@ -1,24 +1,6 @@
-# unipept-web-components
+# Unipept Web Components
 
-## Project setup
-```
-yarn install
-```
+This project contains all Vue components that are shared between the [Unipept Web application](https://github.com/unipept/unipept) and the [Unipept Desktop application](https://github.com/unipept/unipept-desktop).
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Setup
+This project can be used in combination with Unipept Desktop or Unipept Web Application. See [this wiki page](https://github.com/unipept/unipept/wiki/Developing-the-Unipept-Web-Components) for more information.
