@@ -1,9 +1,10 @@
 import Vue from "vue";
-import Vuetify from "vuetify/lib";
+import Vuetify, { UserVuetifyPreset } from "vuetify";
+import "vuetify/dist/vuetify.min.css";
 
 Vue.use(Vuetify);
 
-export default new Vuetify({
+export const options: Partial<UserVuetifyPreset> = {
   icons: {
     iconfont: "mdi",
   },
@@ -16,4 +17,5 @@ export default new Vuetify({
       }
     }
   }
-});
+};
+export default new Vuetify(options);
