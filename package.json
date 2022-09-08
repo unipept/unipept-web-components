@@ -2,12 +2,17 @@
   "name": "unipept-web-components",
   "version": "2.0.0",
   "private": true,
+  "main": "./src/index.ts",
+  "types": "./types/index.d.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --target lib --name unipept-web-components index.ts",
     "lint": "vue-cli-service lint"
   },
-  "main": "index.ts",
+  "files": [
+    "types/*",
+    "dist/*"
+  ],
   "dependencies": {
     "core-js": "^3.8.3",
     "vue": "^2.7.10",
