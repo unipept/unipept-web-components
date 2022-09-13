@@ -2,7 +2,9 @@
   "name": "unipept-web-components",
   "version": "2.0.0",
   "private": true,
-  "main": "./src/index.ts",
+  "main": "dist/unipept-web-components.common.js",
+  "browser": "dist/unipept-web-components.umd.min.js",
+  "unpkg": "dist/unipept-web-components.umd.min.js",
   "types": "./types/index.d.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -10,13 +12,20 @@
     "lint": "vue-cli-service lint"
   },
   "files": [
+    "src/**",
     "types/*",
     "dist/*"
   ],
   "dependencies": {
+    "@types/async": "^3.2.15",
+    "@vueuse/core": "^9.2.0",
+    "async": "^3.2.4",
     "core-js": "^3.8.3",
+    "pinia": "^2.0.22",
+    "shared-memory-datastructures": "^0.1.9",
     "vue": "^2.7.10",
-    "vuetify": "^2.6.9"
+    "vuetify": "^2.6.9",
+    "worker-loader": "^3.0.8"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
