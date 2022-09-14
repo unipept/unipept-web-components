@@ -1,7 +1,7 @@
-import { default as computeFunctionalCountTable } from "@/logic/processing/functional/FunctionalCountTableProcessor.workerSource";
+//import { default as computeFunctionalCountTable } from "@/logic/processing/functional/FunctionalCountTableProcessor.workerSource";
 
 export const workerFunctionMap: Map<string, (any: any) => Promise<any>> = new Map<string, (any: any) => Promise<any>>([
-    ["computeFunctionalCountTable", computeFunctionalCountTable]
+    //["computeFunctionalCountTable", computeFunctionalCountTable]
 ]);
 
 export function createMessageEventListener(ctx: Worker): (event: MessageEvent) => Promise<void> {
