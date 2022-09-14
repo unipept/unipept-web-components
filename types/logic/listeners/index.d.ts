@@ -1,2 +1,2 @@
 import ProgressListener from "./ProgressListener";
-export { ProgressListener };
+export type { ProgressListener };

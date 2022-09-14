@@ -1,4 +1,4 @@
-import Definition from "../../Definition";
+import Definition from "../Definition";
 import NcbiId from "./NcbiId";
 
 export default class NcbiTaxon implements Definition {

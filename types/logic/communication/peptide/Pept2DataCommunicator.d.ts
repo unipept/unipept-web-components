@@ -8,7 +8,6 @@ export default class Pept2DataCommunicator {
     static PEPTDATA_BATCH_SIZE: number;
     static MISSED_CLEAVAGE_BATCH: number;
     static PEPTDATA_ENDPOINT: string;
-    constructor();
     private cancelled;
     process(countTable: CountTable<Peptide>, enableMissingCleavageHandling: boolean, equateIl: boolean, progressListener?: ProgressListener): Promise<[ShareableMap<Peptide, PeptideData>, PeptideTrust]>;
     cancel(): void;

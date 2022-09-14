@@ -4,4 +4,5 @@ import FunctionalCode from "./FunctionalCode";
 export * from "./ec";
 export * from "./go";
 export * from "./interpro";
-export { FunctionalDefinition, FunctionalNamespace, FunctionalCode };
+export type { FunctionalNamespace, FunctionalCode };
+export { FunctionalDefinition };

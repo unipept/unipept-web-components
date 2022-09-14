@@ -15,7 +15,6 @@ export default abstract class FunctionalProteinCountTableProcessor<OntologyId ex
     protected constructor(peptide: Peptide, equateIl: boolean, itemPrefix?: string);
     getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId> | undefined;
     getTrust(): FunctionalTrust | undefined;
-    cancel(): void;
     isCancelled(): boolean;
     compute(proteinProcessor: ProteinProcessor): Promise<void>;
     protected abstract getOntology(countTable: CountTable<OntologyId>): Promise<Ontology<OntologyId, DefinitionType>>;

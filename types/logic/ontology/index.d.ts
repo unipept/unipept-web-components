@@ -5,4 +5,5 @@ export * from "./functional";
 export * from "./peptide";
 export * from "./protein";
 export * from "./taxonomic";
-export { Definition, Ontology, OntologyType };
+export type { Definition, OntologyType };
+export { Ontology };

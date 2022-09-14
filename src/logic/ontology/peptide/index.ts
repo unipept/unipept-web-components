@@ -1,3 +1,3 @@
 import Peptide from "./Peptide";
 
-export { Peptide };
+export type { Peptide };

@@ -1,5 +1,4 @@
 import { NcbiId } from "@/logic/ontology";
-import NetworkConfiguration from "../NetworkConfiguration";
 import NetworkUtils from "../NetworkUtils";
 import NcbiResponse from "./NcbiResponse";
 

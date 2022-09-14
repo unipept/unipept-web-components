@@ -1,5 +1,4 @@
-import { EcCode, EcDefinition, EcProteinCountTableProcessor, GoCode, GoDefinition, GoProteinCountTableProcessor, InterproCode, InterproDefinition, InterproProteinCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData } from "@/logic";
-import { ProteinProcessor } from "@/logic/processing/protein";
+import { EcCode, EcDefinition, EcProteinCountTableProcessor, GoCode, GoDefinition, GoProteinCountTableProcessor, InterproCode, InterproDefinition, InterproProteinCountTableProcessor, NcbiId, NcbiTaxon, Ontology, Peptide, PeptideData, ProteinProcessor } from "@/logic";
 import { ProgressReport } from "./ProgressReport";
 export default interface SinglePeptideAnalysisStatus {
     peptide: Peptide;

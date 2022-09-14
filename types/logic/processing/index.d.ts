@@ -6,4 +6,5 @@ export * from "./functional";
 export * from "./peptide";
 export * from "./protein";
 export * from "./taxonomic";
-export { CountTable, CountTableProcessor, OntologyProcessor, ProteomicsCountTableProcessor };
+export type { CountTableProcessor, OntologyProcessor, ProteomicsCountTableProcessor };
+export { CountTable };

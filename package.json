@@ -8,7 +8,7 @@
   "types": "./types/index.d.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name unipept-web-components index.ts",
+    "build": "vue-cli-service build --target lib --name unipept-web-components src/index.ts",
     "lint": "vue-cli-service lint"
   },
   "files": [
@@ -21,29 +21,17 @@
     "@vueuse/core": "^9.2.0",
     "async": "^3.2.4",
     "core-js": "^3.8.3",
-    "pinia": "^2.0.22",
     "shared-memory-datastructures": "^0.1.9",
     "vue": "^2.7.10",
     "vuetify": "^2.6.9",
     "worker-loader": "^3.0.8"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
-    "eslint": "^8.23.0",
-    "eslint-plugin-vue": "^9.4.0",
-    "lint-staged": "^13.0.3",
     "sass": "^1.32.7",
     "sass-loader": "^13.0.2",
     "typescript": "~4.8.2",
     "vuetify-loader": "^1.9.2"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
   }
 }

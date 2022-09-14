@@ -8,9 +8,12 @@ export * from "./peptide";
 export * from "./protein";
 export * from "./taxonomic";
 
-export {
-    CountTable,
+export type {
     CountTableProcessor,
     OntologyProcessor,
     ProteomicsCountTableProcessor
+};
+
+export {
+    CountTable
 };
