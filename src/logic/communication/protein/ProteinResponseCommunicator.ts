@@ -1,4 +1,4 @@
-import { Peptide } from "@/logic/ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 import NetworkUtils from "../NetworkUtils";
 import { MetaProteinResponse } from "./ProteinResponse";
 

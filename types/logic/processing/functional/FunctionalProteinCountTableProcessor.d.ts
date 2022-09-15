@@ -1,6 +1,9 @@
-import { FunctionalDefinition, FunctionalNamespace, Ontology, Peptide } from "@/logic/ontology";
-import OntologyCode from "@/logic/ontology/OntologyCode";
-import { ProteinDefinition } from "@/logic/ontology/protein";
+import FunctionalDefinition from "../../../logic/ontology/functional/FunctionalDefinition";
+import FunctionalNamespace from "../../../logic/ontology/functional/FunctionalNamespace";
+import Ontology from "../../../logic/ontology/Ontology";
+import OntologyCode from "../../../logic/ontology/OntologyCode";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import ProteinDefinition from "../../../logic/ontology/protein/ProteinDefinition";
 import CountTable from "../CountTable";
 import CountTableProcessor from "../CountTableProcessor";
 import { ProteinProcessor } from "../protein";
@@ -13,8 +16,8 @@ export default abstract class FunctionalProteinCountTableProcessor<OntologyId ex
     private generalCountTable;
     private trust;
     protected constructor(peptide: Peptide, equateIl: boolean, itemPrefix?: string);
-    getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId> | undefined;
-    getTrust(): FunctionalTrust | undefined;
+    getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId>;
+    getTrust(): FunctionalTrust;
     isCancelled(): boolean;
     compute(proteinProcessor: ProteinProcessor): Promise<void>;
     protected abstract getOntology(countTable: CountTable<OntologyId>): Promise<Ontology<OntologyId, DefinitionType>>;

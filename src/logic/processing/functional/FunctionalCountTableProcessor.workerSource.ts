@@ -1,8 +1,10 @@
-import { PeptideData, PeptideDataSerializer } from "@/logic/communication";
-import { FunctionalCode, Peptide } from "@/logic/ontology";
+import PeptideData from "../../../logic/communication/peptide/PeptideData";
+import PeptideDataSerializer from "../../../logic/communication/peptide/PeptideDataSerializer";
+import FunctionalCode from "../../../logic/ontology/functional/FunctionalCode";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
 
-async function compute(
+export default async function compute(
     [
         peptideCounts,
         indexBuffer,
@@ -73,6 +75,4 @@ async function compute(
     ));
 
     return [sortedCounts, item2Peptides, annotatedCount];
-}
-
-export default compute;
+};

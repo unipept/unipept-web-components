@@ -1,5 +1,10 @@
-import { PeptideData, InterproResponseCommunicator } from "@/logic/communication";
-import { InterproCode, InterproDefinition, Peptide, Ontology, InterproNamespace } from "@/logic/ontology";
+import InterproResponseCommunicator from "../../../../logic/communication/functional/interpro/InterproResponseCommunicator";
+import PeptideData from "../../../../logic/communication/peptide/PeptideData";
+import InterproCode from "../../../../logic/ontology/functional/interpro/InterproCode";
+import InterproDefinition from "../../../../logic/ontology/functional/interpro/InterproDefinition";
+import InterproNamespace from "../../../../logic/ontology/functional/interpro/InterproNamespace";
+import Ontology from "../../../../logic/ontology/Ontology";
+import Peptide from "../../../../logic/ontology/peptide/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
 import CountTable from "../../CountTable";
 import FunctionalCountTableProcessor from "../FunctionalCountTableProcessor";

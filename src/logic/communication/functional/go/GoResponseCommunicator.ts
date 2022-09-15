@@ -1,4 +1,5 @@
-import { GoCode, EcCode } from "@/logic/ontology";
+import EcCode from "../../../../logic/ontology/functional/ec/EcCode";
+import GoCode from "../../../../logic/ontology/functional/go/GoCode";
 import NetworkUtils from "../../NetworkUtils";
 import FunctionalResponseCommunicator from "../FunctionalResponseCommunicator";
 import GoResponse from "./GoResponse";

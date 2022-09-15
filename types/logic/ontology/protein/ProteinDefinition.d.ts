@@ -1,8 +1,8 @@
 import Definition from "../Definition";
-import { EcCode } from "../functional";
-import { GoCode } from "../functional";
-import { InterproCode } from "../functional";
-import { NcbiId } from "../taxonomic";
+import EcCode from "../functional/ec/EcCode";
+import GoCode from "../functional/go/GoCode";
+import InterproCode from "../functional/interpro/InterproCode";
+import NcbiId from "../taxonomic/NcbiId";
 import UniprotAccessionId from "./UniprotAccessionId";
 export default class ProteinDefinition implements Definition {
     readonly uniprotAccessionId: UniprotAccessionId;

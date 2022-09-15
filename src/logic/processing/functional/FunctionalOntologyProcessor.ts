@@ -1,6 +1,8 @@
-import { FunctionalResponse, FunctionalResponseCommunicator } from "@/logic/communication";
-import { FunctionalDefinition, Ontology } from "@/logic/ontology";
-import OntologyCode from "@/logic/ontology/OntologyCode";
+import FunctionalResponse from "../../../logic/communication/functional/FunctionalResponse";
+import FunctionalResponseCommunicator from "../../../logic/communication/functional/FunctionalResponseCommunicator";
+import FunctionalDefinition from "../../../logic/ontology/functional/FunctionalDefinition";
+import Ontology from "../../../logic/ontology/Ontology";
+import OntologyCode from "../../../logic/ontology/OntologyCode";
 import CountTable from "../CountTable";
 import OntologyProcessor from "../OntologyProcessor";
 

@@ -1,4 +1,4 @@
-import { Peptide } from "@/logic";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 export default class PeptideTrust {
     readonly missedPeptides: Peptide[];
     readonly matchedPeptides: number;

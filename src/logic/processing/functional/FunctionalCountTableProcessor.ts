@@ -1,6 +1,10 @@
-import { PeptideData } from "@/logic/communication";
-import { FunctionalCode, FunctionalDefinition, FunctionalNamespace, Ontology, Peptide } from "@/logic/ontology";
-import QueueManager from "@/logic/util/queue/QueueManager";
+import PeptideData from "../../../logic/communication/peptide/PeptideData";
+import FunctionalCode from "../../../logic/ontology/functional/FunctionalCode";
+import FunctionalDefinition from "../../../logic/ontology/functional/FunctionalDefinition";
+import FunctionalNamespace from "../../../logic/ontology/functional/FunctionalNamespace";
+import Ontology from "../../../logic/ontology/Ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import QueueManager from "../../../logic/util/queue/QueueManager";
 import { ShareableMap } from "shared-memory-datastructures";
 import CountTable from "../CountTable";
 import ProteomicsCountTableProcessor from "../ProteomicsCountTableProcessor";
@@ -15,9 +19,11 @@ export default abstract class FunctionalCountTableProcessor<
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
 
     // Aggregation of all counts over all namespaces
-    private generalCountTable: CountTable<OntologyId> | undefined;
+    // @ts-ignore
+    private generalCountTable: CountTable<OntologyId>;
     private item2Peptides: Map<OntologyId, Peptide[]> = new Map();
-    private trust: FunctionalTrust | undefined;
+    // @ts-ignore
+    private trust: FunctionalTrust;
 
     /**
      * @param peptideCountTable The peptide count table for which functional count tables must be computed.
@@ -48,8 +54,9 @@ export default abstract class FunctionalCountTableProcessor<
      */
     public getCountTable(
         namespace?: FunctionalNamespace
-    ): CountTable<OntologyId> | undefined {
+    ): CountTable<OntologyId> {
         if (namespace) {
+            // @ts-ignore
             return this.countTables.get(namespace);
         } else {
             return this.generalCountTable;
@@ -60,7 +67,7 @@ export default abstract class FunctionalCountTableProcessor<
      * @return A trust-object that describes how many of the given peptides are in fact associated with at least one
      * annotation.
      */
-    public getTrust(): FunctionalTrust | undefined {
+    public getTrust(): FunctionalTrust {
         return this.trust;
     }
 

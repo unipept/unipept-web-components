@@ -1,4 +1,4 @@
-import { StringUtils } from "@/logic/util";
+import StringUtils from "../../../logic/util/StringUtils";
 import PeptideDataResponse from "./PeptideDataResponse";
 
 export default class PeptideData {

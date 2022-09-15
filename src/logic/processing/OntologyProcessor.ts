@@ -1,4 +1,5 @@
-import { Definition, Ontology } from "../ontology";
+import Definition from "../ontology/Definition";
+import Ontology from "../ontology/Ontology";
 import OntologyCode from "../ontology/OntologyCode";
 import CountTable from "./CountTable";
 

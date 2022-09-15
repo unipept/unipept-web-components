@@ -1,5 +1,6 @@
-import { NcbiId, Peptide } from "@/logic/ontology";
-import { ProteinDefinition } from "@/logic/ontology/protein";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import ProteinDefinition from "../../../logic/ontology/protein/ProteinDefinition";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
 export default class ProteinProcessor {
     private proteins;
     private lca;
@@ -14,7 +15,7 @@ export default class ProteinProcessor {
      * Returns the id of the lowest common ancestor NCBI-taxon for the given peptide and search configuration. Returns
      * undefined in the event that no LCA was found.
      */
-    getLca(): NcbiId | undefined;
+    getLca(): NcbiId;
     /**
      * Compute the common lineage for all organisms associated with the proteins that matched with the given peptide.
      */

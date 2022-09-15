@@ -1,7 +1,9 @@
-import { AnalysisCancelledException } from "@/logic/exceptions";
-import { ProgressListener } from "@/logic/listeners";
-import { Peptide } from "@/logic/ontology";
-import { CountTable, PeptideTrust, PeptideTrustProcessor } from "@/logic/processing";
+import AnalysisCancelledException from "../../../logic/exceptions/AnalysisCancelledException";
+import ProgressListener from "../../../logic/listeners/ProgressListener";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import CountTable from "../../../logic/processing/CountTable";
+import PeptideTrust from "../../../logic/processing/peptide/PeptideTrust";
+import PeptideTrustProcessor from "../../../logic/processing/peptide/PeptideTrustProcessor";
 import { parallelLimit } from "async";
 import { ShareableMap } from "shared-memory-datastructures";
 import NetworkConfiguration from "../NetworkConfiguration";
@@ -29,11 +31,17 @@ export default class Pept2DataCommunicator {
 
         const result = new ShareableMap<Peptide, PeptideData>(undefined, undefined, new PeptideDataSerializer());
 
+        console.log("1")
+
         progressListener?.onProgressUpdate(0.0);
         let previousProgress = 0;
 
+        console.log("2")
+
         const batchSize = enableMissingCleavageHandling ?
             Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
+
+        console.log("3")
 
         const requests = [];
         for (let i = 0; i < peptidesToProcess.length; i += batchSize) {
@@ -74,15 +82,21 @@ export default class Pept2DataCommunicator {
             });
         }
 
+        console.log("4")
+
         // Now perform the actual requests.
         try {
-            await parallelLimit(requests, NetworkConfiguration.PARALLEL_API_REQUESTS);
+            parallelLimit(requests, NetworkConfiguration.PARALLEL_API_REQUESTS);
+            console.log("4.1")
             const trustProcessor = new PeptideTrustProcessor();
             const trust = trustProcessor.getPeptideTrust(countTable, result);
+            console.log("4.2")
             return [result, trust];
         } catch (err: any) {
             // Something went wrong during the analysis. Either the analysis was cancelled, or some other exception
             // occurred.
+
+            console.log("4.error")
 
             if (err.message.includes("Cancelled execution")) {
                 throw new AnalysisCancelledException();

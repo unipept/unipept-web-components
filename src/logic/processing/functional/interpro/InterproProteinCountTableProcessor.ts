@@ -1,5 +1,11 @@
-import { InterproResponseCommunicator } from "@/logic/communication";
-import { InterproCode, InterproDefinition, Peptide, ProteinDefinition, FunctionalNamespace, Ontology, InterproNamespace } from "@/logic/ontology";
+import InterproResponseCommunicator from "../../../../logic/communication/functional/interpro/InterproResponseCommunicator";
+import FunctionalNamespace from "../../../../logic/ontology/functional/FunctionalNamespace";
+import InterproCode from "../../../../logic/ontology/functional/interpro/InterproCode";
+import InterproDefinition from "../../../../logic/ontology/functional/interpro/InterproDefinition";
+import InterproNamespace from "../../../../logic/ontology/functional/interpro/InterproNamespace";
+import Ontology from "../../../../logic/ontology/Ontology";
+import Peptide from "../../../../logic/ontology/peptide/Peptide";
+import ProteinDefinition from "../../../../logic/ontology/protein/ProteinDefinition";
 import CountTable from "../../CountTable";
 import FunctionalProteinCountTableProcessor from "../FunctionalProteinCountTableProcessor";
 import InterproOntologyProcessor from "./InterproOntologyProcessor";

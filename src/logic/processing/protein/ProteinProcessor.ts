@@ -1,14 +1,16 @@
-import { ProteinResponseCommunicator } from "@/logic/communication/protein";
-import { NcbiId, Peptide } from "@/logic/ontology";
-import { ProteinDefinition } from "@/logic/ontology/protein";
+import ProteinResponseCommunicator from "../../../logic/communication/protein/ProteinResponseCommunicator";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import ProteinDefinition from "../../../logic/ontology/protein/ProteinDefinition";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
 
 export default class ProteinProcessor {
     private proteins: ProteinDefinition[];
-    private lca: NcbiId | undefined;
+    private lca: NcbiId;
     private commonLineage: NcbiId[];
 
     constructor() {
         this.proteins = [];
+        this.lca = -1;
         this.commonLineage = [];
     }
 
@@ -24,7 +26,7 @@ export default class ProteinProcessor {
      * Returns the id of the lowest common ancestor NCBI-taxon for the given peptide and search configuration. Returns
      * undefined in the event that no LCA was found.
      */
-    public getLca(): NcbiId | undefined {
+    public getLca(): NcbiId {
         return this.lca
     }
 

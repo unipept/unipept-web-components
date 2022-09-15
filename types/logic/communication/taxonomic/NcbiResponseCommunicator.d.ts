@@ -1,4 +1,4 @@
-import { NcbiId } from "@/logic/ontology";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
 import NcbiResponse from "./NcbiResponse";
 export default class NcbiResponseCommunicator {
     private static idToResponseMap;

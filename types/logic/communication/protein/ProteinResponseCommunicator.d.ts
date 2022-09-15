@@ -1,4 +1,4 @@
-import { Peptide } from "@/logic/ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 import { MetaProteinResponse } from "./ProteinResponse";
 export default class ProteinResponseCommunicator {
     private static readonly apiBaseUrl;

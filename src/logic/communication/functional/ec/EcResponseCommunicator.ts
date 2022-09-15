@@ -1,4 +1,4 @@
-import { EcCode } from "@/logic/ontology";
+import EcCode from "../../../../logic/ontology/functional/ec/EcCode";
 import NetworkUtils from "../../NetworkUtils";
 import FunctionalResponseCommunicator from "../FunctionalResponseCommunicator";
 import EcResponse from "./EcResponse";

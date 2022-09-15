@@ -1,4 +1,4 @@
-import { GoCode } from "@/logic/ontology";
+import GoCode from "../../../../logic/ontology/functional/go/GoCode";
 import FunctionalResponseCommunicator from "../FunctionalResponseCommunicator";
 import GoResponse from "./GoResponse";
 export default class GoResponseCommunicator implements FunctionalResponseCommunicator<GoCode, GoResponse> {

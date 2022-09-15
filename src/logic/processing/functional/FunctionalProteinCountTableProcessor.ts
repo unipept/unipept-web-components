@@ -1,6 +1,9 @@
-import { FunctionalDefinition, FunctionalNamespace, Ontology, Peptide } from "@/logic/ontology";
-import OntologyCode from "@/logic/ontology/OntologyCode";
-import { ProteinDefinition } from "@/logic/ontology/protein";
+import FunctionalDefinition from "../../../logic/ontology/functional/FunctionalDefinition";
+import FunctionalNamespace from "../../../logic/ontology/functional/FunctionalNamespace";
+import Ontology from "../../../logic/ontology/Ontology";
+import OntologyCode from "../../../logic/ontology/OntologyCode";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import ProteinDefinition from "../../../logic/ontology/protein/ProteinDefinition";
 import CountTable from "../CountTable";
 import CountTableProcessor from "../CountTableProcessor";
 import { ProteinProcessor } from "../protein";
@@ -11,8 +14,10 @@ export default abstract class FunctionalProteinCountTableProcessor<
     DefinitionType extends FunctionalDefinition
 > implements CountTableProcessor<OntologyId> {
     private countTables: Map<FunctionalNamespace, CountTable<OntologyId>> = new Map();
-    private generalCountTable: CountTable<OntologyId> | undefined;
-    private trust: FunctionalTrust | undefined;
+    // @ts-ignore
+    private generalCountTable: CountTable<OntologyId>;
+    // @ts-ignore
+    private trust: FunctionalTrust;
 
     protected constructor(
         public readonly peptide: Peptide,
@@ -20,15 +25,16 @@ export default abstract class FunctionalProteinCountTableProcessor<
         protected readonly itemPrefix: string = ""
     ) {}
 
-    public getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId> | undefined {
+    public getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId> {
         if (namespace) {
+            // @ts-ignore
             return this.countTables.get(namespace);
         } else {
             return this.generalCountTable;
         }
     }
 
-    public getTrust(): FunctionalTrust | undefined {
+    public getTrust(): FunctionalTrust {
         return this.trust;
     }
 

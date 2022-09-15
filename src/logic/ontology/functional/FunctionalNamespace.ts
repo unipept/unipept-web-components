@@ -1,6 +1,6 @@
 import EcNamespace from "./ec/EcNamespace";
-import { GoNamespace } from "./go";
-import { InterproNamespace } from "./interpro";
+import GoNamespace from "./go/GoNamespace";
+import InterproNamespace from "./interpro/InterproNamespace";
 
 type FunctionalNamespace = EcNamespace | GoNamespace | InterproNamespace;
 

@@ -1,5 +1,10 @@
-import { EcResponseCommunicator, PeptideData } from "@/logic/communication";
-import { EcCode, EcDefinition, EcNamespace, Ontology, Peptide } from "@/logic/ontology";
+import EcResponseCommunicator from "../../../../logic/communication/functional/ec/EcResponseCommunicator";
+import PeptideData from "../../../../logic/communication/peptide/PeptideData";
+import EcCode from "../../../../logic/ontology/functional/ec/EcCode";
+import EcDefinition from "../../../../logic/ontology/functional/ec/EcDefinition";
+import EcNamespace from "../../../../logic/ontology/functional/ec/EcNamespace";
+import Ontology from "../../../../logic/ontology/Ontology";
+import Peptide from "../../../../logic/ontology/peptide/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
 import CountTable from "../../CountTable";
 import FunctionalCountTableProcessor from "../FunctionalCountTableProcessor";

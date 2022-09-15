@@ -1,4 +1,4 @@
-import { Peptide } from "@/logic/ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 import CountTable from "../CountTable";
 export default class PeptideCountTableProcessor {
     /**

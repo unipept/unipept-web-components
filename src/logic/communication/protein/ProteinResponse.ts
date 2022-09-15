@@ -1,4 +1,8 @@
-import { EcCode, GoCode, InterproCode, NcbiId, UniprotAccessionId } from "@/logic/ontology"
+import EcCode from "../../../logic/ontology/functional/ec/EcCode"
+import GoCode from "../../../logic/ontology/functional/go/GoCode"
+import InterproCode from "../../../logic/ontology/functional/interpro/InterproCode"
+import UniprotAccessionId from "../../../logic/ontology/protein/UniprotAccessionId"
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId"
 
 export interface ProteinResponse {
     uniprotAccessionId: UniprotAccessionId,

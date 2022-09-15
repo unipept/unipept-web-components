@@ -1,5 +1,9 @@
-import { PeptideData } from "@/logic/communication";
-import { FunctionalDefinition, NcbiId, NcbiTaxon, Ontology, Peptide } from "@/logic/ontology";
+import PeptideData from "../../../logic/communication/peptide/PeptideData";
+import FunctionalDefinition from "../../../logic/ontology/functional/FunctionalDefinition";
+import Ontology from "../../../logic/ontology/Ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
+import NcbiTaxon from "../../../logic/ontology/taxonomic/NcbiTaxon";
 import { ShareableMap } from "shared-memory-datastructures";
 import CountTable from "../CountTable";
 export default class FunctionalSummaryProcessor {

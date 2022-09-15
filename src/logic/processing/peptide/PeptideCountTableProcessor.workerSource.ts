@@ -1,4 +1,4 @@
-import { Peptide } from "@/logic/ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 
 /**
  * Convert a list of peptides into a count table with respect to a given set of search settings. This count table maps

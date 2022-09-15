@@ -1,5 +1,5 @@
-import { Peptide } from "@/logic/ontology";
-import { QueueManager } from "@/logic/util";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import QueueManager from "../../../logic/util/queue/QueueManager";
 import CountTable from "../CountTable";
 
 export default class PeptideCountTableProcessor {
@@ -21,6 +21,7 @@ export default class PeptideCountTableProcessor {
             [Map<Peptide, number>, number],
             [Peptide[], boolean, boolean, boolean]
         >("computePeptideCountTable", [peptides, enableMissingCleavageHandling, filterDuplicates, equateIl]);
+
         return new CountTable<Peptide>(peptideCountsMapping, totalFrequency);
     }
 }

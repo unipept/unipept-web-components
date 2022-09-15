@@ -1,5 +1,9 @@
-import { PeptideData } from "@/logic/communication";
-import { FunctionalCode, FunctionalDefinition, FunctionalNamespace, Ontology, Peptide } from "@/logic/ontology";
+import PeptideData from "../../../logic/communication/peptide/PeptideData";
+import FunctionalCode from "../../../logic/ontology/functional/FunctionalCode";
+import FunctionalDefinition from "../../../logic/ontology/functional/FunctionalDefinition";
+import FunctionalNamespace from "../../../logic/ontology/functional/FunctionalNamespace";
+import Ontology from "../../../logic/ontology/Ontology";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
 import CountTable from "../CountTable";
 import ProteomicsCountTableProcessor from "../ProteomicsCountTableProcessor";
@@ -35,12 +39,12 @@ export default abstract class FunctionalCountTableProcessor<OntologyId extends F
      * peptides in which it was found, taking into account the percentage constraints set in the constructor of this
      * class.
      */
-    getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId> | undefined;
+    getCountTable(namespace?: FunctionalNamespace): CountTable<OntologyId>;
     /**
      * @return A trust-object that describes how many of the given peptides are in fact associated with at least one
      * annotation.
      */
-    getTrust(): FunctionalTrust | undefined;
+    getTrust(): FunctionalTrust;
     getAnnotationPeptideMapping(): Map<OntologyId, Peptide[]>;
     /**
      * Do compute both the count table and trust output. Both processing results are stored as part of this object, and

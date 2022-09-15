@@ -1,6 +1,9 @@
-import { NcbiResponseCommunicator, NcbiResponse } from "@/logic/communication";
-import { NcbiId, NcbiTaxon, Ontology } from "@/logic/ontology";
-import { QueueManager } from "@/logic/util";
+import NcbiResponse from "../../../logic/communication/taxonomic/NcbiResponse";
+import NcbiResponseCommunicator from "../../../logic/communication/taxonomic/NcbiResponseCommunicator";
+import Ontology from "../../../logic/ontology/Ontology";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
+import NcbiTaxon from "../../../logic/ontology/taxonomic/NcbiTaxon";
+import QueueManager from "../../../logic/util/queue/QueueManager";
 import CountTable from "../CountTable";
 import OntologyProcessor from "../OntologyProcessor";
 
@@ -8,7 +11,7 @@ export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, 
     constructor(private readonly ncbiCommunicator: NcbiResponseCommunicator) {}
 
     public async getOntology(table: CountTable<NcbiId>): Promise<Ontology<NcbiId, NcbiTaxon>> {
-        return await this.getOntologyByIds(table.getOntologyIds());
+        return this.getOntologyByIds(table.getOntologyIds());
     }
 
     /**

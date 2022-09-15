@@ -1,5 +1,10 @@
-import { PeptideData, GoResponseCommunicator } from "@/logic/communication";
-import { GoCode, GoDefinition, Peptide, Ontology, GoNamespace } from "@/logic/ontology";
+import GoResponseCommunicator from "../../../../logic/communication/functional/go/GoResponseCommunicator";
+import PeptideData from "../../../../logic/communication/peptide/PeptideData";
+import GoCode from "../../../../logic/ontology/functional/go/GoCode";
+import GoDefinition from "../../../../logic/ontology/functional/go/GoDefinition";
+import GoNamespace from "../../../../logic/ontology/functional/go/GoNamespace";
+import Ontology from "../../../../logic/ontology/Ontology";
+import Peptide from "../../../../logic/ontology/peptide/Peptide";
 import { ShareableMap } from "shared-memory-datastructures";
 import CountTable from "../../CountTable";
 import FunctionalCountTableProcessor from "../FunctionalCountTableProcessor";

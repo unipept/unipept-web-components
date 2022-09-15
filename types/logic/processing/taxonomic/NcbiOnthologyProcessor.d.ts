@@ -1,5 +1,7 @@
-import { NcbiResponseCommunicator } from "@/logic/communication";
-import { NcbiId, NcbiTaxon, Ontology } from "@/logic/ontology";
+import NcbiResponseCommunicator from "../../../logic/communication/taxonomic/NcbiResponseCommunicator";
+import Ontology from "../../../logic/ontology/Ontology";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
+import NcbiTaxon from "../../../logic/ontology/taxonomic/NcbiTaxon";
 import CountTable from "../CountTable";
 import OntologyProcessor from "../OntologyProcessor";
 export default class NcbiOntologyProcessor implements OntologyProcessor<NcbiId, NcbiTaxon> {

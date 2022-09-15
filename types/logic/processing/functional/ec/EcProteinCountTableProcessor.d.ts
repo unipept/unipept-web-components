@@ -1,5 +1,10 @@
-import { EcResponseCommunicator } from "@/logic/communication";
-import { EcCode, EcDefinition, FunctionalNamespace, Ontology, Peptide, ProteinDefinition } from "@/logic/ontology";
+import EcResponseCommunicator from "../../../../logic/communication/functional/ec/EcResponseCommunicator";
+import EcCode from "../../../../logic/ontology/functional/ec/EcCode";
+import EcDefinition from "../../../../logic/ontology/functional/ec/EcDefinition";
+import FunctionalNamespace from "../../../../logic/ontology/functional/FunctionalNamespace";
+import Ontology from "../../../../logic/ontology/Ontology";
+import Peptide from "../../../../logic/ontology/peptide/Peptide";
+import ProteinDefinition from "../../../../logic/ontology/protein/ProteinDefinition";
 import CountTable from "../../CountTable";
 import FunctionalProteinCountTableProcessor from "../FunctionalProteinCountTableProcessor";
 export default class EcProteinCountTableProcessor extends FunctionalProteinCountTableProcessor<EcCode, EcDefinition> {

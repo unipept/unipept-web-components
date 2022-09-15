@@ -1,5 +1,8 @@
-import { FunctionalResponseCommunicator, GoResponse, GoResponseCommunicator } from "@/logic/communication";
-import { GoCode, GoDefinition } from "@/logic/ontology";
+import FunctionalResponseCommunicator from "../../../../logic/communication/functional/FunctionalResponseCommunicator";
+import GoResponse from "../../../../logic/communication/functional/go/GoResponse";
+import GoResponseCommunicator from "../../../../logic/communication/functional/go/GoResponseCommunicator";
+import GoCode from "../../../../logic/ontology/functional/go/GoCode";
+import GoDefinition from "../../../../logic/ontology/functional/go/GoDefinition";
 import FunctionalOntologyProcessor from "../FunctionalOntologyProcessor";
 export default class GoOntologyProcessor extends FunctionalOntologyProcessor<GoCode, GoDefinition, GoResponse> {
     private readonly goCommunicator;

@@ -1,6 +1,7 @@
-import { ProgressListener } from "@/logic/listeners";
-import { Peptide } from "@/logic/ontology";
-import { CountTable, PeptideTrust } from "@/logic/processing";
+import ProgressListener from "../../../logic/listeners/ProgressListener";
+import Peptide from "../../../logic/ontology/peptide/Peptide";
+import CountTable from "../../../logic/processing/CountTable";
+import PeptideTrust from "../../../logic/processing/peptide/PeptideTrust";
 import { ShareableMap } from "shared-memory-datastructures";
 import PeptideData from "./PeptideData";
 export default class Pept2DataCommunicator {

@@ -1,4 +1,4 @@
-import { NcbiId } from "@/logic/ontology";
+import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
 import NetworkUtils from "../NetworkUtils";
 import NcbiResponse from "./NcbiResponse";
 

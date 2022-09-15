@@ -1,4 +1,4 @@
-import { InterproCode } from "@/logic/ontology";
+import InterproCode from "../../../../logic/ontology/functional/interpro/InterproCode";
 import NetworkUtils from "../../NetworkUtils";
 import FunctionalResponseCommunicator from "../FunctionalResponseCommunicator";
 import InterproResponse from "./InterproResponse";
