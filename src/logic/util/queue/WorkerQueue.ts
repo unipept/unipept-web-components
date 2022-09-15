@@ -18,8 +18,7 @@ export default class WorkerQueue {
         }
 
         this.queue = async.queue(async(
-            task: { type: string, args: any },
-            callback: (x: any) => void,
+            task: { type: string, args: any }
         ) => {
             // Retrieve worker from the pool.
             const worker = this.workers.pop();
@@ -30,23 +29,20 @@ export default class WorkerQueue {
                         worker.removeEventListener("message", listener);
                         resolve(event.data.result);
                     };
-    
-                    worker.addEventListener("message",listener);
+
+                    worker.addEventListener("message", listener);
                     worker.postMessage(task);
                 });
-    
+
                 // Add worker back to the pool.
                 this.workers.push(worker);
-    
-                callback(result);
+
+                return result
             }
         }, this.concurrency);
     }
 
     public async pushTask<ResultType, ArgType>(type: string, args: ArgType): Promise<ResultType> {
-        return new Promise<ResultType>((resolve) => {
-            // @ts-ignore
-            this.queue.push({ type, args }, (data: ResultType) => resolve(data));
-        });
+        return this.queue.push({type, args});
     }
 }

@@ -14,6 +14,7 @@ export function createMessageEventListener(ctx: Worker): (event: MessageEvent) =
         if (workerFunctionMap.has(messageType)) {
             // @ts-ignore
             const result = await workerFunctionMap.get(messageType)(args);
+
             ctx.postMessage({
                 type: "result",
                 result: result

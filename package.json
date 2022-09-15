@@ -7,7 +7,7 @@
   "unpkg": "dist/unipept-web-components.umd.min.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve src/index.ts",
     "build": "vue-cli-service build --target lib --name unipept-web-components src/index.ts",
     "lint": "vue-cli-service lint"
   },

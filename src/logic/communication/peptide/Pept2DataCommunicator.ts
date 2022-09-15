@@ -45,11 +45,10 @@ export default class Pept2DataCommunicator {
 
         const requests = [];
         for (let i = 0; i < peptidesToProcess.length; i += batchSize) {
-            requests.push(async(done: (val: any) => void) => {
+            requests.push(async() => {
                 if (this.cancelled) {
                     // Stop the processing and let this error be handled by the outer scope.
-                    done(new Error("Cancelled execution"));
-                    return;
+                    throw new Error("Cancelled execution");
                 }
 
                 const requestData = JSON.stringify({
@@ -74,10 +73,10 @@ export default class Pept2DataCommunicator {
                     }
 
                     // Successfully handled this request.
-                    done(null);
+                    return;
                 } catch (err) {
                     // Fetch errors will be handled by the outer scope.
-                    done(err);
+                    throw err;
                 }
             });
         }
