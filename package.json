@@ -79,7 +79,7 @@
         "less-loader": "^7.0.1",
         "nock": "^11.4.0",
         "node-fetch": "^2.6.0",
-        "node-sass": "^4.13.1",
+        "node-sass": "^7.0.0",
         "sass": "^1.17.4",
         "sass-loader": "^10.1.0",
         "svg-inline-loader": "^0.8.0",
