@@ -616,6 +616,10 @@ export default class AssayStoreFactory {
                         progressObj.startTimes[i] = 0;
                         progressObj.endTimes[i] = 0;
                     }
+
+                    progressObj.currentStep = 0;
+                    progressObj.currentValue = -1;
+                    progressObj.startTimes[0] = new Date().getTime();
                 }
             },
 
