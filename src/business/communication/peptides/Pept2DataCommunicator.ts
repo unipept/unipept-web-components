@@ -20,8 +20,17 @@ export default class Pept2DataCommunicator {
     // possible and an exception will be thrown from the "process" function.
     private cancelled: boolean = false;
 
+    /**
+     * Construct a new Pept2DataCommunicator that can be used to extract peptide information from the Unipept API.
+     *
+     * @param serviceUrl Base URL of the handling server. This URL will be used to perform all communication with.
+     * @param cacheKey This key can be used to more fine-grained invalidate or validate requests from the request
+     * cache. In some cases the same base URL is used with a different type of database, causing the requests to be
+     * invalidated.
+     */
     public constructor(
-        public readonly serviceUrl: string
+        public readonly serviceUrl: string,
+        public readonly cacheKey: string = ""
     ) {}
 
     public async process(
@@ -39,7 +48,7 @@ export default class Pept2DataCommunicator {
         const batchSize = configuration.enableMissingCleavageHandling ?
             Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
 
-        const networkManager = new RequestCacheNetworkManager(this.serviceUrl);
+        const networkManager = new RequestCacheNetworkManager(this.serviceUrl, this.cacheKey);
 
         const requests = [];
         for (let i = 0; i < peptidesToProcess.length; i += batchSize) {

@@ -22,7 +22,8 @@ export default class RequestCacheNetworkManager implements NetworkManager {
     private static readonly UNIPROT_VERSION_INVALIDATE_MS = 30 * 1000;
 
     constructor(
-        private readonly baseUrl: string
+        private readonly baseUrl: string,
+        private readonly cacheKey: string = ""
     ) {
         this.setupDb();
     }
@@ -31,7 +32,9 @@ export default class RequestCacheNetworkManager implements NetworkManager {
         try {
             const dbVersion: string = await this.getUniprotDBVersion();
 
-            const dataHash: string = sha256(this.baseUrl + url + JSON.stringify(data) + dbVersion).toString();
+            const dataHash: string = sha256(
+                this.baseUrl + url + JSON.stringify(data) + dbVersion + this.cacheKey
+            ).toString();
 
             const dbResult = await this.readRequestFromDb(dataHash);
             if (dbResult) {

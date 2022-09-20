@@ -8,12 +8,13 @@ import NetworkManager from "./NetworkManager";
  */
 export default class RequestCacheNetworkManager implements NetworkManager {
     private readonly baseUrl;
+    private readonly cacheKey;
     private indexedDb;
     private uniprotVersion;
     private uniprotVersionLastChecked;
     private static readonly MAX_REQUEST_CACHE_SIZE;
     private static readonly UNIPROT_VERSION_INVALIDATE_MS;
-    constructor(baseUrl: string);
+    constructor(baseUrl: string, cacheKey?: string);
     postJSON(url: string, data: any): Promise<any>;
     getJSON(url: string): Promise<any>;
     private setupDb;
