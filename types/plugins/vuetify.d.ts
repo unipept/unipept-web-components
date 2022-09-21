@@ -1,5 +1,3 @@
-import Vuetify, { UserVuetifyPreset } from "vuetify";
-import "vuetify/dist/vuetify.min.css";
-export declare const options: Partial<UserVuetifyPreset>;
+import Vuetify from "vuetify";
 declare const _default: Vuetify;
 export default _default;

@@ -6,7 +6,8 @@ enum InterproNamespace {
     Family = "family",
     HomologousSuperfamily = "homologous superfamily",
     PTM = "ptm",
-    Repeat = "repeat"
+    Repeat = "repeat",
+    Unknown = "unknown"
 }
 
 export function convertStringToInterproNamespace(ns: string): InterproNamespace {
