@@ -14,25 +14,58 @@
             />
 
             <h2>Biological Process</h2>
-            <GoTable 
-                :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.BiologicalProcess)"
-                :loading="assay.analysisInProgress" 
-                :showPercentage="false" 
-            />
+            <v-row>
+                <v-col cols=9>
+                    <GoTable 
+                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.BiologicalProcess)"
+                        :loading="assay.analysisInProgress" 
+                        :showPercentage="false" 
+                    />
+                </v-col>
+                <v-col cols=3>
+                    <QuickGoCard 
+                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.BiologicalProcess)"
+                        :namespace="GoNamespace.BiologicalProcess"
+                        :n="3"
+                    />
+                </v-col>
+            </v-row>
 
             <h2>Cellular Component</h2>
-            <GoTable 
-                :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.CellularComponent)"
-                :loading="assay.analysisInProgress" 
-                :showPercentage="false" 
-            />
+            <v-row>
+                <v-col cols=9>
+                    <GoTable 
+                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.CellularComponent)"
+                        :loading="assay.analysisInProgress" 
+                        :showPercentage="false" 
+                    />
+                </v-col>
+                <v-col cols=3>
+                    <QuickGoCard 
+                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.CellularComponent)" 
+                        :namespace="GoNamespace.CellularComponent"
+                        :n="3"
+                    />
+                </v-col>
+            </v-row>
 
             <h2>Molecular Function</h2>
-            <GoTable 
-                :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.MolecularFunction)"
-                :loading="assay.analysisInProgress" 
-                :showPercentage="false" 
-            />
+            <v-row>
+                <v-col cols=9>
+                    <GoTable 
+                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.MolecularFunction)"
+                        :loading="assay.analysisInProgress" 
+                        :showPercentage="false" 
+                    />
+                </v-col>
+                <v-col cols=3>
+                    <QuickGoCard 
+                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.MolecularFunction)" 
+                        :namespace="GoNamespace.MolecularFunction"
+                        :n="3"
+                    />
+                </v-col>
+            </v-row>
         </v-card-text>
     </v-card>
 </template>
@@ -43,6 +76,7 @@ import { GoNamespace } from '@/logic';
 import GoTable from '../tables/functional/GoTable.vue';
 import GoTableItem from '../tables/functional/GoTableItem';
 import TrustLine from '../util/TrustLine.vue';
+import QuickGoCard from '../cards/QuickGoCard.vue';
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus
