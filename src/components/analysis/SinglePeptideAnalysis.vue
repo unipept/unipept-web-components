@@ -24,10 +24,10 @@
                 <LineageTable :assay="assay" />
             </v-tab-item>
             <v-tab-item>
-                <div>3</div>
+                <GoSummaryCard :assay="assay" />
             </v-tab-item>
             <v-tab-item>
-                <div>4</div>
+                <EcSummaryCard :assay="assay" />
             </v-tab-item>
             <v-tab-item>
                 <InterproSummaryCard :assay="assay" />
@@ -42,6 +42,8 @@ import { defineProps, ref } from "vue";
 import MatchedProteinsTable from "../tables/MatchedProteinsTable.vue";
 import LineageTable from "../tables/LineageTable.vue";
 import InterproSummaryCard from "./InterproSummaryCard.vue";
+import EcSummaryCard from "./EcSummaryCard.vue";
+import GoSummaryCard from "./GoSummaryCard.vue";
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus

@@ -68,7 +68,7 @@ const headers = [
         width: "20%"
     },
     {
-        text: "InterPro Entry",
+        text: "InterPro-entry",
         align: "start",
         value: "code",
         width: "20%"

@@ -2,17 +2,17 @@
     <v-card flat>
         <v-card-text>
             <TrustLine
-                :trust="assay.interproProteinCountTableProcessor.getTrust()"
+                :trust="assay.ecProteinCountTableProcessor.getTrust()"
                 :faKind="{
-                    singular: 'InterPro entry',
-                    plural: 'InterPro entries'
+                    singular: 'EC number',
+                    plural: 'EC numbers'
                 }"
                 :countKind="{
                     singular: 'protein',
                     plural: 'proteins'
                 }"
             />
-            <InterproTable 
+            <EcTable 
                 :items="assay.analysisInProgress ? [] : items(assay)"
                 :loading="assay.analysisInProgress" 
                 :showPercentage="false" 
@@ -21,14 +21,10 @@
     </v-card>
 </template>
 
-FunctionalUtils.computeTrustLine(this.trust, "InterPro-entry", "protein");
-
-
 <script setup lang="ts">
 import { SinglePeptideAnalysisStatus } from '@/interface';
-import { InterproNamespace } from '@/logic';
-import InterproTableItem from '../tables/functional/InterproTableItem';
-import InterproTable from '../tables/functional/InterproTable.vue';
+import EcTable from '../tables/functional/EcTable.vue';
+import EcTableItem from '../tables/functional/EcTableItem';
 import TrustLine from '../util/TrustLine.vue';
 
 export interface Props {
@@ -38,22 +34,20 @@ export interface Props {
 defineProps<Props>();
 
 const items = (assay: SinglePeptideAnalysisStatus) => {
-    const countTable = assay.interproProteinCountTableProcessor.getCountTable();
+    const countTable = assay.ecProteinCountTableProcessor.getCountTable();
 
-    const items: InterproTableItem[] = [];
+    const items: EcTableItem[] = [];
     countTable.toMap().forEach((count, code) => {
-        const definition = assay.interproOntology.getDefinition(code) || { 
+        const definition = assay.ecOntology.getDefinition(code) || { 
             name: "", 
-            code: code,
-            namespace: InterproNamespace.Unknown 
+            code: code
         };
 
         items.push({
             name: definition.name,
             code: definition.code,
-            namespace: definition.namespace,
             count: count,
-            relativeCount: count / assay.interproProteinCountTableProcessor.getTrust().totalAmountOfItems
+            relativeCount: count / assay.ecProteinCountTableProcessor.getTrust().totalAmountOfItems
         });
     });
 
