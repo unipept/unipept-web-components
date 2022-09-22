@@ -12,9 +12,11 @@
                     dense
                     :items="assay.analysisInProgress ? [] : organisms(assay)"
                     :headers="headers"
+                    :loading="assay.analysisInProgress"
                     :footer-props="{
                         'items-per-page-options': [10, 20, 50, 100, -1]
-                    }">
+                    }"
+                >
                     <template v-slot:body="{ items }">
                         <tbody>
                             <tr v-for="item in items" :key="item.name">

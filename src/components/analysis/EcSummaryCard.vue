@@ -2,6 +2,7 @@
     <v-card flat>
         <v-card-text>
             <TrustLine
+                class="mb-5"
                 :trust="assay.ecProteinCountTableProcessor?.getTrust()"
                 :faKind="{
                     singular: 'EC number',

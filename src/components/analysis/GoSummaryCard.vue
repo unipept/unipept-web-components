@@ -2,6 +2,7 @@
     <v-card flat>
         <v-card-text>
             <TrustLine
+                class="mb-5"
                 :trust="assay.goProteinCountTableProcessor?.getTrust()"
                 :faKind="{
                     singular: 'GO term',
@@ -13,7 +14,7 @@
                 }"
             />
 
-            <h2>Biological Process</h2>
+            <h2 class="py-2">Biological Process</h2>
             <v-row>
                 <v-col cols=9>
                     <GoTable 
@@ -31,7 +32,7 @@
                 </v-col>
             </v-row>
 
-            <h2>Cellular Component</h2>
+            <h2 class="py-2">Cellular Component</h2>
             <v-row>
                 <v-col cols=9>
                     <GoTable 
@@ -49,7 +50,7 @@
                 </v-col>
             </v-row>
 
-            <h2>Molecular Function</h2>
+            <h2 class="py-2">Molecular Function</h2>
             <v-row>
                 <v-col cols=9>
                     <GoTable 
