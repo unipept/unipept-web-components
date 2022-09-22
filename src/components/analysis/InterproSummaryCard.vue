@@ -2,7 +2,7 @@
     <v-card flat>
         <v-card-text>
             <TrustLine
-                :trust="assay.interproProteinCountTableProcessor.getTrust()"
+                :trust="assay.interproProteinCountTableProcessor?.getTrust()"
                 :faKind="{
                     singular: 'InterPro entry',
                     plural: 'InterPro entries'

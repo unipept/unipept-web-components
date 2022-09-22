@@ -14,6 +14,8 @@ import InterproProteinCountTableProcessor from "../logic/processing/functional/i
 import ProteinProcessor from "../logic/processing/protein/ProteinProcessor"
 import Peptide from "../logic/ontology/peptide/Peptide"
 import { ProgressReport } from "./ProgressReport"
+import NcbiTree from "../logic/ontology/taxonomic/NcbiTree"
+import { DataNodeLike } from "unipept-visualizations/types"
 
 export default interface SinglePeptideAnalysisStatus {
     peptide: Peptide
@@ -47,8 +49,8 @@ export default interface SinglePeptideAnalysisStatus {
     interproOntology: Ontology<InterproCode, InterproDefinition>
 
     // Tree for all taxa that are associated with the proteins that correspond to the current peptide.
-    // taxaTree: Tree,
+    taxaTree: NcbiTree,
 
     // Tree for the Enzyme Commission numbers
-    // ecTree: DataNodeLike
+    ecTree: DataNodeLike
 }

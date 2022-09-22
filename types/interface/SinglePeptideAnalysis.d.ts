@@ -14,6 +14,8 @@ import InterproProteinCountTableProcessor from "../logic/processing/functional/i
 import ProteinProcessor from "../logic/processing/protein/ProteinProcessor";
 import Peptide from "../logic/ontology/peptide/Peptide";
 import { ProgressReport } from "./ProgressReport";
+import NcbiTree from "../logic/ontology/taxonomic/NcbiTree";
+import { DataNodeLike } from "unipept-visualizations/types";
 export default interface SinglePeptideAnalysisStatus {
     peptide: Peptide;
     equateIl: boolean;
@@ -33,4 +35,6 @@ export default interface SinglePeptideAnalysisStatus {
     goOntology: Ontology<GoCode, GoDefinition>;
     ecOntology: Ontology<EcCode, EcDefinition>;
     interproOntology: Ontology<InterproCode, InterproDefinition>;
+    taxaTree: NcbiTree;
+    ecTree: DataNodeLike;
 }

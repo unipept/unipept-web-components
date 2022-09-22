@@ -2,7 +2,7 @@
     <v-card flat>
         <v-card-text>
             <TrustLine
-                :trust="assay.goProteinCountTableProcessor.getTrust()"
+                :trust="assay.goProteinCountTableProcessor?.getTrust()"
                 :faKind="{
                     singular: 'GO term',
                     plural: 'GO terms'
