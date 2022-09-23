@@ -20,23 +20,22 @@
                 :showPercentage="false" 
             />
 
-            <v-card class="mt-5" outlined>
-                <v-btn
-                    small
-                    depressed
-                    class="item-treeview-dl-btn"
-                    @click=""
-                >
-                    <v-icon>mdi-download</v-icon> Save as image
-                </v-btn>
-                <TreeView 
-                    :data="assay.ecTree"
-                    :loading="assay.analysisInProgress"
-                    :width="800"
-                    :height="300"
-                    :autoResize="true"
-                />
-            </v-card>
+            <TreeViewControls
+                class="mt-3"
+                :loading="assay.analysisInProgress"
+                :fullscreen="() => { }" 
+                :download="() => { }"
+            >
+                <template #treeview>
+                    <TreeView 
+                        :data="assay.ecTree"
+                        :loading="assay.analysisInProgress"
+                        :width="800"
+                        :height="300"
+                        :autoResize="true"
+                    />
+                </template>
+            </TreeViewControls>
         </v-card-text>
     </v-card>
 </template>
@@ -47,6 +46,7 @@ import EcTable from '../tables/functional/EcTable.vue';
 import EcTableItem from '../tables/functional/EcTableItem';
 import TrustLine from '../util/TrustLine.vue';
 import TreeView from '../visualizations/TreeView.vue';
+import TreeViewControls from '../visualizations/TreeViewControls.vue';
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus

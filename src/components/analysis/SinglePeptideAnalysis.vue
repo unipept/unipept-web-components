@@ -18,7 +18,7 @@
                 <MatchedProteinsTable :assay="assay" />
             </v-tab-item>
             <v-tab-item>
-                <div>1</div>
+                <LineageTree :assay="assay" />
             </v-tab-item>
             <v-tab-item>
                 <LineageTable :assay="assay" />
@@ -44,6 +44,7 @@ import LineageTable from "../tables/LineageTable.vue";
 import InterproSummaryCard from "./InterproSummaryCard.vue";
 import EcSummaryCard from "./EcSummaryCard.vue";
 import GoSummaryCard from "./GoSummaryCard.vue";
+import LineageTree from "./LineageTree.vue";
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus

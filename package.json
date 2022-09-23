@@ -17,9 +17,6 @@
     "dist/*"
   ],
   "dependencies": {
-    "@types/async": "^3.2.15",
-    "@types/jquery": "^3.5.14",
-    "@types/uuid": "^8.3.4",
     "@vueuse/core": "^9.2.0",
     "async": "^3.2.4",
     "core-js": "^3.8.3",
@@ -32,6 +29,9 @@
     "worker-loader": "^3.0.8"
   },
   "devDependencies": {
+    "@types/async": "^3.2.15",
+    "@types/jquery": "^3.5.14",
+    "@types/uuid": "^8.3.4",
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "sass": "^1.32.7",

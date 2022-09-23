@@ -1,10 +1,10 @@
 import { DataNodeLike } from "unipept-visualizations";
 
 export default class NcbiTreeNode implements DataNodeLike {
-    public children: NcbiTreeNode[] = [];
-
     public count: number = 0;
     public selfCount: number = 0;
+
+    public children: NcbiTreeNode[] = [];
 
     public extra: any = {};
 
@@ -31,7 +31,12 @@ export default class NcbiTreeNode implements DataNodeLike {
      */
     public getChild(taxonId: number): NcbiTreeNode | null {
         const child = this.children.find(c => c.id === taxonId);
-        return (child ? child : null);
+
+        if (child) {
+            return child;
+        }
+
+        return null;
     }
 
     /**

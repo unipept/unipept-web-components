@@ -1,7 +1,7 @@
 <template>
     <div v-if="!error">
-        <div v-if="!treeComputed" class="d-flex justify-center mb-5" style="height: max-content; align-content: center;">
-            <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
+        <div v-if="!treeComputed" class="d-flex justify-center align-self-center mb-5" style="height: max-content; align-content: center;">
+            <v-progress-circular class="align-self-center" :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
         </div>
         <div class="treeview-container" ref="visualization"></div>
     </div>
@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { DataNodeLike, Treeview as UnipeptTreeView, TreeviewSettings } from 'unipept-visualizations';
+import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
 import { computed, onMounted, ref } from 'vue';
 
 export interface Props {
@@ -29,6 +30,7 @@ export interface Props {
     height?: number
     autoResize?: boolean
     tooltip?: (node: DataNodeLike) => string
+    colors?: (node: TreeviewNode) => string,
 
     loading?: boolean
 }
@@ -65,6 +67,10 @@ const initializeVisualisation = () => {
 
     if(props.tooltip) {
         settings = { ...settings, getTooltip: props.tooltip };
+    }
+
+    if(props.colors) {
+        settings = { ...settings, colorProvider: props.colors };
     }
 
     new UnipeptTreeView(

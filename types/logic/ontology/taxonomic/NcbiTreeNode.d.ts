@@ -2,9 +2,9 @@ import { DataNodeLike } from "unipept-visualizations";
 export default class NcbiTreeNode implements DataNodeLike {
     readonly id: number;
     readonly name: string;
-    children: NcbiTreeNode[];
     count: number;
     selfCount: number;
+    children: NcbiTreeNode[];
     extra: any;
     /**
      * Creates a node based on a mandatory id. Name and rank are optional.
