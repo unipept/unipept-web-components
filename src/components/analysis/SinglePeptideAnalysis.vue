@@ -41,10 +41,10 @@ import { SinglePeptideAnalysisStatus } from "@/interface";
 import { defineProps, ref } from "vue";
 import MatchedProteinsTable from "../tables/MatchedProteinsTable.vue";
 import LineageTable from "../tables/LineageTable.vue";
-import InterproSummaryCard from "./InterproSummaryCard.vue";
-import EcSummaryCard from "./EcSummaryCard.vue";
-import GoSummaryCard from "./GoSummaryCard.vue";
-import LineageTree from "./LineageTree.vue";
+import InterproSummaryCard from "../cards/InterproSummaryCard.vue";
+import EcSummaryCard from "../cards/EcSummaryCard.vue";
+import GoSummaryCard from "../cards/GoSummaryCard.vue";
+import LineageTree from "../trees/LineageTree.vue";
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus

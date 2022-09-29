@@ -1,10 +1,10 @@
-import { AnalysisStatus } from "./AnalysisStatus";
 import { ProgressReport, Step } from "./ProgressReport";
 import SinglePeptideAnalysisStatus from "./SinglePeptideAnalysis";
+import MultiProteomicsAnalysisStatus from "./MultiProteomicsAnalysis";
 
 export type {
-    AnalysisStatus,
     ProgressReport,
     Step,
-    SinglePeptideAnalysisStatus
+    SinglePeptideAnalysisStatus,
+    MultiProteomicsAnalysisStatus
 };

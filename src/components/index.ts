@@ -2,4 +2,5 @@
 import "vuetify/dist/vuetify.min.css";
 
 export * from './analysis';
+export * from './util';
 //export * from './tables';
