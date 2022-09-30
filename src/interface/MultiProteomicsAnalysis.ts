@@ -8,17 +8,12 @@ import InterproDefinition from "../logic/ontology/functional/interpro/InterproDe
 import Ontology from "../logic/ontology/Ontology"
 import NcbiId from "../logic/ontology/taxonomic/NcbiId"
 import NcbiTaxon from "../logic/ontology/taxonomic/NcbiTaxon"
-import EcProteinCountTableProcessor from "../logic/processing/functional/ec/EcProteinCountTableProcessor"
-import GoProteinCountTableProcessor from "../logic/processing/functional/go/GoProteinCountTableProcessor"
-import InterproProteinCountTableProcessor from "../logic/processing/functional/interpro/InterproProteinCountTableProcessor"
-import ProteinProcessor from "../logic/processing/protein/ProteinProcessor"
 import Peptide from "../logic/ontology/peptide/Peptide"
 import { ProgressReport } from "./ProgressReport"
 import NcbiTree from "../logic/ontology/taxonomic/NcbiTree"
-import { DataNodeLike, TreeNode } from "unipept-visualizations/types"
 import Assay from "./Assay"
 import { ShareableMap } from "shared-memory-datastructures"
-import { CountTable, GoCountTableProcessor, EcCountTableProcessor, InterproCountTableProcessor, PeptideTrust } from ".."
+import { CountTable, GoCountTableProcessor, EcCountTableProcessor, InterproCountTableProcessor, PeptideTrust, LcaCountTableProcessor } from ".."
 
 export default interface MultiProteomicsAnalysisStatus {
     assay: Assay
@@ -38,13 +33,13 @@ export default interface MultiProteomicsAnalysisStatus {
     }
 
     // Keeps track of the original, unfiltered version of the data.
-    originalData: {
+    data: {
         peptideCountTable: CountTable<Peptide>
         goCountTableProcessor: GoCountTableProcessor
         ecCountTableProcessor: EcCountTableProcessor
         interproCountTableProcessor: InterproCountTableProcessor
-        //ncbiCountTableProcessor: LcaCountTableProcessor
-        tree: TreeNode
+        lcaCountTableProcessor: LcaCountTableProcessor
+        tree: NcbiTree
         trust: PeptideTrust
     }
 

@@ -81,21 +81,15 @@ export default class Pept2DataCommunicator {
             });
         }
 
-        console.log("4")
-
         // Now perform the actual requests.
         try {
             parallelLimit(requests, NetworkConfiguration.PARALLEL_API_REQUESTS);
-            console.log("4.1")
             const trustProcessor = new PeptideTrustProcessor();
             const trust = trustProcessor.getPeptideTrust(countTable, result);
-            console.log("4.2")
             return [result, trust];
         } catch (err: any) {
             // Something went wrong during the analysis. Either the analysis was cancelled, or some other exception
             // occurred.
-
-            console.log("4.error")
 
             if (err.message.includes("Cancelled execution")) {
                 throw new AnalysisCancelledException();

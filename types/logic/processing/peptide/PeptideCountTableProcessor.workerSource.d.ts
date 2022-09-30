@@ -8,7 +8,7 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
  * @returns A tuple with 2 items. The first item is a mapping between a peptide and it's frequency, and the second item
  * is the total frequency of all items combined (from the first map).
  */
-export declare function compute([peptides, enableMissingCleavageHandling, filterDuplicates, equateIl]: [
+export default function compute([peptides, enableMissingCleavageHandling, filterDuplicates, equateIl]: [
     Peptide[],
     boolean,
     boolean,

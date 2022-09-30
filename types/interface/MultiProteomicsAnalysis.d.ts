@@ -10,10 +10,10 @@ import NcbiId from "../logic/ontology/taxonomic/NcbiId";
 import NcbiTaxon from "../logic/ontology/taxonomic/NcbiTaxon";
 import Peptide from "../logic/ontology/peptide/Peptide";
 import { ProgressReport } from "./ProgressReport";
-import { TreeNode } from "unipept-visualizations/types";
+import NcbiTree from "../logic/ontology/taxonomic/NcbiTree";
 import Assay from "./Assay";
 import { ShareableMap } from "shared-memory-datastructures";
-import { CountTable, GoCountTableProcessor, EcCountTableProcessor, InterproCountTableProcessor, PeptideTrust } from "..";
+import { CountTable, GoCountTableProcessor, EcCountTableProcessor, InterproCountTableProcessor, PeptideTrust, LcaCountTableProcessor } from "..";
 export default interface MultiProteomicsAnalysisStatus {
     assay: Assay;
     progress: ProgressReport;
@@ -27,12 +27,13 @@ export default interface MultiProteomicsAnalysisStatus {
         message: string;
         object: Error | null;
     };
-    originalData: {
+    data: {
         peptideCountTable: CountTable<Peptide>;
         goCountTableProcessor: GoCountTableProcessor;
         ecCountTableProcessor: EcCountTableProcessor;
         interproCountTableProcessor: InterproCountTableProcessor;
-        tree: TreeNode;
+        lcaCountTableProcessor: LcaCountTableProcessor;
+        tree: NcbiTree;
         trust: PeptideTrust;
     };
     filteredData: {
