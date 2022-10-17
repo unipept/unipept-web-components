@@ -8,9 +8,16 @@ export default class EcResponseCommunicator implements FunctionalResponseCommuni
     private static codesProcessed = new Set<EcCode>();
     private static inProgress: Promise<void> | undefined;
 
-    private static readonly apiBaseUrl = "http://api.unipept.ugent.be/" // TODO: THIS CANNOT BE HARDCODED HERE!!!
-    public static readonly EC_BATCH_SIZE: number = 100;
+    // TODO: create environment
     public static readonly EC_ENDPOINT: string = "/private_api/ecnumbers";
+
+    public static apiBaseUrl: string = "http://api.unipept.ugent.be";
+    public static batchSize: number = 100;
+
+    public static setup(apiBaseUrl: string, batchSize: number) {
+        this.apiBaseUrl = apiBaseUrl;
+        this.batchSize = batchSize;
+    }
 
     public async process(codes: EcCode[]): Promise<void> {
         while (EcResponseCommunicator.inProgress) {
@@ -35,9 +42,9 @@ export default class EcResponseCommunicator implements FunctionalResponseCommuni
         codes = codes.map(c => c.substring(3))
         const toProcess = codes.filter(c => !this.codesProcessed.has(c));
 
-        for (let i = 0; i < toProcess.length; i += this.EC_BATCH_SIZE) {
+        for (let i = 0; i < toProcess.length; i += this.batchSize) {
             const data = JSON.stringify({
-                ecnumbers: toProcess.slice(i, i + this.EC_BATCH_SIZE)
+                ecnumbers: toProcess.slice(i, i + this.batchSize)
             });
 
             const res = await NetworkUtils.postJSON(this.apiBaseUrl + this.EC_ENDPOINT, data);

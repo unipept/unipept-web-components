@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 100%; position: relative;">
+    <div style="height: 100%; position: relative; background-color: white;">
         <div v-if="!loading" class="controlbar">
             <span class="align-self-center me-1 text-caption">
                 Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root
@@ -10,12 +10,14 @@
             <v-btn v-if="reset" class="ma-1" x-small fab @click="reset" :elevation="0">
                 <v-icon>mdi-restore</v-icon>
             </v-btn>
-            <v-btn  v-if="fullscreen" class="ma-1" x-small fab @click="fullscreen" :elevation="0">
+            <v-btn v-if="fullscreen" class="ma-1" x-small fab @click="fullscreen" :elevation="0">
                 <v-icon>mdi-fullscreen</v-icon>
             </v-btn>
         </div>
 
-        <slot name="treeview"></slot>
+        <div style="height: inherit;">
+            <slot name="treeview"></slot>
+        </div>
     </div>
 </template>
 

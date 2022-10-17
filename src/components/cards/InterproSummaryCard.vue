@@ -3,7 +3,7 @@
         <v-card-text>
             <TrustLine
                 class="mb-5"
-                :trust="assay.interproProteinCountTableProcessor?.getTrust()"
+                :trust="interproProcessor?.getTrust()"
                 :faKind="{
                     singular: 'InterPro entry',
                     plural: 'InterPro entries'
@@ -14,50 +14,54 @@
                 }"
             />
             <InterproTable 
-                :items="assay.analysisInProgress ? [] : items(assay)"
-                :loading="assay.analysisInProgress" 
+                :items="items"
+                :loading="analysisInProgress" 
                 :showPercentage="false" 
             />
         </v-card-text>
     </v-card>
 </template>
 
-FunctionalUtils.computeTrustLine(this.trust, "InterPro-entry", "protein");
-
-
 <script setup lang="ts">
-import { SinglePeptideAnalysisStatus } from '@/interface';
-import { InterproNamespace } from '@/logic';
+import { FunctionalCountTableProcessor, InterproCode, InterproDefinition, InterproNamespace, Ontology } from '@/logic';
 import InterproTableItem from '../tables/functional/InterproTableItem';
 import InterproTable from '../tables/functional/InterproTable.vue';
 import TrustLine from '../util/TrustLine.vue';
+import { computed } from 'vue';
 
 export interface Props {
-    assay: SinglePeptideAnalysisStatus
+    analysisInProgress: boolean;
+    
+    interproProcessor: FunctionalCountTableProcessor<InterproCode, InterproDefinition>
+    interproOntology: Ontology<InterproCode, InterproDefinition>
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-const items = (assay: SinglePeptideAnalysisStatus) => {
-    const countTable = assay.interproProteinCountTableProcessor.getCountTable();
+const items = computed(() => {
+    if(!props.analysisInProgress) {
+        const countTable = props.interproProcessor.getCountTable();
 
-    const items: InterproTableItem[] = [];
-    countTable.toMap().forEach((count, code) => {
-        const definition = assay.interproOntology.getDefinition(code) || { 
-            name: "", 
-            code: code,
-            namespace: InterproNamespace.Unknown 
-        };
+        const items: InterproTableItem[] = [];
+        countTable.toMap().forEach((count, code) => {
+            const definition = props.interproOntology.getDefinition(code) || { 
+                name: "", 
+                code: code,
+                namespace: InterproNamespace.Unknown 
+            };
 
-        items.push({
-            name: definition.name,
-            code: definition.code,
-            namespace: definition.namespace,
-            count: count,
-            relativeCount: count / assay.interproProteinCountTableProcessor.getTrust().totalAmountOfItems
+            items.push({
+                name: definition.name,
+                code: definition.code,
+                namespace: definition.namespace,
+                count: count,
+                relativeCount: count / props.interproProcessor.getTrust().totalAmountOfItems
+            });
         });
-    });
 
-    return items;
-}
+        return items;
+    }
+
+    return [];
+});
 </script>

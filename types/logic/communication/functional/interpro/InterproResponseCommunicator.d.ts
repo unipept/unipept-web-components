@@ -5,9 +5,10 @@ export default class InterproResponseCommunicator implements FunctionalResponseC
     private static interproCodeToResponseMap;
     private static codesProcessed;
     private static inProgress;
-    private static readonly apiBaseUrl;
-    static readonly INTERPRO_BATCH_SIZE: number;
     static readonly INTERPRO_ENDPOINT: string;
+    static apiBaseUrl: string;
+    static batchSize: number;
+    static setup(apiBaseUrl: string, batchSize: number): void;
     process(codes: InterproCode[]): Promise<void>;
     getResponse(code: InterproCode): InterproResponse | undefined;
     getResponseMap(): Map<InterproCode, InterproResponse>;

@@ -6,20 +6,21 @@ import PeptideTrust from "../../../logic/processing/peptide/PeptideTrust";
 import PeptideTrustProcessor from "../../../logic/processing/peptide/PeptideTrustProcessor";
 import { parallelLimit } from "async";
 import { ShareableMap } from "shared-memory-datastructures";
-import NetworkConfiguration from "../NetworkConfiguration";
-import NetworkUtils from "../NetworkUtils";
+import NetworkUtils from "../../util/NetworkUtils";
 import PeptideData from "./PeptideData";
 import PeptideDataSerializer from "./PeptideDataSerializer";
 
 export default class Pept2DataCommunicator {
-    private static readonly apiBaseUrl = "http://api.unipept.ugent.be/" // TODO: THIS CANNOT BE HARDCODED HERE!!!
-    public static PEPTDATA_BATCH_SIZE = 100;
-    public static MISSED_CLEAVAGE_BATCH = 25;
-    public static PEPTDATA_ENDPOINT = "/mpa/pept2data";
-
     // Should the analysis continue? If this flag is set to true, the analysis will be cancelled as soon as
     // possible and an exception will be thrown from the "process" function.
     private cancelled = false;
+
+    constructor(
+        private readonly apiBaseUrl: string = "http://api.unipept.ugent.be",
+        private readonly peptdataBatchSize: number = 100,
+        private readonly missedCleavageBatchSize: number = 25,
+        private readonly parallelRequests: number = 5
+    ) {}
 
     public async process(
         countTable: CountTable<Peptide>,
@@ -27,28 +28,21 @@ export default class Pept2DataCommunicator {
         equateIl: boolean,
         progressListener?: ProgressListener
     ): Promise<[ShareableMap<Peptide, PeptideData>, PeptideTrust]> {
-        const peptidesToProcess = countTable.getOntologyIds();
-
         const result = new ShareableMap<Peptide, PeptideData>(undefined, undefined, new PeptideDataSerializer());
 
-        console.log("1")
+        const peptidesToProcess = countTable.getOntologyIds();
+        const amountOfPeptides = peptidesToProcess.length;
 
         progressListener?.onProgressUpdate(0.0);
         let previousProgress = 0;
 
-        console.log("2")
-
-        const batchSize = enableMissingCleavageHandling ?
-            Pept2DataCommunicator.MISSED_CLEAVAGE_BATCH : Pept2DataCommunicator.PEPTDATA_BATCH_SIZE;
-
-        console.log("3")
+        const batchSize = enableMissingCleavageHandling ? this.missedCleavageBatchSize : this.peptdataBatchSize;
 
         const requests = [];
-        for (let i = 0; i < peptidesToProcess.length; i += batchSize) {
+        for (let i = 0; i < amountOfPeptides + batchSize; i += batchSize) {
             requests.push(async() => {
-                if (this.cancelled) {
-                    // Stop the processing and let this error be handled by the outer scope.
-                    throw new Error("Cancelled execution");
+                if(this.cancelled) {
+                    throw new AnalysisCancelledException();
                 }
 
                 const requestData = JSON.stringify({
@@ -58,45 +52,33 @@ export default class Pept2DataCommunicator {
                 });
 
                 try {
-                    const response = await NetworkUtils.postJSON(
-                        Pept2DataCommunicator.apiBaseUrl + Pept2DataCommunicator.PEPTDATA_ENDPOINT,
-                        requestData
-                    );
+                    const response = await NetworkUtils.postJson(this.apiBaseUrl + "/mpa/pept2data", requestData);
 
-                    for (const p of response.peptides) {
-                        result.set(p.sequence, PeptideData.createFromPeptideDataResponse(p));
+                    for(const peptide of response.peptides) {
+                        result.set(peptide.sequence, PeptideData.createFromPeptideDataResponse(peptide));
                     }
 
-                    if (previousProgress < i / peptidesToProcess.length) {
-                        previousProgress = i / peptidesToProcess.length;
-                        progressListener?.onProgressUpdate(i / peptidesToProcess.length);
+                    const newProgress = Math.min(i, amountOfPeptides) / amountOfPeptides;
+                    if(previousProgress < newProgress) {
+                        previousProgress = newProgress;
+                        progressListener?.onProgressUpdate(newProgress);
                     }
 
-                    // Successfully handled this request.
+                    // Success!
                     return;
-                } catch (err) {
-                    // Fetch errors will be handled by the outer scope.
-                    throw err;
-                }
+                } catch (err) { throw err; }
             });
         }
 
-        // Now perform the actual requests.
         try {
-            parallelLimit(requests, NetworkConfiguration.PARALLEL_API_REQUESTS);
+            // Perform the actual requests in parallel. (await cannot be removed!!)
+            await parallelLimit(requests, this.parallelRequests);  
+
             const trustProcessor = new PeptideTrustProcessor();
             const trust = trustProcessor.getPeptideTrust(countTable, result);
-            return [result, trust];
-        } catch (err: any) {
-            // Something went wrong during the analysis. Either the analysis was cancelled, or some other exception
-            // occurred.
 
-            if (err.message.includes("Cancelled execution")) {
-                throw new AnalysisCancelledException();
-            } else {
-                throw err;
-            }
-        }
+            return [result, trust];
+        } catch (err) { throw err; }
     }
 
     public cancel() {

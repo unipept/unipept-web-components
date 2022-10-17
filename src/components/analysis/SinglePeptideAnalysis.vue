@@ -24,13 +24,26 @@
                 <LineageTable :assay="assay" />
             </v-tab-item>
             <v-tab-item>
-                <GoSummaryCard :assay="assay" />
+                <GoSummaryCard 
+                    :analysisInProgress="assay.analysisInProgress"
+                    :goProcessor="assay.goProteinCountTableProcessor"
+                    :goOntology="assay.goOntology"
+                />
             </v-tab-item>
             <v-tab-item>
-                <EcSummaryCard :assay="assay" />
+                <EcSummaryCard 
+                    :analysisInProgress="assay.analysisInProgress"
+                    :ecProcessor="assay.ecProteinCountTableProcessor"
+                    :ecOntology="assay.ecOntology"
+                    :ecTree="assay.ecTree"
+                />
             </v-tab-item>
             <v-tab-item>
-                <InterproSummaryCard :assay="assay" />
+                <InterproSummaryCard
+                    :analysisInProgress="assay.analysisInProgress"
+                    :interproProcessor="assay.interproProteinCountTableProcessor"
+                    :interproOntology="assay.interproOntology"
+                />
             </v-tab-item>
         </v-tabs-items>
     </v-card>
@@ -41,10 +54,10 @@ import { SinglePeptideAnalysisStatus } from "@/interface";
 import { defineProps, ref } from "vue";
 import MatchedProteinsTable from "../tables/MatchedProteinsTable.vue";
 import LineageTable from "../tables/LineageTable.vue";
-import InterproSummaryCard from "../cards/InterproSummaryCard.vue";
-import EcSummaryCard from "../cards/EcSummaryCard.vue";
-import GoSummaryCard from "../cards/GoSummaryCard.vue";
 import LineageTree from "../trees/LineageTree.vue";
+import GoSummaryCard from "../cards/GoSummaryCard.vue";
+import EcSummaryCard from "../cards/EcSummaryCard.vue";
+import InterproSummaryCard from "../cards/InterproSummaryCard.vue";
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus

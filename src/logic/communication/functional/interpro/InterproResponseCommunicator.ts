@@ -8,9 +8,15 @@ export default class InterproResponseCommunicator implements FunctionalResponseC
     private static codesProcessed = new Set<InterproCode>();
     private static inProgress: Promise<void> | undefined;
 
-    private static readonly apiBaseUrl = "http://api.unipept.ugent.be/" // TODO: THIS CANNOT BE HARDCODED HERE!!!
-    public static readonly INTERPRO_BATCH_SIZE: number = 100;
     public static readonly INTERPRO_ENDPOINT: string = "/private_api/interpros";
+
+    public static apiBaseUrl: string = "http://api.unipept.ugent.be";
+    public static batchSize: number = 100;
+
+    public static setup(apiBaseUrl: string, batchSize: number) {
+        this.apiBaseUrl = apiBaseUrl;
+        this.batchSize = batchSize;
+    }
 
     public async process(codes: InterproCode[]): Promise<void> {
         while (InterproResponseCommunicator.inProgress) {
@@ -38,9 +44,9 @@ export default class InterproResponseCommunicator implements FunctionalResponseC
         codes = codes.map(c => c.substring(4));
         const toProcess = codes.filter(c => !this.codesProcessed.has(c));
 
-        for (let i = 0; i < toProcess.length; i += this.INTERPRO_BATCH_SIZE) {
+        for (let i = 0; i < toProcess.length; i += this.batchSize) {
             const data = JSON.stringify({
-                interpros: toProcess.slice(i, i + this.INTERPRO_BATCH_SIZE)
+                interpros: toProcess.slice(i, i + this.batchSize)
             });
 
             const res = await NetworkUtils.postJSON(this.apiBaseUrl + this.INTERPRO_ENDPOINT, data);

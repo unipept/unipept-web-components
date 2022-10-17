@@ -1,9 +1,20 @@
 <template>
-    <div v-if="!error">
-        <div v-if="!treeComputed" class="d-flex justify-center align-self-center mb-5" style="height: max-content; align-content: center;">
-            <v-progress-circular class="align-self-center" :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
+    <div style="height: inherit;" v-if="!error">
+        <div 
+            v-if="!treeComputed" 
+            class="d-flex loading-container"
+            style="height: max-content; align-content: center;"
+        >
+            <v-progress-circular 
+                style="left: 0; right: 0; top: 0; bottom: 0; position: absolute;"
+                class="align-self-center" 
+                :width="5" 
+                :size="50" 
+                color="primary" 
+                indeterminate 
+            />
         </div>
-        <div class="treeview-container" ref="visualization"></div>
+        <div style="height: inherit;" class="treeview-container" ref="visualization"></div>
     </div>
     <v-container fluid v-else class="error-container mt-2 d-flex align-center">
         <div class="error-container">
@@ -37,7 +48,7 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     width: 800,
-    height: 600,
+    height: 300,
     autoResize: false,
     loading: false,
 });
@@ -103,6 +114,12 @@ onMounted(() => {
         flex-direction: column;
         text-align: center;
     }
+    
+    .loading-container {
+        min-height: inherit;
+        position: relative;
+    }
+
    .treeview-container svg {
         width: 100%;
         max-height: 600px;

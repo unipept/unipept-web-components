@@ -9,9 +9,9 @@
             :itemsPerPage="5"
         >
             <template v-slot:header.action>
-                <tooltip message="Download table as CSV">
+                <Tooltip message="Download table as CSV">
                     <v-icon @click="saveTableAsCsv()">mdi-download</v-icon>
-                </tooltip>
+                </Tooltip>
             </template>
 
             <template v-slot:item.count="{ item }">
@@ -40,6 +40,7 @@
 
 <script setup lang="ts">
 import EcTableItem from './EcTableItem';
+import Tooltip from '@/components/util/Tooltip.vue';
 
 export interface Props {
     items: EcTableItem[],

@@ -3,7 +3,7 @@
         <v-card-text>
             <TrustLine
                 class="mb-5"
-                :trust="assay.goProteinCountTableProcessor?.getTrust()"
+                :trust="goProcessor?.getTrust()"
                 :faKind="{
                     singular: 'GO term',
                     plural: 'GO terms'
@@ -18,14 +18,14 @@
             <v-row>
                 <v-col cols=9>
                     <GoTable 
-                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.BiologicalProcess)"
-                        :loading="assay.analysisInProgress" 
+                        :items="biologicalProcessItems"
+                        :loading="analysisInProgress" 
                         :showPercentage="false" 
                     />
                 </v-col>
                 <v-col cols=3>
                     <QuickGoCard 
-                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.BiologicalProcess)"
+                        :items="biologicalProcessItems"
                         :namespace="GoNamespace.BiologicalProcess"
                         :n="3"
                     />
@@ -36,14 +36,14 @@
             <v-row>
                 <v-col cols=9>
                     <GoTable 
-                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.CellularComponent)"
-                        :loading="assay.analysisInProgress" 
+                        :items="cellularComponentItems"
+                        :loading="analysisInProgress" 
                         :showPercentage="false" 
                     />
                 </v-col>
                 <v-col cols=3>
                     <QuickGoCard 
-                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.CellularComponent)" 
+                        :items="cellularComponentItems" 
                         :namespace="GoNamespace.CellularComponent"
                         :n="3"
                     />
@@ -54,14 +54,14 @@
             <v-row>
                 <v-col cols=9>
                     <GoTable 
-                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.MolecularFunction)"
-                        :loading="assay.analysisInProgress" 
+                        :items="molecularFunctionItems"
+                        :loading="analysisInProgress" 
                         :showPercentage="false" 
                     />
                 </v-col>
                 <v-col cols=3>
                     <QuickGoCard 
-                        :items="assay.analysisInProgress ? [] : items(assay, GoNamespace.MolecularFunction)" 
+                        :items="molecularFunctionItems" 
                         :namespace="GoNamespace.MolecularFunction"
                         :n="3"
                     />
@@ -72,25 +72,56 @@
 </template>
 
 <script setup lang="ts">
-import { SinglePeptideAnalysisStatus } from '@/interface';
-import { GoNamespace } from '@/logic';
-import GoTable from '../tables/functional/GoTable.vue';
-import GoTableItem from '../tables/functional/GoTableItem';
-import TrustLine from '../util/TrustLine.vue';
-import QuickGoCard from '../cards/QuickGoCard.vue';
+import { FunctionalCountTableProcessor, GoCode, GoDefinition, GoNamespace, Ontology } from '@/logic';
+import GoTableItem from '@/components/tables/functional/GoTableItem';
+import GoTable from '@/components/tables/functional/GoTable.vue';
+import QuickGoCard from './QuickGoCard.vue';
+import TrustLine from '@/components/util/TrustLine.vue';
+import { computed } from 'vue';
 
 export interface Props {
-    assay: SinglePeptideAnalysisStatus
+    analysisInProgress: boolean;
+    
+    goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>
+    goOntology: Ontology<GoCode, GoDefinition>
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-const items = (assay: SinglePeptideAnalysisStatus, namespace: GoNamespace) => {
-    const countTable = assay.goProteinCountTableProcessor.getCountTable(namespace);
+const biologicalProcessItems = computed(() => {
+    if(!props.analysisInProgress) {
+        return items(props.goProcessor, props.goOntology, GoNamespace.BiologicalProcess);
+    }
+
+    return [];
+});
+
+const cellularComponentItems = computed(() => {
+    if(!props.analysisInProgress) {
+        return items(props.goProcessor, props.goOntology, GoNamespace.CellularComponent);
+    }
+
+    return [];
+});
+
+const molecularFunctionItems = computed(() => {
+    if(!props.analysisInProgress) {
+        return items(props.goProcessor, props.goOntology, GoNamespace.MolecularFunction);
+    }
+
+    return [];
+});
+
+const items = (
+    goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>, 
+    goOntology: Ontology<GoCode, GoDefinition>,
+    namespace: GoNamespace
+) => {
+    const countTable = goProcessor.getCountTable(namespace);
 
     const items: GoTableItem[] = [];
     countTable.toMap().forEach((count, code) => {
-        const definition = assay.goOntology.getDefinition(code) || { 
+        const definition = goOntology.getDefinition(code) || { 
             name: "", 
             code: code
         };
@@ -99,7 +130,7 @@ const items = (assay: SinglePeptideAnalysisStatus, namespace: GoNamespace) => {
             name: definition.name,
             code: definition.code,
             count: count,
-            relativeCount: count / assay.goProteinCountTableProcessor.getTrust().totalAmountOfItems
+            relativeCount: count / goProcessor.getTrust().totalAmountOfItems
         });
     });
 

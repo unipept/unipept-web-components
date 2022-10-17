@@ -1,3 +1,3 @@
-//import usePept2DataCommunicator from "./usePept2DataCommunicator";
+import useFullscreen  from "./useFullscreen";
 
-//export { usePept2DataCommunicator };
+export { useFullscreen };

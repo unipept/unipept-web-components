@@ -11,9 +11,9 @@
             :sortDesc="[true]"
         >
             <template v-slot:header.action>
-                <tooltip message="Download table as CSV">
+                <Tooltip message="Download table as CSV">
                     <v-icon @click="saveTableAsCsv(items, search)">mdi-download</v-icon>
-                </tooltip>
+                </Tooltip>
             </template>
 
             <template v-slot:item.count="{ item }">
@@ -49,6 +49,7 @@
 import { NetworkUtils, CsvUtils, InterproNamespace } from '@/logic';
 import { ref } from 'vue';
 import InterproTableItem from './InterproTableItem';
+import Tooltip from '@/components/util/Tooltip.vue';
 
 export interface Props {
     items: InterproTableItem[],

@@ -16,6 +16,9 @@ import { ShareableMap } from "shared-memory-datastructures";
 import { CountTable, GoCountTableProcessor, EcCountTableProcessor, InterproCountTableProcessor, PeptideTrust, LcaCountTableProcessor } from "..";
 export default interface MultiProteomicsAnalysisStatus {
     assay: Assay;
+    equateIl: boolean;
+    filterDuplicates: boolean;
+    cleavageHandling: boolean;
     progress: ProgressReport;
     analysisInProgress: boolean;
     analysisReady: boolean;

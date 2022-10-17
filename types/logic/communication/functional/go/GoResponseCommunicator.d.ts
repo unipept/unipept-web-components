@@ -5,9 +5,10 @@ export default class GoResponseCommunicator implements FunctionalResponseCommuni
     private static goCodeToResponseMap;
     private static codesProcessed;
     private static inProgress;
-    private static readonly apiBaseUrl;
-    static readonly GO_BATCH_SIZE: number;
     static readonly GO_ENDPOINT: string;
+    static apiBaseUrl: string;
+    static batchSize: number;
+    static setup(apiBaseUrl: string, batchSize: number): void;
     process(codes: GoCode[]): Promise<void>;
     getResponse(code: GoCode): GoResponse | undefined;
     getResponseMap(): Map<GoCode, GoResponse>;

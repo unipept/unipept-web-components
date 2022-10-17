@@ -18,6 +18,10 @@ import { CountTable, GoCountTableProcessor, EcCountTableProcessor, InterproCount
 export default interface MultiProteomicsAnalysisStatus {
     assay: Assay
 
+    equateIl: boolean,
+    filterDuplicates: boolean,
+    cleavageHandling: boolean,
+
     progress: ProgressReport
     analysisInProgress: boolean
     analysisReady: boolean

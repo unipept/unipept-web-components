@@ -1,9 +1,9 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <TrustLine
+            <TrustLine 
                 class="mb-5"
-                :trust="assay.ecProteinCountTableProcessor?.getTrust()"
+                :trust="ecProcessor?.getTrust()"
                 :faKind="{
                     singular: 'EC number',
                     plural: 'EC numbers'
@@ -15,23 +15,22 @@
             />
 
             <EcTable 
-                :items="assay.analysisInProgress ? [] : items(assay)"
-                :loading="assay.analysisInProgress" 
+                :items="items"
+                :loading="analysisInProgress" 
                 :showPercentage="false" 
             />
 
             <TreeViewControls
+                ref="treeView"
                 class="mt-3"
-                :loading="assay.analysisInProgress"
-                :fullscreen="() => { }" 
+                :loading="analysisInProgress"
+                :fullscreen="toggleFullscreen" 
                 :download="() => { }"
             >
                 <template #treeview>
                     <TreeView 
-                        :data="assay.ecTree"
-                        :loading="assay.analysisInProgress"
-                        :width="800"
-                        :height="300"
+                        :data="ecTree"
+                        :loading="analysisInProgress || !ecTree"
                         :autoResize="true"
                     />
                 </template>
@@ -41,7 +40,9 @@
 </template>
 
 <script setup lang="ts">
-import { SinglePeptideAnalysisStatus } from '@/interface';
+import useFullscreen from '@/composables/useFullscreen';
+import { EcCode, EcDefinition, FunctionalCountTableProcessor, Ontology } from '@/logic';
+import { computed, ref } from 'vue';
 import EcTable from '../tables/functional/EcTable.vue';
 import EcTableItem from '../tables/functional/EcTableItem';
 import TrustLine from '../util/TrustLine.vue';
@@ -49,29 +50,44 @@ import TreeView from '../visualizations/TreeView.vue';
 import TreeViewControls from '../visualizations/TreeViewControls.vue';
 
 export interface Props {
-    assay: SinglePeptideAnalysisStatus
+    analysisInProgress: boolean
+    
+    ecProcessor: FunctionalCountTableProcessor<EcCode, EcDefinition>
+    ecOntology: Ontology<EcCode, EcDefinition>
+    ecTree: any
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-const items = (assay: SinglePeptideAnalysisStatus) => {
-    const countTable = assay.ecProteinCountTableProcessor.getCountTable();
 
-    const items: EcTableItem[] = [];
-    countTable.toMap().forEach((count, code) => {
-        const definition = assay.ecOntology.getDefinition(code) || { 
-            name: "", 
-            code: code
-        };
+const treeView = ref<HTMLElement | null>(null);
 
-        items.push({
-            name: definition.name,
-            code: definition.code,
-            count: count,
-            relativeCount: count / assay.ecProteinCountTableProcessor.getTrust().totalAmountOfItems
+const { toggle } = useFullscreen();
+
+const toggleFullscreen = () => toggle(treeView.value);
+
+const items = computed(() => {
+    if(!props.analysisInProgress) {
+        const countTable = props.ecProcessor.getCountTable();
+
+        const items: EcTableItem[] = [];
+        countTable.toMap().forEach((count, code) => {
+            const definition = props.ecOntology.getDefinition(code) || { 
+                name: "", 
+                code: code
+            };
+
+            items.push({
+                name: definition.name,
+                code: definition.code,
+                count: count,
+                relativeCount: count / props.ecProcessor.getTrust().totalAmountOfItems
+            });
         });
-    });
 
-    return items;
-}
+        return items;
+    }
+
+    return [];
+});
 </script>

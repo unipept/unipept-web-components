@@ -5,11 +5,12 @@ import PeptideTrust from "../../../logic/processing/peptide/PeptideTrust";
 import { ShareableMap } from "shared-memory-datastructures";
 import PeptideData from "./PeptideData";
 export default class Pept2DataCommunicator {
-    private static readonly apiBaseUrl;
-    static PEPTDATA_BATCH_SIZE: number;
-    static MISSED_CLEAVAGE_BATCH: number;
-    static PEPTDATA_ENDPOINT: string;
+    private readonly apiBaseUrl;
+    private readonly peptdataBatchSize;
+    private readonly missedCleavageBatchSize;
+    private readonly parallelRequests;
     private cancelled;
+    constructor(apiBaseUrl?: string, peptdataBatchSize?: number, missedCleavageBatchSize?: number, parallelRequests?: number);
     process(countTable: CountTable<Peptide>, enableMissingCleavageHandling: boolean, equateIl: boolean, progressListener?: ProgressListener): Promise<[ShareableMap<Peptide, PeptideData>, PeptideTrust]>;
     cancel(): void;
 }
