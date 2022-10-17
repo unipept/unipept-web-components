@@ -24,7 +24,7 @@
                 </div>
             </template>
             <template v-slot:item.code="{ item }">
-                <a :href="item.url" target="_blank" class="font-regular">
+                <a :href="url(item.code)" target="_blank" class="font-regular">
                     {{ item.code }}
                     <v-icon x-small>mdi-open-in-new</v-icon>
                 </a>
@@ -78,6 +78,10 @@ const headers = [
         sortable: false
     }
 ];
+
+const url = (code: string) => {
+    return `http://amigo.geneontology.org/amigo/search/ontology?q=${code}`;
+}
 
 const saveTableAsCsv = async () => { /* TODO */ }
 </script>

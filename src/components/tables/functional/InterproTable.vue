@@ -26,7 +26,7 @@
                 </div>
             </template>
             <template v-slot:item.code="{ item }">
-                <a :href="item.url" target="_blank" class="font-regular">
+                <a :href="url(item.code)" target="_blank" class="font-regular">
                     {{ item.code }}
                     <v-icon x-small>mdi-open-in-new</v-icon>
                 </a>
@@ -105,6 +105,10 @@ const filterNamespace = (count: number, search: string, item: InterproTableItem)
     }
 
     return item.namespace === search;
+}
+
+const url = (code: string) => {
+    return `https://www.ebi.ac.uk/interpro/search/text/${code.substring(4)}/#table`;
 }
 
 const saveTableAsCsv = async (items: InterproTableItem[], namespace: string | undefined) => {

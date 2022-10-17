@@ -15,8 +15,6 @@
                     <TreeView 
                         :data="assay?.taxaTree?.getRoot()"
                         :loading="assay.analysisInProgress"
-                        :width="800"
-                        :height="500"
                         :autoResize="true"
                         :colors="colors"
                     />

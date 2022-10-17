@@ -186,13 +186,13 @@ const headers = [
         text: "UniProt ID",
         align: "start",
         value: "uniprotAccessionId",
-        width: "17%"
+        width: "20%"
     },
     {
         text: "Name",
         align: "start",
         value: "name",
-        width: "32%"
+        width: "29%"
     },
     {
         text: "Organism",
