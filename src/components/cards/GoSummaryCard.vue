@@ -128,6 +128,7 @@ const items = (
 
         items.push({
             name: definition.name,
+            namespace: namespace,
             code: definition.code,
             count: count,
             relativeCount: count / goProcessor.getTrust().totalAmountOfItems

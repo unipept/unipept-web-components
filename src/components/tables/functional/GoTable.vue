@@ -10,7 +10,7 @@
         >
             <template v-slot:header.action>
                 <Tooltip message="Download table as CSV">
-                    <v-icon @click="saveTableAsCsv()">mdi-download</v-icon>
+                    <v-icon @click="downloadCsv(items)">mdi-download</v-icon>
                 </Tooltip>
             </template>
 
@@ -41,6 +41,7 @@
 <script setup lang="ts">
 import GoTableItem from './GoTableItem';
 import Tooltip from '@/components/util/Tooltip.vue';
+import useCsvDownload from '@/composables/useCsvDownload';
 
 export interface Props {
     items: GoTableItem[],
@@ -83,5 +84,14 @@ const url = (code: string) => {
     return `http://amigo.geneontology.org/amigo/search/ontology?q=${code}`;
 }
 
-const saveTableAsCsv = async () => { /* TODO */ }
+const { download } = useCsvDownload();
+
+const downloadCsv = (items: GoTableItem[]) => {
+    const header = ["Peptides", "GO-term", "Name", "Namespace"];
+    const grid: string[][] = items.map(item => [item.count.toString(), item.code, item.name, item.namespace]);
+
+    const namespace: string = items[0].namespace;
+
+    download(header, grid, `go-${namespace.split(" ").join("_")}-table.csv`);
+}
 </script>

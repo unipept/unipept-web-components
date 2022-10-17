@@ -12,7 +12,7 @@
         >
             <template v-slot:header.action>
                 <Tooltip message="Download table as CSV">
-                    <v-icon @click="saveTableAsCsv(items, search)">mdi-download</v-icon>
+                    <v-icon @click="downloadCsv(items, selectedNamespace)">mdi-download</v-icon>
                 </Tooltip>
             </template>
 
@@ -46,14 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import { NetworkUtils, CsvUtils, InterproNamespace } from '@/logic';
+import { InterproNamespace } from '@/logic';
 import { ref } from 'vue';
 import InterproTableItem from './InterproTableItem';
 import Tooltip from '@/components/util/Tooltip.vue';
+import useCsvDownload from '@/composables/useCsvDownload';
 
 export interface Props {
     items: InterproTableItem[],
-    search: string,
 
     loading: boolean
     showPercentage: boolean
@@ -111,14 +111,15 @@ const url = (code: string) => {
     return `https://www.ebi.ac.uk/interpro/search/text/${code.substring(4)}/#table`;
 }
 
-const saveTableAsCsv = async (items: InterproTableItem[], namespace: string | undefined) => {
-    const header = ["Peptides", "Interpro Entry", "Name"];
-    const grid: string[][] = items.map(item => [item.count.toString(), item.code, item.name]);
+const { download } = useCsvDownload();
 
-    await NetworkUtils.downloadDataByForm(
-        CsvUtils.toCsvString([header].concat(grid)),
-        "Interpro Entry" + (namespace ? "-" + namespace : "") + "-export.csv",
-        "text/csv"
-    );
+const downloadCsv = (items: InterproTableItem[], namespace: string) => {
+    const header = ["Peptides", "InterPro-entry", "Name", "Namespace"];
+
+    const grid: string[][] = items
+        .filter(item => namespace === "all" || item.namespace === namespace)
+        .map(item => [item.count.toString(), item.code, item.name, item.namespace]);
+
+    download(header, grid, `interpro-${namespace.split(" ").join("_")}-table.csv`);
 }
 </script>

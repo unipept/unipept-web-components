@@ -10,7 +10,7 @@
         >
             <template v-slot:header.action>
                 <Tooltip message="Download table as CSV">
-                    <v-icon @click="saveTableAsCsv()">mdi-download</v-icon>
+                    <v-icon @click="downloadCsv(items)">mdi-download</v-icon>
                 </Tooltip>
             </template>
 
@@ -41,6 +41,7 @@
 <script setup lang="ts">
 import EcTableItem from './EcTableItem';
 import Tooltip from '@/components/util/Tooltip.vue';
+import useCsvDownload from '@/composables/useCsvDownload';
 
 export interface Props {
     items: EcTableItem[],
@@ -49,7 +50,7 @@ export interface Props {
     showPercentage: boolean
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const headers = [
     {
@@ -83,5 +84,12 @@ const url = (code: string) => {
     return `https://www.uniprot.org/uniprot/?query=${code}`;
 }
 
-const saveTableAsCsv = async () => { /* TODO */ }
+const { download } = useCsvDownload();
+
+const downloadCsv = (items: EcTableItem[]) => {
+    const header = ["Peptides", "EC-number", "Name"];
+    const grid: string[][] = items.map(item => [item.count.toString(), item.code, item.name]);
+
+    download(header, grid, "ec-table.csv");
+}
 </script>
