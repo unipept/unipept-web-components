@@ -1,2 +1,3 @@
 import useFullscreen from "./useFullscreen";
-export { useFullscreen };
+import useSvgDownload from "./useSvgDownload";
+export { useFullscreen, useSvgDownload };

@@ -24,8 +24,8 @@
                 ref="treeView"
                 class="mt-3"
                 :loading="analysisInProgress"
-                :fullscreen="toggleFullscreen" 
-                :download="() => { }"
+                :fullscreen="() => toggle(treeView)" 
+                :download="downloadSvg"
             >
                 <template #treeview>
                     <TreeView 
@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSvgDownload } from '@/composables';
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcDefinition, FunctionalCountTableProcessor, Ontology } from '@/logic';
 import { computed, ref } from 'vue';
@@ -59,12 +60,16 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-
 const treeView = ref<HTMLElement | null>(null);
 
 const { toggle } = useFullscreen();
+const { download } = useSvgDownload();
 
-const toggleFullscreen = () => toggle(treeView.value);
+const downloadSvg = () => {
+    // @ts-ignore
+    const svg = treeView.value?.$el.querySelector("svg");
+    download(svg, "EcTree.svg");
+}
 
 const items = computed(() => {
     if(!props.analysisInProgress) {
