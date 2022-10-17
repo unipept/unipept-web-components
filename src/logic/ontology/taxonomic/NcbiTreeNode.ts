@@ -1,7 +1,7 @@
 import { DataNodeLike } from "unipept-visualizations";
 
 export default class NcbiTreeNode implements DataNodeLike {
-    public count: number = 0;
+    public count: number = -1;
     public selfCount: number = 0;
 
     public children: NcbiTreeNode[] = [];
@@ -64,7 +64,7 @@ export default class NcbiTreeNode implements DataNodeLike {
      * @return The number of peptides.
      */
     public getCounts(): number {
-        if (this.count === undefined) {
+        if (this.count === -1) {
             this.count = this.selfCount;
             if (this.getChildCount() !== 0) {
                 this.count += this.children.reduce((sum, c) => sum + c.getCounts(), 0);
@@ -79,8 +79,8 @@ export default class NcbiTreeNode implements DataNodeLike {
      * @param f The function to call.
      */
     public callRecursively(f: (x: NcbiTreeNode) => any) {
-        f(this);
-
+        // @ts-ignore
+        f.call(this);
         if (this.children) {
             this.children.forEach(c => {
                 c.callRecursively(f);

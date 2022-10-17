@@ -9,14 +9,18 @@
                 :loading="assay.analysisInProgress"
                 :fullscreen="() => toggle(treeView)" 
                 :download="downloadSvg"
-                :reset="() => { }"
+                :reset="() => reset = true"
             >
                 <template #treeview>
-                    <TreeView 
+                    <TreeView
                         :data="assay?.taxaTree?.getRoot()"
                         :loading="assay.analysisInProgress"
+                        :width="800"
+                        :height="500"
                         :autoResize="true"
                         :colors="colors"
+                        :doReset="reset"
+                        @reset="reset = false"
                     />
                 </template>
             </TreeViewControls>
@@ -49,7 +53,9 @@ const downloadSvg = () => {
     // @ts-ignore
     const svg = treeView.value?.$el.querySelector("svg");
     download(svg, "LineageTree.svg");
-}
+};
+
+const reset = ref<boolean>(false);
 
 const colors = (d: TreeviewNode) => {
     if (d.name === "Bacteria") return "#1565C0"; // blue

@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { DataNodeLike, Treeview as UnipeptTreeView, TreeviewSettings } from 'unipept-visualizations';
 import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, Ref, ref, watch } from 'vue';
 
 export interface Props {
     data: DataNodeLike
@@ -41,9 +41,10 @@ export interface Props {
     height?: number
     autoResize?: boolean
     tooltip?: (node: DataNodeLike) => string
-    colors?: (node: TreeviewNode) => string,
+    colors?: (node: TreeviewNode) => string
 
     loading?: boolean
+    doReset?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -51,21 +52,35 @@ const props = withDefaults(defineProps<Props>(), {
     height: 300,
     autoResize: false,
     loading: false,
+    doReset: false
 });
+
+const emits = defineEmits(["reset"]);
 
 const visualization = ref<HTMLElement | null>(null);
 
 const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-const treeComputed = computed(() => {
+const treeComputed: Ref<UnipeptTreeView | undefined> = computed(() => {
     // A tree is not computed if the visualization is not mounted or if the data is not set.
     if(props.loading || !mounted.value) {
-        return false;
+        return undefined;
     }
 
     // When the visualization is mounted, the tree can be computed.
     return initializeVisualisation();
+});
+
+// Watch wheter we have to perform a reset
+watch(() => props.doReset, () => {
+    if(treeComputed.value) {
+        // @ts-ignore
+        treeComputed.value.reset();
+
+        // Let the parent component know that the reset has been performed
+        emits("reset", true);
+    }
 });
 
 const initializeVisualisation = () => {
@@ -84,7 +99,7 @@ const initializeVisualisation = () => {
         settings = { ...settings, colorProvider: props.colors };
     }
 
-    new UnipeptTreeView(
+    const treeview = new UnipeptTreeView(
         visualization.value as HTMLElement,
         props.data,
         settings as TreeviewSettings,
@@ -98,7 +113,7 @@ const initializeVisualisation = () => {
         }
     }
 
-    return true;
+    return treeview;
 }
 
 onMounted(() => {

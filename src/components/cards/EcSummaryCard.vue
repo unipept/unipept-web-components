@@ -26,12 +26,15 @@
                 :loading="analysisInProgress"
                 :fullscreen="() => toggle(treeView)" 
                 :download="downloadSvg"
+                :reset="() => reset = true"
             >
                 <template #treeview>
                     <TreeView 
                         :data="ecTree"
                         :loading="analysisInProgress || !ecTree"
                         :autoResize="true"
+                        :doReset="reset"
+                        @reset="reset = false"
                     />
                 </template>
             </TreeViewControls>
@@ -70,6 +73,8 @@ const downloadSvg = () => {
     const svg = treeView.value?.$el.querySelector("svg");
     download(svg, "EcTree.svg");
 }
+
+const reset = ref<boolean>(false);
 
 const items = computed(() => {
     if(!props.analysisInProgress) {

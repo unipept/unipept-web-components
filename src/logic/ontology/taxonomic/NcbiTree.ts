@@ -92,8 +92,9 @@ export default class NcbiTree {
      * Sorts all children of the tree by name of the organism
      */
     public sortTree(): void {
-        this.root.callRecursively(function(node: NcbiTreeNode) {
-            node.children.sort(function(a: NcbiTreeNode, b: NcbiTreeNode) {
+        this.root.callRecursively(function() {
+            // @ts-ignore
+            this.children.sort(function(a: NcbiTreeNode, b: NcbiTreeNode) {
                 if (a.name < b.name) return -1;
                 if (a.name > b.name) return 1;
                 return 0;
