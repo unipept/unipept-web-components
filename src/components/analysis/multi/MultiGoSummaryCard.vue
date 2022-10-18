@@ -213,7 +213,8 @@ export default class MultiGoSummaryCard extends Vue {
             this.goOntology.getDefinition(code),
             peptideCounts,
             this.pept2data,
-            this.ncbiOntology
+            this.ncbiOntology,
+            (peptideData: PeptideData) => peptideData.go
         );
 
         await NetworkUtils.downloadDataByForm(

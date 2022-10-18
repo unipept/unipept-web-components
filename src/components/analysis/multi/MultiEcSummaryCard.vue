@@ -218,7 +218,8 @@ export default class MultiEcSummaryCard extends Vue {
             this.ecOntology.getDefinition(code),
             peptideCounts,
             this.pept2data,
-            this.ncbiOntology
+            this.ncbiOntology,
+            (peptideData: PeptideData) => peptideData.ec
         );
 
         await NetworkUtils.downloadDataByForm(
