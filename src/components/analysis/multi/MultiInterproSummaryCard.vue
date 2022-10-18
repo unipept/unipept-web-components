@@ -212,7 +212,8 @@ export default class MultiInterproSummaryCard extends Vue {
             this.interproOntology.getDefinition(code),
             peptideCounts,
             this.pept2data,
-            this.ncbiOntology
+            this.ncbiOntology,
+            (peptideData: PeptideData) => peptideData.ipr
         );
 
         await NetworkUtils.downloadDataByForm(

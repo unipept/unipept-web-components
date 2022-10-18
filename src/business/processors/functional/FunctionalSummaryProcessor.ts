@@ -19,13 +19,14 @@ export default class FunctionalSummaryProcessor {
         element: FunctionalDefinition,
         peptideTable: CountTable<Peptide>,
         pept2data: ShareableMap<Peptide, PeptideData>,
-        ncbiOntology: Ontology<NcbiId, NcbiTaxon>
+        ncbiOntology: Ontology<NcbiId, NcbiTaxon>,
+        definitionExtractor: (peptideData: PeptideData) => FunctionalDefinition[]
     ): Promise<string[][]> {
         const processedPeptides: string[][] = peptideTable.getOntologyIds().map(peptide => {
             let peptideCount = peptideTable.getCounts(peptide);
             let peptideData =  pept2data.get(peptide);
-            const ecs = peptideData.ec;
-            let ecProteinCount = element.code in ecs ? ecs[element.code] : 0
+            const items = definitionExtractor(peptideData);
+            let itemProteinCount = element.code in items ? items[element.code] : 0
 
             const totalCount = peptideData.faCounts.all;
 
@@ -33,9 +34,9 @@ export default class FunctionalSummaryProcessor {
                 peptide,
                 peptideCount,
                 totalCount,
-                ecProteinCount,
-                100 * (ecProteinCount / totalCount),
-                ncbiOntology.getDefinition(peptideData.lca)
+                itemProteinCount,
+                100 * (itemProteinCount / totalCount),
+                ncbiOntology.getDefinition(peptideData.lca).name
             ]
         })
 

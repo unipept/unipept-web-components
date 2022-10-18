@@ -174,6 +174,7 @@ export default class ImageDownloadModal extends Vue {
         }
     }
 
+
     private async saveSVG(): Promise<void> {
         await NetworkUtils.downloadDataByForm(this.svgString, this.baseFileName + ".svg", "image/svg+xml");
     }

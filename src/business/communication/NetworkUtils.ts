@@ -73,7 +73,7 @@ export default class NetworkUtils {
             // Hack to be able to use Electron without the need to add it to the required dependencies
             eval(`
                 const fs = require("fs");
-                const { dialog } = require("electron").remote;
+                const { dialog } = require("@electron/remote");
                 
                 dialog.showSaveDialog(
                     null,
