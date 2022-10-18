@@ -23,7 +23,7 @@
                     </template>
 
                     <v-list class="grey lighten-3">
-                        <v-list-item :ripple="false" dense class="menu-header">
+                        <v-list-item dense class="menu-header">
                             <v-list-item-title>
                                 Sort by number of peptides in related proteins
 

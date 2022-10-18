@@ -168,20 +168,20 @@ export default class ImageDownloadModal extends Vue {
 
     async saveImage() {
         if (this.formatValue === "SVG") {
-            this.saveSVG();
+            await this.saveSVG();
         } else if (this.formatValue === "PNG") {
-            this.savePNG();
+            await this.savePNG();
         }
     }
 
-    private async saveSVG() {
-        console.log("Downloading SVG: " + this.svgString);
-        NetworkUtils.downloadDataByLink(this.svgString, this.baseFileName + ".svg")
+
+    private async saveSVG(): Promise<void> {
+        await NetworkUtils.downloadDataByForm(this.svgString, this.baseFileName + ".svg", "image/svg+xml");
     }
 
-    private async savePNG() {
+    private async savePNG(): Promise<void> {
         const resizedPngDataUrl = await this.pngSource.toDataUrl(this.scalingValue);
-        NetworkUtils.downloadDataByLink(resizedPngDataUrl, this.baseFileName + ".png")
+        return NetworkUtils.downloadDataByLink(resizedPngDataUrl, this.baseFileName + ".png")
     }
 }
 </script>
