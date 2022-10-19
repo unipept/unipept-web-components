@@ -1,7 +1,7 @@
 <template>
     <div style="height: inherit;" v-if="!error">
         <div 
-            v-if="!treeComputed" 
+            v-if="!visualizationComputed" 
             class="d-flex loading-container"
             style="height: max-content; align-content: center;"
         >
@@ -14,7 +14,7 @@
                 indeterminate 
             />
         </div>
-        <div style="height: inherit;" class="treeview-container" ref="visualization"></div>
+        <div class="visualization-container" ref="visualization"></div>
     </div>
     <v-container fluid v-else class="error-container mt-2 d-flex align-center">
         <div class="error-container">
@@ -30,29 +30,30 @@
 </template>
 
 <script setup lang="ts">
-import { DataNodeLike, Treeview as UnipeptTreeView, TreeviewSettings } from 'unipept-visualizations';
-import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
+import { NcbiTree } from '@/logic';
+import { Treemap as UnipeptTreemap, TreemapSettings } from 'unipept-visualizations';
 import { computed, onMounted, Ref, ref, watch } from 'vue';
 
 export interface Props {
-    data: DataNodeLike
+    data: NcbiTree
 
     width?: number
     height?: number
     autoResize?: boolean
-    tooltip?: (node: DataNodeLike) => string
-    colors?: (node: TreeviewNode) => string
+    // tooltip?: (node: DataNodeLike) => string
+    // colors?: (node: TreeviewNode) => string
 
     loading?: boolean
     doReset?: boolean
+    fullscreen?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    width: 800,
-    height: 300,
+    height: 600,
     autoResize: false,
     loading: false,
-    doReset: false
+    doReset: false,
+    fullscreen: false
 });
 
 const emits = defineEmits(["reset"]);
@@ -62,7 +63,7 @@ const visualization = ref<HTMLElement | null>(null);
 const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-const treeComputed: Ref<UnipeptTreeView | undefined> = computed(() => {
+const visualizationComputed: Ref<UnipeptTreemap | undefined> = computed(() => {
     // A tree is not computed if the visualization is not mounted or if the data is not set.
     if(props.loading || !mounted.value) {
         return undefined;
@@ -74,12 +75,25 @@ const treeComputed: Ref<UnipeptTreeView | undefined> = computed(() => {
 
 // Watch wheter we have to perform a reset
 watch(() => props.doReset, () => {
-    if(treeComputed.value) {
+    if(visualizationComputed.value) {
         // @ts-ignore
-        treeComputed.value.reset();
+        visualizationComputed.value.reset();
 
         // Let the parent component know that the reset has been performed
         emits("reset", true);
+    }
+});
+
+// Watch wheter we have to perform a resize
+watch(() => props.fullscreen, () => {
+    if(visualizationComputed.value) {
+        if(props.fullscreen) {
+            // @ts-ignore
+            visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight - 20);
+        } else {
+            // @ts-ignore
+            visualizationComputed.value.resize(visualization.value?.clientWidth, props.height - 20);
+        }
     }
 });
 
@@ -87,21 +101,21 @@ const initializeVisualisation = () => {
     error.value = false;
 
     let settings = {
-        width: props.width,
-        height: props.height,
-    } as TreeviewSettings;
+        width: props.width ? props.width : visualization.value?.clientWidth,
+        height: props.height
+    } as TreemapSettings;
 
-    if(props.tooltip) {
-        settings = { ...settings, getTooltip: props.tooltip };
-    }
+    // if(props.tooltip) {
+    //     settings = { ...settings, getTooltip: props.tooltip };
+    // }
 
-    if(props.colors) {
-        settings = { ...settings, colorProvider: props.colors };
-    }
+    // if(props.colors) {
+    //     settings = { ...settings, colorProvider: props.colors };
+    // }
 
-    const treeview = new UnipeptTreeView(
+    const treeview = new UnipeptTreemap(
         visualization.value as HTMLElement,
-        props.data,
+        props.data.getRoot(),
         settings,
     );
 
@@ -135,8 +149,8 @@ onMounted(() => {
         position: relative;
     }
 
-   .treeview-container svg {
+   .visualization-container {
         width: 100%;
-        max-height: 600px;
+        height: 100%;
     }
 </style>
