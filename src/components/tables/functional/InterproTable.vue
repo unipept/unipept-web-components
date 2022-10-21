@@ -123,3 +123,13 @@ const downloadCsv = (items: InterproTableItem[], namespace: string) => {
     download(header, grid, `interpro-${namespace.split(" ").join("_")}-table.csv`);
 }
 </script>
+
+<style scoped>
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+</style>

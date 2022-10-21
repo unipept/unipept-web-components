@@ -24,9 +24,9 @@
                 </div>
             </template>
             <template v-slot:item.code="{ item }">
-                <a :href="url(item.code)" target="_blank" class="font-regular">
+                <a :href="url(item.code)" target="_blank" class="font-regular d-flex">
                     {{ item.code }}
-                    <v-icon x-small>mdi-open-in-new</v-icon>
+                    <v-icon class="pl-2" x-small>mdi-open-in-new</v-icon>
                 </a>
             </template>
             <template v-slot:item.name="{ item }">
@@ -93,3 +93,13 @@ const downloadCsv = (items: EcTableItem[]) => {
     download(header, grid, "ec-table.csv");
 }
 </script>
+
+<style scoped>
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+</style>

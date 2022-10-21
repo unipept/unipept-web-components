@@ -95,3 +95,13 @@ const downloadCsv = (items: GoTableItem[]) => {
     download(header, grid, `go-${namespace.split(" ").join("_")}-table.csv`);
 }
 </script>
+
+<style scoped>
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+</style>

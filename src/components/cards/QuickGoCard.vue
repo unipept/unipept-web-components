@@ -1,6 +1,8 @@
 <template>
     <div style="height: 100%;">
         <img v-if="quickGoSmallUrl" :src="quickGoSmallUrl" class="quickGoThumb" @click="showModal = !showModal">
+        <v-skeleton-loader v-else class="quickGoThumb" type="image"
+        ></v-skeleton-loader>
         <v-dialog v-if="items" v-model="showModal" max-width="90%">
             <v-card>
                 <v-card-title>QuickGo {{ namespace.toString() }}</v-card-title>
