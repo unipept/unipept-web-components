@@ -1,20 +1,14 @@
 <template>
     <div style="height: inherit;" v-if="!error">
-        <div 
-            v-if="!visualizationComputed" 
-            class="d-flex loading-container"
-            style="height: max-content; align-content: center;"
-        >
+        <div v-if="!visualizationComputed" class="d-flex loading-container">
             <v-progress-circular 
-                style="left: 0; right: 0; top: 0; bottom: 0; position: absolute;"
-                class="align-self-center" 
                 :width="5" 
                 :size="50" 
                 color="primary" 
                 indeterminate 
             />
         </div>
-        <div class="visualization-container" ref="visualization"></div>
+        <div once class="visualization-container" ref="visualization"></div>
     </div>
     <v-container fluid v-else class="error-container mt-2 d-flex align-center">
         <div class="error-container">
@@ -58,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits(["reset"]);
 
+const wrapper = ref<HTMLElement | null>(null);
 const visualization = ref<HTMLElement | null>(null);
 
 const mounted = ref<boolean>(false);
@@ -102,16 +97,8 @@ const initializeVisualisation = () => {
 
     let settings = {
         width: props.width ? props.width : visualization.value?.clientWidth,
-        height: props.height
+        height: props.height - 20
     } as TreemapSettings;
-
-    // if(props.tooltip) {
-    //     settings = { ...settings, getTooltip: props.tooltip };
-    // }
-
-    // if(props.colors) {
-    //     settings = { ...settings, colorProvider: props.colors };
-    // }
 
     const treeview = new UnipeptTreemap(
         visualization.value as HTMLElement,
@@ -145,8 +132,9 @@ onMounted(() => {
     }
     
     .loading-container {
-        min-height: inherit;
-        position: relative;
+        height: inherit;
+        align-items: center;
+        justify-content: center;
     }
 
    .visualization-container {

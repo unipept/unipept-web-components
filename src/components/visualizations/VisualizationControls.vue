@@ -7,6 +7,9 @@
             <v-btn v-if="settings" class="ma-1" x-small fab @click="settings" :elevation="0">
                 <v-icon>mdi-settings</v-icon>
             </v-btn>
+            <v-btn v-if="rotate" class="ma-1" x-small fab @click="rotate" :elevation="0">
+                <v-icon>mdi-format-rotate-90</v-icon>
+            </v-btn>
             <v-btn v-if="download" class="ma-1" x-small fab @click="download" :elevation="0">
                 <v-icon>mdi-download</v-icon>
             </v-btn>
@@ -31,6 +34,7 @@ export interface Props {
     overlap?: boolean
 
     settings?: () => void
+    rotate?: () => void
     download?: () => void
     reset?: () => void
     fullscreen?: () => void

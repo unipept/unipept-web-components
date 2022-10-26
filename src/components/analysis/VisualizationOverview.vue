@@ -14,7 +14,7 @@
         </v-tabs>
 
         <v-tabs-items class="mb-5" v-model="currentTab">
-            <v-tab-item>
+            <v-tab-item class="fixed-height">
                 <VisualizationControls
                     ref="sunburst"
                     caption="Click a slice to zoom in and the center node to zoom out"
@@ -35,7 +35,7 @@
                     </template>
                 </VisualizationControls>
             </v-tab-item>
-            <v-tab-item>
+            <v-tab-item class="fixed-height">
                 <VisualizationControls
                     ref="treemap"
                     caption="Click a square to zoom in and right click to zoom out"
@@ -49,6 +49,7 @@
                         <TreeMap
                             :data="taxaTree"
                             :loading="analysisInProgress || !taxaTree"
+                            :height="460"
                             :autoResize="true"
                             :doReset="treemapReset"
                             @reset="treemapReset = false"
@@ -57,7 +58,7 @@
                     </template>
                 </VisualizationControls>
             </v-tab-item>
-            <v-tab-item>
+            <v-tab-item class="fixed-height">
                 <VisualizationControls
                     ref="treeview"
                     caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
@@ -71,7 +72,7 @@
                             :data="ecTree"
                             :loading="analysisInProgress || !ecTree"
                             :autoResize="true"
-                            :height="400"
+                            :height="500"
                             :doReset="treeviewReset"
                             @reset="treeviewReset = false"
                         />
@@ -82,7 +83,14 @@
                 <div></div>
             </v-tab-item>
             <v-tab-item>
-                <div></div>
+                <HeatmapWizardSingle 
+                    :loading="analysisInProgress"
+                    :ecCountTableProcessor="ecCountTableProcessor"
+                    :ecOntology="ecOntology"
+                    :ncbiCountTableProcessor="ncbiCountTableProcessor"
+                    :ncbiOntology="ncbiOntology"
+                    :ncbiTree="ncbiTree"
+                />
             </v-tab-item>
         </v-tabs-items>
     </v-card>
@@ -96,13 +104,21 @@ import { ref } from 'vue';
 import VisualizationControls from '../visualizations/VisualizationControls.vue';
 import TreeView from '../visualizations/TreeView.vue';
 import Sunburst from '../visualizations/Sunburst.vue';
-import { NcbiTree } from '@/logic';
+import { EcCode, EcCountTableProcessor, EcDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Ontology } from '@/logic';
 import TreeMap from '../visualizations/TreeMap.vue';
+import HeatmapWizardSingle from '../visualizations/heatmap/single/HeatmapWizardSingle.vue';
+import { VCard, VTabs, VTab, VTabsItems, VTabItem } from 'vuetify/lib';
 
 export interface Props {
     analysisInProgress: boolean
     ecTree: DataNodeLike
     taxaTree: NcbiTree
+
+    ecCountTableProcessor: EcCountTableProcessor
+    ecOntology: Ontology<EcCode, EcDefinition>
+    ncbiCountTableProcessor: LcaCountTableProcessor
+    ncbiOntology: Ontology<NcbiId, NcbiTaxon>
+    ncbiTree: NcbiTree
 }
 
 defineProps<Props>();
@@ -130,3 +146,9 @@ const treemapReset  = ref<boolean>(false);
 
 //const treemapFullscreen = ref<boolean>(false);
 </script>
+
+<style scoped>
+.fixed-height {
+    height: 500px;
+}
+</style>

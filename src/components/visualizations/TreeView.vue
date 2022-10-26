@@ -1,13 +1,7 @@
 <template>
     <div style="height: inherit;" v-if="!error">
-        <div 
-            v-if="!treeComputed" 
-            class="d-flex loading-container"
-            style="height: max-content; align-content: center;"
-        >
+        <div v-if="!treeComputed" class="d-flex loading-container">
             <v-progress-circular 
-                style="left: 0; right: 0; top: 0; bottom: 0; position: absolute;"
-                class="align-self-center" 
                 :width="5" 
                 :size="50" 
                 color="primary" 
@@ -131,8 +125,9 @@ onMounted(() => {
     }
     
     .loading-container {
-        min-height: inherit;
-        position: relative;
+        height: inherit;
+        align-items: center;
+        justify-content: center;
     }
 
    .treeview-container svg {
