@@ -81,6 +81,8 @@ const categoryFilter = (value: any, category: string, item: any) => {
     return item.category === category;
 }
 
+watch(() => props.items, () => deselectAll());
+
 watch(selectedItems, (selected) => {
     emits('select', selected);
 });
