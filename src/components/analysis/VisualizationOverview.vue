@@ -53,7 +53,7 @@
                             :autoResize="true"
                             :doReset="treemapReset"
                             @reset="treemapReset = false"
-                            :fullscreen="isFullscreen"
+                            :fullscreen="isFullscreen && currentTab === 1"
                         />
                     </template>
                 </VisualizationControls>
