@@ -52,7 +52,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits(["reset"]);
 
-const wrapper = ref<HTMLElement | null>(null);
 const visualization = ref<HTMLElement | null>(null);
 
 const mounted = ref<boolean>(false);

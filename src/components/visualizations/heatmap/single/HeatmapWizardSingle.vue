@@ -49,7 +49,7 @@
                         :fullscreen="() => toggle(heatmap)" 
                         :download="() => { }"
                         :reset="() => heatmapReset = true"
-                        :rotate="() => { }"
+                        :rotate="() => isRotated = !isRotated"
                         overlap
                     >
                         <template #visualization>
@@ -59,6 +59,8 @@
                                 :column-labels="heatmapColumns"
                                 :loading="heatMapLoading"
                                 :width="wrapper?.clientWidth"
+                                :fullscreen="isFullscreen"
+                                :rotated="isRotated"
                                 :doReset="heatmapReset"
                                 @reset="heatmapReset = false"
                             />
@@ -73,7 +75,7 @@
 <script setup lang="ts">
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcCountTableProcessor, EcDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Normalizer, Ontology } from '@/logic';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { VStepper, VStepperHeader, VStepperStep, VDivider, VStepperItems, VStepperContent, VBtn } from 'vuetify/lib';
 import VisualizationControls from '../../VisualizationControls.vue';
 import HeatMap from '../HeatMap.vue';
@@ -107,18 +109,17 @@ const verticalItems = ref<DataSourceSingleItem[]>([]);
 
 const normalizer = ref<Normalizer>();
 
+const isRotated = ref<boolean>(false);
+
 const heatMapLoading = computed(() => {
-    return horizontalItems.value.length === 0 
-        || verticalItems.value.length === 0 
+    return heatmapRows.value.length === 0 
+        || heatmapColumns.value.length === 0 
         || currentStep.value < 4;
 });
 
 const heatmapRows = computed(() => verticalItems.value.map(item => item.name));
 const heatmapColumns = computed(() => horizontalItems.value.map(item => item.name));
 const heatmapData = computed(() => {
-    // TODO: add hashing to avoid recomputing the heatmap data
-    console.log(wrapper.value?.clientWidth);
-
     if (normalizer.value === undefined) {
         return [];
     }
@@ -133,6 +134,12 @@ const heatmapData = computed(() => {
     }
 
     return normalizer.value.normalize(data);
+});
+
+watch(currentStep, () => {
+    if(currentStep.value < 4) {
+        isRotated.value = false;
+    }
 });
 </script>
 

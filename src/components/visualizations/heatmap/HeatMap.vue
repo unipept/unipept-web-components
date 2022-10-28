@@ -17,22 +17,26 @@ export interface Props {
     columnLabels: string[]
 
     width?: number
+    height?: number
 
     loading?: boolean
     doReset?: boolean
     clusterRows?: boolean
     clusterColumns?: boolean
     rotated?: boolean
+    fullscreen?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     width: 400,
+    height: 600,
 
     loading: false,
     doReset: false,
     clusterRows: true,
     clusterColumns: true,
-    rotated: false
+    rotated: false,
+    fullscreen: false
 });
 
 const emits = defineEmits(["reset"]);
@@ -42,7 +46,15 @@ const visualization = ref<HTMLElement | null>(null);
 const mounted = ref<boolean>(false);
 
 const visualizationComputed: Ref<UnipeptHeatmap | undefined> = computed(() => {
-    if(props.loading || !mounted.value) {
+    if(!mounted) {
+        return undefined;
+    }
+
+    if(props.loading) {
+        if(visualization.value) {
+            visualization.value.innerHTML = "";
+        }
+
         return undefined;
     }
 
@@ -55,15 +67,33 @@ watch(() => props.doReset, () => {
         // @ts-ignore
         visualizationComputed.value.reset();
 
+        if(props.fullscreen) {
+            // @ts-ignore
+            visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight);
+        }
+
         // Let the parent component know that the reset has been performed
         emits("reset", true);
     }
 });
 
+// Watch wheter we have to perform a resize
+watch(() => props.fullscreen, () => {
+    if(visualizationComputed.value) {
+        if(props.fullscreen) {
+            // @ts-ignore
+            visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight);
+        } else {
+            // @ts-ignore
+            visualizationComputed.value.resize(props.width, props.height);
+        }
+    }
+});
+
 const initializeVisualisation = () => {
     const settings = {
-        width: props.width,
-        height: 500,
+        width: props.fullscreen ? visualization.value?.clientWidth : props.width,
+        height: props.fullscreen ? visualization.value?.clientHeight : props.height,
         dendrogramEnabled: true
     } as HeatmapSettings
 
@@ -79,8 +109,6 @@ const initializeVisualisation = () => {
         columns,
         settings
     );
-
-    console.log(visualization.value)
 
     if(props.clusterRows && !props.clusterColumns) {
         heatmap.cluster("rows");
@@ -114,6 +142,7 @@ onMounted(() => {
     }
 
    .visualization-container {
-        max-height: 600px;
+        width: 100%;
+        height: 100%;
     }
 </style>
