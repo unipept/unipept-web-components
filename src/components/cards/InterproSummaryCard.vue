@@ -16,7 +16,7 @@
             <InterproTable 
                 :items="items"
                 :loading="analysisInProgress" 
-                :showPercentage="false" 
+                :showPercentage="showPercentage" 
             />
         </v-card-text>
     </v-card>
@@ -30,7 +30,8 @@ import TrustLine from '../util/TrustLine.vue';
 import { computed } from 'vue';
 
 export interface Props {
-    analysisInProgress: boolean;
+    analysisInProgress: boolean
+    showPercentage: boolean
     
     interproProcessor: FunctionalCountTableProcessor<InterproCode, InterproDefinition>
     interproOntology: Ontology<InterproCode, InterproDefinition>

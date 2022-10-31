@@ -20,7 +20,7 @@
                     <GoTable 
                         :items="biologicalProcessItems"
                         :loading="analysisInProgress" 
-                        :showPercentage="false" 
+                        :showPercentage="showPercentage" 
                     />
                 </v-col>
                 <v-col cols=3>
@@ -38,7 +38,7 @@
                     <GoTable 
                         :items="cellularComponentItems"
                         :loading="analysisInProgress" 
-                        :showPercentage="false" 
+                        :showPercentage="showPercentage" 
                     />
                 </v-col>
                 <v-col cols=3>
@@ -56,7 +56,7 @@
                     <GoTable 
                         :items="molecularFunctionItems"
                         :loading="analysisInProgress" 
-                        :showPercentage="false" 
+                        :showPercentage="showPercentage" 
                     />
                 </v-col>
                 <v-col cols=3>
@@ -80,7 +80,8 @@ import TrustLine from '@/components/util/TrustLine.vue';
 import { computed } from 'vue';
 
 export interface Props {
-    analysisInProgress: boolean;
+    analysisInProgress: boolean
+    showPercentage: boolean
     
     goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>
     goOntology: Ontology<GoCode, GoDefinition>

@@ -17,7 +17,7 @@
             <EcTable 
                 :items="items"
                 :loading="analysisInProgress" 
-                :showPercentage="false" 
+                :showPercentage="showPercentage" 
             />
 
             <TreeViewControls
@@ -55,6 +55,7 @@ import TreeViewControls from '../visualizations/TreeViewControls.vue';
 
 export interface Props {
     analysisInProgress: boolean
+    showPercentage: boolean
     
     ecProcessor: FunctionalCountTableProcessor<EcCode, EcDefinition>
     ecOntology: Ontology<EcCode, EcDefinition>
