@@ -22,15 +22,18 @@ import DataSourceSingleItem from './DataSourceSingleItem';
 import DataSourceTable from '@/components/tables/DataSourceTable.vue';
 import { computed, ref } from 'vue';
 import FunctionalDefinition from '@/logic/ontology/functional/FunctionalDefinition';
-import { LcaCountTableProcessor, Ontology, NcbiId, NcbiTaxon, NcbiRank, NcbiTree, EcCountTableProcessor, EcCode, EcDefinition, EcNamespace } from '@/logic';
+import { LcaCountTableProcessor, Ontology, NcbiId, NcbiTaxon, NcbiRank, NcbiTree, EcCountTableProcessor, EcCode, EcDefinition, EcNamespace, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, GoNamespace, InterproNamespace } from '@/logic';
 import { VSelect } from 'vuetify/lib';
 
 export interface Props {
     loading: boolean
 
+    goCountTableProcessor: GoCountTableProcessor
+    goOntology: Ontology<GoCode, GoDefinition>
     ecCountTableProcessor: EcCountTableProcessor
     ecOntology: Ontology<EcCode, EcDefinition>
-
+    interproCountTableProcessor: InterproCountTableProcessor
+    interproOntology: Ontology<InterproCode, InterproDefinition>
     ncbiCountTableProcessor: LcaCountTableProcessor
     ncbiOntology: Ontology<NcbiId, NcbiTaxon>
     ncbiTree: NcbiTree
@@ -53,6 +56,10 @@ const selectedDataSourceItems = computed(() => {
         return ncbiItems.value;
     } else if (selectedDataSource.value === "Enzyme Commission") {
         return ecItems.value;
+    } else if (selectedDataSource.value === "Gene Ontology") {
+        return goItems.value;
+    } else if (selectedDataSource.value === "Interpro") {
+        return interproItems.value;
     } else {
         return [];
     }
@@ -64,13 +71,19 @@ const categories = computed(() => {
     } else if (selectedDataSource.value === "Enzyme Commission") {
         console.log('sdfsdf');
         return ["All", ...Object.values(EcNamespace)];
+    } else if (selectedDataSource.value === "Gene Ontology") {
+        return ["All", ...Object.values(GoNamespace)];
+    } else if (selectedDataSource.value === "Interpro") {
+        return ["All", ...Object.values(InterproNamespace)];
     } else {
         return [];
     }
 });
 
 const ncbiItems = computed(() => computeItems(props.ncbiCountTableProcessor, props.ncbiOntology));
+const goItems = computed(() => computeItems(props.goCountTableProcessor, props.goOntology));
 const ecItems = computed(() => computeItems(props.ecCountTableProcessor, props.ecOntology));
+const interproItems = computed(() => computeItems(props.interproCountTableProcessor, props.interproOntology));
 
 const computeItems = (
     countProcessor: any,

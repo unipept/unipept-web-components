@@ -16,8 +16,12 @@
                 <v-stepper-content step="1">
                     <DataSourceSingle
                         :loading="loading"
+                        :goCountTableProcessor="goCountTableProcessor"
+                        :goOntology="goOntology"
                         :ecCountTableProcessor="ecCountTableProcessor"
                         :ecOntology="ecOntology"
+                        :interproCountTableProcessor="interproCountTableProcessor"
+                        :interproOntology="interproOntology"
                         :ncbiCountTableProcessor="ncbiCountTableProcessor"
                         :ncbiOntology="ncbiOntology"
                         :ncbiTree="ncbiTree"
@@ -28,8 +32,12 @@
                 <v-stepper-content step="2">
                     <DataSourceSingle
                         :loading="loading"
+                        :goCountTableProcessor="goCountTableProcessor"
+                        :goOntology="goOntology"
                         :ecCountTableProcessor="ecCountTableProcessor"
                         :ecOntology="ecOntology"
+                        :interproCountTableProcessor="interproCountTableProcessor"
+                        :interproOntology="interproOntology"
                         :ncbiCountTableProcessor="ncbiCountTableProcessor"
                         :ncbiOntology="ncbiOntology"
                         :ncbiTree="ncbiTree"
@@ -74,7 +82,7 @@
 
 <script setup lang="ts">
 import useFullscreen from '@/composables/useFullscreen';
-import { EcCode, EcCountTableProcessor, EcDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Normalizer, Ontology } from '@/logic';
+import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Normalizer, Ontology } from '@/logic';
 import { computed, ref, watch } from 'vue';
 import { VStepper, VStepperHeader, VStepperStep, VDivider, VStepperItems, VStepperContent, VBtn } from 'vuetify/lib';
 import VisualizationControls from '../../VisualizationControls.vue';
@@ -86,8 +94,12 @@ import DataSourceSingleItem from './DataSourceSingleItem';
 export interface Props {
     loading: boolean
 
+    goCountTableProcessor: GoCountTableProcessor
+    goOntology: Ontology<GoCode, GoDefinition>
     ecCountTableProcessor: EcCountTableProcessor
     ecOntology: Ontology<EcCode, EcDefinition>
+    interproCountTableProcessor: InterproCountTableProcessor
+    interproOntology: Ontology<InterproCode, InterproDefinition>
     ncbiCountTableProcessor: LcaCountTableProcessor
     ncbiOntology: Ontology<NcbiId, NcbiTaxon>
     ncbiTree: NcbiTree

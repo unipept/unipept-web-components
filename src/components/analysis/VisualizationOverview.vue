@@ -85,8 +85,12 @@
             <v-tab-item>
                 <HeatmapWizardSingle 
                     :loading="analysisInProgress"
+                    :goCountTableProcessor="goCountTableProcessor"
+                    :goOntology="goOntology"
                     :ecCountTableProcessor="ecCountTableProcessor"
                     :ecOntology="ecOntology"
+                    :interproCountTableProcessor="interproCountTableProcessor"
+                    :interproOntology="interproOntology"
                     :ncbiCountTableProcessor="ncbiCountTableProcessor"
                     :ncbiOntology="ncbiOntology"
                     :ncbiTree="ncbiTree"
@@ -104,7 +108,7 @@ import { ref } from 'vue';
 import VisualizationControls from '../visualizations/VisualizationControls.vue';
 import TreeView from '../visualizations/TreeView.vue';
 import Sunburst from '../visualizations/Sunburst.vue';
-import { EcCode, EcCountTableProcessor, EcDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Ontology } from '@/logic';
+import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Ontology } from '@/logic';
 import TreeMap from '../visualizations/TreeMap.vue';
 import HeatmapWizardSingle from '../visualizations/heatmap/single/HeatmapWizardSingle.vue';
 import { VCard, VTabs, VTab, VTabsItems, VTabItem } from 'vuetify/lib';
@@ -114,8 +118,12 @@ export interface Props {
     ecTree: DataNodeLike
     taxaTree: NcbiTree
 
+    goCountTableProcessor: GoCountTableProcessor
+    goOntology: Ontology<GoCode, GoDefinition>
     ecCountTableProcessor: EcCountTableProcessor
     ecOntology: Ontology<EcCode, EcDefinition>
+    interproCountTableProcessor: InterproCountTableProcessor
+    interproOntology: Ontology<InterproCode, InterproDefinition>
     ncbiCountTableProcessor: LcaCountTableProcessor
     ncbiOntology: Ontology<NcbiId, NcbiTaxon>
     ncbiTree: NcbiTree
