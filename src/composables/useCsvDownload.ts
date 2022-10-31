@@ -11,8 +11,18 @@ const useCsvDownload = () => {
         downloadLink.download = filename;
         downloadLink.click();
     };
+
+    const downloadString = (csvString: string, filename: string) => {
+        const csvBlob = new Blob([csvString], {type:"data:text/csv;charset=UTF-8"});
+        const csvUrl = URL.createObjectURL(csvBlob);
+
+        const downloadLink = document.createElement("a");
+        downloadLink.href = csvUrl;
+        downloadLink.download = filename;
+        downloadLink.click();
+    };
     
-    return { download };
+    return { download, downloadString };
 }
 
 export default useCsvDownload;

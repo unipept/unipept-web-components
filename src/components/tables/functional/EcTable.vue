@@ -50,7 +50,7 @@ export interface Props {
     showPercentage: boolean
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const headers = [
     {
