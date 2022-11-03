@@ -68,53 +68,24 @@ export default class NetworkUtils {
         return NetworkUtils.get(url).then(JSON.parse);
     }
 
-    public static async downloadDataByForm(data: string, fileName: string, fileType: string = null): Promise<string> {
-        if (SystemUtils.isElectron()) {
-            // Hack to be able to use Electron without the need to add it to the required dependencies
-            eval(`
-                const fs = require("fs");
-                const { dialog } = require("@electron/remote");
-                
-                dialog.showSaveDialog(
-                    null,
-                    {
-                        title: "save to CSV",
-                        defaultPath: fileName
-                    }
-                ).then((returnValue) => {
-                    if (!returnValue.canceled) {
-                        fs.writeFileSync(returnValue.filePath, data);
-                    }
-                });
-            `);
-        } else {
-            return new Promise(function(resolve, reject) {
-                let nonce = Math.random();
-                $("form.download").remove();
+    public static async downloadDataByForm(data: string, fileName: string, fileType: string): Promise<void> {
+        const url = URL.createObjectURL(new Blob([data], { type: fileType }));
 
-                $("body").append("<form class='download' method='post' action='/download'></form>");
+        const a = document.createElement("a");
 
-                let $downloadForm = $("form.download").append(
-                    "<input type='hidden' name='filename' value='" + fileName + "'/>"
-                );
-                $downloadForm.append("<input type='hidden' name='data' class='data'/>");
-                if (fileType !== null) {
-                    $downloadForm.append(`<input type='hidden' name='filetype' value='${fileType}'/>`);
-                }
-                $downloadForm.append("<input type='hidden' name='nonce' value='" + nonce + "'/>");
-                // The x-www-form-urlencoded spec replaces newlines with \n\r
-                $downloadForm.find(".data").val(data.replace(/\n\r/g, "\n"));
+        a.href = url;
+        a.download = fileName || "download";
 
-                let downloadTimer = setInterval(() => {
-                    if (document.cookie.indexOf(nonce.toString()) !== -1) {
-                        clearInterval(downloadTimer);
-                        resolve(fileName);
-                    }
-                }, 100);
+        const clickHandler = () => {
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+                removeEventListener("click", clickHandler);
+            }, 150);
+        };
 
-                $downloadForm.submit();
-            });
-        }
+        a.addEventListener("click", clickHandler, false);
+
+        a.click();
     }
 
     /**

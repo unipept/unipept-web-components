@@ -19,7 +19,7 @@ export default class NetworkUtils {
      * @param url
      */
     static getJSON(url: string): any;
-    static downloadDataByForm(data: string, fileName: string, fileType?: string): Promise<string>;
+    static downloadDataByForm(data: string, fileName: string, fileType: string): Promise<void>;
     /**
      * Triggers a file download in the browser using a hidden link and a data url.
      *
