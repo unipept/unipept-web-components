@@ -44,12 +44,12 @@ function filter(peptides: Peptide[], searchConfiguration: SearchConfiguration): 
  * Split all peptides after every K or R if not followed by P if advancedMissedCleavageHandling isn't set.
  */
 function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boolean): Peptide[] {
-    if (!advancedMissedCleavageHandling) {
-        return peptides.join("+")
-            .replace(/([KR])([^P])/g, "$1+$2")
-            .replace(/([KR])([^P+])/g, "$1+$2")
-            .split("+");
-    }
+    // if (!advancedMissedCleavageHandling) {
+    //     return peptides.join("+")
+    //         .replace(/([KR])([^P])/g, "$1+$2")
+    //         .replace(/([KR])([^P+])/g, "$1+$2")
+    //         .split("+");
+    // }
     return peptides;
 }
 
