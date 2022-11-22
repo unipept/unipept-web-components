@@ -4,11 +4,11 @@
             This interactive tree bundles the complete taxonomic lineages of all UniProt entries whose protein sequence contains the tryptic peptide.
 
             <TreeViewControls
-                ref="treeView"
+                ref="treeview"
                 class="mt-3"
                 :loading="assay.analysisInProgress"
-                :fullscreen="() => toggle(treeView)" 
-                :download="downloadSvg"
+                :fullscreen="() => toggle(treeview)" 
+                :download="() => downloadTreeviewModalOpen = true"
                 :reset="() => reset = true"
             >
                 <template #treeview>
@@ -24,6 +24,13 @@
                     />
                 </template>
             </TreeViewControls>
+
+            <DownloadImageModal 
+                :openModal="downloadTreeviewModalOpen"
+                :imageSource="treeviewElement()"
+                @close="downloadTreeviewModalOpen = false"
+                supportsSvg
+            />
         </v-card-text>
     </v-card>
 </template>
@@ -32,9 +39,12 @@
 import useFullscreen from '@/composables/useFullscreen';
 import useSvgDownload from '@/composables/useSvgDownload';
 import { SinglePeptideAnalysisStatus } from '@/interface';
+import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import d3 from 'd3';
 import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
 import { ref } from 'vue';
+import { VCard, VCardText } from 'vuetify/lib';
+import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import TreeView from '../visualizations/TreeView.vue';
 import TreeViewControls from '../visualizations/TreeViewControls.vue';
     
@@ -44,18 +54,13 @@ export interface Props {
 
 defineProps<Props>();
 
-const treeView = ref<HTMLElement | null>(null);
+const treeview = ref<HTMLElement | null>(null);
 
 const { toggle } = useFullscreen();
-const { download } = useSvgDownload();
-
-const downloadSvg = () => {
-    // @ts-ignore
-    const svg = treeView.value?.$el.querySelector("svg");
-    download(svg, "LineageTree.svg");
-};
 
 const reset = ref<boolean>(false);
+
+const downloadTreeviewModalOpen = ref<boolean>(false);
 
 const colors = (d: TreeviewNode) => {
     if (d.name === "Bacteria") return "#1565C0"; // blue
@@ -65,4 +70,7 @@ const colors = (d: TreeviewNode) => {
 
     return d3.scaleOrdinal(d3.schemeCategory10).call(this, d as any);
 };
+
+// @ts-ignore
+const treeviewElement = () => new SvgImageSource(treeview.value?.$el.querySelector("svg"));
 </script>

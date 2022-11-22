@@ -10,7 +10,7 @@
             <v-btn v-if="rotate" class="ma-1" x-small fab @click="rotate" :elevation="0">
                 <v-icon>mdi-format-rotate-90</v-icon>
             </v-btn>
-            <v-btn v-if="download" class="ma-1" x-small fab @click="download" :elevation="0">
+            <v-btn v-if="download && !hideDownload" class="ma-1" x-small fab @click="download" :elevation="0">
                 <v-icon>mdi-download</v-icon>
             </v-btn>
             <v-btn v-if="reset" class="ma-1" x-small fab @click="reset" :elevation="0">
@@ -21,7 +21,7 @@
             </v-btn>
         </div>
 
-        <div style="height: inherit;" :style="overlap ? '' : 'position: relative'">
+        <div :style="overlap ? 'height: 100%;' : 'height: calc(100% - 40px); position: relative'">
             <slot name="visualization"></slot>
         </div>
     </div>
@@ -32,6 +32,7 @@ export interface Props {
     caption: string
     loading: boolean
     overlap?: boolean
+    hideDownload?: boolean
 
     settings?: () => void
     rotate?: () => void
@@ -41,7 +42,8 @@ export interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-    overlap: true
+    overlap: true,
+    hideDownload: false
 });
 </script>
 
@@ -52,6 +54,7 @@ withDefaults(defineProps<Props>(), {
         align-self: center;
         opacity: 0.8;
         width: 100%;
+        height: 40px;
         background-color: #EDEDED;
         right: 0;
         top: 0;

@@ -20,8 +20,9 @@
                     caption="Click a slice to zoom in and the center node to zoom out"
                     :loading="analysisInProgress"
                     :fullscreen="() => toggle(sunburst)" 
-                    :download="() => downloadSvg(sunburst, 'sunburst.svg')"
+                    :download="() => downloadSunburstModalOpen = true"
                     :reset="() => sunburstReset = true"
+                    :hideDownload="isFullscreen"
                 >
                     <template #visualization>
                         <Sunburst
@@ -42,8 +43,9 @@
                     :loading="analysisInProgress"
                     :overlap="false"
                     :fullscreen="() => toggle(treemap)" 
-                    :download="() => downloadSvg(treemap, 'treemap.svg')"
+                    :download="() => downloadTreemapModalOpen = true"
                     :reset="() => treemapReset = true"
+                    :hideDownload="isFullscreen"
                 >
                     <template #visualization>
                         <TreeMap
@@ -64,8 +66,9 @@
                     caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                     :loading="analysisInProgress"
                     :fullscreen="() => toggle(treeview)" 
-                    :download="() => downloadSvg(treeview, 'treeview.svg')"
+                    :download="() => downloadTreeviewModalOpen = true"
                     :reset="() => treeviewReset = true"
+                    :hideDownload="isFullscreen"
                 >
                     <template #visualization>
                         <TreeView 
@@ -97,12 +100,31 @@
                 />
             </v-tab-item>
         </v-tabs-items>
+
+        <DownloadImageModal 
+            :openModal="downloadSunburstModalOpen"
+            :imageSource="sunburstElement()"
+            @close="downloadSunburstModalOpen = false"
+            supportsSvg
+        />
+
+        <DownloadImageModal 
+            :openModal="downloadTreemapModalOpen"
+            :imageSource="treemapElement()"
+            @close="downloadTreemapModalOpen = false"
+        />
+
+        <DownloadImageModal 
+            :openModal="downloadTreeviewModalOpen"
+            :imageSource="treeviewElement()"
+            @close="downloadTreeviewModalOpen = false"
+            supportsSvg
+        />
     </v-card>
 </template>
 
 <script setup lang="ts">
 import useFullscreen from '@/composables/useFullscreen';
-import useSvgDownload from '@/composables/useSvgDownload';
 import { DataNodeLike } from 'unipept-visualizations/types';
 import { ref } from 'vue';
 import VisualizationControls from '../visualizations/VisualizationControls.vue';
@@ -112,6 +134,9 @@ import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProces
 import TreeMap from '../visualizations/TreeMap.vue';
 import HeatmapWizardSingle from '../visualizations/heatmap/single/HeatmapWizardSingle.vue';
 import { VCard, VTabs, VTab, VTabsItems, VTabItem } from 'vuetify/lib';
+import DownloadImageModal from '../modals/DownloadImageModal.vue';
+import DomImageSource from '@/logic/util/image/DomImageSource';
+import SvgImageSource from '@/logic/util/image/SvgImageSource';
 
 export interface Props {
     analysisInProgress: boolean
@@ -138,21 +163,23 @@ const sunburst = ref<HTMLElement | null>(null);
 const treemap  = ref<HTMLElement | null>(null);
 
 const { isFullscreen, toggle } = useFullscreen();
-const { download } = useSvgDownload();
-
-const downloadSvg = (element: HTMLElement | null, filename: string) => {
-    if (element) {
-        // @ts-ignore
-        const svg = element.$el.querySelector("svg");
-        download(svg, filename);
-    }
-}
 
 const treeviewReset = ref<boolean>(false);
 const sunburstReset = ref<boolean>(false);
 const treemapReset  = ref<boolean>(false);
 
 //const treemapFullscreen = ref<boolean>(false);
+
+const downloadSunburstModalOpen = ref<boolean>(false);
+const downloadTreemapModalOpen = ref<boolean>(false);
+const downloadTreeviewModalOpen = ref<boolean>(false);
+
+// @ts-ignore
+const sunburstElement = () => new SvgImageSource(sunburst.value?.$el.querySelector(".visualization-container").children[1]);
+// @ts-ignore
+const treemapElement = () => new DomImageSource(treemap.value?.$el.querySelector(".treemap"));
+// @ts-ignore
+const treeviewElement = () => new SvgImageSource(treeview.value?.$el.querySelector("svg"));
 </script>
 
 <style scoped>

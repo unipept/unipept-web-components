@@ -1,5 +1,5 @@
 <template>
-    <div style="height: inherit;" v-if="!error">
+    <div style="height: 100%;" v-if="!error">
         <div v-if="!visualizationComputed" class="d-flex loading-container">
             <v-progress-circular 
                 :width="5" 
@@ -82,6 +82,7 @@ watch(() => props.doReset, () => {
 watch(() => props.fullscreen, () => {
     if(visualizationComputed.value) {
         if(props.fullscreen) {
+            console.log("fullscreen", visualization.value?.clientHeight);
             // @ts-ignore
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight - 20);
         } else {

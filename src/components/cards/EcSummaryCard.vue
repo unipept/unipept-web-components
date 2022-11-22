@@ -21,12 +21,13 @@
             />
 
             <TreeViewControls
-                ref="treeView"
+                ref="treeview"
                 class="mt-3"
                 :loading="analysisInProgress"
-                :fullscreen="() => toggle(treeView)" 
-                :download="downloadSvg"
+                :fullscreen="() => toggle(treeview)" 
+                :download="() => downloadModalOpen = true"
                 :reset="() => reset = true"
+                :hideDownload="isFullscreen"
             >
                 <template #treeview>
                     <TreeView 
@@ -38,15 +39,23 @@
                     />
                 </template>
             </TreeViewControls>
+            
+            <DownloadImageModal 
+                :openModal="downloadModalOpen"
+                :imageSource="treeviewElement()"
+                @close="downloadModalOpen = false"
+                supportsSvg
+            />
         </v-card-text>
     </v-card>
 </template>
 
 <script setup lang="ts">
-import { useSvgDownload } from '@/composables';
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcDefinition, FunctionalCountTableProcessor, Ontology } from '@/logic';
+import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import { computed, ref } from 'vue';
+import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import EcTable from '../tables/functional/EcTable.vue';
 import EcTableItem from '../tables/functional/EcTableItem';
 import TrustLine from '../util/TrustLine.vue';
@@ -64,18 +73,16 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const treeView = ref<HTMLElement | null>(null);
+const treeview = ref<HTMLElement | null>(null);
 
-const { toggle } = useFullscreen();
-const { download } = useSvgDownload();
-
-const downloadSvg = () => {
-    // @ts-ignore
-    const svg = treeView.value?.$el.querySelector("svg");
-    download(svg, "EcTree.svg");
-}
+const { isFullscreen, toggle } = useFullscreen();
 
 const reset = ref<boolean>(false);
+
+const downloadModalOpen = ref<boolean>(false);
+
+// @ts-ignore
+const treeviewElement = () => new SvgImageSource(treeview.value?.$el.querySelector("svg"));
 
 const items = computed(() => {
     if(!props.analysisInProgress) {

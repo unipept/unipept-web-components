@@ -4,10 +4,20 @@
             Please select at least one item for both axis of the heatmap.
         </div>
         <div class="visualization-container" ref="visualization"></div>
+
+        <DownloadImageModal 
+            :openModal="downloadModalOpen"
+            :imageSource="heatmapElement()"
+            @close="downloadModalOpen = false"
+            supportsSvg
+        />
     </div>
 </template>
 
 <script setup lang="ts">
+import DownloadImageModal from '@/components/modals/DownloadImageModal.vue';
+import SvgImageSource from '@/logic/util/image/SvgImageSource';
+import SvgStringImageSource from '@/logic/util/image/SvgStringImageSource';
 import { Heatmap as UnipeptHeatmap, HeatmapSettings } from 'unipept-visualizations';
 import { computed, onMounted, Ref, ref, watch } from 'vue';
 
@@ -25,6 +35,7 @@ export interface Props {
     clusterColumns?: boolean
     rotated?: boolean
     fullscreen?: boolean
+    download?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -36,10 +47,11 @@ const props = withDefaults(defineProps<Props>(), {
     clusterRows: true,
     clusterColumns: true,
     rotated: false,
-    fullscreen: false
+    fullscreen: false,
+    download: false,
 });
 
-const emits = defineEmits(["reset"]);
+const emits = defineEmits(["reset", "download"]);
 
 const visualization = ref<HTMLElement | null>(null);
 
@@ -60,6 +72,11 @@ const visualizationComputed: Ref<UnipeptHeatmap | undefined> = computed(() => {
 
     return initializeVisualisation();
 });
+
+const downloadModalOpen = ref<boolean>(false);
+
+// @ts-ignore
+const heatmapElement = () => new SvgStringImageSource(visualizationComputed.value?.toSVG());
 
 // Watch wheter we have to perform a reset
 watch(() => props.doReset, () => {
@@ -88,6 +105,14 @@ watch(() => props.fullscreen, () => {
             visualizationComputed.value.resize(props.width, props.height);
         }
     }
+});
+
+watch(() => props.download, () => {
+    downloadModalOpen.value = props.download;
+});
+
+watch(() => downloadModalOpen.value, () => {
+    emits("download", downloadModalOpen.value);
 });
 
 const initializeVisualisation = () => {

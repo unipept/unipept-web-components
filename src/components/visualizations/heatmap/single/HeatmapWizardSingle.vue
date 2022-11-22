@@ -55,9 +55,10 @@
                         caption="Scroll to zoom, drag to pan"
                         :loading="heatMapLoading"
                         :fullscreen="() => toggle(heatmap)" 
-                        :download="() => { }"
+                        :download="() => downloadModalOpen = true"
                         :reset="() => heatmapReset = true"
                         :rotate="() => isRotated = !isRotated"
+                        :hideDownload="isFullscreen"
                         overlap
                     >
                         <template #visualization>
@@ -71,6 +72,8 @@
                                 :rotated="isRotated"
                                 :doReset="heatmapReset"
                                 @reset="heatmapReset = false"
+                                :download="downloadModalOpen"
+                                @download="downloadModalOpen = $event"
                             />
                         </template>
                     </VisualizationControls>
@@ -81,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import DownloadImageModal from '@/components/modals/DownloadImageModal.vue';
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Normalizer, Ontology } from '@/logic';
 import { computed, ref, watch } from 'vue';
@@ -147,6 +151,8 @@ const heatmapData = computed(() => {
 
     return normalizer.value.normalize(data);
 });
+
+const downloadModalOpen = ref<boolean>(false);
 
 watch(currentStep, () => {
     if(currentStep.value < 4) {
