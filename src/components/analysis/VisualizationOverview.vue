@@ -82,8 +82,8 @@
                     </template>
                 </VisualizationControls>
             </v-tab-item>
-            <v-tab-item>
-                <div></div>
+            <v-tab-item class="pa-5">
+                <HierarchicalOutline :tree="taxaTree" :equate-il="true" :loading="analysisInProgress" />
             </v-tab-item>
             <v-tab-item>
                 <HeatmapWizardSingle 
@@ -137,6 +137,7 @@ import { VCard, VTabs, VTab, VTabsItems, VTabItem } from 'vuetify/lib';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import DomImageSource from '@/logic/util/image/DomImageSource';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
+import HierarchicalOutline from '../visualizations/HierarchicalOutline.vue';
 
 export interface Props {
     analysisInProgress: boolean
