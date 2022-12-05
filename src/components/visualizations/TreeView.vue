@@ -58,7 +58,7 @@ const error = ref<boolean>(false);
 
 const treeComputed: Ref<UnipeptTreeView | undefined> = computed(() => {
     // A tree is not computed if the visualization is not mounted or if the data is not set.
-    if(props.loading || !mounted.value) {
+    if(props.loading || !mounted.value || !props.data) {
         return undefined;
     }
 

@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { NcbiTree } from '@/logic';
 import { Treemap as UnipeptTreemap, TreemapSettings } from 'unipept-visualizations';
-import { computed, onMounted, Ref, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 export interface Props {
     data: NcbiTree
@@ -34,6 +34,7 @@ export interface Props {
     width?: number
     height?: number
     autoResize?: boolean
+    filterId: number
     // tooltip?: (node: DataNodeLike) => string
     // colors?: (node: TreeviewNode) => string
 
@@ -45,33 +46,49 @@ export interface Props {
 const props = withDefaults(defineProps<Props>(), {
     height: 600,
     autoResize: false,
+    filterId: 1,
     loading: false,
     doReset: false,
     fullscreen: false
 });
 
-const emits = defineEmits(["reset"]);
+const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 
 const visualization = ref<HTMLElement | null>(null);
+const visualizationComputed = ref<UnipeptTreemap | undefined>(undefined);
 
 const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-const visualizationComputed: Ref<UnipeptTreemap | undefined> = computed(() => {
+watch([() => props.loading, mounted], () => {
     // A tree is not computed if the visualization is not mounted or if the data is not set.
     if(props.loading || !mounted.value) {
-        return undefined;
+        visualizationComputed.value = undefined;
     }
 
-    // When the visualization is mounted, the tree can be computed.
-    return initializeVisualisation();
+    if(!visualizationComputed.value) {
+        visualizationComputed.value = initializeVisualisation();
+    }
+});
+
+watch(() => props.data, () => {
+    visualizationComputed.value = undefined;
+    
+    if(visualization.value) {
+        visualization.value.innerHTML = "";
+    }
+
+    if(!props.loading && mounted.value) {
+        visualizationComputed.value = initializeVisualisation();
+    }
 });
 
 // Watch wheter we have to perform a reset
 watch(() => props.doReset, () => {
+    console.log("resetting")
     if(visualizationComputed.value) {
-        // @ts-ignore
-        visualizationComputed.value.reset();
+        // reset filterId to root
+        emits("update-selected-taxon-id", 1)
 
         // Let the parent component know that the reset has been performed
         emits("reset", true);
@@ -92,19 +109,34 @@ watch(() => props.fullscreen, () => {
     }
 });
 
+watch(() => props.filterId, () => {
+    if(visualizationComputed.value) {
+        // @ts-ignore
+        visualizationComputed.value.reroot(props.filterId, false);
+    }
+});
+
 const initializeVisualisation = () => {
     error.value = false;
 
     let settings = {
         width: props.width ? props.width : visualization.value?.clientWidth,
-        height: props.height - 20
+        height: props.height - 20,
+        rerootCallback: d => {
+            if(visualizationComputed.value) {
+                emits("update-selected-taxon-id", d.id);
+            }
+        }
     } as TreemapSettings;
 
-    const treeview = new UnipeptTreemap(
+    const treemap = new UnipeptTreemap(
         visualization.value as HTMLElement,
         props.data.getRoot(),
         settings,
     );
+
+    // @ts-ignore
+    treemap.reroot(props.filterId);
 
     if (props.autoResize) {
         const svgEl = visualization.value?.querySelector("svg");
@@ -114,7 +146,7 @@ const initializeVisualisation = () => {
         }
     }
 
-    return treeview;
+    return treemap;
 }
 
 onMounted(() => {

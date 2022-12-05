@@ -34,6 +34,7 @@ export interface Props {
     width?: number
     height?: number
     autoResize?: boolean
+    filterId: number
     // tooltip?: (node: DataNodeLike) => string
     // colors?: (node: TreeviewNode) => string
 
@@ -45,11 +46,12 @@ const props = withDefaults(defineProps<Props>(), {
     width: 800,
     height: 300,
     autoResize: false,
+    filterId: 1,
     loading: false,
     doReset: false
 });
 
-const emits = defineEmits(["reset"]);
+const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 
 const visualization = ref<HTMLElement | null>(null);
 
@@ -77,23 +79,23 @@ watch(() => props.doReset, () => {
     }
 });
 
+watch(() => props.filterId, () => {
+    if(visualizationComputed.value) {
+        // @ts-ignore
+        visualizationComputed.value.reroot(props.filterId, false);
+    }
+});
+
 const initializeVisualisation = () => {
     error.value = false;
 
     let settings = {
         width: props.width,
         height: props.height,
+        rerootCallback: d => emits("update-selected-taxon-id", d.id)
     } as SunburstSettings;
 
-    // if(props.tooltip) {
-    //     settings = { ...settings, getTooltip: props.tooltip };
-    // }
-
-    // if(props.colors) {
-    //     settings = { ...settings, colorProvider: props.colors };
-    // }
-
-    const treeview = new UnipeptSunburst(
+    const sunburst = new UnipeptSunburst(
         visualization.value as HTMLElement,
         props.data.getRoot(),
         settings,
@@ -107,7 +109,7 @@ const initializeVisualisation = () => {
         }
     }
 
-    return treeview;
+    return sunburst;
 }
 
 onMounted(() => {

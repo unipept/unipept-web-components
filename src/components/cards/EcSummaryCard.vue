@@ -23,7 +23,7 @@
             <TreeViewControls
                 ref="treeview"
                 class="mt-3"
-                :loading="analysisInProgress"
+                :loading="analysisInProgress || !ecTree"
                 :fullscreen="() => toggle(treeview)" 
                 :download="() => downloadModalOpen = true"
                 :reset="() => reset = true"
@@ -54,6 +54,7 @@
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcDefinition, FunctionalCountTableProcessor, Ontology } from '@/logic';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
+import { DataNodeLike } from 'unipept-visualizations/types';
 import { computed, ref } from 'vue';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import EcTable from '../tables/functional/EcTable.vue';
@@ -68,7 +69,7 @@ export interface Props {
     
     ecProcessor: FunctionalCountTableProcessor<EcCode, EcDefinition>
     ecOntology: Ontology<EcCode, EcDefinition>
-    ecTree: any
+    ecTree: DataNodeLike
 }
 
 const props = defineProps<Props>();

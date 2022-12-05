@@ -26,12 +26,14 @@
                 >
                     <template #visualization>
                         <Sunburst
-                            :data="taxaTree"
-                            :loading="analysisInProgress || !taxaTree"
+                            :data="ncbiTree"
+                            :loading="analysisInProgress || !ncbiTree"
                             :autoResize="true"
                             :height="500"
                             :doReset="sunburstReset"
+                            :filterId="filterId"
                             @reset="sunburstReset = false"
+                            @update-selected-taxon-id="updateSelectedTaxonId"
                         />
                     </template>
                 </VisualizationControls>
@@ -49,13 +51,15 @@
                 >
                     <template #visualization>
                         <TreeMap
-                            :data="taxaTree"
-                            :loading="analysisInProgress || !taxaTree"
+                            :data="ncbiTree"
+                            :loading="analysisInProgress || !ncbiTree"
                             :height="460"
                             :autoResize="true"
                             :doReset="treemapReset"
-                            @reset="treemapReset = false"
                             :fullscreen="isFullscreen && currentTab === 1"
+                            :filterId="filterId"
+                            @reset="treemapReset = false"
+                            @update-selected-taxon-id="updateSelectedTaxonId"
                         />
                     </template>
                 </VisualizationControls>
@@ -83,7 +87,7 @@
                 </VisualizationControls>
             </v-tab-item>
             <v-tab-item class="pa-5">
-                <HierarchicalOutline :tree="taxaTree" :equate-il="true" :loading="analysisInProgress" />
+                <HierarchicalOutline :tree="ncbiTree" :equate-il="true" :loading="analysisInProgress" />
             </v-tab-item>
             <v-tab-item>
                 <HeatmapWizardSingle 
@@ -141,8 +145,6 @@ import HierarchicalOutline from '../visualizations/HierarchicalOutline.vue';
 
 export interface Props {
     analysisInProgress: boolean
-    ecTree: DataNodeLike
-    taxaTree: NcbiTree
 
     goCountTableProcessor: GoCountTableProcessor
     goOntology: Ontology<GoCode, GoDefinition>
@@ -153,9 +155,14 @@ export interface Props {
     ncbiCountTableProcessor: LcaCountTableProcessor
     ncbiOntology: Ontology<NcbiId, NcbiTaxon>
     ncbiTree: NcbiTree
+    ecTree: DataNodeLike
+
+    filterId: number
 }
 
 defineProps<Props>();
+
+const emits = defineEmits(['update-selected-taxon-id']);
 
 const currentTab = ref<number>(0);
 
@@ -181,6 +188,10 @@ const sunburstElement = () => new SvgImageSource(sunburst.value?.$el.querySelect
 const treemapElement = () => new DomImageSource(treemap.value?.$el.querySelector(".treemap"));
 // @ts-ignore
 const treeviewElement = () => new SvgImageSource(treeview.value?.$el.querySelector("svg"));
+
+const updateSelectedTaxonId = (id: number) => {
+    emits('update-selected-taxon-id', id);
+};
 </script>
 
 <style scoped>
