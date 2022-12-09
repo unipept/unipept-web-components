@@ -9,7 +9,6 @@ export default class PeptideTrustProcessor {
         countTable: CountTable<Peptide>,
         pept2data: ShareableMap<Peptide, PeptideData>
     ): PeptideTrust {
-        console.log('peptdata', pept2data);
         let matchedPeptides = 0;
         const missedPeptides: Peptide[] = [];
 
