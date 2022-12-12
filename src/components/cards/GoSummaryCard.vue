@@ -20,7 +20,8 @@
                     <GoTable 
                         :items="biologicalProcessItems"
                         :loading="analysisInProgress" 
-                        :showPercentage="showPercentage" 
+                        :showPercentage="showPercentage"
+                        :downloadItem="downloadItem"
                     />
                 </v-col>
                 <v-col cols=3>
@@ -38,7 +39,8 @@
                     <GoTable 
                         :items="cellularComponentItems"
                         :loading="analysisInProgress" 
-                        :showPercentage="showPercentage" 
+                        :showPercentage="showPercentage"
+                        :downloadItem="downloadItem"
                     />
                 </v-col>
                 <v-col cols=3>
@@ -56,7 +58,8 @@
                     <GoTable 
                         :items="molecularFunctionItems"
                         :loading="analysisInProgress" 
-                        :showPercentage="showPercentage" 
+                        :showPercentage="showPercentage"
+                        :downloadItem="downloadItem"
                     />
                 </v-col>
                 <v-col cols=3>
@@ -85,6 +88,8 @@ export interface Props {
     
     goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>
     goOntology: Ontology<GoCode, GoDefinition>
+
+    downloadItem?: (code: GoCode) => Promise<void>
 }
 
 const props = defineProps<Props>();

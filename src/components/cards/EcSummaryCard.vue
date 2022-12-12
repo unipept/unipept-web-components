@@ -17,7 +17,8 @@
             <EcTable 
                 :items="items"
                 :loading="analysisInProgress" 
-                :showPercentage="showPercentage" 
+                :showPercentage="showPercentage"
+                :downloadItem="downloadItem"
             />
 
             <TreeViewControls
@@ -52,10 +53,11 @@
 
 <script setup lang="ts">
 import useFullscreen from '@/composables/useFullscreen';
-import { EcCode, EcDefinition, FunctionalCountTableProcessor, Ontology } from '@/logic';
+import { CsvUtils, EcCode, EcDefinition, FunctionalCountTableProcessor, FunctionalSummaryProcessor, NetworkUtils, Ontology, PeptideCountTableProcessor } from '@/logic';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import { DataNodeLike } from 'unipept-visualizations/types';
 import { computed, ref } from 'vue';
+import { VCard, VCardText } from 'vuetify/lib';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import EcTable from '../tables/functional/EcTable.vue';
 import EcTableItem from '../tables/functional/EcTableItem';
@@ -70,6 +72,8 @@ export interface Props {
     ecProcessor: FunctionalCountTableProcessor<EcCode, EcDefinition>
     ecOntology: Ontology<EcCode, EcDefinition>
     ecTree: DataNodeLike
+
+    downloadItem?: (code: EcCode) => Promise<void>
 }
 
 const props = defineProps<Props>();

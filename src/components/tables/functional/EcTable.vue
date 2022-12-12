@@ -23,16 +23,30 @@
                     {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
             </template>
+
             <template v-slot:item.code="{ item }">
                 <a :href="url(item.code)" target="_blank" class="font-regular d-flex">
                     {{ item.code }}
                     <v-icon class="pl-2" x-small>mdi-open-in-new</v-icon>
                 </a>
             </template>
+
             <template v-slot:item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
                 </span>
+            </template>
+
+            <template v-slot:item.action="{ item }">
+                <Tooltip
+                    v-if="downloadItem"
+                    message="Download CSV summary of the filtered functional annotation">
+                    <v-btn icon @click="downloadEcItem(item.code)">
+                        <v-icon>
+                            mdi-download
+                        </v-icon>
+                    </v-btn>
+                </tooltip>
             </template>
         </v-data-table>
     </div>
@@ -40,17 +54,19 @@
 
 <script setup lang="ts">
 import EcTableItem from './EcTableItem';
-import Tooltip from '@/components/util/Tooltip.vue';
 import useCsvDownload from '@/composables/useCsvDownload';
+import { FunctionalCode } from '@/logic';
+import Tooltip from '@/components/util/Tooltip.vue';
 
 export interface Props {
     items: EcTableItem[],
 
     loading: boolean
-    showPercentage: boolean
+    showPercentage: boolean,
+    downloadItem?: (code: FunctionalCode) => Promise<void>
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const headers = [
     {
@@ -91,6 +107,12 @@ const downloadCsv = (items: EcTableItem[]) => {
     const grid: string[][] = items.map(item => [item.count.toString(), item.code, item.name]);
 
     download(header, grid, "ec-table.csv");
+}
+
+const downloadEcItem = async (code: FunctionalCode) => {
+    if(props.downloadItem) {
+        await props.downloadItem(code);
+    }
 }
 </script>
 

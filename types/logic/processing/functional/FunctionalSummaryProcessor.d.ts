@@ -17,5 +17,5 @@ export default class FunctionalSummaryProcessor {
      * @param ncbiOntology An Ontology that maps taxon id's onto the corresponding taxon objects. All of the taxa id's
      * that are present in the pept2data table should be available in this ontology.
      */
-    summarizeFunctionalAnnotation(element: FunctionalDefinition, peptideTable: CountTable<Peptide>, pept2data: ShareableMap<Peptide, PeptideData>, ncbiOntology: Ontology<NcbiId, NcbiTaxon>): Promise<string[][]>;
+    summarizeFunctionalAnnotation(element: FunctionalDefinition, peptideTable: CountTable<Peptide>, pept2data: ShareableMap<Peptide, PeptideData>, ncbiOntology: Ontology<NcbiId, NcbiTaxon>, definitionExtractor: (peptideData: PeptideData) => FunctionalDefinition[]): Promise<string[][]>;
 }

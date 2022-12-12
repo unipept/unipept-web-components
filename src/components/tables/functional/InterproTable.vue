@@ -25,28 +25,43 @@
                     {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
             </template>
+
             <template v-slot:item.code="{ item }">
                 <a :href="url(item.code)" target="_blank" class="font-regular">
                     {{ item.code }}
                     <v-icon x-small>mdi-open-in-new</v-icon>
                 </a>
             </template>
+
             <template v-slot:item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
                 </span>
             </template>
+
             <template v-slot:item.namespace="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.namespace }}
                 </span>
+            </template>
+
+            <template v-slot:item.action="{ item }">
+                <Tooltip
+                    v-if="downloadItem"
+                    message="Download CSV summary of the filtered functional annotation">
+                    <v-btn icon @click="downloadInterproItem(item.code)">
+                        <v-icon>
+                            mdi-download
+                        </v-icon>
+                    </v-btn>
+                </tooltip>
             </template>
         </v-data-table>
     </div>
 </template>
 
 <script setup lang="ts">
-import { InterproNamespace } from '@/logic';
+import { FunctionalCode, InterproNamespace } from '@/logic';
 import { ref } from 'vue';
 import InterproTableItem from './InterproTableItem';
 import Tooltip from '@/components/util/Tooltip.vue';
@@ -55,11 +70,12 @@ import useCsvDownload from '@/composables/useCsvDownload';
 export interface Props {
     items: InterproTableItem[],
 
-    loading: boolean
-    showPercentage: boolean
+    loading: boolean,
+    showPercentage: boolean,
+    downloadItem?: (code: FunctionalCode) => Promise<void>
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const headers = [
     {
@@ -121,6 +137,12 @@ const downloadCsv = (items: InterproTableItem[], namespace: string) => {
         .map(item => [item.count.toString(), item.code, item.name, item.namespace]);
 
     download(header, grid, `interpro-${namespace.split(" ").join("_")}-table.csv`);
+}
+
+const downloadInterproItem = async (code: FunctionalCode) => {
+    if(props.downloadItem) {
+        await props.downloadItem(code);
+    }
 }
 </script>
 

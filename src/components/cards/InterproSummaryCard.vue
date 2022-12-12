@@ -16,7 +16,8 @@
             <InterproTable 
                 :items="items"
                 :loading="analysisInProgress" 
-                :showPercentage="showPercentage" 
+                :showPercentage="showPercentage"
+                :downloadItem="downloadItem"
             />
         </v-card-text>
     </v-card>
@@ -35,6 +36,8 @@ export interface Props {
     
     interproProcessor: FunctionalCountTableProcessor<InterproCode, InterproDefinition>
     interproOntology: Ontology<InterproCode, InterproDefinition>
+
+    downloadItem?: (code: InterproCode) => Promise<void>
 }
 
 const props = defineProps<Props>();

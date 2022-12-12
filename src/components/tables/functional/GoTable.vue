@@ -23,16 +23,30 @@
                     {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
             </template>
+
             <template v-slot:item.code="{ item }">
                 <a :href="url(item.code)" target="_blank" class="font-regular">
                     {{ item.code }}
                     <v-icon x-small>mdi-open-in-new</v-icon>
                 </a>
             </template>
+
             <template v-slot:item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
                      {{ item.name }}
                 </span>
+            </template>
+
+            <template v-slot:item.action="{ item }">
+                <Tooltip
+                    v-if="downloadItem"
+                    message="Download CSV summary of the filtered functional annotation">
+                    <v-btn icon @click="downloadGoItem(item.code)">
+                        <v-icon>
+                            mdi-download
+                        </v-icon>
+                    </v-btn>
+                </tooltip>
             </template>
         </v-data-table>
     </div>
@@ -42,15 +56,17 @@
 import GoTableItem from './GoTableItem';
 import Tooltip from '@/components/util/Tooltip.vue';
 import useCsvDownload from '@/composables/useCsvDownload';
+import { FunctionalCode } from '@/logic';
 
 export interface Props {
     items: GoTableItem[],
 
     loading: boolean
-    showPercentage: boolean
+    showPercentage: boolean,
+    downloadItem?: (code: FunctionalCode) => Promise<void>
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const headers = [
     {
@@ -93,6 +109,12 @@ const downloadCsv = (items: GoTableItem[]) => {
     const namespace: string = items[0].namespace;
 
     download(header, grid, `go-${namespace.split(" ").join("_")}-table.csv`);
+}
+
+const downloadGoItem = async (code: FunctionalCode) => {
+    if(props.downloadItem) {
+        await props.downloadItem(code);
+    }
 }
 </script>
 
