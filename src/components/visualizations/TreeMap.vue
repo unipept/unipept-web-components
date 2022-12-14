@@ -80,19 +80,14 @@ watch(() => props.data, () => {
 
     if(!props.loading && mounted.value) {
         visualizationComputed.value = initializeVisualisation();
+        emits("update-selected-taxon-id", 1)
     }
 });
 
 // Watch wheter we have to perform a reset
 watch(() => props.doReset, () => {
-    console.log("resetting")
-    if(visualizationComputed.value) {
-        // reset filterId to root
-        emits("update-selected-taxon-id", 1)
-
-        // Let the parent component know that the reset has been performed
-        emits("reset", true);
-    }
+    emits("update-selected-taxon-id", 1)
+    emits("reset", true);
 });
 
 // Watch wheter we have to perform a resize

@@ -4,18 +4,30 @@
             <span class="align-self-center me-1 text-caption">
                 {{ caption }}
             </span>
-            <v-btn v-if="settings" class="ma-1" x-small fab @click="settings" :elevation="0">
-                <v-icon>mdi-settings</v-icon>
-            </v-btn>
+
+            <v-menu v-if="settings">
+                <template v-slot:activator="{ on }">
+                    <v-btn class="ma-1" fab x-small v-on="on" :elevation="0">
+                        <v-icon>mdi-cog-outline</v-icon>
+                    </v-btn>
+                </template>
+                <v-list>
+                    <slot name="settings"></slot>
+                </v-list>
+            </v-menu>
+
             <v-btn v-if="rotate" class="ma-1" x-small fab @click="rotate" :elevation="0">
                 <v-icon>mdi-format-rotate-90</v-icon>
             </v-btn>
+
             <v-btn v-if="download && !hideDownload" class="ma-1" x-small fab @click="download" :elevation="0">
                 <v-icon>mdi-download</v-icon>
             </v-btn>
+
             <v-btn v-if="reset" class="ma-1" x-small fab @click="reset" :elevation="0">
                 <v-icon>mdi-restore</v-icon>
             </v-btn>
+
             <v-btn v-if="fullscreen" class="ma-1" x-small fab @click="fullscreen" :elevation="0">
                 <v-icon>mdi-fullscreen</v-icon>
             </v-btn>
@@ -33,8 +45,8 @@ export interface Props {
     loading: boolean
     overlap?: boolean
     hideDownload?: boolean
+    settings?: boolean
 
-    settings?: () => void
     rotate?: () => void
     download?: () => void
     reset?: () => void
@@ -43,7 +55,8 @@ export interface Props {
 
 withDefaults(defineProps<Props>(), {
     overlap: true,
-    hideDownload: false
+    hideDownload: false,
+    settings: false
 });
 </script>
 

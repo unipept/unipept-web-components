@@ -23,14 +23,27 @@
                     :download="() => downloadSunburstModalOpen = true"
                     :reset="() => sunburstReset = true"
                     :hideDownload="isFullscreen"
+                    settings
                 >
+                    <template #settings>
+                        <v-list-item>
+                            <v-list-item-action>
+                                <v-checkbox v-model="isFixedColors" color="primary"></v-checkbox>
+                            </v-list-item-action>
+
+                            <v-list-item-content>
+                                <v-list-item-title>Use fixed colors</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
                     <template #visualization>
                         <Sunburst
                             :data="ncbiTree"
-                            :loading="analysisInProgress || !ncbiTree"
+                            :loading="analysisInProgress"
                             :autoResize="true"
                             :height="500"
                             :doReset="sunburstReset"
+                            :isFixedColors="isFixedColors"
                             :filterId="filterId"
                             @reset="sunburstReset = false"
                             @update-selected-taxon-id="updateSelectedTaxonId"
@@ -165,6 +178,7 @@ defineProps<Props>();
 const emits = defineEmits(['update-selected-taxon-id']);
 
 const currentTab = ref<number>(0);
+const isFixedColors = ref<boolean>(false);
 
 const treeview = ref<HTMLElement | null>(null);
 const sunburst = ref<HTMLElement | null>(null);

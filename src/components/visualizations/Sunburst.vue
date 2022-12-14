@@ -34,6 +34,7 @@ export interface Props {
     width?: number
     height?: number
     autoResize?: boolean
+    isFixedColors?: boolean
     filterId: number
     // tooltip?: (node: DataNodeLike) => string
     // colors?: (node: TreeviewNode) => string
@@ -46,6 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
     width: 800,
     height: 300,
     autoResize: false,
+    isFixedColors: false,
     filterId: 1,
     loading: false,
     doReset: false
@@ -54,29 +56,36 @@ const props = withDefaults(defineProps<Props>(), {
 const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 
 const visualization = ref<HTMLElement | null>(null);
+const visualizationComputed = ref<UnipeptSunburst | undefined>(undefined);
 
 const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-const visualizationComputed: Ref<UnipeptSunburst | undefined> = computed(() => {
+watch([() => props.loading, mounted], () => {
     // A tree is not computed if the visualization is not mounted or if the data is not set.
     if(props.loading || !mounted.value) {
-        return undefined;
+        visualizationComputed.value = undefined;
     }
 
-    // When the visualization is mounted, the tree can be computed.
-    return initializeVisualisation();
+    if(!visualizationComputed.value) {
+        visualizationComputed.value = initializeVisualisation();
+    }
+});
+
+watch(() => props.data, () => {
+    visualizationComputed.value = undefined;
+
+    if(!props.loading && mounted.value) {
+        visualizationComputed.value = initializeVisualisation();
+
+        emits("update-selected-taxon-id", 1);
+    }
 });
 
 // Watch wheter we have to perform a reset
 watch(() => props.doReset, () => {
-    if(visualizationComputed.value) {
-        // @ts-ignore
-        visualizationComputed.value.reset();
-
-        // Let the parent component know that the reset has been performed
-        emits("reset", true);
-    }
+    emits("update-selected-taxon-id", 1);
+    emits("reset", true);
 });
 
 watch(() => props.filterId, () => {
@@ -86,13 +95,26 @@ watch(() => props.filterId, () => {
     }
 });
 
+watch(() => props.isFixedColors, () => {
+    visualizationComputed.value = undefined;
+    // @ts-ignore
+    visualizationComputed.value = initializeVisualisation();
+    // @ts-ignore
+    visualizationComputed.value.reroot(props.filterId, false);
+});
+
 const initializeVisualisation = () => {
     error.value = false;
 
     let settings = {
         width: props.width,
         height: props.height,
-        rerootCallback: d => emits("update-selected-taxon-id", d.id)
+        useFixedColors: props.isFixedColors,
+        rerootCallback: d => {
+            if(visualizationComputed.value) {
+                emits("update-selected-taxon-id", d.id);
+            }
+        }
     } as SunburstSettings;
 
     const sunburst = new UnipeptSunburst(
