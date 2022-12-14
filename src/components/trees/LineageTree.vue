@@ -3,15 +3,17 @@
         <v-card-text>
             This interactive tree bundles the complete taxonomic lineages of all UniProt entries whose protein sequence contains the tryptic peptide.
 
-            <TreeViewControls
+            <VisualizationControls
                 ref="treeview"
                 class="mt-3"
+                caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                 :loading="assay.analysisInProgress"
                 :fullscreen="() => toggle(treeview)" 
                 :download="() => downloadTreeviewModalOpen = true"
                 :reset="() => reset = true"
+                :hideDownload="isFullscreen"
             >
-                <template #treeview>
+                <template #visualization>
                     <TreeView
                         :data="assay?.taxaTree?.getRoot()"
                         :loading="assay.analysisInProgress"
@@ -23,7 +25,7 @@
                         @reset="reset = false"
                     />
                 </template>
-            </TreeViewControls>
+            </VisualizationControls>
 
             <DownloadImageModal 
                 :openModal="downloadTreeviewModalOpen"
@@ -46,7 +48,7 @@ import { ref } from 'vue';
 import { VCard, VCardText } from 'vuetify/lib';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import TreeView from '../visualizations/TreeView.vue';
-import TreeViewControls from '../visualizations/TreeViewControls.vue';
+import VisualizationControls from '../visualizations/VisualizationControls.vue';
     
 export interface Props {
     assay: SinglePeptideAnalysisStatus
@@ -56,7 +58,7 @@ defineProps<Props>();
 
 const treeview = ref<HTMLElement | null>(null);
 
-const { toggle } = useFullscreen();
+const { isFullscreen, toggle } = useFullscreen();
 
 const reset = ref<boolean>(false);
 

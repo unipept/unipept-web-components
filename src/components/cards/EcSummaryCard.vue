@@ -21,16 +21,17 @@
                 :downloadItem="downloadItem"
             />
 
-            <TreeViewControls
+            <VisualizationControls
                 ref="treeview"
                 class="mt-3"
+                caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                 :loading="analysisInProgress || !ecTree"
                 :fullscreen="() => toggle(treeview)" 
                 :download="() => downloadModalOpen = true"
                 :reset="() => reset = true"
                 :hideDownload="isFullscreen"
             >
-                <template #treeview>
+                <template #visualization>
                     <TreeView 
                         :data="ecTree"
                         :loading="analysisInProgress || !ecTree"
@@ -39,7 +40,7 @@
                         @reset="reset = false"
                     />
                 </template>
-            </TreeViewControls>
+            </VisualizationControls>
             
             <DownloadImageModal 
                 :openModal="downloadModalOpen"
@@ -63,7 +64,7 @@ import EcTable from '../tables/functional/EcTable.vue';
 import EcTableItem from '../tables/functional/EcTableItem';
 import TrustLine from '../util/TrustLine.vue';
 import TreeView from '../visualizations/TreeView.vue';
-import TreeViewControls from '../visualizations/TreeViewControls.vue';
+import VisualizationControls from '../visualizations/VisualizationControls.vue';
 
 export interface Props {
     analysisInProgress: boolean
