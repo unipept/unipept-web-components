@@ -1,2 +1,2 @@
-declare type Peptide = string;
+type Peptide = string;
 export default Peptide;

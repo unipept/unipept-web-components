@@ -1,4 +1,4 @@
-declare type PeptideDataResponse = {
+type PeptideDataResponse = {
     lca: number;
     lineage: number[];
     fa: {

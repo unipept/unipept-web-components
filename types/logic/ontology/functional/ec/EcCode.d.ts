@@ -1,2 +1,2 @@
-declare type EcCode = string;
+type EcCode = string;
 export default EcCode;

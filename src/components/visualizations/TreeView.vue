@@ -1,6 +1,6 @@
 <template>
     <div style="height: inherit;" v-if="!error">
-        <div v-if="!treeComputed" class="d-flex loading-container">
+        <div v-if="!visualizationComputed" class="d-flex loading-container">
             <v-progress-circular 
                 :width="5" 
                 :size="50" 
@@ -27,6 +27,7 @@
 import { DataNodeLike, Treeview as UnipeptTreeView, TreeviewSettings } from 'unipept-visualizations';
 import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
 import { computed, onMounted, Ref, ref, watch } from 'vue';
+import { tooltipContent } from './VisualizationHelper';
 
 export interface Props {
     data: DataNodeLike
@@ -34,9 +35,6 @@ export interface Props {
     width?: number
     height?: number
     autoResize?: boolean
-    tooltip?: (node: DataNodeLike) => string
-    colors?: (node: TreeviewNode) => string
-
     loading?: boolean
     doReset?: boolean
 }
@@ -52,25 +50,31 @@ const props = withDefaults(defineProps<Props>(), {
 const emits = defineEmits(["reset"]);
 
 const visualization = ref<HTMLElement | null>(null);
+const visualizationComputed = ref<UnipeptTreeView | undefined>(undefined);
 
-const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-const treeComputed: Ref<UnipeptTreeView | undefined> = computed(() => {
-    // A tree is not computed if the visualization is not mounted or if the data is not set.
-    if(props.loading || !mounted.value || !props.data) {
-        return undefined;
+watch(() => props.loading, () => {
+    if(props.loading || !props.data) {
+        visualizationComputed.value = undefined;
     }
 
-    // When the visualization is mounted, the tree can be computed.
-    return initializeVisualisation();
+    if(!visualizationComputed.value) {
+        visualizationComputed.value = initializeVisualisation();
+    }
+});
+
+watch(() => props.data, () => {
+    if(!props.loading) {
+        visualizationComputed.value = initializeVisualisation();
+    }
 });
 
 // Watch wheter we have to perform a reset
 watch(() => props.doReset, () => {
-    if(treeComputed.value) {
+    if(visualizationComputed.value) {
         // @ts-ignore
-        treeComputed.value.reset();
+        visualizationComputed.value.reset();
 
         // Let the parent component know that the reset has been performed
         emits("reset", true);
@@ -83,15 +87,8 @@ const initializeVisualisation = () => {
     let settings = {
         width: props.width,
         height: props.height,
+        getTooltipText: d => tooltipContent(d)
     } as TreeviewSettings;
-
-    if(props.tooltip) {
-        settings = { ...settings, getTooltip: props.tooltip };
-    }
-
-    if(props.colors) {
-        settings = { ...settings, colorProvider: props.colors };
-    }
 
     const treeview = new UnipeptTreeView(
         visualization.value as HTMLElement,
@@ -111,7 +108,9 @@ const initializeVisualisation = () => {
 }
 
 onMounted(() => {
-    mounted.value = true;
+    if(!props.loading && props.data) {
+        visualizationComputed.value = initializeVisualisation();
+    }
 });
 </script>
 

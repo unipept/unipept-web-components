@@ -1,6 +1,6 @@
 <template>
     <v-card>
-        <v-tabs 
+        <v-tabs
             slider-color="secondary" 
             background-color="primary" 
             dark 

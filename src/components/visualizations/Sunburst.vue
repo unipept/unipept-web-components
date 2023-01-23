@@ -27,6 +27,7 @@
 import { NcbiTree } from '@/logic';
 import { Sunburst as UnipeptSunburst, SunburstSettings } from 'unipept-visualizations';
 import { computed, onMounted, Ref, ref, watch } from 'vue';
+import { tooltipContent } from './VisualizationHelper';
 
 export interface Props {
     data: NcbiTree
@@ -36,8 +37,6 @@ export interface Props {
     autoResize?: boolean
     isFixedColors?: boolean
     filterId: number
-    // tooltip?: (node: DataNodeLike) => string
-    // colors?: (node: TreeviewNode) => string
 
     loading?: boolean
     doReset?: boolean
@@ -58,12 +57,10 @@ const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptSunburst | undefined>(undefined);
 
-const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-watch([() => props.loading, mounted], () => {
-    // A tree is not computed if the visualization is not mounted or if the data is not set.
-    if(props.loading || !mounted.value) {
+watch(() => props.loading, () => {
+    if(props.loading) {
         visualizationComputed.value = undefined;
     }
 
@@ -73,9 +70,7 @@ watch([() => props.loading, mounted], () => {
 });
 
 watch(() => props.data, () => {
-    visualizationComputed.value = undefined;
-
-    if(!props.loading && mounted.value) {
+    if(!props.loading) {
         visualizationComputed.value = initializeVisualisation();
 
         emits("update-selected-taxon-id", 1);
@@ -96,8 +91,6 @@ watch(() => props.filterId, () => {
 });
 
 watch(() => props.isFixedColors, () => {
-    visualizationComputed.value = undefined;
-    // @ts-ignore
     visualizationComputed.value = initializeVisualisation();
     // @ts-ignore
     visualizationComputed.value.reroot(props.filterId, false);
@@ -105,6 +98,10 @@ watch(() => props.isFixedColors, () => {
 
 const initializeVisualisation = () => {
     error.value = false;
+    
+    visualizationComputed.value = undefined;
+
+    if(!props.data) return;
 
     let settings = {
         width: props.width,
@@ -114,7 +111,8 @@ const initializeVisualisation = () => {
             if(visualizationComputed.value) {
                 emits("update-selected-taxon-id", d.id);
             }
-        }
+        },
+        getTooltipText: d => tooltipContent(d)
     } as SunburstSettings;
 
     const sunburst = new UnipeptSunburst(
@@ -135,7 +133,9 @@ const initializeVisualisation = () => {
 }
 
 onMounted(() => {
-    mounted.value = true;
+    if(!props.loading) {
+        visualizationComputed.value = initializeVisualisation();
+    }
 });
 </script>
 

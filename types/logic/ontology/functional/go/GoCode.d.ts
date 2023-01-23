@@ -1,2 +1,2 @@
-declare type GoCode = string;
+type GoCode = string;
 export default GoCode;

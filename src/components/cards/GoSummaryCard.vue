@@ -1,18 +1,27 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <TrustLine
-                class="mb-5"
-                :trust="goProcessor?.getTrust()"
-                :faKind="{
-                    singular: 'GO term',
-                    plural: 'GO terms'
-                }"
-                :countKind="{
-                    singular: 'protein',
-                    plural: 'proteins'
-                }"
-            />
+            <v-row v-if="!analysisInProgress">
+                <v-col>
+                    <TrustLine
+                        class="mb-5"
+                        :trust="goProcessor?.getTrust()"
+                        :faKind="{
+                            singular: 'GO term',
+                            plural: 'GO terms'
+                        }"
+                        :countKind="{
+                            singular: 'protein',
+                            plural: 'proteins'
+                        }"
+                    />
+                </v-col>
+                <v-col class="flex-grow-0">
+                    <v-btn icon @click="editFilterPercentageModalOpen = true">
+                        <v-icon color="grey darken-1">mdi-cog-outline</v-icon>
+                    </v-btn>
+                </v-col>
+            </v-row>
 
             <h2 class="py-2">Biological Process</h2>
             <v-row>
@@ -70,6 +79,13 @@
                     />
                 </v-col>
             </v-row>
+
+            <EditFilterPercentageModal
+                :model-value="filterPercentage"
+                :openModal="editFilterPercentageModalOpen"
+                @close="editFilterPercentageModalOpen = false"
+                @update:model-value="onUpdateFilterPercentage"
+            />
         </v-card-text>
     </v-card>
 </template>
@@ -80,11 +96,13 @@ import GoTableItem from '@/components/tables/functional/GoTableItem';
 import GoTable from '@/components/tables/functional/GoTable.vue';
 import QuickGoCard from './QuickGoCard.vue';
 import TrustLine from '@/components/util/TrustLine.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import EditFilterPercentageModal from '../modals/EditFilterPercentageModal.vue';
 
 export interface Props {
     analysisInProgress: boolean
     showPercentage: boolean
+    filter: number
     
     goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>
     goOntology: Ontology<GoCode, GoDefinition>
@@ -93,6 +111,11 @@ export interface Props {
 }
 
 const props = defineProps<Props>();
+
+const emits = defineEmits(["filerPercentageChange"])
+
+const editFilterPercentageModalOpen = ref<boolean>(false);
+const filterPercentage = ref<number>(props.filter);
 
 const biologicalProcessItems = computed(() => {
     if(!props.analysisInProgress) {
@@ -143,4 +166,9 @@ const items = (
 
     return items;
 }
+
+const onUpdateFilterPercentage = (newFilterPercentage: number) => {
+    filterPercentage.value = newFilterPercentage;
+    emits("filerPercentageChange", newFilterPercentage);
+};
 </script>

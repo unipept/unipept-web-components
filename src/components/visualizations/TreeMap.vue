@@ -26,7 +26,8 @@
 <script setup lang="ts">
 import { NcbiTree } from '@/logic';
 import { Treemap as UnipeptTreemap, TreemapSettings } from 'unipept-visualizations';
-import { onMounted, ref, watch } from 'vue';
+import { onBeforeUpdate, onMounted, onUnmounted, ref, watch } from 'vue';
+import { tooltipContent } from './VisualizationHelper';
 
 export interface Props {
     data: NcbiTree
@@ -35,8 +36,6 @@ export interface Props {
     height?: number
     autoResize?: boolean
     filterId: number
-    // tooltip?: (node: DataNodeLike) => string
-    // colors?: (node: TreeviewNode) => string
 
     loading?: boolean
     doReset?: boolean
@@ -57,12 +56,10 @@ const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptTreemap | undefined>(undefined);
 
-const mounted = ref<boolean>(false);
 const error = ref<boolean>(false);
 
-watch([() => props.loading, mounted], () => {
-    // A tree is not computed if the visualization is not mounted or if the data is not set.
-    if(props.loading || !mounted.value) {
+watch(() => props.loading, () => {
+    if(props.loading) {
         visualizationComputed.value = undefined;
     }
 
@@ -72,29 +69,17 @@ watch([() => props.loading, mounted], () => {
 });
 
 watch(() => props.data, () => {
-    visualizationComputed.value = undefined;
-    
-    if(visualization.value) {
-        visualization.value.innerHTML = "";
-    }
-
-    if(!props.loading && mounted.value) {
+    if(!props.loading) {
         visualizationComputed.value = initializeVisualisation();
-        emits("update-selected-taxon-id", 1)
-    }
-});
 
-// Watch wheter we have to perform a reset
-watch(() => props.doReset, () => {
-    emits("update-selected-taxon-id", 1)
-    emits("reset", true);
+        emits("update-selected-taxon-id", 1);
+    }
 });
 
 // Watch wheter we have to perform a resize
 watch(() => props.fullscreen, () => {
     if(visualizationComputed.value) {
         if(props.fullscreen) {
-            console.log("fullscreen", visualization.value?.clientHeight);
             // @ts-ignore
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight - 20);
         } else {
@@ -102,6 +87,12 @@ watch(() => props.fullscreen, () => {
             visualizationComputed.value.resize(visualization.value?.clientWidth, props.height - 20);
         }
     }
+});
+
+// Watch wheter we have to perform a reset
+watch(() => props.doReset, () => {
+    emits("update-selected-taxon-id", 1)
+    emits("reset", true);
 });
 
 watch(() => props.filterId, () => {
@@ -114,6 +105,13 @@ watch(() => props.filterId, () => {
 const initializeVisualisation = () => {
     error.value = false;
 
+    visualizationComputed.value = undefined;
+    if(visualization.value) {
+        visualization.value.innerHTML = "";
+    }
+
+    console.log(props.width ? props.width : visualization.value?.clientWidth)
+
     let settings = {
         width: props.width ? props.width : visualization.value?.clientWidth,
         height: props.height - 20,
@@ -121,7 +119,8 @@ const initializeVisualisation = () => {
             if(visualizationComputed.value) {
                 emits("update-selected-taxon-id", d.id);
             }
-        }
+        },
+        getTooltipText: d => tooltipContent(d)
     } as TreemapSettings;
 
     const treemap = new UnipeptTreemap(
@@ -145,7 +144,9 @@ const initializeVisualisation = () => {
 }
 
 onMounted(() => {
-    mounted.value = true;
+    if(!props.loading) {
+        visualizationComputed.value = initializeVisualisation();
+    }
 });
 </script>
 
