@@ -3,13 +3,17 @@ import NetworkUtils from "../NetworkUtils";
 import { MetaProteinResponse } from "./ProteinResponse";
 
 export default class ProteinResponseCommunicator {
-    //const a = "http://127.0.0.1:3000";
-    private static readonly apiBaseUrl = "http://api.unipept.ugent.be" // TODO: THIS CANNOT BE HARDCODED HERE!!!
     public static readonly PROTEIN_ENDPOINT: string = "/private_api/proteins";
 
     // Maps a peptide and it's search settings (equateIl) onto the previously received protein responses.
     private static cachedResponses: Map<string, MetaProteinResponse> = new Map();
     private static inProgress: Promise<void> | undefined;
+
+    private static apiBaseUrl = "http://api.unipept.ugent.be"
+
+    public static setup(apiBaseUrl: string) {
+        this.apiBaseUrl = apiBaseUrl;
+    }
 
     /**
      * Returns the API-response from Unipept that contains all protein information associated with the given peptide.

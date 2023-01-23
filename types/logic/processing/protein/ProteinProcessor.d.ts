@@ -1,3 +1,4 @@
+import ProteinResponseCommunicator from "../../../logic/communication/protein/ProteinResponseCommunicator";
 import Peptide from "../../../logic/ontology/peptide/Peptide";
 import ProteinDefinition from "../../../logic/ontology/protein/ProteinDefinition";
 import NcbiId from "../../../logic/ontology/taxonomic/NcbiId";
@@ -5,7 +6,8 @@ export default class ProteinProcessor {
     private proteins;
     private lca;
     private commonLineage;
-    constructor();
+    private communicator;
+    constructor(communicator: ProteinResponseCommunicator);
     /**
      * Returns a list of protein definitions associated with the given peptide. These definitions are guaranteed to be
      * sorted by organism name.

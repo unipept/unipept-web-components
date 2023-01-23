@@ -1,10 +1,11 @@
 import Peptide from "../../../logic/ontology/peptide/Peptide";
 import { MetaProteinResponse } from "./ProteinResponse";
 export default class ProteinResponseCommunicator {
-    private static readonly apiBaseUrl;
     static readonly PROTEIN_ENDPOINT: string;
     private static cachedResponses;
     private static inProgress;
+    private static apiBaseUrl;
+    static setup(apiBaseUrl: string): void;
     /**
      * Returns the API-response from Unipept that contains all protein information associated with the given peptide.
      *

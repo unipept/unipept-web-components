@@ -7,11 +7,14 @@ export default class ProteinProcessor {
     private proteins: ProteinDefinition[];
     private lca: NcbiId;
     private commonLineage: NcbiId[];
+    private communicator: ProteinResponseCommunicator;
 
-    constructor() {
+    constructor(communicator: ProteinResponseCommunicator) {
         this.proteins = [];
         this.lca = -1;
         this.commonLineage = [];
+
+        this.communicator = communicator;
     }
 
     /**
@@ -42,8 +45,7 @@ export default class ProteinProcessor {
      * @param equateIl Whether the amino acids "I" and "L" in a peptide should be treated equally.
      */
     public async compute(peptide: Peptide, equateIl: boolean): Promise<void> {
-        const proteinResponseCommunicator = new ProteinResponseCommunicator();
-        const response = await proteinResponseCommunicator.getResponse(peptide, equateIl);
+        const response = await this.communicator.getResponse(peptide, equateIl);
 
         if (response) {
             this.proteins = response.proteins.map(response => new ProteinDefinition(
