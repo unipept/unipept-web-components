@@ -45,7 +45,7 @@ const emits = defineEmits(['close', 'update:model-value'])
 
 const dialogOpen = ref<boolean>(props.openModal);
 
-const filterPercentage = ref<number>(5);
+const filterPercentage = ref<number>(props.modelValue);
 
 const closeDialog = () => {
     dialogOpen.value = false;
@@ -53,8 +53,12 @@ const closeDialog = () => {
     emits('close', dialogOpen.value);
 }
 
-watch(() => props.openModal, async (newVal) => {
+watch(() => props.openModal, (newVal) => {
     dialogOpen.value = newVal;
+});
+
+watch(() => props.modelValue, (newVal) => {
+    filterPercentage.value = newVal;
 });
 </script>
 
