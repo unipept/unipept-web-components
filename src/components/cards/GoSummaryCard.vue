@@ -96,7 +96,7 @@ import GoTableItem from '@/components/tables/functional/GoTableItem';
 import GoTable from '@/components/tables/functional/GoTable.vue';
 import QuickGoCard from './QuickGoCard.vue';
 import TrustLine from '@/components/util/TrustLine.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import EditFilterPercentageModal from '../modals/EditFilterPercentageModal.vue';
 
 export interface Props {
@@ -171,4 +171,8 @@ const onUpdateFilterPercentage = (newFilterPercentage: number) => {
     filterPercentage.value = newFilterPercentage;
     emits("filerPercentageChange", newFilterPercentage);
 };
+
+watch(() => props.filter, (newFilter) => {
+    onUpdateFilterPercentage(newFilter)
+});
 </script>

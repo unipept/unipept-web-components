@@ -1,18 +1,28 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <TrustLine 
-                class="mb-5"
-                :trust="ecProcessor?.getTrust()"
-                :faKind="{
-                    singular: 'EC number',
-                    plural: 'EC numbers'
-                }"
-                :countKind="{
-                    singular: 'protein',
-                    plural: 'proteins'
-                }"
-            />
+            <v-row v-if="!analysisInProgress">
+                <v-col>
+                    <TrustLine 
+                        class="mb-5"
+                        :trust="ecProcessor?.getTrust()"
+                        :faKind="{
+                            singular: 'EC number',
+                            plural: 'EC numbers'
+                        }"
+                        :countKind="{
+                            singular: 'protein',
+                            plural: 'proteins'
+                        }"
+                    />
+                </v-col>
+                <v-col class="flex-grow-0">
+                    <v-btn icon @click="editFilterPercentageModalOpen = true">
+                        <v-icon color="grey darken-1">mdi-cog-outline</v-icon>
+                    </v-btn>
+                </v-col>
+            </v-row>
+            
 
             <EcTable 
                 :items="items"
@@ -48,6 +58,13 @@
                 @close="downloadModalOpen = false"
                 supportsSvg
             />
+
+            <EditFilterPercentageModal
+                :model-value="filterPercentage"
+                :openModal="editFilterPercentageModalOpen"
+                @close="editFilterPercentageModalOpen = false"
+                @update:model-value="onUpdateFilterPercentage"
+            />
         </v-card-text>
     </v-card>
 </template>
@@ -57,9 +74,10 @@ import useFullscreen from '@/composables/useFullscreen';
 import { CsvUtils, EcCode, EcDefinition, FunctionalCountTableProcessor, FunctionalSummaryProcessor, NetworkUtils, Ontology, PeptideCountTableProcessor } from '@/logic';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import { DataNodeLike } from 'unipept-visualizations/types';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { VCard, VCardText } from 'vuetify/lib';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
+import EditFilterPercentageModal from '../modals/EditFilterPercentageModal.vue';
 import EcTable from '../tables/functional/EcTable.vue';
 import EcTableItem from '../tables/functional/EcTableItem';
 import TrustLine from '../util/TrustLine.vue';
@@ -69,6 +87,7 @@ import VisualizationControls from '../visualizations/VisualizationControls.vue';
 export interface Props {
     analysisInProgress: boolean
     showPercentage: boolean
+    filter: number
     
     ecProcessor: FunctionalCountTableProcessor<EcCode, EcDefinition>
     ecOntology: Ontology<EcCode, EcDefinition>
@@ -78,6 +97,11 @@ export interface Props {
 }
 
 const props = defineProps<Props>();
+
+const emits = defineEmits(["filerPercentageChange"])
+
+const editFilterPercentageModalOpen = ref<boolean>(false);
+const filterPercentage = ref<number>(props.filter);
 
 const treeview = ref<HTMLElement | null>(null);
 
@@ -113,5 +137,16 @@ const items = computed(() => {
     }
 
     return [];
+});
+
+const onUpdateFilterPercentage = (newFilterPercentage: number) => {
+    filterPercentage.value = newFilterPercentage;
+    emits("filerPercentageChange", newFilterPercentage);
+};
+
+watch(() => props.filter, (newFilter) => {
+    console.log("newFilter ec (1)", newFilter)
+    filterPercentage.value = newFilter;
+    console.log("newFilter ec (2)", filterPercentage.value)
 });
 </script>
