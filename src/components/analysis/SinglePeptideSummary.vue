@@ -44,7 +44,7 @@
                     <span class="font-weight-bold">{{ assay.goProteinCountTableProcessor.getTrust().annotatedItems }} proteins</span>
                     ({{ toPercentage(assay.goProteinCountTableProcessor.getTrust().annotatedItems / assay.goProteinCountTableProcessor.getTrust().totalAmountOfItems) }})
                     have at least one 
-                    <span v-if="goLink" class="font-weight-bold link primary--text" @click="goLinkClicked">GO term</span> 
+                    <span v-if="goLink" class="link primary--text" @click="goLinkClicked">GO term</span> 
                     <span v-else        class="font-weight-bold">GO term</span> 
                     assigned to them.
                 </div>
@@ -53,7 +53,7 @@
                     <span class="font-weight-bold">{{ assay.ecProteinCountTableProcessor.getTrust().annotatedItems }} proteins</span>
                     ({{ toPercentage(assay.ecProteinCountTableProcessor.getTrust().annotatedItems / assay.ecProteinCountTableProcessor.getTrust().totalAmountOfItems) }})
                     have at least one 
-                    <span v-if="ecLink" class="font-weight-bold link primary--text" @click="ecLinkClicked">EC number</span> 
+                    <span v-if="ecLink" class="link primary--text" @click="ecLinkClicked">EC number</span> 
                     <span v-else        class="font-weight-bold">EC number</span> 
                     assigned to them.
                 </div>
@@ -62,7 +62,7 @@
                     <span class="font-weight-bold">{{ assay.interproProteinCountTableProcessor.getTrust().annotatedItems }} proteins</span>
                     ({{ toPercentage(assay.interproProteinCountTableProcessor.getTrust().annotatedItems / assay.interproProteinCountTableProcessor.getTrust().totalAmountOfItems) }})
                     have at least one 
-                    <span v-if="interproLink" class="font-weight-bold link primary--text" @click="interproLinkClicked">InterPro entry</span> 
+                    <span v-if="interproLink" class="link primary--text" @click="interproLinkClicked">InterPro entry</span> 
                     <span v-else              class="font-weight-bold">InterPro entry</span> 
                     assigned to them.
                 </div>
