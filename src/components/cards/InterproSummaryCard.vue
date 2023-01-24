@@ -16,7 +16,7 @@
                         }"
                     />
                 </v-col>
-                <v-col class="flex-grow-0">
+                <v-col v-if="filter !== undefined" class="flex-grow-0">
                     <v-btn icon @click="editFilterPercentageModalOpen = true">
                         <v-icon color="grey darken-1">mdi-cog-outline</v-icon>
                     </v-btn>
