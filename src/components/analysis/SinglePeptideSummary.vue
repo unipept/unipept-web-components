@@ -16,7 +16,7 @@
                 <div class="headline">Biodiversity</div>
                 <div v-if="lca(assay)">
                     The <span class="font-weight-bold">lowest common ancestor</span> is
-                    <a :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${lca(assay)?.id}`" target="_blank">
+                    <a :href="taxonomyUrl(lca(assay))" target="_blank">
                         {{ lca(assay)?.name }}
                     </a> ({{ lca(assay)?.rank }}).
                 </div>
@@ -95,4 +95,18 @@ const toPercentage = (n: number): string => {
     }
     return StringUtils.numberToPercent(n);
 }
+
+const taxonomyUrl = (taxon: NcbiTaxon | undefined): string => {
+    if (taxon === undefined || taxon.id === 1) {
+        return 'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi';
+    }
+
+    return `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${taxon.id}`;
+};
 </script>
+
+<style scoped>
+a {
+    text-decoration: none;
+}
+</style>
