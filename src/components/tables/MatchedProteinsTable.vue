@@ -244,12 +244,14 @@ const filterByValue = (value: any, search: string, item: MatchedProtein) => {
         return true;
     }
 
-    return item.name.includes(search) ||
-        item.uniprotAccessionId.includes(search) ||
-        item.organism.includes(search) ||
-        item.functionalAnnotations.go.some(e => e.name.includes(search) || e.code.includes(search)) ||
-        item.functionalAnnotations.interpro.some(e => e.name.includes(search) || e.code.includes(search)) ||
-        item.functionalAnnotations.ec.some(e => e.name.includes(search) || e.code.includes(search));
+    search = search.toLowerCase();
+
+    return item.name.toLowerCase().includes(search) ||
+        item.uniprotAccessionId.toLowerCase().includes(search) ||
+        item.organism.toLowerCase().includes(search) ||
+        item.functionalAnnotations.go.some(e => e.name.toLowerCase().includes(search) || e.code.toLowerCase().includes(search)) ||
+        item.functionalAnnotations.interpro.some(e => e.name.toLowerCase().includes(search) || e.code.toLowerCase().includes(search)) ||
+        item.functionalAnnotations.ec.some(e => e.name.toLowerCase().includes(search) || e.code.toLowerCase().includes(search));
 };
 
 const toggleExpanded = (item: MatchedProtein) => {
