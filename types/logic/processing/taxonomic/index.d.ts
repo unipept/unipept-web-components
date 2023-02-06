@@ -1,3 +1,4 @@
 import LcaCountTableProcessor from "./LcaCountTableProcessor";
 import NcbiOntologyProcessor from "./NcbiOnthologyProcessor";
-export { LcaCountTableProcessor, NcbiOntologyProcessor };
+import HighlightedTreeProcessor from "./HighlightedTreeProcessor";
+export { LcaCountTableProcessor, NcbiOntologyProcessor, HighlightedTreeProcessor };

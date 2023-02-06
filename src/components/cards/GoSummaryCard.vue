@@ -31,6 +31,9 @@
                         :loading="analysisInProgress" 
                         :showPercentage="showPercentage"
                         :downloadItem="downloadItem"
+                        :ncbiTree="ncbiTree"
+                        :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
+                        :itemToPeptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
                     />
                 </v-col>
                 <v-col cols=3>
@@ -50,6 +53,9 @@
                         :loading="analysisInProgress" 
                         :showPercentage="showPercentage"
                         :downloadItem="downloadItem"
+                        :ncbiTree="ncbiTree"
+                        :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
+                        :itemToPeptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
                     />
                 </v-col>
                 <v-col cols=3>
@@ -69,6 +75,9 @@
                         :loading="analysisInProgress" 
                         :showPercentage="showPercentage"
                         :downloadItem="downloadItem"
+                        :ncbiTree="ncbiTree"
+                        :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
+                        :itemToPeptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
                     />
                 </v-col>
                 <v-col cols=3>
@@ -91,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { FunctionalCountTableProcessor, GoCode, GoDefinition, GoNamespace, Ontology } from '@/logic';
+import { FunctionalCountTableProcessor, GoCode, GoDefinition, GoNamespace, LcaCountTableProcessor, NcbiTree, Ontology } from '@/logic';
 import GoTableItem from '@/components/tables/functional/GoTableItem';
 import GoTable from '@/components/tables/functional/GoTable.vue';
 import QuickGoCard from './QuickGoCard.vue';
@@ -106,6 +115,9 @@ export interface Props {
     
     goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>
     goOntology: Ontology<GoCode, GoDefinition>
+
+    ncbiProcessor?: LcaCountTableProcessor
+    ncbiTree?: NcbiTree
 
     downloadItem?: (code: GoCode) => Promise<void>
 }

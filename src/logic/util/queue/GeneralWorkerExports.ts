@@ -2,12 +2,14 @@ import { default as computeFunctionalCountTable } from "../../../logic/processin
 import { default as computeNcbiOntology } from "../../../logic/processing/taxonomic/NcbiOntologyProcessor.workerSource";
 import { default as computeLcaCountTable } from "../../../logic/processing/taxonomic/LcaCountTableProcessor.workerSource";
 import { default as computePeptideCountTable } from "../../../logic/processing/peptide/PeptideCountTableProcessor.workerSource";
+import { default as computeHighlightedTree } from "../../../logic/processing/taxonomic/HighlightedTreeProcessor.workerSource";
 
 export const workerFunctionMap: Map<string, (any: any) => Promise<any>> = new Map<string, (any: any) => Promise<any>>([
     ["computeNcbiOntology", computeNcbiOntology],
     ["computeFunctionalCountTable", computeFunctionalCountTable],
     ["computeLcaCountTable", computeLcaCountTable],
-    ["computePeptideCountTable", computePeptideCountTable]
+    ["computePeptideCountTable", computePeptideCountTable],
+    ["computeHighlightedTree", computeHighlightedTree]
 ]);
 
 export function createMessageEventListener(ctx: Worker): (event: MessageEvent) => Promise<void> {

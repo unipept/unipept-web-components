@@ -37,6 +37,10 @@ export interface Props {
     autoResize?: boolean
     loading?: boolean
     doReset?: boolean
+
+    linkStrokeColor?: (d: any) => string
+    nodeStrokeColor?: (d: any) => string
+    nodeFillColor?: (d: any) => string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -89,6 +93,17 @@ const initializeVisualisation = () => {
         height: props.height,
         getTooltipText: d => tooltipContent(d)
     } as TreeviewSettings;
+
+    // Add the settings that are passed as props
+    if (props.linkStrokeColor) {
+        settings.linkStrokeColor = props.linkStrokeColor;
+    }
+    if (props.nodeStrokeColor) {
+        settings.nodeStrokeColor = props.nodeStrokeColor;
+    }
+    if (props.nodeFillColor) {
+        settings.nodeFillColor = props.nodeFillColor;
+    }
 
     const treeview = new UnipeptTreeView(
         visualization.value as HTMLElement,
