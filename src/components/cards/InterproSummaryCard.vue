@@ -28,6 +28,9 @@
                 :loading="analysisInProgress" 
                 :showPercentage="showPercentage"
                 :downloadItem="downloadItem"
+                :ncbiTree="ncbiTree"
+                :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
+                :itemToPeptides="(interproProcessor && ncbiTree) ? interproProcessor.getAnnotationPeptideMapping() : undefined"
             />
 
             <EditFilterPercentageModal
@@ -41,12 +44,13 @@
 </template>
 
 <script setup lang="ts">
-import { FunctionalCountTableProcessor, InterproCode, InterproDefinition, InterproNamespace, Ontology } from '@/logic';
+import { FunctionalCountTableProcessor, InterproCode, InterproDefinition, InterproNamespace, LcaCountTableProcessor, NcbiTree, Ontology } from '@/logic';
 import InterproTableItem from '../tables/functional/InterproTableItem';
 import InterproTable from '../tables/functional/InterproTable.vue';
 import TrustLine from '../util/TrustLine.vue';
 import { computed, ref, watch } from 'vue';
 import EditFilterPercentageModal from '../modals/EditFilterPercentageModal.vue';
+import { VCard, VCardText, VRow, VCol, VBtn, VIcon } from 'vuetify/lib';
 
 export interface Props {
     analysisInProgress: boolean
@@ -55,6 +59,9 @@ export interface Props {
     
     interproProcessor: FunctionalCountTableProcessor<InterproCode, InterproDefinition>
     interproOntology: Ontology<InterproCode, InterproDefinition>
+
+    ncbiProcessor?: LcaCountTableProcessor
+    ncbiTree?: NcbiTree
 
     downloadItem?: (code: InterproCode) => Promise<void>
 }

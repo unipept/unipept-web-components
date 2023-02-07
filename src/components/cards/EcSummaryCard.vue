@@ -29,6 +29,9 @@
                 :loading="analysisInProgress" 
                 :showPercentage="showPercentage"
                 :downloadItem="downloadItem"
+                :ncbiTree="ncbiTree"
+                :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
+                :itemToPeptides="(ecProcessor && ncbiTree) ? ecProcessor.getAnnotationPeptideMapping() : undefined"
             />
 
             <VisualizationControls
@@ -71,7 +74,7 @@
 
 <script setup lang="ts">
 import useFullscreen from '@/composables/useFullscreen';
-import { CsvUtils, EcCode, EcDefinition, FunctionalCountTableProcessor, FunctionalSummaryProcessor, NetworkUtils, Ontology, PeptideCountTableProcessor } from '@/logic';
+import { CsvUtils, EcCode, EcDefinition, FunctionalCountTableProcessor, FunctionalSummaryProcessor, LcaCountTableProcessor, NcbiTree, NetworkUtils, Ontology, PeptideCountTableProcessor } from '@/logic';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import { DataNodeLike } from 'unipept-visualizations/types';
 import { computed, ref, watch } from 'vue';
@@ -92,6 +95,9 @@ export interface Props {
     ecProcessor: FunctionalCountTableProcessor<EcCode, EcDefinition>
     ecOntology: Ontology<EcCode, EcDefinition>
     ecTree: DataNodeLike
+
+    ncbiProcessor?: LcaCountTableProcessor
+    ncbiTree?: NcbiTree
 
     downloadItem?: (code: EcCode) => Promise<void>
 }

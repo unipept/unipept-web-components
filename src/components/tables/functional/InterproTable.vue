@@ -9,11 +9,21 @@
             :customFilter="filterNamespace"
             :sortBy="['count']"
             :sortDesc="[true]"
+            item-key="code"
+            :expanded.sync="expanded"
+            show-expand
         >
             <template v-slot:header.action>
                 <Tooltip message="Download table as CSV">
                     <v-icon @click="downloadCsv(items, selectedNamespace)">mdi-download</v-icon>
                 </Tooltip>
+            </template>
+
+            <template v-slot:item.data-table-expand="{ item }">
+                <v-btn v-if="ncbiTree" class="v-data-table__expand-icon" icon :disabled="item.totalAnnotations === 0" @click="onExpandClicked(item)">
+                    <v-icon v-if="expanded.findIndex(i => i.code === item.code) !== -1">mdi-chevron-up</v-icon>
+                    <v-icon v-else>mdi-chevron-down</v-icon>
+                </v-btn>
             </template>
 
             <template v-slot:item.count="{ item }">
@@ -56,26 +66,59 @@
                     </v-btn>
                 </tooltip>
             </template>
+
+            <template v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length" class="expand-container">
+                    <VisualizationControls
+                        ref="treeview"
+                        caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
+                        :loading="!ncbiTree"
+                    >
+                        <template #visualization>
+                            <TreeView 
+                                :data="treeAvailable.get(item.code)"
+                                :loading="computingTree && !treeAvailable.get(item.code)"
+                                :autoResize="true"
+                                :height="350"
+                                :linkStrokeColor="linkStrokeColor"
+                                :nodeStrokeColor="highlightColorFunc"
+                                :nodeFillColor="highlightColorFunc"
+                            />
+                        </template>
+                    </VisualizationControls>
+                </td>
+            </template>
         </v-data-table>
     </div>
 </template>
 
 <script setup lang="ts">
-import { FunctionalCode, InterproNamespace } from '@/logic';
+// @ts-nocheck
+
+import { FunctionalCode, HighlightedTreeProcessor, InterproCode, InterproNamespace, NcbiId, NcbiTree, Peptide } from '@/logic';
 import { ref } from 'vue';
 import InterproTableItem from './InterproTableItem';
 import Tooltip from '@/components/util/Tooltip.vue';
 import useCsvDownload from '@/composables/useCsvDownload';
+import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
+import TreeView from '@/components/visualizations/TreeView.vue';
+import { DataNodeLike } from 'unipept-visualizations/types';
+import { VSelect, VDataTable, VIcon, VBtn } from 'vuetify/lib';
 
 export interface Props {
     items: InterproTableItem[],
 
     loading: boolean,
     showPercentage: boolean,
+    ncbiTree?: NcbiTree
+    taxaToPeptides?: Map<NcbiId, Peptide[]>
+    itemToPeptides?: Map<InterproCode, Peptide[]>
     downloadItem?: (code: FunctionalCode) => Promise<void>
 }
 
 const props = defineProps<Props>();
+
+const expanded = ref<InterproTableItem[]>([]);
 
 const headers = [
     {
@@ -111,6 +154,16 @@ const headers = [
     }
 ];
 
+const treeAvailable = new Map<string, DataNodeLike>();
+
+const highlightedTreeProcessor = new HighlightedTreeProcessor();
+
+const computingTree = ref(false);
+
+const highlightColor: string = "#ffc107";
+const highlightColorFunc = (d: any) => d.extra.included ? highlightColor : "lightgrey";
+const linkStrokeColor = ({ target: d }: any) => highlightColorFunc(d.data);
+
 const namespaceValues: string[] = ["all"].concat(Object.values(InterproNamespace).map(i => i.toString())).sort();
 
 const selectedNamespace = ref<string>("all");
@@ -144,14 +197,47 @@ const downloadInterproItem = async (code: FunctionalCode) => {
         await props.downloadItem(code);
     }
 }
+
+const onExpandClicked = (item: InterproTableItem) => {
+    computingTree.value = true;
+
+    const idx: number = expanded.value.findIndex(i => i.code === item.code);
+
+    computeTree(item.code);
+
+    if (idx >= 0) {
+        expanded.value.splice(idx, 1);
+    } else {
+        expanded.value.push(item);
+    }
+}
+
+const computeTree = (code: string) => {
+    if (props.taxaToPeptides) {
+        highlightedTreeProcessor.computeHighlightedTree(
+            props.itemToPeptides?.get(code) ?? [],
+            props.ncbiTree,
+            props.taxaToPeptides
+        ).then((rootNode: any) => {
+            treeAvailable.set(code, rootNode);
+            computingTree.value = false;
+        });
+    }
+}
 </script>
 
 <style scoped>
-    a {
-        text-decoration: none;
-    }
+.expand-container {
+    padding: 0 !important;
+    border-style: none solid solid solid;
+    border-color: #ededed;
+}
 
-    a:hover {
-        text-decoration: none;
-    }
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
 </style>
