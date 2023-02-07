@@ -41,7 +41,7 @@
                             :data="ncbiTree"
                             :loading="analysisInProgress"
                             :autoResize="true"
-                            :height="500"
+                            :height="600"
                             :doReset="sunburstReset"
                             :isFixedColors="isFixedColors"
                             :filterId="filterId"
