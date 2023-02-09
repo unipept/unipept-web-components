@@ -14,6 +14,7 @@
                             singular: 'protein',
                             plural: 'proteins'
                         }"
+                        :clickable="ncbiTree !== undefined"
                     />
                 </v-col>
                 <v-col class="flex-grow-0">
