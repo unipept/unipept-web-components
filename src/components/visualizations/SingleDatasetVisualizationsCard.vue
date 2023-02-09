@@ -246,7 +246,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
                 .getElementsByTagName("svg");
             const svgElement = svgElements
                 .item(svgElements.length - 1);
-            this.svgImageData = SvgUtils.elementToSvgDataUrl(svgElement);
+            this.svgImageData = svgElement.outerHTML;
             this.pngSource = new SvgElementToPngSource(svgElement);
             this.imageBaseName = "unipept_sunburst";
             this.downloadImageDialogOpen = true;
@@ -265,7 +265,7 @@ export default class SingleDatasetVisualizationsCard extends Vue {
                 .getElementById("treeviewWrapper")
                 .getElementsByTagName("svg")
                 .item(0);
-            this.svgImageData = SvgUtils.elementToSvgDataUrl(svgElement);
+            this.svgImageData = svgElement.outerHTML;
             this.pngSource = new SvgElementToPngSource(svgElement);
             this.imageBaseName = "unipept_treeview";
             this.downloadImageDialogOpen = true;
