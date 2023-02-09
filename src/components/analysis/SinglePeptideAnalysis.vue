@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { SinglePeptideAnalysisStatus } from "@/interface";
-import { defineProps, ref } from "vue";
+import { defineProps, ref, watch } from "vue";
 import MatchedProteinsTable from "../tables/MatchedProteinsTable.vue";
 import LineageTable from "../tables/LineageTable.vue";
 import LineageTree from "../trees/LineageTree.vue";
@@ -61,9 +61,22 @@ import InterproSummaryCard from "../cards/InterproSummaryCard.vue";
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus
+    tab?: number
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    tab: 0
+});
 
-const currentTab = ref<number>(0);
+const emits = defineEmits(["tabUpdate"]);
+
+const currentTab = ref<number>(props.tab);
+
+watch(() => props.tab, (newTab) => {
+    currentTab.value = newTab;
+});
+
+watch(currentTab, (newTab) => {
+    emits("tabUpdate", newTab);
+});
 </script>
