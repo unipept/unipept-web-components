@@ -1,4 +1,4 @@
-type Pept2DataResponse = {
+declare type Pept2DataResponse = {
     sequence: string;
     lca: number;
     lineage: number[];

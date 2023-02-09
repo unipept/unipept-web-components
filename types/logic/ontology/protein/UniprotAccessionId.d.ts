@@ -1,2 +1,2 @@
-type UniprotAccessionId = string;
+declare type UniprotAccessionId = string;
 export default UniprotAccessionId;

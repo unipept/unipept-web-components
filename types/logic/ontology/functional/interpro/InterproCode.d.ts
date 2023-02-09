@@ -1,2 +1,2 @@
-type InterproCode = string;
+declare type InterproCode = string;
 export default InterproCode;

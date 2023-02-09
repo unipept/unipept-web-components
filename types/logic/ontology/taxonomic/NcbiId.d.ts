@@ -1,2 +1,2 @@
-type NcbiId = number;
+declare type NcbiId = number;
 export default NcbiId;

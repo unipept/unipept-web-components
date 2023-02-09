@@ -19,20 +19,7 @@ export default class NetworkUtils {
      * @param url
      */
     static getJSON(url: string): any;
-<<<<<<< HEAD:types/business/communication/NetworkUtils.d.ts
-    static downloadDataByForm(data: string, fileName: string, fileType: string): Promise<void>;
-    /**
-     * Triggers a file download in the browser using a hidden link and a data url.
-     *
-     * The download attribute doesn't work in IE and Safari: http://caniuse.com/#feat=download
-     *
-     * @param dataURL The dataURL of the data
-     * @param fileName The requested file name
-     */
-    static downloadDataByLink(dataURL: string, fileName: string): void;
-=======
     static downloadDataByForm(data: string, fileName: string, fileType?: string | null): Promise<unknown>;
->>>>>>> migrate/vue-2.7:types/logic/communication/NetworkUtils.d.ts
     /**
      * This method should be used when a specific URL should be opened in a new browser window. The method automatically
      * decides whether Electron or a default redirection should take place.

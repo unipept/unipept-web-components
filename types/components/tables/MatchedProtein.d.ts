@@ -1,5 +1,5 @@
 import { UniprotAccessionId, GoDefinition, EcDefinition, InterproDefinition } from "@/logic";
-type MatchedProtein = {
+declare type MatchedProtein = {
     uniprotAccessionId: UniprotAccessionId;
     name: string;
     organism: string;
