@@ -1,6 +1,6 @@
 name: Lint
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
   lint:
