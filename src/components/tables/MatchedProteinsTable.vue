@@ -26,26 +26,6 @@
                 <template v-slot:item.fa="{ item }">
                     <v-tooltip top :open-delay="500">
                         <template v-slot:activator="{ on }">
-                            <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.ec.length > 0 ? 'indigo' : 'indigo lighten-4'">
-                                <span class="white--text headline" style="font-size: 14px !important;">EC</span>
-                            </v-avatar>
-                        </template>
-                        <span v-if="item.functionalAnnotations.ec.length >= 0">
-                            This protein is annotated with
-                            <span class="font-weight-bold" v-if="item.functionalAnnotations.ec.length === 1">
-                                {{ item.functionalAnnotations.ec.length }} EC-number.
-                            </span>
-                            <span class="font-weight-bold" v-else>
-                                {{ item.functionalAnnotations.ec.length }} EC-numbers.
-                            </span>
-                        </span>
-                        <span v-else>
-                            This protein is not annotated with EC-numbers.
-                        </span>
-                    </v-tooltip>
-
-                    <v-tooltip top :open-delay="500">
-                        <template v-slot:activator="{ on }">
                             <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.go.length > 0 ? 'amber' : 'amber lighten-4'">
                                 <span :class="[item.functionalAnnotations.go.length > 0 ? 'dark--text' : 'gray--text', 'headline']" style="font-size: 14px !important;">GO</span>
                             </v-avatar>
@@ -61,6 +41,26 @@
                         </span>
                         <span v-else>
                             This protein is not annotated with GO-terms.
+                        </span>
+                    </v-tooltip>
+                    
+                    <v-tooltip top :open-delay="500">
+                        <template v-slot:activator="{ on }">
+                            <v-avatar v-on="on" size="30" :color="item.functionalAnnotations.ec.length > 0 ? 'indigo' : 'indigo lighten-4'">
+                                <span class="white--text headline" style="font-size: 14px !important;">EC</span>
+                            </v-avatar>
+                        </template>
+                        <span v-if="item.functionalAnnotations.ec.length >= 0">
+                            This protein is annotated with
+                            <span class="font-weight-bold" v-if="item.functionalAnnotations.ec.length === 1">
+                                {{ item.functionalAnnotations.ec.length }} EC-number.
+                            </span>
+                            <span class="font-weight-bold" v-else>
+                                {{ item.functionalAnnotations.ec.length }} EC-numbers.
+                            </span>
+                        </span>
+                        <span v-else>
+                            This protein is not annotated with EC-numbers.
                         </span>
                     </v-tooltip>
 
@@ -97,26 +97,8 @@
                             subheader
                             dense
                             disabled
-                            v-if="assay.peptideData">
-                            <v-subheader v-if="item.functionalAnnotations.ec && item.functionalAnnotations.ec.length > 0">
-                                Enzyme Commission numbers
-                            </v-subheader>
-                            <v-list-item-group
-                                v-if="item.functionalAnnotations.ec && item.functionalAnnotations.ec.length > 0"
-                                class="ec-list-group">
-                                <v-list-item v-for="definition of item.functionalAnnotations.ec" :key="definition.code">
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            {{ definition.code.substr(3) }} - {{ definition.name }} - {{ definition.namespace }}
-                                        </v-list-item-title>
-                                        <v-list-item-subtitle>
-                                            Assigned to {{ assay.peptideData.ec[definition.code] }} of
-                                            {{ assay.peptideData.faCounts.ec }} matched proteins with an EC annotation
-                                            ({{ percentageForAnnotation(assay, definition.code, "ec") }}).
-                                        </v-list-item-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-list-item-group>
+                            v-if="assay.peptideData"
+                        >
                             <v-subheader v-if="item.functionalAnnotations.go && item.functionalAnnotations.go.length > 0">
                                 Gene Ontology terms
                             </v-subheader>
@@ -132,6 +114,25 @@
                                             Assigned to {{ assay.peptideData.go[definition.code] }} of
                                             {{ assay.peptideData.faCounts.go }} matched proteins with a GO annotation
                                             ({{ percentageForAnnotation(assay, definition.code, "go") }}).
+                                        </v-list-item-subtitle>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list-item-group>
+                            <v-subheader v-if="item.functionalAnnotations.ec && item.functionalAnnotations.ec.length > 0">
+                                Enzyme Commission numbers
+                            </v-subheader>
+                            <v-list-item-group
+                                v-if="item.functionalAnnotations.ec && item.functionalAnnotations.ec.length > 0"
+                                class="ec-list-group">
+                                <v-list-item v-for="definition of item.functionalAnnotations.ec" :key="definition.code">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            {{ definition.code.substr(3) }} - {{ definition.name }} - {{ definition.namespace }}
+                                        </v-list-item-title>
+                                        <v-list-item-subtitle>
+                                            Assigned to {{ assay.peptideData.ec[definition.code] }} of
+                                            {{ assay.peptideData.faCounts.ec }} matched proteins with an EC annotation
+                                            ({{ percentageForAnnotation(assay, definition.code, "ec") }}).
                                         </v-list-item-subtitle>
                                     </v-list-item-content>
                                 </v-list-item>
