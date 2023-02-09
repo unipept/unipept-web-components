@@ -5,8 +5,12 @@
         @click:outside="onClickOutside"
     >
         <v-card>
-            <v-card-title>
+            <v-card-title class="mb-3">
                 Filter
+                <v-spacer />
+                <v-btn icon @click="onClickOutside">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
             </v-card-title>
 
             <v-card-subtitle>
