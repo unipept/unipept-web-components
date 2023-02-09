@@ -1,16 +1,10 @@
+// @ts-nocheck
+
 import * as d3 from "d3";
 import $ from "jquery";
-import * as clipboard from "clipboard-polyfill"
-import AnalyticsUtil from "./../../business/analytics/AnalyticsUtil";
+import { NcbiTree } from "@/logic";
 
-/**
- * Constructs a Searchtree object
- *
- * @param  {Tree} t The JSON representation of the tree
- * @param  {boolean} il Whether IL were equated
- * @return {Searchtree} The constructed Searchtree object
- */
-function constructSearchtree(t, il, rerootCallback = x => {}) {
+function constructSearchtree(t: NcbiTree, il: boolean, rerootCallback = (x: any) => {}) {
     /** ************* Private variables ***************/
 
     // parameters
@@ -122,8 +116,6 @@ function constructSearchtree(t, il, rerootCallback = x => {}) {
      * @return {false} prevent default
      */
     function clickAction() {
-        AnalyticsUtil.logToGoogle("Multi Peptide", "tree", "Peptides", null);
-
         let d = d3.select(this.parentElement).datum(),
             margin = this.offsetTop - 9,
             ownSequences,

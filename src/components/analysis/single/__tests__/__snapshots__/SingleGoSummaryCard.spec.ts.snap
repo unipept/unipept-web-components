@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`SingleGoSummaryCard displays the correct trust line 1`] = `"<span class=\\"go-trust\\"><strong>All proteins</strong> have at least one GO-term assigned to them. </span>"`;
