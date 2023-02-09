@@ -1,6 +1,3 @@
-import SearchSettingsForm from "./SearchSettingsForm.vue";
-export { SearchSettingsForm };
-export * from "./functional";
-export * from "./multi";
-export * from "./single";
-export * from "./statistics";
+export { default as SinglePeptideSummary } from './SinglePeptideSummary.vue';
+export { default as SinglePeptideAnalysis } from "./SinglePeptideAnalysis.vue";
+export { default as VisualizationOverview } from "./VisualizationOverview.vue";
