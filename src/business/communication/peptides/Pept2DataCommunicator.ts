@@ -13,7 +13,7 @@ import RequestCacheNetworkManager from "@/business/communication/RequestCacheNet
 
 export default class Pept2DataCommunicator {
     public static PEPTDATA_BATCH_SIZE = 100;
-    public static MISSED_CLEAVAGE_BATCH = 25;
+    public static MISSED_CLEAVAGE_BATCH = 5;
     public static PEPTDATA_ENDPOINT = "/mpa/pept2data";
 
     // Should the analysis continue? If this flag is set to true, the analysis will be cancelled as soon as
