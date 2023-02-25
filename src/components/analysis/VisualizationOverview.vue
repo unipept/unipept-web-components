@@ -89,8 +89,8 @@
                 >
                     <template #visualization>
                         <TreeView 
-                            :data="ecTree"
-                            :loading="analysisInProgress || !ecTree"
+                            :data="ncbiTree?.getRoot()"
+                            :loading="analysisInProgress || !ncbiTree"
                             :autoResize="true"
                             :height="500"
                             :doReset="treeviewReset"
