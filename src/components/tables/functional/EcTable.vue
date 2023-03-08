@@ -64,6 +64,7 @@
                     <VisualizationControls
                         ref="treeview"
                         caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
+                        internalDownload
                         :loading="!ncbiTree"
                     >
                         <template #visualization>
@@ -112,6 +113,12 @@ const props = defineProps<Props>();
 
 const expanded = ref<EcTableItem[]>([]);
 
+const treeAvailable = new Map<string, DataNodeLike>();
+
+const highlightedTreeProcessor = new HighlightedTreeProcessor();
+
+const computingTree = ref(false);
+
 const headers = [
     {
         text: "Peptides",
@@ -139,12 +146,6 @@ const headers = [
         sortable: false
     }
 ];
-
-const treeAvailable = new Map<string, DataNodeLike>();
-
-const highlightedTreeProcessor = new HighlightedTreeProcessor();
-
-const computingTree = ref(false);
 
 const highlightColor: string = "#ffc107";
 const highlightColorFunc = (d: any) => d.extra.included ? highlightColor : "lightgrey";
