@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 100%; position: relative; background-color: white;">
+    <div style="height: 100%; position: relative; background-color: white;" ref="container">
         <div v-if="!loading" class="controlbar" :style="overlap ? 'position: absolute' : 'position: relative'">
             <span class="align-self-center me-1 text-caption">
                 {{ caption }}
@@ -24,6 +24,10 @@
                 <v-icon>mdi-download</v-icon>
             </v-btn>
 
+            <v-btn v-else-if="internalDownload && !hideDownload" class="ma-1" x-small fab @click="downloadOpen = true" :elevation="0">
+                <v-icon>mdi-download</v-icon>
+            </v-btn>
+
             <v-btn v-if="reset" class="ma-1" x-small fab @click="reset" :elevation="0">
                 <v-icon>mdi-restore</v-icon>
             </v-btn>
@@ -36,15 +40,27 @@
         <div :style="overlap ? 'height: 100%;' : 'height: calc(100% - 40px); position: relative'">
             <slot name="visualization"></slot>
         </div>
+
+        <DownloadImageModal 
+            :openModal="downloadOpen"
+            :imageSource="element()"
+            @close="downloadOpen = false"
+            supportsSvg
+        />
     </div>
 </template>
 
 <script setup lang="ts">
+import SvgImageSource from '@/logic/util/image/SvgImageSource'
+import { ref } from 'vue'
+import { DownloadImageModal } from '../modals'
+
 export interface Props {
     caption: string
     loading: boolean
     overlap?: boolean
     hideDownload?: boolean
+    internalDownload?: boolean
     settings?: boolean
 
     rotate?: () => void
@@ -56,8 +72,17 @@ export interface Props {
 withDefaults(defineProps<Props>(), {
     overlap: true,
     hideDownload: false,
+    internalDownload: false,
     settings: false
 });
+
+// Will currently only work for svg images
+const downloadOpen = ref(false)
+
+const container = ref<HTMLElement | null>(null);
+
+// @ts-ignore
+const element = () => new SvgImageSource(container.value?.querySelector("svg"));
 </script>
 
 <style scoped>

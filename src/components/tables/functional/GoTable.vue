@@ -64,6 +64,7 @@
                     <VisualizationControls
                         ref="treeview"
                         caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
+                        internalDownload
                         :loading="!ncbiTree"
                     >
                         <template #visualization>
