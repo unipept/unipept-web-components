@@ -11,7 +11,7 @@ function constructSearchtree(t: NcbiTree, il: boolean, rerootCallback = (x: any)
     let that = {},
         dataTree = t,
         data = t.root,
-        equateIL = il ? "equateIL" : "";
+        equateIL = il ? "true" : "false";
 
     let tree,
         items;
@@ -126,13 +126,12 @@ function constructSearchtree(t: NcbiTree, il: boolean, rerootCallback = (x: any)
         $("span.clicked").removeClass("clicked");
         $(this).addClass("clicked");
 
-
         infoPane
             .html(`
                 <h3>
                   <a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${(d as any).id}' target='_blank'>
                     ${(d as any).name}
-                  </a> (${(d as any).rank})
+                  </a> (${(d as any).extra.rank})
                 </h3>`);
 
         $("#tree_data").css({
@@ -144,7 +143,7 @@ function constructSearchtree(t: NcbiTree, il: boolean, rerootCallback = (x: any)
         if (ownSequences && ownSequences.length > 0) {
             stringBuffer = "<h4 class='own' style='font-size:16px;'>Peptides specific for this taxon</h4><ul style='max-height: 200px; overflow-y: auto; margin-top: 16px;'>";
             for (i = 0; i < ownSequences.length; i++) {
-                stringBuffer += `<li><a href='/sequences/${ownSequences[i]}/${equateIL}' title='Tryptic Peptide Analysis of ${ownSequences[i]}' target='_blank'>${ownSequences[i]}</a></li>`;
+                stringBuffer += `<li><a href='/tpa/${ownSequences[i]}?equate=${equateIL}' title='Tryptic Peptide Analysis of ${ownSequences[i]}' target='_blank'>${ownSequences[i]}</a></li>`;
             }
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
@@ -158,7 +157,7 @@ function constructSearchtree(t: NcbiTree, il: boolean, rerootCallback = (x: any)
         if (allSequences && allSequences.length > 0 && allSequences.length !== (ownSequences ? ownSequences.length : 0)) {
             stringBuffer = "<h4 class='all' style='font-size: 16px;'>Peptides specific to this taxon or its subtaxa</h4><ul style='max-height: 200px; overflow-y: auto; margin-top: 16px;'>";
             for (i = 0; i < allSequences.length; i++) {
-                stringBuffer += `<li><a href='/sequences/${allSequences[i]}/${equateIL}' title='Tryptic Peptide Analysis of ${allSequences[i]}' target='_blank'>${allSequences[i]}</a></li>`;
+                stringBuffer += `<li><a href='/tpa/${allSequences[i]}?equate=${equateIL}' title='Tryptic Peptide Analysis of ${allSequences[i]}' target='_blank'>${allSequences[i]}</a></li>`;
             }
             stringBuffer += "</ul>";
             infoPane.append(stringBuffer);
