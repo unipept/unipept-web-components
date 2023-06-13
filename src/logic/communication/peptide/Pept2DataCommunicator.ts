@@ -54,7 +54,7 @@ export default class Pept2DataCommunicator {
                 try {
                     const response = await NetworkUtils.postJson(this.apiBaseUrl + "/mpa/pept2data", requestData);
 
-                    for(const peptide of response.peptides) {
+                    for (const peptide of response.peptides) {
                         result.set(peptide.sequence, PeptideData.createFromPeptideDataResponse(peptide));
                     }
 
@@ -72,7 +72,7 @@ export default class Pept2DataCommunicator {
 
         try {
             // Perform the actual requests in parallel. (await cannot be removed!!)
-            await parallelLimit(requests, this.parallelRequests);  
+            await parallelLimit(requests, this.parallelRequests);
 
             const trustProcessor = new PeptideTrustProcessor();
             const trust = trustProcessor.getPeptideTrust(countTable, result);

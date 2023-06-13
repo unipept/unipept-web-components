@@ -45,8 +45,7 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
 
 function filter(peptides: Peptide[], enableMissingCleavageHandling: boolean, equateIl: boolean): Peptide[] {
     let out = cleavePeptides(peptides, enableMissingCleavageHandling);
-    out = filterShortPeptides(out);
-    return equateIL(out, equateIl);
+    return filterShortPeptides(out);
 }
 
 /**
@@ -67,14 +66,4 @@ function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boo
  */
 function filterShortPeptides(peptides: Peptide[]): Peptide[] {
     return peptides.filter(p => p.length >= 5);
-}
-
-/**
- * Replaces every I with an L if equateIL is set to true.
- */
-function equateIL(peptides: Peptide[], equateIL: boolean): Peptide[] {
-    if (equateIL) {
-        return peptides.map(p => p.replace(/I/g, "L"));
-    }
-    return peptides;
 }
