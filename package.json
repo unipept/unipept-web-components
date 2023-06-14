@@ -1,6 +1,6 @@
 {
   "name": "unipept-web-components",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "main": "dist/unipept-web-components.common.js",
   "browser": "dist/unipept-web-components.umd.min.js",
   "unpkg": "dist/unipept-web-components.umd.min.js",
