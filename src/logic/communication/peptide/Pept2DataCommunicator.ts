@@ -9,6 +9,7 @@ import { ShareableMap } from "shared-memory-datastructures";
 import NetworkUtils from "../../util/NetworkUtils";
 import PeptideData from "./PeptideData";
 import PeptideDataSerializer from "./PeptideDataSerializer";
+import NetworkCacheManager from "../NetworkCacheManager";
 
 export default class Pept2DataCommunicator {
     // Should the analysis continue? If this flag is set to true, the analysis will be cancelled as soon as
@@ -19,7 +20,8 @@ export default class Pept2DataCommunicator {
         private readonly apiBaseUrl: string = "http://api.unipept.ugent.be",
         private readonly peptdataBatchSize: number = 100,
         private readonly missedCleavageBatchSize: number = 25,
-        private readonly parallelRequests: number = 5
+        private readonly parallelRequests: number = 5,
+        public readonly cacheKey: string = ""
     ) {}
 
     public async process(
@@ -38,6 +40,8 @@ export default class Pept2DataCommunicator {
 
         const batchSize = enableMissingCleavageHandling ? this.missedCleavageBatchSize : this.peptdataBatchSize;
 
+        const networkManager = new NetworkCacheManager(this.apiBaseUrl, this.cacheKey);
+
         const requests = [];
         for (let i = 0; i < amountOfPeptides + batchSize; i += batchSize) {
             requests.push(async() => {
@@ -52,7 +56,7 @@ export default class Pept2DataCommunicator {
                 });
 
                 try {
-                    const response = await NetworkUtils.postJson(this.apiBaseUrl + "/mpa/pept2data", requestData);
+                    const response = await networkManager.postJSON(this.apiBaseUrl + "/mpa/pept2data", requestData);
 
                     for (const peptide of response.peptides) {
                         result.set(peptide.sequence, PeptideData.createFromPeptideDataResponse(peptide));
