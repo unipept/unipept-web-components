@@ -9,8 +9,9 @@ export default class Pept2DataCommunicator {
     private readonly peptdataBatchSize;
     private readonly missedCleavageBatchSize;
     private readonly parallelRequests;
+    readonly cacheKey: string;
     private cancelled;
-    constructor(apiBaseUrl?: string, peptdataBatchSize?: number, missedCleavageBatchSize?: number, parallelRequests?: number);
+    constructor(apiBaseUrl?: string, peptdataBatchSize?: number, missedCleavageBatchSize?: number, parallelRequests?: number, cacheKey?: string);
     process(countTable: CountTable<Peptide>, enableMissingCleavageHandling: boolean, equateIl: boolean, progressListener?: ProgressListener): Promise<[ShareableMap<Peptide, PeptideData>, PeptideTrust]>;
     cancel(): void;
 }

@@ -17,9 +17,12 @@
     "dist/*"
   ],
   "dependencies": {
+    "@types/crypto-js": "^4.1.1",
     "async": "^3.2.4",
     "canvg": "^4.0.1",
     "core-js": "^3.8.3",
+    "crypto-js": "^4.1.1",
+    "dexie": "^3.2.4",
     "html-to-image": "^1.10.8",
     "jquery": "^3.6.1",
     "less": "^4.1.3",
