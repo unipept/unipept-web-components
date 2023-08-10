@@ -1,6 +1,5 @@
 import WorkerQueue from "./WorkerQueue";
-// @ts-ignore
-import Worker from "worker-loader?inline=fallback!./GeneralWorker.worker";
+import Worker from "./GeneralWorker.worker?worker";
 
 export default class QueueManager {
     private static longRunningQueue: WorkerQueue;

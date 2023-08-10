@@ -1,6 +1,6 @@
 <template>
-    <v-dialog 
-        v-model="dialogOpen" 
+    <v-dialog
+        v-model="dialogOpen"
         max-width="500"
         @click:outside="onClickOutside"
     >
@@ -8,21 +8,25 @@
             <v-card-title class="mb-3">
                 Filter
                 <v-spacer />
-                <v-btn icon @click="onClickOutside">
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
+                <v-btn
+                    icon="mdi-close"
+                    @click="onClickOutside"
+                />
             </v-card-title>
 
             <v-card-subtitle>
                 <p>
-                    By default Unipept does not report all found annotations. It uses a clever filtering technique that removes untrustworthy annotations. 
+                    By default Unipept does not report all found annotations. It uses a clever filtering technique that removes untrustworthy annotations.
                     The strength of This filter is expressed as a percentage.
                 </p>
                 <ul>
-                    <li><strong>0%</strong> means no filtering occurs. <br> 
-                    We assign the annotation <i>A</i> to a peptide sequence <i>P</i> if there is at least one protein that contains an exact match for <i>P</i> and has been assigned the annotation <i>A</i>.
+                    <li>
+                        <strong>0%</strong> means no filtering occurs. <br>
+                        We assign the annotation <i>A</i> to a peptide sequence <i>P</i> if there is at least one protein that contains an exact match for <i>P</i> and has been assigned the annotation <i>A</i>.
                     </li>
-                    <li><strong>100%</strong> is the strongest level of filtering. <br> In this case we require that every protein that contains a certain peptide sequence <i>P</i> has the annotation <i>A</i>. before we assign the annotation <i>A</i>. to the peptide.</li>
+                    <li>
+                        <strong>100%</strong> is the strongest level of filtering. <br> In this case we require that every protein that contains a certain peptide sequence <i>P</i> has the annotation <i>A</i>. before we assign the annotation <i>A</i>. to the peptide.
+                    </li>
                 </ul>
                 <p>
                     The default value is 5%. This means that a peptide sequence <i>P</i> is assumed to be annotated with an annotation <i>A</i> if at least 5% of the UniProt entries<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> in which <i>P</i> occurs has been annotated with <i>A</i>.
@@ -30,7 +34,7 @@
             </v-card-subtitle>
 
             <v-card-text class="mt-2 pb-0">
-                <v-slider 
+                <v-slider
                     v-model="filterPercentage"
                     thumb-color="primary"
                     thumb-label="always"
@@ -48,9 +52,14 @@
                 </v-slider>
             </v-card-text>
 
-            <v-card-actions class="pb-5 pt-0" >
-                <v-spacer></v-spacer>
-                <v-btn color="primary" @click="closeDialog">Apply filter</v-btn>
+            <v-card-actions class="pb-5 pt-0">
+                <v-spacer />
+                <v-btn
+                    color="primary"
+                    @click="closeDialog"
+                >
+                    Apply filter
+                </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

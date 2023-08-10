@@ -117,6 +117,7 @@ const downloadOpen = ref(false)
 
 const container = ref<HTMLElement | null>(null);
 
+// @ts-ignore (ideally, in the future, we should check whether the query selector returns an empty result and adjust accordingly)
 const element = () => new SvgImageSource(container.value?.querySelector("svg"));
 </script>
 

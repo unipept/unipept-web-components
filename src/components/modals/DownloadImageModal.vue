@@ -1,7 +1,6 @@
 <template>
     <v-dialog
         v-model="dialogOpen"
-        max-width="820"
         @click:outside="closeDialog"
     >
         <v-card v-if="preparingImage">
