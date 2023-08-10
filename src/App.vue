@@ -1,11 +1,15 @@
 <template>
-  <v-app>
-    <v-main>
-      <HelloWorld />
-    </v-main>
-  </v-app>
+    <v-app>
+        <v-main>
+            <tree-view :data="data" />
+        </v-main>
+    </v-app>
 </template>
 
 <script setup lang="ts">
-  import HelloWorld from '@/components/HelloWorld.vue'
+import TreeView from "@/components/visualizations/TreeView.vue"
+import { ref } from "vue";
+import * as taxonomyData from "./taxonomy.json";
+
+const data = ref(taxonomyData);
 </script>
