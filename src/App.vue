@@ -108,14 +108,12 @@ const startAnalysis = async function() {
     const peptideCountTable = new CountTable<Peptide>(peptideMap);
 
     const [pept2Data, trust] = await pept2DataCommunicator.process(peptideCountTable, false, equateIl);
-    console.log(pept2Data.get("FFNAENVK")?.faCounts);
 
     const goCountTableProcessor = new GoCountTableProcessor(peptideCountTable, pept2Data, goCommunicator);
     await goCountTableProcessor.compute();
 
     const goOntologyProcessor = new GoOntologyProcessor(goCommunicator);
     const goOntology = await goOntologyProcessor.getOntology(goCountTableProcessor.getCountTable());
-    console.log(goOntology);
 
     const interproCountTableProcessor = new InterproCountTableProcessor(peptideCountTable, pept2Data, interproCommunicator);
     await interproCountTableProcessor.compute();
@@ -129,7 +127,6 @@ const startAnalysis = async function() {
 
     const ecOntologyProcessor = new EcOntologyProcessor(ecCommunicator);
     const ecOntology = await ecOntologyProcessor.getOntology(ecCountTableProcessor.getCountTable());
-    console.log(ecOntology);
 
     const lcaCountTableProcessor = new LcaCountTableProcessor(peptideCountTable, pept2Data);
     await lcaCountTableProcessor.compute();

@@ -51,6 +51,7 @@
                 size="x-small"
                 fab
                 :elevation="0"
+                icon="mdi-download"
                 @click="downloadOpen = true"
             />
 

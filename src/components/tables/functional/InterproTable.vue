@@ -98,6 +98,7 @@
                     class="expand-container"
                 >
                     <VisualizationControls
+                        v-if="computingTree.has(item.raw.code) && !computingTree.get(item.raw.code)"
                         ref="treeview"
                         caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                         internal-download
@@ -115,6 +116,17 @@
                             />
                         </template>
                     </VisualizationControls>
+                    <div
+                        v-else
+                        class="d-flex flex-column align-center pa-2"
+                    >
+                        <v-progress-circular
+                            indeterminate
+                            color="primary"
+                            size="50"
+                        />
+                        <span>Computing highlighted tree...</span>
+                    </div>
                 </td>
             </template>
         </v-data-table>

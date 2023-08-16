@@ -20,6 +20,7 @@
             <div class="d-flex justify-end">
                 <v-btn
                     icon="mdi-close"
+                    variant="plain"
                     @click="closeDialog"
                 />
             </div>
@@ -57,7 +58,7 @@
                     <v-select
                         v-model="scalingValue"
                         :items="enlargementValues"
-                        item-text="label"
+                        item-title="label"
                         dense
                         hide-details
                         :disabled="isSvg()"
@@ -84,11 +85,11 @@
                 <v-btn
                     id="download-png-btn"
                     color="primary"
+                    prepend-icon="mdi-download"
+                    variant="elevated"
                     @click="saveImage()"
                 >
-                    <v-icon left>
-                        mdi-download
-                    </v-icon>Download image
+                    Download image
                 </v-btn>
             </v-card-actions>
             <v-divider />
