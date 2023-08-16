@@ -7,13 +7,14 @@
                     color="primary"
                 />
             </div>
-            <go-summary-card
+            <ec-summary-card
                 v-else
                 :filter="0"
-                :go-ontology="goOntology!"
+                :ec-ontology="ecOntology!"
                 :analysis-in-progress="loading"
                 :show-percentage="true"
-                :go-processor="goProcessor!"
+                :ec-processor="ecProcessor!"
+                :ec-tree="ecTree"
                 :ncbi-tree="ncbiTree!"
                 :ncbi-processor="ncbiProcessor"
             />
@@ -37,7 +38,7 @@ import * as sample from "@/sample7.json";
 
 import {
     computeEcTree,
-    CountTable, EcCountTableProcessor,
+    CountTable, EcCode, EcCountTableProcessor, EcDefinition,
     EcOntologyProcessor,
     EcProteinCountTableProcessor,
     EcResponseCommunicator, GoCode, GoCountTableProcessor, GoDefinition,
@@ -55,7 +56,8 @@ import {
     ProteinResponseCommunicator, QueueManager
 } from "@/logic";
 import Peptide from "@/logic/ontology/peptide/Peptide";
-import GoSummaryCard from "@/components/cards/GoSummaryCard.vue";
+import EcSummaryCard from "@/components/cards/EcSummaryCard.vue";
+import { DataNodeLike } from "unipept-visualizations/types";
 
 const loading = ref(true);
 
@@ -88,10 +90,14 @@ InterproResponseCommunicator.setup(unipeptApiUrl, interproBatchSize);
 const interproCommunicator = new InterproResponseCommunicator();
 
 const goOntology: Ref<Ontology<GoCode, GoDefinition> | undefined> = ref();
+const ecOntology: Ref<Ontology<EcCode, EcDefinition> | undefined> = ref();
 const interproOntology: Ref<Ontology<InterproCode, InterproDefinition> | undefined> = ref();
 
 const goProcessor: Ref<GoCountTableProcessor | undefined> = ref();
+const ecProcessor: Ref<EcCountTableProcessor | undefined> = ref();
 const interproProcessor: Ref<InterproCountTableProcessor | undefined> = ref();
+
+const ecTree: Ref<DataNodeLike | undefined> = ref();
 
 const ncbiTree: Ref<NcbiTree | undefined> = ref();
 const ncbiProcessor: Ref<LcaCountTableProcessor | undefined> = ref();
@@ -129,9 +135,10 @@ const startAnalysis = async function() {
 
     const ecCountTableProcessor = new EcCountTableProcessor(peptideCountTable, pept2Data, ecCommunicator);
     await ecCountTableProcessor.compute();
+    ecProcessor.value = ecCountTableProcessor;
 
     const ecOntologyProcessor = new EcOntologyProcessor(ecCommunicator);
-    const ecOntology = await ecOntologyProcessor.getOntology(ecCountTableProcessor.getCountTable());
+    ecOntology.value = await ecOntologyProcessor.getOntology(ecCountTableProcessor.getCountTable());
 
     const lcaCountTableProcessor = new LcaCountTableProcessor(peptideCountTable, pept2Data);
     await lcaCountTableProcessor.compute();
@@ -142,6 +149,11 @@ const startAnalysis = async function() {
 
     ncbiTree.value = new NcbiTree(
         lcaCountTableProcessor.getCountTable(), ncbiOntology, lcaCountTableProcessor.getAnnotationPeptideMapping()
+    );
+
+    ecTree.value = computeEcTree(
+        ecCountTableProcessor.getCountTable(),
+        ecOntology.value,
     );
 
     loading.value = false;

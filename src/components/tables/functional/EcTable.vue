@@ -73,7 +73,7 @@
                             v-bind="props"
                             icon="mdi-download"
                             variant="plain"
-                            @click="downloadGoItem(item.selectable.code)"
+                            @click="downloadEcItem(item.selectable.code)"
                         />
                     </template>
                 </v-tooltip>
@@ -94,9 +94,9 @@
                         <template #visualization>
                             <TreeView
                                 :data="treeAvailable.get(item.raw.code)"
-                                :loading="computingTree.get(item.raw.code) && !treeAvailable.get(item.raw.code)"
+                                :loading="computingTree.get(item.raw.code)! && !treeAvailable.get(item.raw.code)"
                                 :auto-resize="true"
-                                :height="350"
+                                :height="300"
                                 :link-stroke-color="linkStrokeColor"
                                 :node-stroke-color="highlightColorFunc"
                                 :node-fill-color="highlightColorFunc"
@@ -121,28 +121,34 @@
 </template>
 
 <script setup lang="ts">
-import GoTableItem from './GoTableItem';
+import EcTableItem from './EcTableItem';
 import useCsvDownload from '@/composables/useCsvDownload';
-import { FunctionalCode, GoCode, HighlightedTreeProcessor, InterproCode, NcbiId, NcbiTree, Peptide } from "@/logic";
+import { EcCode, FunctionalCode, HighlightedTreeProcessor, NcbiId, NcbiTree, Peptide } from "@/logic";
 import { Ref, ref, toRaw } from "vue";
-import TreeView from '@/components/visualizations/TreeView.vue';
-import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
 import { DataNodeLike } from 'unipept-visualizations/types';
+import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
+import TreeView from '@/components/visualizations/TreeView.vue';
 import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
-    items: GoTableItem[]
+    items: EcTableItem[],
     loading: boolean
-    showPercentage: boolean
+    showPercentage: boolean,
     ncbiTree?: NcbiTree
     taxaToPeptides?: Map<NcbiId, Peptide[]>
-    itemToPeptides?: Map<GoCode, Peptide[]>
+    itemToPeptides?: Map<EcCode, Peptide[]>
     downloadItem?: (code: FunctionalCode) => Promise<void>
 }
 
 const props = defineProps<Props>();
 
-const expanded = ref<GoCode[]>([]);
+const expanded = ref<EcTableItem[]>([]);
+
+const treeAvailable = new Map<string, DataNodeLike>();
+
+const highlightedTreeProcessor = new HighlightedTreeProcessor();
+
+const computingTree: Ref<Map<EcCode, boolean>> = ref(new Map());
 
 const headers = ref([
     {
@@ -152,7 +158,7 @@ const headers = ref([
         width: "20%"
     },
     {
-        title: "GO-term",
+        title: "EC-number",
         align: "start",
         key: "code",
         width: "30%"
@@ -172,32 +178,24 @@ const headers = ref([
     }
 ]);
 
-const treeAvailable = new Map<string, DataNodeLike>();
-
-const highlightedTreeProcessor = new HighlightedTreeProcessor();
-
-const computingTree: Ref<Map<InterproCode, boolean>> = ref(new Map());
-
 const highlightColor: string = "#ffc107";
 const highlightColorFunc = (d: any) => d.extra.included ? highlightColor : "lightgrey";
 const linkStrokeColor = ({ target: d }: any) => highlightColorFunc(d.data);
 
 const url = (code: string) => {
-    return `http://amigo.geneontology.org/amigo/search/ontology?q=${code}`;
+    return `https://www.uniprot.org/uniprot/?query=${code}`;
 }
 
 const { download } = useCsvDownload();
 
-const downloadCsv = (items: GoTableItem[]) => {
-    const header = ["Peptides", "GO-term", "Name", "Namespace"];
-    const grid: string[][] = items.map(item => [item.count.toString(), item.code, item.name, item.namespace]);
+const downloadCsv = (items: EcTableItem[]) => {
+    const header = ["Peptides", "EC-number", "Name"];
+    const grid: string[][] = items.map(item => [item.count.toString(), item.code, item.name]);
 
-    const namespace: string = items[0].namespace;
-
-    download(header, grid, `go-${namespace.split(" ").join("_")}-table.csv`);
+    download(header, grid, "ec-table.csv");
 }
 
-const downloadGoItem = async (code: FunctionalCode) => {
+const downloadEcItem = async (code: FunctionalCode) => {
     if(props.downloadItem) {
         await props.downloadItem(code);
     }
@@ -214,7 +212,6 @@ const onExpandClicked = (item: any) => {
         expanded.value.push(item.raw.code);
     }
 }
-
 
 const computeTree = async function(code: string) {
     computingTree.value.set(code, true);
