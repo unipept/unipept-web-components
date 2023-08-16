@@ -74,7 +74,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const emits = defineEmits(["filerPercentageChange"])
+const emits = defineEmits(["filterPercentageChange"])
 
 const editFilterPercentageModalOpen = ref<boolean>(false);
 const filterPercentage = ref<number>(props.filter);

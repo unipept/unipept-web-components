@@ -7,13 +7,13 @@
                     color="primary"
                 />
             </div>
-            <interpro-summary-card
+            <go-summary-card
                 v-else
                 :filter="0"
-                :interpro-ontology="interproOntology!"
+                :go-ontology="goOntology!"
                 :analysis-in-progress="loading"
                 :show-percentage="true"
-                :interpro-processor="interproProcessor!"
+                :go-processor="goProcessor!"
                 :ncbi-tree="ncbiTree!"
                 :ncbi-processor="ncbiProcessor"
             />
@@ -40,7 +40,7 @@ import {
     CountTable, EcCountTableProcessor,
     EcOntologyProcessor,
     EcProteinCountTableProcessor,
-    EcResponseCommunicator, GoCountTableProcessor,
+    EcResponseCommunicator, GoCode, GoCountTableProcessor, GoDefinition,
     GoOntologyProcessor,
     GoProteinCountTableProcessor,
     GoResponseCommunicator, InterproCode, InterproCountTableProcessor, InterproDefinition, InterproOntologyProcessor,
@@ -55,7 +55,7 @@ import {
     ProteinResponseCommunicator, QueueManager
 } from "@/logic";
 import Peptide from "@/logic/ontology/peptide/Peptide";
-import InterproSummaryCard from "@/components/cards/InterproSummaryCard.vue";
+import GoSummaryCard from "@/components/cards/GoSummaryCard.vue";
 
 const loading = ref(true);
 
@@ -87,8 +87,12 @@ const ecCommunicator = new EcResponseCommunicator();
 InterproResponseCommunicator.setup(unipeptApiUrl, interproBatchSize);
 const interproCommunicator = new InterproResponseCommunicator();
 
+const goOntology: Ref<Ontology<GoCode, GoDefinition> | undefined> = ref();
 const interproOntology: Ref<Ontology<InterproCode, InterproDefinition> | undefined> = ref();
+
+const goProcessor: Ref<GoCountTableProcessor | undefined> = ref();
 const interproProcessor: Ref<InterproCountTableProcessor | undefined> = ref();
+
 const ncbiTree: Ref<NcbiTree | undefined> = ref();
 const ncbiProcessor: Ref<LcaCountTableProcessor | undefined> = ref();
 
@@ -111,9 +115,10 @@ const startAnalysis = async function() {
 
     const goCountTableProcessor = new GoCountTableProcessor(peptideCountTable, pept2Data, goCommunicator);
     await goCountTableProcessor.compute();
+    goProcessor.value = goCountTableProcessor;
 
     const goOntologyProcessor = new GoOntologyProcessor(goCommunicator);
-    const goOntology = await goOntologyProcessor.getOntology(goCountTableProcessor.getCountTable());
+    goOntology.value = await goOntologyProcessor.getOntology(goCountTableProcessor.getCountTable());
 
     const interproCountTableProcessor = new InterproCountTableProcessor(peptideCountTable, pept2Data, interproCommunicator);
     await interproCountTableProcessor.compute();
