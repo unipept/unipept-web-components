@@ -7,7 +7,11 @@
                     color="primary"
                 />
             </div>
-            <matched-proteins-table
+<!--            <matched-proteins-table-->
+<!--                v-else-->
+<!--                :assay="singlePeptideStatus!"-->
+<!--            />-->
+            <lineage-table
                 v-else
                 :assay="singlePeptideStatus!"
             />
@@ -39,6 +43,7 @@ import {
     ProteinResponseCommunicator, QueueManager
 } from "@/logic";
 import Peptide from "@/logic/ontology/peptide/Peptide";
+import LineageTable from "@/components/tables/LineageTable.vue";
 
 const loading = ref(true);
 

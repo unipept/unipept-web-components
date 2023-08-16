@@ -215,32 +215,32 @@ defineProps<Props>();
 
 const headers = ref([
     {
-        text: "UniProt ID",
+        title: "UniProt ID",
         align: "start",
         key: "uniprotAccessionId",
         width: "20%"
     },
     {
-        text: "Name",
+        title: "Name",
         align: "start",
         key: "name",
         width: "29%"
     },
     {
-        text: "Organism",
+        title: "Organism",
         align: "start",
         key: "organism",
         width: "30%"
     },
     {
-        text: "Annotations",
+        title: "Annotations",
         align: "start",
         key: "fa",
         width: "16%",
         sortable: false
     },
     {
-        text: "",
+        title: "",
         key: "data-table-expand",
         width: "5%"
     },
