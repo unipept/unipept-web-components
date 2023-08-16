@@ -16,7 +16,7 @@
         </div>
         <div
             ref="visualization"
-            style="height: inherit;"
+            :style="'height: ' + height + 'px'"
             class="treeview-container"
         />
     </div>

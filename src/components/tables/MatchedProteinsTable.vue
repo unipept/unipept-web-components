@@ -15,7 +15,6 @@
                 v-model:expanded="expanded"
                 :headers="headers"
                 :items="assay.analysisInProgress ? [] : items(assay)"
-                item-key="uniprotAccessionId"
                 item-value="uniprotAccessionId"
                 :search="filter"
                 :custom-filter="filterByValue"

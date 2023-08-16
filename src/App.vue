@@ -14,6 +14,8 @@
                 :analysis-in-progress="loading"
                 :show-percentage="true"
                 :interpro-processor="interproProcessor!"
+                :ncbi-tree="ncbiTree!"
+                :ncbi-processor="ncbiProcessor"
             />
 
 <!--            <matched-proteins-table-->
@@ -86,8 +88,9 @@ InterproResponseCommunicator.setup(unipeptApiUrl, interproBatchSize);
 const interproCommunicator = new InterproResponseCommunicator();
 
 const interproOntology: Ref<Ontology<InterproCode, InterproDefinition> | undefined> = ref();
-
 const interproProcessor: Ref<InterproCountTableProcessor | undefined> = ref();
+const ncbiTree: Ref<NcbiTree | undefined> = ref();
+const ncbiProcessor: Ref<LcaCountTableProcessor | undefined> = ref();
 
 QueueManager.initializeQueue(4);
 
@@ -116,11 +119,10 @@ const startAnalysis = async function() {
 
     const interproCountTableProcessor = new InterproCountTableProcessor(peptideCountTable, pept2Data, interproCommunicator);
     await interproCountTableProcessor.compute();
+    interproProcessor.value = interproCountTableProcessor;
 
     const interproOntologyProcessor = new InterproOntologyProcessor(interproCommunicator);
-
     interproOntology.value = await interproOntologyProcessor.getOntology(interproCountTableProcessor.getCountTable());
-    interproProcessor.value = interproCountTableProcessor;
 
     const ecCountTableProcessor = new EcCountTableProcessor(peptideCountTable, pept2Data, ecCommunicator);
     await ecCountTableProcessor.compute();
@@ -131,11 +133,12 @@ const startAnalysis = async function() {
 
     const lcaCountTableProcessor = new LcaCountTableProcessor(peptideCountTable, pept2Data);
     await lcaCountTableProcessor.compute();
+    ncbiProcessor.value = lcaCountTableProcessor;
 
     const ncbiOntologyProcessor = new NcbiOntologyProcessor(ncbiCommunicator);
     const ncbiOntology = await ncbiOntologyProcessor.getOntology(lcaCountTableProcessor.getCountTable());
 
-    const tree = new NcbiTree(
+    ncbiTree.value = new NcbiTree(
         lcaCountTableProcessor.getCountTable(), ncbiOntology, lcaCountTableProcessor.getAnnotationPeptideMapping()
     );
 

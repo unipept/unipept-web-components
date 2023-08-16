@@ -15,7 +15,7 @@
             :custom-filter="filterNamespace"
             :sort-by="['count']"
             :sort-desc="[true]"
-            item-key="code"
+            item-value="code"
             show-expand
         >
             <template #header.action>
@@ -30,15 +30,16 @@
                 </v-tooltip>
             </template>
 
-<!--            <template #item.data-table-expand="{ item }">-->
-<!--                <v-btn -->
-<!--                    v-if="ncbiTree" -->
-<!--                    class="v-data-table__expand-icon" -->
-<!--                    icon="" :disabled="item.totalAnnotations === 0" @click="onExpandClicked(item)">-->
-<!--                    <v-icon v-if="expanded.findIndex(i => i.code === item.code) !== -1">mdi-chevron-up</v-icon>-->
-<!--                    <v-icon v-else>mdi-chevron-down</v-icon>-->
-<!--                </v-btn>-->
-<!--            </template>-->
+            <template #item.data-table-expand="{ item }">
+                <v-btn
+                    v-if="ncbiTree"
+                    size="small"
+                    variant="plain"
+                    :icon="expanded.findIndex(i => i === item.raw.code) !== -1 ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                    :disabled="item.totalAnnotations === 0"
+                    @click="onExpandClicked(item)"
+                />
+            </template>
 
             <template #item.count="{ item }">
                 <div
@@ -59,7 +60,7 @@
                     class="font-regular"
                 >
                     {{ item.selectable.code }}
-                    <v-icon x-small>mdi-open-in-new</v-icon>
+                    <v-icon size="x-small">mdi-open-in-new</v-icon>
                 </a>
             </template>
 
@@ -100,14 +101,14 @@
                         ref="treeview"
                         caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                         internal-download
-                        :loading="!ncbiTree"
+                        :loading="computingTree.get(item.raw.code)!"
                     >
                         <template #visualization>
                             <TreeView
-                                :data="treeAvailable.get(item.code)"
-                                :loading="computingTree && !treeAvailable.get(item.code)"
+                                :data="treeAvailable.get(item.raw.code)"
+                                :loading="computingTree.get(item.raw.code)! && !treeAvailable.get(item.raw.code)"
                                 :auto-resize="true"
-                                :height="350"
+                                :height="300"
                                 :link-stroke-color="linkStrokeColor"
                                 :node-stroke-color="highlightColorFunc"
                                 :node-fill-color="highlightColorFunc"
@@ -122,7 +123,7 @@
 
 <script setup lang="ts">
 import { FunctionalCode, HighlightedTreeProcessor, InterproCode, InterproNamespace, NcbiId, NcbiTree, Peptide } from '@/logic';
-import { ref } from 'vue';
+import { Ref, ref, toRaw } from "vue";
 import InterproTableItem from './InterproTableItem';
 import useCsvDownload from '@/composables/useCsvDownload';
 import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
@@ -132,7 +133,6 @@ import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: InterproTableItem[],
-
     loading: boolean,
     showPercentage: boolean,
     ncbiTree?: NcbiTree
@@ -143,7 +143,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const expanded = ref<InterproTableItem[]>([]);
+const expanded = ref<InterproCode[]>([]);
 
 const headers = ref([
     {
@@ -183,7 +183,7 @@ const treeAvailable = new Map<string, DataNodeLike>();
 
 const highlightedTreeProcessor = new HighlightedTreeProcessor();
 
-const computingTree = ref(false);
+const computingTree: Ref<Map<InterproCode, boolean>> = ref(new Map());
 
 const highlightColor: string = "#ffc107";
 const highlightColorFunc = (d: any) => d.extra.included ? highlightColor : "lightgrey";
@@ -223,31 +223,30 @@ const downloadInterproItem = async (code: FunctionalCode) => {
     }
 }
 
-// const onExpandClicked = (item: InterproTableItem) => {
-//     computingTree.value = true;
-//
-//     const idx: number = expanded.value.findIndex(i => i.code === item.code);
-//
-//     computeTree(item.code);
-//
-//     if (idx >= 0) {
-//         expanded.value.splice(idx, 1);
-//     } else {
-//         expanded.value.push(item);
-//     }
-// }
+// TODO fix the type annotation of item here once VDataTable is stable
+const onExpandClicked = (item: any) => {
+    const idx: number = expanded.value.findIndex(i => i === item.raw.code);
 
-const computeTree = (code: string) => {
-    if (props.taxaToPeptides) {
-        highlightedTreeProcessor.computeHighlightedTree(
-            props.itemToPeptides?.get(code) ?? [],
-            props.ncbiTree,
-            props.taxaToPeptides
-        ).then((rootNode: any) => {
-            treeAvailable.set(code, rootNode);
-            computingTree.value = false;
-        });
+    if (idx >= 0) {
+        expanded.value.splice(idx, 1);
+    } else {
+        computeTree(item.raw.code);
+        expanded.value.push(item.raw.code);
     }
+}
+
+const computeTree = async function(code: string) {
+    computingTree.value.set(code, true);
+    if (props.taxaToPeptides && props.ncbiTree) {
+        const rootNode: any = await highlightedTreeProcessor.computeHighlightedTree(
+            toRaw(props.itemToPeptides?.get(code)) ?? [],
+            toRaw(props.ncbiTree),
+            toRaw(props.taxaToPeptides)
+        );
+
+        treeAvailable.set(code, rootNode);
+    }
+    computingTree.value.set(code, false);
 }
 </script>
 
@@ -259,6 +258,7 @@ const computeTree = (code: string) => {
 }
 
 a {
+    color: #2196f3;
     text-decoration: none;
 }
 
