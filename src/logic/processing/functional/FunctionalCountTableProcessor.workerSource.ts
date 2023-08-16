@@ -56,7 +56,7 @@ export default async function compute(
             if (!item2Peptides.has(term)) {
                 item2Peptides.set(term, []);
             }
-            
+
             // @ts-ignore
             item2Peptides.get(term).push(peptide);
         }

@@ -32,18 +32,19 @@
             :loading="loading"
             :search="selectedCategory"
             :custom-filter="categoryFilter"
-            show-select
             :items-per-page="5"
+            show-select
         />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import DataSourceMultiItem from './DataSourceMultiItem';
+import { ref, watch } from 'vue';
+import DataSourceItem from '@/components/tables/DataSourceItem';
+import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
-    items: DataSourceMultiItem[]
+    items: DataSourceItem[]
     categories: string[]
     loading: boolean
     identifier?: boolean
@@ -60,24 +61,18 @@ const headers = ref([
         title: "Name",
         align: "start",
         key: "name",
-        width: "30%"
+        width: "40%"
     },
     {
         title: props.identifier ? "Identifier" : "Rank",
         align: "start",
         key: props.identifier ? "id" : "category",
-        width: "30%"
+        width: "40%"
     },
     {
         title: "# Peptides",
         align: "start",
         key: "count",
-        width: "20%"
-    },
-    {
-        title: "# Assays",
-        align: "start",
-        key: "assayCount",
         width: "20%"
     },
 ]);

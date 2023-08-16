@@ -24,13 +24,19 @@ export default class WorkerQueue {
             const worker = this.workers.pop();
 
             if(worker) {
-                const result = await new Promise<any>((resolve) => {
-                    const listener = (event: MessageEvent) => {
-                        worker.removeEventListener("message", listener);
+                const result = await new Promise<any>((resolve, reject) => {
+                    const messageListener = (event: MessageEvent) => {
+                        worker.removeEventListener("message", messageListener);
                         resolve(event.data.result);
                     };
+                    worker.addEventListener("message", messageListener);
 
-                    worker.addEventListener("message", listener);
+                    const errorListener = (event: ErrorEvent) => {
+                        worker.removeEventListener("error", errorListener);
+                        reject(event.error);
+                    }
+                    worker.addEventListener("error", errorListener);
+
                     worker.postMessage(task);
                 });
 
