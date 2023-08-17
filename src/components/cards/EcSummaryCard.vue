@@ -54,7 +54,7 @@
                     <TreeView
                         :data="ecTree"
                         :loading="analysisInProgress || !ecTree"
-                        :auto-tesize="true"
+                        :auto-resize="true"
                         :do-reset="reset"
                         @reset="reset = false"
                     />

@@ -42,7 +42,7 @@
 import useFullscreen from '@/composables/useFullscreen';
 import { SinglePeptideAnalysisStatus } from '@/interface';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
-import d3 from 'd3';
+import { scaleOrdinal, schemeCategory10 } from "d3";
 import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
 import { ref } from 'vue';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
@@ -69,7 +69,7 @@ const colors = (d: TreeviewNode) => {
     if (d.name === "Eukaryota") return "#2E7D32"; // green
     if (d.name === "Viruses") return "#C62828"; // red
 
-    return d3.scaleOrdinal(d3.schemeCategory10).call(this, d as any);
+    return scaleOrdinal(schemeCategory10).call(this, d as any);
 };
 
 // @ts-ignore (We know that the SVG-element will always be there)

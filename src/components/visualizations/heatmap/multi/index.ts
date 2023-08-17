@@ -1,1 +1,3 @@
-export { default as HeatmapWizardMulti } from './HeatmapWizardMulti.vue';
+import HeatmapWizardMulti from './HeatmapWizardMulti.vue';
+
+export { HeatmapWizardMulti };
