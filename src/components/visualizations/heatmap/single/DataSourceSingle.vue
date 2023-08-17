@@ -7,7 +7,7 @@
             class="flex-grow-0"
         />
 
-        <DataSourceTable
+        <data-source-table
             :items="selectedDataSourceItems"
             :categories="categories"
             :loading="loading"

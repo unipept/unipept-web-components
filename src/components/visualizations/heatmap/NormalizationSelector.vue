@@ -5,7 +5,7 @@
         </p>
         <v-radio-group
             v-model="normalizer"
-            inline
+            color="primary"
         >
             <v-radio
                 v-for="normalizationType of normalizationTypes.keys()"

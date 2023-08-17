@@ -33,6 +33,8 @@
             :search="selectedCategory"
             :custom-filter="categoryFilter"
             :items-per-page="5"
+            return-object
+            color="primary"
             show-select
         />
     </div>

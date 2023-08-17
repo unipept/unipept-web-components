@@ -67,9 +67,9 @@ onMounted(() => {
 </script>
 
 <style lang="less">
-    @gray-base:              #000;
-    @gray-light:             lighten(@gray-base, 46.7%);
-    @gray-lighter:           lighten(@gray-base, 93.5%);
+    @gray-base: #000;
+    @gray-light: lighten(@gray-base, 46.7%);
+    @gray-lighter: lighten(@gray-base, 93.5%);
     @black-divider: rgba(0,0,0,0.12);
     @black-secondary: rgba(0,0,0,0.54);
     @black-text: rgba(0,0,0,0.87);

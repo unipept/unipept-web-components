@@ -6,36 +6,40 @@
         >
             <v-stepper-header>
                 <v-stepper-item
+                    color="primary"
                     editable
                     title="Horizontal axis"
-                    value="1"
+                    :value="1"
                     :complete="currentStep > 1"
                 />
                 <v-divider />
                 <v-stepper-item
+                    color="primary"
                     editable
-                    title="Horizontal axis"
-                    value="2"
+                    title="Vertical axis"
+                    :value="2"
                     :complete="currentStep > 2"
                 />
                 <v-divider />
                 <v-stepper-item
+                    color="primary"
                     editable
                     title="Normalization"
-                    value="3"
+                    :value="3"
                     :complete="currentStep > 3"
                 />
                 <v-divider />
                 <v-stepper-item
+                    color="primary"
                     editable
                     title="Heatmap"
-                    value="4"
+                    :value="4"
                     :complete="currentStep > 4"
                 />
             </v-stepper-header>
             <v-stepper-window>
                 <v-stepper-window-item :value="1">
-                    <DataSourceSingle
+                    <data-source-single
                         :loading="loading"
                         :go-count-table-processor="goCountTableProcessor"
                         :go-ontology="goOntology"
@@ -50,7 +54,7 @@
                     />
                 </v-stepper-window-item>
                 <v-stepper-window-item :value="2">
-                    <DataSourceSingle
+                    <data-source-single
                         :loading="loading"
                         :go-count-table-processor="goCountTableProcessor"
                         :go-ontology="goOntology"
@@ -65,10 +69,10 @@
                     />
                 </v-stepper-window-item>
                 <v-stepper-window-item :value="3">
-                    <NormalizationSelector @update="normalizer = $event" />
+                    <normalization-selector @update="normalizer = $event" />
                 </v-stepper-window-item>
                 <v-stepper-window-item :value="4">
-                    <VisualizationControls
+                    <visualization-controls
                         ref="heatmap"
                         caption="Scroll to zoom, drag to pan"
                         :loading="heatMapLoading"
@@ -80,7 +84,7 @@
                         overlap
                     >
                         <template #visualization>
-                            <HeatMap
+                            <heat-map
                                 :data="heatmapData"
                                 :row-labels="heatmapRows"
                                 :column-labels="heatmapColumns"
@@ -94,10 +98,11 @@
                                 @download="downloadModalOpen = $event"
                             />
                         </template>
-                    </VisualizationControls>
+                    </visualization-controls>
                 </v-stepper-window-item>
             </v-stepper-window>
             <v-stepper-actions
+                color="primary"
                 @click:prev="currentStep -= 1"
                 @click:next="currentStep += 1"
             />
@@ -114,10 +119,10 @@ import HeatMap from '../HeatMap.vue';
 import NormalizationSelector from '../NormalizationSelector.vue';
 import DataSourceSingle from './DataSourceSingle.vue';
 import DataSourceSingleItem from './DataSourceSingleItem';
+import { VStepper, VStepperActions, VStepperHeader, VStepperItem, VStepperWindow, VStepperWindowItem } from 'vuetify/labs/VStepper';
 
 export interface Props {
     loading: boolean
-
     goCountTableProcessor: GoCountTableProcessor
     goOntology: Ontology<GoCode, GoDefinition>
     ecCountTableProcessor: EcCountTableProcessor

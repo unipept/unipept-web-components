@@ -11,7 +11,7 @@
             class="visualization-container"
         />
 
-        <DownloadImageModal
+        <download-image-modal
             :open-modal="downloadModalOpen"
             :image-source="heatmapElement()"
             supports-svg
@@ -67,8 +67,8 @@ const visualizationComputed: Ref<UnipeptHeatmap | undefined> = computed(() => {
         return undefined;
     }
 
-    if(props.loading) {
-        if(visualization.value) {
+    if (props.loading) {
+        if (visualization.value) {
             visualization.value.innerHTML = "";
         }
 
@@ -83,13 +83,13 @@ const downloadModalOpen = ref<boolean>(false);
 // @ts-ignore (we know that toSVG exists on this object)
 const heatmapElement = () => new SvgStringImageSource(visualizationComputed.value?.toSVG());
 
-// Watch wheter we have to perform a reset
+// Watch whether we have to perform a reset
 watch(() => props.doReset, () => {
-    if(visualizationComputed.value) {
+    if (visualizationComputed.value) {
         // @ts-ignore (reset is not exposed by the visualization interface)
         visualizationComputed.value.reset();
 
-        if(props.fullscreen) {
+        if (props.fullscreen) {
             // @ts-ignore (reset is not exposed by the visualization interface)
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight);
         }
@@ -101,8 +101,8 @@ watch(() => props.doReset, () => {
 
 // Watch whether we have to perform a resize
 watch(() => props.fullscreen, () => {
-    if(visualizationComputed.value) {
-        if(props.fullscreen) {
+    if (visualizationComputed.value) {
+        if (props.fullscreen) {
             // @ts-ignore (ideally, we should check here if the value is actually there)
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight);
         } else {
@@ -119,7 +119,11 @@ watch(() => downloadModalOpen.value, () => {
     emits("download", downloadModalOpen.value);
 });
 
-const initializeVisualisation = () => {
+const initializeVisualisation = function() {
+    if (!props.data || props.data.length === 0) {
+        return;
+    }
+
     const settings = {
         width: props.fullscreen ? visualization.value?.clientWidth : props.width,
         height: props.fullscreen ? visualization.value?.clientHeight : props.height,
@@ -139,11 +143,11 @@ const initializeVisualisation = () => {
         settings
     );
 
-    if(props.clusterRows && !props.clusterColumns) {
+    if (props.clusterRows && !props.clusterColumns) {
         heatmap.cluster("rows");
-    } else if(!props.clusterRows && props.clusterColumns) {
+    } else if (!props.clusterRows && props.clusterColumns) {
         heatmap.cluster("columns");
-    } else if(!props.clusterRows && !props.clusterColumns) {
+    } else if (!props.clusterRows && !props.clusterColumns) {
         heatmap.cluster("none");
     } else {
         heatmap.cluster("all");
