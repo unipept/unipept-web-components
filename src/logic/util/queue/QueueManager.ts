@@ -1,5 +1,5 @@
 import WorkerQueue from "./WorkerQueue";
-import Worker from "./GeneralWorker.worker?worker";
+import Worker from "./GeneralWorker.worker?worker&inline";
 
 export default class QueueManager {
     private static longRunningQueue: WorkerQueue;

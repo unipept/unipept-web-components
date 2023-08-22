@@ -15,7 +15,7 @@
             "DOM"
         ],
         "skipLibCheck": true,
-        "outDir": "dist",
+        "outDir": "./dist/types",
         "declaration": true,
         "noEmit": false,
         "paths": {

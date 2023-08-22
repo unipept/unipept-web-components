@@ -3,23 +3,24 @@
     "version": "2.1.0",
     "scripts": {
         "dev": "vite",
-        "build": "vue-tsc --emitDeclarationOnly && vite build",
+        "build": "vue-tsc --emitDeclarationOnly && vite build && tsc --emitDeclarationOnly && rm -rf types/test types/plugins types/main.d.ts",
         "preview": "vite preview",
-        "lint": "eslint . --fix --ignore-path .gitignore"
+        "lint": "eslint . --fix --ignore-path .gitignore",
+        "types": "tsc --emitDeclarationOnly && rm -rf types/test types/plugins types/main.d.ts"
     },
     "files": [
-        "dist"
+        "dist/**"
     ],
-    "main": "./dist/unipept-web-components.umd.cjs",
-    "module": "./dist/unipept-web-components.js",
+    "main": "./dist/unipept-web-components.umd.js",
+    "module": "./dist/unipept-web-components.mjs",
     "exports": {
         ".": {
-            "import": "./dist/unipept-web-components.js",
-            "require": "./dist/unipept-web-components.umd.cjs"
+            "import": "./dist/unipept-web-components.mjs",
+            "require": "./dist/unipept-web-components.umd.js"
         },
         "./style.css": "./dist/style.css"
     },
-    "types": "./dist/index.d.ts",
+    "types": "./dist/types/index.d.ts",
     "dependencies": {
         "@mdi/font": "7.0.96",
         "async": "^3.2.4",
