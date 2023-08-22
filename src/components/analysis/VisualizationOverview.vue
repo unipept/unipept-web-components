@@ -70,7 +70,7 @@
                 value="treemap"
                 class="fixed-height"
             >
-                <VisualizationControls
+                <visualization-controls
                     ref="treemap"
                     caption="Click a square to zoom in and right click to zoom out"
                     :loading="analysisInProgress"
@@ -87,19 +87,19 @@
                             :height="460"
                             :auto-resize="true"
                             :do-reset="treemapReset"
-                            :fullscreen="isFullscreen && currentTab === 1"
+                            :fullscreen="isFullscreen && currentTab === 'sunburst'"
                             :filter-id="filterId"
                             @reset="treemapReset = false"
                             @update-selected-taxon-id="updateSelectedTaxonId"
                         />
                     </template>
-                </VisualizationControls>
+                </visualization-controls>
             </v-window-item>
             <v-window-item
                 value="treeview"
                 class="fixed-height"
             >
-                <VisualizationControls
+                <visualization-controls
                     ref="treeview"
                     caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                     :loading="analysisInProgress"
@@ -109,7 +109,7 @@
                     :hide-download="isFullscreen"
                 >
                     <template #visualization>
-                        <TreeView
+                        <tree-view
                             :data="ncbiTree?.getRoot()"
                             :loading="analysisInProgress || !ncbiTree"
                             :auto-resize="true"
@@ -118,20 +118,20 @@
                             @reset="treeviewReset = false"
                         />
                     </template>
-                </VisualizationControls>
+                </visualization-controls>
             </v-window-item>
             <v-window-item
                 value="hierarchical"
                 class="pa-5"
             >
-                <HierarchicalOutline
+                <hierarchical-outline
                     :tree="ncbiTree"
                     :equate-il="true"
                     :loading="analysisInProgress"
                 />
             </v-window-item>
             <v-window-item value="heatmap">
-                <HeatmapWizardSingle
+                <heatmap-wizard-single
                     :loading="analysisInProgress"
                     :go-count-table-processor="goCountTableProcessor"
                     :go-ontology="goOntology"
@@ -174,7 +174,6 @@ import { DataNodeLike } from 'unipept-visualizations/types';
 import { ref } from 'vue';
 import VisualizationControls from '../visualizations/VisualizationControls.vue';
 import TreeView from '../visualizations/TreeView.vue';
-import Sunburst from '../visualizations/Sunburst.vue';
 import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Ontology } from '@/logic';
 import TreeMap from '../visualizations/TreeMap.vue';
 import HeatmapWizardSingle from '../visualizations/heatmap/single/HeatmapWizardSingle.vue';

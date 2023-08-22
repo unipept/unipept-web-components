@@ -11,6 +11,8 @@
         </v-card-title>
 
         <v-card-text>
+
+            <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
             <v-data-table
                 v-model:expanded="expanded"
                 :headers="headers"
@@ -23,11 +25,11 @@
             >
                 <template #item.uniprotAccessionId="{ item }" >
                     <span
-                        @click="openInUniProt(item.uniprotAccessionId)"
                         style="cursor: pointer;"
+                        @click="openInUniProt(item.raw.uniprotAccessionId)"
                     >
                         <span style="position: relative; top: 4px;">
-                            {{ item.selectable.uniprotAccessionId }}
+                            {{ item.raw.uniprotAccessionId }}
                         </span>
                         <v-btn
                             icon="mdi-open-in-new"
@@ -43,29 +45,29 @@
                             <v-avatar
                                 v-bind="props"
                                 size="30"
-                                :color="item.selectable.functionalAnnotations.go.length > 0 ? 'amber' : 'amber-lighten-4'"
+                                :color="item.raw.functionalAnnotations.go.length > 0 ? 'amber' : 'amber-lighten-4'"
                             >
                                 <span
-                                    :class="[item.selectable.functionalAnnotations.go.length > 0 ? 'dark--text' : 'gray--text', 'headline']"
+                                    :class="[item.raw.functionalAnnotations.go.length > 0 ? 'dark--text' : 'gray--text', 'headline']"
                                     style="font-size: 14px !important;"
                                 >
                                     GO
                                 </span>
                             </v-avatar>
                         </template>
-                        <span v-if="item.selectable.functionalAnnotations.go.length >= 0">
+                        <span v-if="item.raw.functionalAnnotations.go.length >= 0">
                             This protein is annotated with
                             <span
-                                v-if="item.selectable.functionalAnnotations.go.length === 1"
+                                v-if="item.raw.functionalAnnotations.go.length === 1"
                                 class="font-weight-bold"
                             >
-                                {{ item.selectable.functionalAnnotations.go.length }} GO-term.
+                                {{ item.raw.functionalAnnotations.go.length }} GO-term.
                             </span>
                             <span
                                 v-else
                                 class="font-weight-bold"
                             >
-                                {{ item.selectable.functionalAnnotations.go.length }} GO-terms.
+                                {{ item.raw.functionalAnnotations.go.length }} GO-terms.
                             </span>
                         </span>
                         <span v-else>
@@ -78,7 +80,7 @@
                             <v-avatar
                                 v-bind="props"
                                 size="30"
-                                :color="item.selectable.functionalAnnotations.ec.length > 0 ? 'indigo' : 'indigo-lighten-4'"
+                                :color="item.raw.functionalAnnotations.ec.length > 0 ? 'indigo' : 'indigo-lighten-4'"
                             >
                                 <span
                                     class="text-white"
@@ -88,19 +90,19 @@
                                 </span>
                             </v-avatar>
                         </template>
-                        <span v-if="item.selectable.functionalAnnotations.ec.length >= 0">
+                        <span v-if="item.raw.functionalAnnotations.ec.length >= 0">
                             This protein is annotated with
                             <span
-                                v-if="item.selectable.functionalAnnotations.ec.length === 1"
+                                v-if="item.raw.functionalAnnotations.ec.length === 1"
                                 class="font-weight-bold"
                             >
-                                {{ item.selectable.functionalAnnotations.ec.length }} EC-number.
+                                {{ item.raw.functionalAnnotations.ec.length }} EC-number.
                             </span>
                             <span
                                 v-else
                                 class="font-weight-bold"
                             >
-                                {{ item.selectable.functionalAnnotations.ec.length }} EC-numbers.
+                                {{ item.raw.functionalAnnotations.ec.length }} EC-numbers.
                             </span>
                         </span>
                         <span v-else>
@@ -113,7 +115,7 @@
                             <v-avatar
                                 v-bind="props"
                                 size="30"
-                                :color="item.selectable.functionalAnnotations.interpro.length > 0 ? 'red' : 'red-lighten-4'"
+                                :color="item.raw.functionalAnnotations.interpro.length > 0 ? 'red' : 'red-lighten-4'"
                             >
                                 <span
                                     class="text-white"
@@ -123,10 +125,10 @@
                                 </span>
                             </v-avatar>
                         </template>
-                        <span v-if="item.selectable.functionalAnnotations.interpro.length >= 0">
+                        <span v-if="item.raw.functionalAnnotations.interpro.length >= 0">
                             This protein is annotated with
                             <span
-                                v-if="item.selectable.functionalAnnotations.interpro.length === 1"
+                                v-if="item.raw.functionalAnnotations.interpro.length === 1"
                                 class="font-weight-bold"
                             >
                                 1 InterPro-entry.
@@ -135,7 +137,7 @@
                                 v-else
                                 class="font-weight-bold"
                             >
-                                {{ item.selectable.functionalAnnotations.interpro.length }} InterPro-entries.
+                                {{ item.raw.functionalAnnotations.interpro.length }} InterPro-entries.
                             </span>
                         </span>
                         <span v-else>
@@ -150,32 +152,32 @@
                         style="padding-top: 12px; padding-bottom: 12px;"
                     >
                         <v-list
-                            v-if="item.selectable.functionalAnnotations.go.length > 0 || item.selectable.functionalAnnotations.ec.length > 0 || item.selectable.functionalAnnotations.interpro.length > 0"
+                            v-if="item.raw.functionalAnnotations.go.length > 0 || item.raw.functionalAnnotations.ec.length > 0 || item.raw.functionalAnnotations.interpro.length > 0"
                             lines="two"
                         >
-                            <v-list-subheader v-if="item.selectable.functionalAnnotations.go && item.selectable.functionalAnnotations.go.length > 0">
+                            <v-list-subheader v-if="item.raw.functionalAnnotations.go && item.raw.functionalAnnotations.go.length > 0">
                                 Gene Ontology terms
                             </v-list-subheader>
                             <v-list-item
-                                v-for="definition of item.selectable.functionalAnnotations.go"
+                                v-for="definition of item.raw.functionalAnnotations.go"
                                 :key="definition.code"
                                 :title="[definition.code, definition.name, definition.namespace].join(' - ')"
                                 :subtitle="`Assigned to ${assay.peptideData.go[definition.code]} of ${assay.peptideData.faCounts.go} matched proteins with a GO annotation (${percentageForAnnotation(assay, definition.code, 'go')}).`"
                             />
-                            <v-list-subheader v-if="item.selectable.functionalAnnotations.ec && item.selectable.functionalAnnotations.ec.length > 0">
+                            <v-list-subheader v-if="item.raw.functionalAnnotations.ec && item.raw.functionalAnnotations.ec.length > 0">
                                 Enzyme Commission numbers
                             </v-list-subheader>
                             <v-list-item
-                                v-for="definition of item.selectable.functionalAnnotations.ec"
+                                v-for="definition of item.raw.functionalAnnotations.ec"
                                 :key="definition.code"
                                 :title="[definition.code.substring(3), definition.name, definition.namespace].join(' - ')"
                                 :subtitle="`Assigned to ${assay.peptideData.ec[definition.code]} of ${assay.peptideData.faCounts.ec} matched proteins with an EC annotation (${percentageForAnnotation(assay, definition.code, 'ec')}).`"
                             />
-                            <v-list-subheader v-if="item.selectable.functionalAnnotations.interpro && item.selectable.functionalAnnotations.interpro.length > 0">
+                            <v-list-subheader v-if="item.raw.functionalAnnotations.interpro && item.raw.functionalAnnotations.interpro.length > 0">
                                 InterPro entries
                             </v-list-subheader>
                             <v-list-item
-                                v-for="definition of item.selectable.functionalAnnotations.interpro"
+                                v-for="definition of item.raw.functionalAnnotations.interpro"
                                 :key="definition.code"
                                 :title="[definition.code.substring(4), definition.name, definition.namespace].join(' - ')"
                                 :subtitle="`Assigned to ${assay.peptideData.ipr[definition.code]} of ${assay.peptideData.faCounts.ipr} matched proteins with an InterPro annotation (${percentageForAnnotation(assay, definition.code, 'ipr')}).`"

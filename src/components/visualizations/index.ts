@@ -1,6 +1,7 @@
-import HierachicalOutline from './HierachicalOutline.vue';
+import HierarchicalOutline from "./HierarchicalOutline.vue";
 import Sunburst from './Sunburst.vue';
-import Treemap from './Treemap.vue';
-import Treeview from './Treeview.vue';
+import TreeMap from './TreeMap.vue';
+import TreeView from './TreeView.vue';
 
-export { HierachicalOutline, Sunburst, Treemap, Treeview };
+export * from "./heatmap";
+export { HierarchicalOutline, Sunburst, TreeMap, TreeView };

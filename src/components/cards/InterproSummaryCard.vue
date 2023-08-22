@@ -108,7 +108,7 @@ const items = computed(() => {
 
 const onUpdateFilterPercentage = (newFilterPercentage: number) => {
     filterPercentage.value = newFilterPercentage;
-    emits("filerPercentageChange", newFilterPercentage);
+    emits("filterPercentageChange", newFilterPercentage);
 };
 
 watch(() => props.filter, (newFilter) => {

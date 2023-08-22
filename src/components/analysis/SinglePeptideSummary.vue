@@ -135,7 +135,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
 import { SinglePeptideAnalysisStatus } from '@/interface'
 import { NcbiTaxon, ProteinDefinition, StringUtils } from '@/logic';
 

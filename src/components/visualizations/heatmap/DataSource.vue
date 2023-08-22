@@ -25,6 +25,7 @@
             </a>
         </div>
 
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
@@ -32,7 +33,7 @@
             show-select
             item-key="id"
             :items-per-page="5"
-            sort-by="popularity"
+            :sort-by="['popularity']"
             sort-desc
             :loading="loading"
             :search="selectedCategory"
@@ -43,6 +44,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: any[]

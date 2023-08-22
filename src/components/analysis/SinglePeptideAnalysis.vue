@@ -28,15 +28,16 @@
 
         <v-window v-model="currentTab">
             <v-window-item value="matched-proteins">
-                <MatchedProteinsTable :assay="assay" />
+                <matched-proteins-table :assay="assay" />
             </v-window-item>
             <v-window-item value="lineage-tree">
-                <LineageTree :assay="assay" />
+                <lineage-tree :assay="assay" />
             </v-window-item>
             <v-window-item value="lineage-table">
-                <LineageTable :assay="assay" />
+                <lineage-table :assay="assay" />
             </v-window-item>
             <v-window-item value="go-terms">
+                <!-- @vue-ignore -->
                 <go-summary-card
                     :analysis-in-progress="assay.analysisInProgress"
                     :go-processor="assay.goProteinCountTableProcessor"
@@ -44,6 +45,7 @@
                 />
             </v-window-item>
             <v-window-item value="ec-numbers">
+                <!-- @vue-ignore -->
                 <ec-summary-card
                     :analysis-in-progress="assay.analysisInProgress"
                     :ec-processor="assay.ecProteinCountTableProcessor"
@@ -52,6 +54,7 @@
                 />
             </v-window-item>
             <v-window-item value="interpro">
+                <!-- @vue-ignore -->
                 <interpro-summary-card
                     :analysis-in-progress="assay.analysisInProgress"
                     :interpro-processor="assay.interproProteinCountTableProcessor"
@@ -64,7 +67,7 @@
 
 <script setup lang="ts">
 import { SinglePeptideAnalysisStatus } from "@/interface";
-import { defineProps, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import MatchedProteinsTable from "../tables/MatchedProteinsTable.vue";
 import LineageTable from "../tables/LineageTable.vue";
 import LineageTree from "../trees/LineageTree.vue";

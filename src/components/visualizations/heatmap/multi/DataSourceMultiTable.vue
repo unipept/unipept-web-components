@@ -25,6 +25,7 @@
             </a>
         </div>
 
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
@@ -41,6 +42,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import DataSourceMultiItem from './DataSourceMultiItem';
+import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: DataSourceMultiItem[]

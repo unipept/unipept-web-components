@@ -1,5 +1,6 @@
 <template>
     <div>
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model:expanded="expanded"
             :headers="headers"
@@ -11,6 +12,7 @@
             item-value="code"
             show-expand
         >
+            <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
             <template #header.action>
                 <v-tooltip text="Download table as CSV">
                     <template #activator="{ props }">
@@ -29,7 +31,7 @@
                     size="small"
                     variant="plain"
                     :icon="expanded.findIndex(i => i === item.raw.code) !== -1 ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                    :disabled="item.totalAnnotations === 0"
+                    :disabled="item.raw.totalAnnotations === 0"
                     @click="onExpandClicked(item)"
                 />
             </template>
@@ -39,27 +41,27 @@
                     :style="{
                         padding: '12px',
                         background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' +
-                            item.selectable.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.selectable.relativeCount * 100 + '%)',
+                            item.raw.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.raw.relativeCount * 100 + '%)',
                     }"
                 >
-                    {{ showPercentage ? (item.selectable.relativeCount * 100).toFixed(2) + " %" : item.selectable.count }}
+                    {{ showPercentage ? (item.raw.relativeCount * 100).toFixed(2) + " %" : item.raw.count }}
                 </div>
             </template>
 
             <template #item.code="{ item }">
                 <a
-                    :href="url(item.selectable.code)"
+                    :href="url(item.raw.code)"
                     target="_blank"
                     class="font-regular"
                 >
-                    {{ item.selectable.code }}
+                    {{ item.raw.code }}
                     <v-icon size="x-small">mdi-open-in-new</v-icon>
                 </a>
             </template>
 
             <template #item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
-                    {{ item.selectable.name }}
+                    {{ item.raw.name }}
                 </span>
             </template>
 
@@ -73,7 +75,7 @@
                             v-bind="props"
                             icon="mdi-download"
                             variant="plain"
-                            @click="downloadEcItem(item.selectable.code)"
+                            @click="downloadEcItem(item.raw.code)"
                         />
                     </template>
                 </v-tooltip>
@@ -93,7 +95,7 @@
                     >
                         <template #visualization>
                             <TreeView
-                                :data="treeAvailable.get(item.raw.code)"
+                                :data="treeAvailable.get(item.raw.code)!"
                                 :loading="computingTree.get(item.raw.code)! && !treeAvailable.get(item.raw.code)"
                                 :auto-resize="true"
                                 :height="300"

@@ -8,6 +8,8 @@
                     extracted from the UniProt entry, followed by columns representing taxonomic ranks ordered from
                     superkingdom on the left to forma on the right.
                 </p>
+
+                <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
                 <v-data-table
                     density="compact"
                     :items="assay.analysisInProgress ? [] : organisms(assay)"
@@ -21,15 +23,15 @@
                         <tbody>
                             <tr
                                 v-for="item in items"
-                                :key="item.selectable.name"
+                                :key="item.raw.name"
                             >
                                 <td>
                                     <span class="font-small font-weight-bold">
-                                        {{ item.selectable.definition.name }}
+                                        {{ item.raw.definition.name }}
                                     </span>
                                 </td>
                                 <td
-                                    v-for="l in item.selectable.lineage"
+                                    v-for="l in item.raw.lineage"
                                     :key="l ? l.id : generateId()"
                                     :class="[ l ? getColour(l.name) : '', 'lineage-cell', 'px-2']"
                                 >
