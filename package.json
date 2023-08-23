@@ -3,10 +3,10 @@
     "version": "2.1.0",
     "scripts": {
         "dev": "vite",
-        "build": "vue-tsc --emitDeclarationOnly && vite build && tsc --emitDeclarationOnly && rm -rf types/test types/plugins types/main.d.ts",
+        "build": "vue-tsc --emitDeclarationOnly && vite build && tsc --emitDeclarationOnly && tsc-alias && rm -rf types/test types/plugins types/main.d.ts",
         "preview": "vite preview",
         "lint": "eslint . --fix --ignore-path .gitignore",
-        "types": "tsc --emitDeclarationOnly && rm -rf types/test types/plugins types/main.d.ts"
+        "types": "tsc --emitDeclarationOnly && tsc-alias && rm -rf types/test types/plugins types/main.d.ts"
     },
     "files": [
         "dist/**"
@@ -47,6 +47,7 @@
         "eslint": "^8.0.0",
         "eslint-plugin-vue": "^9.0.0",
         "less": "^4.2.0",
+        "tsc-alias": "^1.8.7",
         "typescript": "^5.0.0",
         "vite": "^4.2.0",
         "vite-plugin-vuetify": "^1.0.0",
