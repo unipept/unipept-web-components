@@ -7,24 +7,35 @@
                     color="primary"
                 />
             </div>
-            <visualization-overview
-                v-else
-                :filter="0"
-                :go-count-table-processor="goProcessor!"
-                :go-ontology="goOntology!"
-                :ec-count-table-processor="ecProcessor!"
-                :ec-ontology="ecOntology!"
-                :interpro-count-table-processor="interproProcessor!"
-                :interpro-ontology="interproOntology!"
-                :filter-id="2"
-                :analysis-in-progress="loading"
-                :show-percentage="true"
-                :ec-tree="ecTree!"
-                :ncbi-tree="ncbiTree!"
-                :ncbi-ontology="ncbiOntology!"
-                :ncbi-count-table-processor="lcaProcessor!"
-            />
+            <div v-else>
+                <visualization-overview
+                    :filter="0"
+                    :go-count-table-processor="goProcessor!"
+                    :go-ontology="goOntology!"
+                    :ec-count-table-processor="ecProcessor!"
+                    :ec-ontology="ecOntology!"
+                    :interpro-count-table-processor="interproProcessor!"
+                    :interpro-ontology="interproOntology!"
+                    :filter-id="2"
+                    :analysis-in-progress="loading"
+                    :show-percentage="true"
+                    :ec-tree="ecTree!"
+                    :ncbi-tree="ncbiTree!"
+                    :ncbi-ontology="ncbiOntology!"
+                    :ncbi-count-table-processor="lcaProcessor!"
+                />
 
+                <go-summary-card
+                    :analysis-in-progress="loading"
+                    :go-processor="goProcessor!"
+                    :go-ontology="goOntology!"
+                    :ncbi-processor="lcaProcessor!"
+                    :ncbi-tree="ncbiTree!"
+                    :show-percentage="true"
+                    :filter="5"
+                    @filter-percentage-change="() => {}"
+                />
+            </div>
 
 <!--            <div v-else>-->
 <!--                <single-peptide-summary-->
@@ -80,6 +91,7 @@ import { DataNodeLike } from "unipept-visualizations";
 import VisualizationOverview from "@/components/analysis/VisualizationOverview.vue";
 import SinglePeptideAnalysis from "@/components/analysis/SinglePeptideAnalysis.vue";
 import SinglePeptideSummary from "@/components/analysis/SinglePeptideSummary.vue";
+import GoSummaryCard from "@/components/cards/GoSummaryCard.vue";
 
 const loading = ref(true);
 
