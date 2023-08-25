@@ -25,14 +25,16 @@
         fluid
         class="error-container mt-2 d-flex align-center"
     >
-        <div class="error-container">
-            <v-icon size="x-large">
+        <div class="d-flex flex-column align-center">
+            <v-icon
+                size="x-large"
+                color="error"
+            >
                 mdi-alert-circle-outline
             </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="initializeVisualisation()">continue</a>?
-            </p>
+            <span>
+                An error occurred during the analysis of this assay.
+            </span>
         </div>
     </v-container>
 </template>
@@ -54,6 +56,7 @@ export interface Props {
 
     loading?: boolean
     doReset?: boolean
+    error?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,7 +66,8 @@ const props = withDefaults(defineProps<Props>(), {
     isFixedColors: false,
     filterId: 1,
     loading: false,
-    doReset: false
+    doReset: false,
+    error: false
 });
 
 const emits = defineEmits(["reset", "update-selected-taxon-id"]);
@@ -71,7 +75,6 @@ const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptSunburst | undefined>(undefined);
 
-const error = ref<boolean>(false);
 
 watch(() => props.loading, () => {
     if(props.loading) {
@@ -111,8 +114,6 @@ watch(() => props.isFixedColors, () => {
 });
 
 const initializeVisualisation = () => {
-    error.value = false;
-
     visualizationComputed.value = undefined;
 
     if(!props.data) return;

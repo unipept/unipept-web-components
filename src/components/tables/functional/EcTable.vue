@@ -127,7 +127,7 @@ import EcTableItem from './EcTableItem';
 import useCsvDownload from '@/composables/useCsvDownload';
 import { EcCode, FunctionalCode, HighlightedTreeProcessor, NcbiId, NcbiTree, Peptide } from "@/logic";
 import { Ref, ref, toRaw } from "vue";
-import { DataNodeLike } from 'unipept-visualizations/types';
+import { DataNodeLike } from 'unipept-visualizations';
 import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
 import TreeView from '@/components/visualizations/TreeView.vue';
 import { VDataTable } from 'vuetify/labs/VDataTable';

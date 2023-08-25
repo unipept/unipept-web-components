@@ -12,6 +12,9 @@ export default class QueueManager {
      * Queue for operations that are known to require a lot of work and can take quite some time (i.e. > 0.5s).
      */
     public static getLongRunningQueue(): WorkerQueue {
+        if (!this.longRunningQueue) {
+            throw new Error("QueueManager not initialized!");
+        }
         return this.longRunningQueue;
     }
 }

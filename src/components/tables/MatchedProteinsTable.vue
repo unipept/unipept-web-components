@@ -7,6 +7,7 @@
                 label="Filter"
                 single-line
                 hide-details
+                variant="underlined"
             />
         </v-card-title>
 

@@ -78,7 +78,7 @@
             <slot name="visualization" />
         </div>
 
-        <DownloadImageModal
+        <download-image-modal
             :open-modal="downloadOpen"
             :image-source="element()"
             supports-svg

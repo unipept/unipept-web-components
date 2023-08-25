@@ -129,7 +129,7 @@ import { FunctionalCode, GoCode, HighlightedTreeProcessor, InterproCode, NcbiId,
 import { Ref, ref, toRaw } from "vue";
 import TreeView from '@/components/visualizations/TreeView.vue';
 import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
-import { DataNodeLike } from 'unipept-visualizations/types';
+import { DataNodeLike } from 'unipept-visualizations';
 import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {

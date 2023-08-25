@@ -82,7 +82,7 @@
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcDefinition, FunctionalCountTableProcessor, LcaCountTableProcessor, NcbiTree, Ontology } from '@/logic';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
-import { DataNodeLike } from 'unipept-visualizations/types';
+import { DataNodeLike } from 'unipept-visualizations';
 import { computed, ref, watch } from 'vue';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import EditFilterPercentageModal from '../modals/EditFilterPercentageModal.vue';

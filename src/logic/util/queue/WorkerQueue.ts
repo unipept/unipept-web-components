@@ -23,7 +23,7 @@ export default class WorkerQueue {
             // Retrieve worker from the pool.
             const worker = this.workers.pop();
 
-            if(worker) {
+            if (worker) {
                 const result = await new Promise<any>((resolve, reject) => {
                     const messageListener = (event: MessageEvent) => {
                         worker.removeEventListener("message", messageListener);
@@ -43,12 +43,14 @@ export default class WorkerQueue {
                 // Add worker back to the pool.
                 this.workers.push(worker);
 
-                return result
+                return result;
+            } else {
+                throw new Error("No workers available in the queue!");
             }
         }, this.concurrency);
     }
 
-    public async pushTask<ResultType, ArgType>(type: string, args: ArgType): Promise<ResultType> {
+    public pushTask<ResultType, ArgType>(type: string, args: ArgType): Promise<ResultType> {
         return this.queue.push({type, args});
     }
 }

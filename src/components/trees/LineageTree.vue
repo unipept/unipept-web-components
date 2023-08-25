@@ -43,7 +43,6 @@ import useFullscreen from '@/composables/useFullscreen';
 import { SinglePeptideAnalysisStatus } from '@/interface';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import { scaleOrdinal, schemeCategory10 } from "d3";
-import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
 import { ref } from 'vue';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import TreeView from '../visualizations/TreeView.vue';
@@ -63,7 +62,7 @@ const reset = ref<boolean>(false);
 
 const downloadTreeviewModalOpen = ref<boolean>(false);
 
-const colors = (d: TreeviewNode) => {
+const colors = (d: any) => {
     if (d.name === "Bacteria") return "#1565C0"; // blue
     if (d.name === "Archaea") return "#FF8F00"; // orange
     if (d.name === "Eukaryota") return "#2E7D32"; // green

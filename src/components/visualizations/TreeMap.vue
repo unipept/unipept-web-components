@@ -25,16 +25,16 @@
         fluid
         class="error-container mt-2 d-flex align-center"
     >
-        <div class="error-container">
+        <div class="d-flex flex-column align-center">
             <v-icon
                 size="x-large"
+                color="error"
             >
                 mdi-alert-circle-outline
             </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="initializeVisualisation()">continue</a>?
-            </p>
+            <span>
+                An error occurred during the analysis of this assay.
+            </span>
         </div>
     </v-container>
 </template>
@@ -55,7 +55,9 @@ export interface Props {
 
     loading?: boolean
     doReset?: boolean
-    fullscreen?: boolean
+    fullscreen?: boolean,
+
+    error?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,7 +66,8 @@ const props = withDefaults(defineProps<Props>(), {
     filterId: 1,
     loading: false,
     doReset: false,
-    fullscreen: false
+    fullscreen: false,
+    error: false
 });
 
 // TODO these should also be properly typed.
@@ -72,8 +75,6 @@ const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptTreemap | undefined>(undefined);
-
-const error = ref<boolean>(false);
 
 watch(() => props.loading, () => {
     if(props.loading) {
@@ -120,14 +121,10 @@ watch(() => props.filterId, () => {
 });
 
 const initializeVisualisation = () => {
-    error.value = false;
-
     visualizationComputed.value = undefined;
     if(visualization.value) {
         visualization.value.innerHTML = "";
     }
-
-    console.log(props.width ? props.width : visualization.value?.clientWidth)
 
     const settings = {
         width: props.width ? props.width : visualization.value?.clientWidth,

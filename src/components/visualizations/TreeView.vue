@@ -25,14 +25,16 @@
         fluid
         class="error-container mt-2 d-flex align-center"
     >
-        <div class="error-container">
-            <v-icon x-large>
+        <div class="d-flex flex-column align-center">
+            <v-icon
+                size="x-large"
+                color="error"
+            >
                 mdi-alert-circle-outline
             </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="initializeVisualisation()">continue</a>?
-            </p>
+            <span>
+                An error occurred during the analysis of this assay.
+            </span>
         </div>
     </v-container>
 </template>
@@ -51,6 +53,8 @@ export interface Props {
     loading?: boolean
     doReset?: boolean
 
+    error?: boolean
+
     linkStrokeColor?: (d: any) => string
     nodeStrokeColor?: (d: any) => string
     nodeFillColor?: (d: any) => string
@@ -61,15 +65,14 @@ const props = withDefaults(defineProps<Props>(), {
     height: 300,
     autoResize: false,
     loading: false,
-    doReset: false
+    doReset: false,
+    error: false
 });
 
 const emits = defineEmits(["reset"]);
 
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptTreeView | undefined>();
-
-const error = ref<boolean>(false);
 
 watch(() => props.loading, () => {
     if(props.loading || !props.data) {
@@ -99,8 +102,6 @@ watch(() => props.doReset, () => {
 });
 
 const initializeVisualisation = () => {
-    error.value = false;
-
     const settings = {
         width: props.width,
         height: props.height,
