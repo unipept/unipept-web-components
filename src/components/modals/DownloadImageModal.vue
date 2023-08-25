@@ -33,7 +33,7 @@
             </div>
 
             <div class="ma-4">
-                <div class="d-flex justify-start align-center">
+                <div class="d-flex justify-start align-center mb-2">
                     <span
                         class="mr-2"
                         style="position: relative; top: 3px;"
@@ -44,7 +44,7 @@
                         v-model="formatValue"
                         :items="formatValues"
                         item-text="label"
-                        dense
+                        density="compact"
                         hide-details
                     />
                 </div>
@@ -59,7 +59,7 @@
                         v-model="scalingValue"
                         :items="enlargementValues"
                         item-title="label"
-                        dense
+                        density="compact"
                         hide-details
                         :disabled="isSvg()"
                     />

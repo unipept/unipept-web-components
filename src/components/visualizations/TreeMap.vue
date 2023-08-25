@@ -126,8 +126,18 @@ const initializeVisualisation = () => {
         visualization.value.innerHTML = "";
     }
 
+    let width: number = props.width ? props.width : (visualization.value?.clientWidth || 0);
+    if (!props.width) {
+        let currentEl = visualization.value;
+        while (currentEl && currentEl.clientWidth === 0) {
+            // Wait until the visualization has a width
+            currentEl = currentEl.parentElement;
+        }
+        width = currentEl?.clientWidth || 0;
+    }
+
     const settings = {
-        width: props.width ? props.width : visualization.value?.clientWidth,
+        width: width,
         height: props.height - 20,
         rerootCallback: d => {
             if(visualizationComputed.value) {
@@ -136,6 +146,8 @@ const initializeVisualisation = () => {
         },
         getTooltipText: d => tooltipContent(d)
     } as TreemapSettings;
+
+    console.log(JSON.stringify(settings));
 
     const treemap = new UnipeptTreemap(
         visualization.value as HTMLElement,
