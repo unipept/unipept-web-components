@@ -45,6 +45,10 @@ import { Sunburst as UnipeptSunburst, SunburstSettings } from 'unipept-visualiza
 import { onMounted, ref, watch } from 'vue';
 import { tooltipContent } from './VisualizationHelper';
 
+// The amount of milliseconds that the SunBurst should wait with animating movement before or after a filter was
+// changed.
+const rerootTimeout = 0;
+
 export interface Props {
     data: NcbiTree
 
@@ -101,10 +105,12 @@ watch(() => props.doReset, () => {
 });
 
 watch(() => props.filterId, () => {
-    if(visualizationComputed.value) {
-        // @ts-ignore (reroot is not exported in the interface of the visualization)
-        visualizationComputed.value.reroot(props.filterId, false);
-    }
+    new Promise<void>((resolve) => setTimeout(resolve, rerootTimeout)).then(() => {
+        if (visualizationComputed.value) {
+            // @ts-ignore (reroot is not exported in the interface of the visualization)
+            visualizationComputed.value.reroot(props.filterId, false);
+        }
+    });
 });
 
 watch(() => props.isFixedColors, () => {
@@ -123,9 +129,12 @@ const initializeVisualisation = () => {
         height: props.height,
         useFixedColors: props.isFixedColors,
         rerootCallback: d => {
-            if(visualizationComputed.value) {
-                emits("update-selected-taxon-id", d.id);
-            }
+            // Wait 500ms to start the animation to avoid stutter in the interface.
+            new Promise(resolve => setTimeout(resolve, rerootTimeout)).then(() => {
+                if (visualizationComputed.value) {
+                    emits("update-selected-taxon-id", d.id);
+                }
+            });
         },
         getTooltipText: d => tooltipContent(d)
     } as SunburstSettings;

@@ -13,7 +13,7 @@
 
         <v-col
             id="searchtree"
-            class="treeView multi pt-0"
+            class="treeView multi pt-2"
             cols="6"
         />
 

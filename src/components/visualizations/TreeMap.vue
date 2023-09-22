@@ -147,8 +147,6 @@ const initializeVisualisation = () => {
         getTooltipText: d => tooltipContent(d)
     } as TreemapSettings;
 
-    console.log(JSON.stringify(settings));
-
     const treemap = new UnipeptTreemap(
         visualization.value as HTMLElement,
         props.data.getRoot(),
