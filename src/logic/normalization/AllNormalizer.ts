@@ -1,4 +1,4 @@
-import Normalizer from "./Normalizer";
+import { Normalizer } from "./Normalizer";
 
 /**
  * Normalises values in a grid relative to one absolute maximum and minimum value for the whole grid. The largest and

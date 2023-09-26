@@ -1,22 +1,27 @@
 <template>
     <div style="height: inherit;">
-        <div v-if="!visualizationComputed" class="d-flex loading-container">
+        <div
+            v-if="!visualizationComputed"
+            class="d-flex loading-container"
+        >
             Please select at least one item for both axis of the heatmap.
         </div>
-        <div class="visualization-container" ref="visualization"></div>
+        <div
+            ref="visualization"
+            class="visualization-container"
+        />
 
-        <DownloadImageModal 
-            :openModal="downloadModalOpen"
-            :imageSource="heatmapElement()"
+        <download-image-modal
+            :open-modal="downloadModalOpen"
+            :image-source="heatmapElement()"
+            supports-svg
             @close="downloadModalOpen = false"
-            supportsSvg
         />
     </div>
 </template>
 
 <script setup lang="ts">
 import DownloadImageModal from '@/components/modals/DownloadImageModal.vue';
-import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import SvgStringImageSource from '@/logic/util/image/SvgStringImageSource';
 import { Heatmap as UnipeptHeatmap, HeatmapSettings } from 'unipept-visualizations';
 import { computed, onMounted, Ref, ref, watch } from 'vue';
@@ -58,12 +63,12 @@ const visualization = ref<HTMLElement | null>(null);
 const mounted = ref<boolean>(false);
 
 const visualizationComputed: Ref<UnipeptHeatmap | undefined> = computed(() => {
-    if(!mounted) {
+    if(!mounted.value) {
         return undefined;
     }
 
-    if(props.loading) {
-        if(visualization.value) {
+    if (props.loading) {
+        if (visualization.value) {
             visualization.value.innerHTML = "";
         }
 
@@ -75,17 +80,17 @@ const visualizationComputed: Ref<UnipeptHeatmap | undefined> = computed(() => {
 
 const downloadModalOpen = ref<boolean>(false);
 
-// @ts-ignore
+// @ts-ignore (we know that toSVG exists on this object)
 const heatmapElement = () => new SvgStringImageSource(visualizationComputed.value?.toSVG());
 
-// Watch wheter we have to perform a reset
+// Watch whether we have to perform a reset
 watch(() => props.doReset, () => {
-    if(visualizationComputed.value) {
-        // @ts-ignore
+    if (visualizationComputed.value) {
+        // @ts-ignore (reset is not exposed by the visualization interface)
         visualizationComputed.value.reset();
 
-        if(props.fullscreen) {
-            // @ts-ignore
+        if (props.fullscreen) {
+            // @ts-ignore (reset is not exposed by the visualization interface)
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight);
         }
 
@@ -94,14 +99,13 @@ watch(() => props.doReset, () => {
     }
 });
 
-// Watch wheter we have to perform a resize
+// Watch whether we have to perform a resize
 watch(() => props.fullscreen, () => {
-    if(visualizationComputed.value) {
-        if(props.fullscreen) {
-            // @ts-ignore
+    if (visualizationComputed.value) {
+        if (props.fullscreen) {
+            // @ts-ignore (ideally, we should check here if the value is actually there)
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight);
         } else {
-            // @ts-ignore
             visualizationComputed.value.resize(props.width, props.height);
         }
     }
@@ -115,7 +119,11 @@ watch(() => downloadModalOpen.value, () => {
     emits("download", downloadModalOpen.value);
 });
 
-const initializeVisualisation = () => {
+const initializeVisualisation = function() {
+    if (!props.data || props.data.length === 0) {
+        return;
+    }
+
     const settings = {
         width: props.fullscreen ? visualization.value?.clientWidth : props.width,
         height: props.fullscreen ? visualization.value?.clientHeight : props.height,
@@ -135,11 +143,11 @@ const initializeVisualisation = () => {
         settings
     );
 
-    if(props.clusterRows && !props.clusterColumns) {
+    if (props.clusterRows && !props.clusterColumns) {
         heatmap.cluster("rows");
-    } else if(!props.clusterRows && props.clusterColumns) {
+    } else if (!props.clusterRows && props.clusterColumns) {
         heatmap.cluster("columns");
-    } else if(!props.clusterRows && !props.clusterColumns) {
+    } else if (!props.clusterRows && !props.clusterColumns) {
         heatmap.cluster("none");
     } else {
         heatmap.cluster("all");
@@ -161,7 +169,7 @@ onMounted(() => {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .loading-container {
         padding: 24px 24px 16px 24px;
     }

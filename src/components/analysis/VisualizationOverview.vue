@@ -1,160 +1,190 @@
 <template>
     <v-card>
         <v-tabs
-            slider-color="secondary" 
-            background-color="primary" 
-            dark 
             v-model="currentTab"
+            slider-color="secondary"
+            bg-color="primary"
+            dark
         >
-            <v-tab>Sunburst</v-tab>
-            <v-tab>Treemap</v-tab>
-            <v-tab>Treeview</v-tab>
-            <v-tab>Hierarchical outline</v-tab>
-            <v-tab>Heatmap</v-tab>
+            <v-tab value="sunburst">
+                Sunburst
+            </v-tab>
+            <v-tab value="treemap">
+                Treemap
+            </v-tab>
+            <v-tab value="treeview">
+                Treeview
+            </v-tab>
+            <v-tab value="hierarchical">
+                Hierarchical outline
+            </v-tab>
+            <v-tab value="heatmap">
+                Heatmap
+            </v-tab>
         </v-tabs>
 
-        <v-tabs-items class="mb-5" v-model="currentTab">
-            <v-tab-item class="fixed-height">
-                <VisualizationControls
-                    ref="sunburst"
+        <v-window
+            v-model="currentTab"
+            class="mb-5"
+        >
+            <v-window-item
+                value="sunburst"
+                class="fixed-height"
+            >
+                <visualization-controls
+                    ref="sunburstRef"
                     caption="Click a slice to zoom in and the center node to zoom out"
                     :loading="analysisInProgress"
-                    :fullscreen="() => toggle(sunburst)" 
+                    :fullscreen="() => toggle(sunburstRef)"
                     :download="() => downloadSunburstModalOpen = true"
                     :reset="() => sunburstReset = true"
-                    :hideDownload="isFullscreen"
+                    :hide-download="isFullscreen"
                     settings
                 >
                     <template #settings>
-                        <v-list-item>
+                        <v-list-item title="Use fixed colors">
                             <v-list-item-action>
-                                <v-checkbox v-model="isFixedColors" color="primary"></v-checkbox>
+                                <v-checkbox
+                                    v-model="isFixedColors"
+                                    color="primary"
+                                />
                             </v-list-item-action>
-
-                            <v-list-item-content>
-                                <v-list-item-title>Use fixed colors</v-list-item-title>
-                            </v-list-item-content>
                         </v-list-item>
                     </template>
                     <template #visualization>
-                        <Sunburst
+                        <sunburst
                             :data="ncbiTree"
                             :loading="analysisInProgress"
-                            :autoResize="true"
+                            :auto-resize="true"
                             :height="600"
-                            :doReset="sunburstReset"
-                            :isFixedColors="isFixedColors"
-                            :filterId="filterId"
+                            :do-reset="sunburstReset"
+                            :is-fixed-colors="isFixedColors"
+                            :filter-id="filterId"
+                            :error="error"
                             @reset="sunburstReset = false"
                             @update-selected-taxon-id="updateSelectedTaxonId"
                         />
                     </template>
-                </VisualizationControls>
-            </v-tab-item>
-            <v-tab-item class="fixed-height">
-                <VisualizationControls
-                    ref="treemap"
+                </visualization-controls>
+            </v-window-item>
+            <v-window-item
+                value="treemap"
+                class="fixed-height"
+            >
+                <visualization-controls
+                    ref="treemapRef"
                     caption="Click a square to zoom in and right click to zoom out"
                     :loading="analysisInProgress"
                     :overlap="false"
-                    :fullscreen="() => toggle(treemap)" 
+                    :fullscreen="() => toggle(treemapRef)"
                     :download="() => downloadTreemapModalOpen = true"
                     :reset="() => treemapReset = true"
-                    :hideDownload="isFullscreen"
+                    :hide-download="isFullscreen"
                 >
                     <template #visualization>
-                        <TreeMap
+                        <tree-map
                             :data="ncbiTree"
                             :loading="analysisInProgress || !ncbiTree"
                             :height="460"
-                            :autoResize="true"
-                            :doReset="treemapReset"
-                            :fullscreen="isFullscreen && currentTab === 1"
-                            :filterId="filterId"
+                            :auto-resize="true"
+                            :do-reset="treemapReset"
+                            :fullscreen="isFullscreen && currentTab === 'sunburst'"
+                            :filter-id="filterId"
+                            :error="error"
                             @reset="treemapReset = false"
                             @update-selected-taxon-id="updateSelectedTaxonId"
                         />
                     </template>
-                </VisualizationControls>
-            </v-tab-item>
-            <v-tab-item class="fixed-height">
-                <VisualizationControls
-                    ref="treeview"
+                </visualization-controls>
+            </v-window-item>
+            <v-window-item
+                value="treeview"
+                class="fixed-height"
+            >
+                <visualization-controls
+                    ref="treeviewRef"
                     caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                     :loading="analysisInProgress"
-                    :fullscreen="() => toggle(treeview)" 
+                    :fullscreen="() => toggle(treeviewRef)"
                     :download="() => downloadTreeviewModalOpen = true"
                     :reset="() => treeviewReset = true"
-                    :hideDownload="isFullscreen"
+                    :hide-download="isFullscreen"
                 >
                     <template #visualization>
-                        <TreeView 
-                            :data="ecTree"
-                            :loading="analysisInProgress || !ecTree"
-                            :autoResize="true"
+                        <tree-view
+                            :data="ncbiTree?.getRoot()"
+                            :loading="analysisInProgress || !ncbiTree"
+                            :auto-resize="true"
                             :height="500"
-                            :doReset="treeviewReset"
+                            :do-reset="treeviewReset"
+                            :error="error"
                             @reset="treeviewReset = false"
                         />
                     </template>
-                </VisualizationControls>
-            </v-tab-item>
-            <v-tab-item class="pa-5">
-                <HierarchicalOutline :tree="ncbiTree" :equate-il="true" :loading="analysisInProgress" />
-            </v-tab-item>
-            <v-tab-item>
-                <HeatmapWizardSingle 
+                </visualization-controls>
+            </v-window-item>
+            <v-window-item
+                value="hierarchical"
+                class="pa-5"
+            >
+                <hierarchical-outline
+                    :tree="ncbiTree"
+                    :equate-il="true"
                     :loading="analysisInProgress"
-                    :goCountTableProcessor="goCountTableProcessor"
-                    :goOntology="goOntology"
-                    :ecCountTableProcessor="ecCountTableProcessor"
-                    :ecOntology="ecOntology"
-                    :interproCountTableProcessor="interproCountTableProcessor"
-                    :interproOntology="interproOntology"
-                    :ncbiCountTableProcessor="ncbiCountTableProcessor"
-                    :ncbiOntology="ncbiOntology"
-                    :ncbiTree="ncbiTree"
                 />
-            </v-tab-item>
-        </v-tabs-items>
+            </v-window-item>
+            <v-window-item value="heatmap">
+                <heatmap-wizard-single
+                    :loading="analysisInProgress"
+                    :go-count-table-processor="goCountTableProcessor"
+                    :go-ontology="goOntology"
+                    :ec-count-table-processor="ecCountTableProcessor"
+                    :ec-ontology="ecOntology"
+                    :interpro-count-table-processor="interproCountTableProcessor"
+                    :interpro-ontology="interproOntology"
+                    :ncbi-count-table-processor="ncbiCountTableProcessor"
+                    :ncbi-ontology="ncbiOntology"
+                    :ncbi-tree="ncbiTree"
+                />
+            </v-window-item>
+        </v-window>
 
-        <DownloadImageModal 
-            :openModal="downloadSunburstModalOpen"
-            :imageSource="sunburstElement()"
+        <download-image-modal
+            :open-modal="downloadSunburstModalOpen"
+            :image-source="sunburstElement()"
+            supports-svg
             @close="downloadSunburstModalOpen = false"
-            supportsSvg
         />
 
-        <DownloadImageModal 
-            :openModal="downloadTreemapModalOpen"
-            :imageSource="treemapElement()"
+        <download-image-modal
+            :open-modal="downloadTreemapModalOpen"
+            :image-source="treemapElement()"
             @close="downloadTreemapModalOpen = false"
         />
 
-        <DownloadImageModal 
-            :openModal="downloadTreeviewModalOpen"
-            :imageSource="treeviewElement()"
+        <download-image-modal
+            :open-modal="downloadTreeviewModalOpen"
+            :image-source="treeviewElement()"
+            supports-svg
             @close="downloadTreeviewModalOpen = false"
-            supportsSvg
         />
     </v-card>
 </template>
 
 <script setup lang="ts">
 import useFullscreen from '@/composables/useFullscreen';
-import { DataNodeLike } from 'unipept-visualizations/types';
+import { DataNodeLike } from 'unipept-visualizations';
 import { ref } from 'vue';
 import VisualizationControls from '../visualizations/VisualizationControls.vue';
 import TreeView from '../visualizations/TreeView.vue';
-import Sunburst from '../visualizations/Sunburst.vue';
 import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Ontology } from '@/logic';
 import TreeMap from '../visualizations/TreeMap.vue';
 import HeatmapWizardSingle from '../visualizations/heatmap/single/HeatmapWizardSingle.vue';
-import { VCard, VTabs, VTab, VTabsItems, VTabItem } from 'vuetify/lib';
 import DownloadImageModal from '../modals/DownloadImageModal.vue';
 import DomImageSource from '@/logic/util/image/DomImageSource';
 import SvgImageSource from '@/logic/util/image/SvgImageSource';
 import HierarchicalOutline from '../visualizations/HierarchicalOutline.vue';
+import Sunburst from '../visualizations/Sunburst.vue';
 
 export interface Props {
     analysisInProgress: boolean
@@ -170,19 +200,23 @@ export interface Props {
     ncbiTree: NcbiTree
     ecTree: DataNodeLike
 
-    filterId: number
+    filterId: number,
+
+    error?: boolean
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+    error: false
+});
 
 const emits = defineEmits(['update-selected-taxon-id']);
 
-const currentTab = ref<number>(0);
+const currentTab = ref<string>("sunburst");
 const isFixedColors = ref<boolean>(false);
 
-const treeview = ref<HTMLElement | null>(null);
-const sunburst = ref<HTMLElement | null>(null);
-const treemap  = ref<HTMLElement | null>(null);
+const treeviewRef = ref<HTMLElement | null>(null);
+const sunburstRef = ref<HTMLElement | null>(null);
+const treemapRef  = ref<HTMLElement | null>(null);
 
 const { isFullscreen, toggle } = useFullscreen();
 
@@ -196,12 +230,12 @@ const downloadSunburstModalOpen = ref<boolean>(false);
 const downloadTreemapModalOpen = ref<boolean>(false);
 const downloadTreeviewModalOpen = ref<boolean>(false);
 
-// @ts-ignore
-const sunburstElement = () => new SvgImageSource(sunburst.value?.$el.querySelector(".visualization-container").children[1]);
-// @ts-ignore
-const treemapElement = () => new DomImageSource(treemap.value?.$el.querySelector(".treemap"));
-// @ts-ignore
-const treeviewElement = () => new SvgImageSource(treeview.value?.$el.querySelector("svg"));
+// @ts-ignore (TODO: get rid of jQuery here)
+const sunburstElement = () => new SvgImageSource(sunburstRef.value?.$el.querySelector(".visualization-container").children[1]);
+// @ts-ignore (TODO: get rid of jQuery here)
+const treemapElement = () => new DomImageSource(treemapRef.value?.$el.querySelector(".treemap"));
+// @ts-ignore (TODO: get rid of jQuery here)
+const treeviewElement = () => new SvgImageSource(treeviewRef.value?.$el.querySelector("svg"));
 
 const updateSelectedTaxonId = (id: number) => {
     emits('update-selected-taxon-id', id);

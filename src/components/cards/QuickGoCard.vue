@@ -1,24 +1,45 @@
 <template>
     <div style="height: 100%;">
-        <img v-if="quickGoSmallUrl" :src="quickGoSmallUrl" class="quickGoThumb" @click="showModal = !showModal">
-        <v-skeleton-loader v-else class="quickGoThumb" type="image"
-        ></v-skeleton-loader>
-        <v-dialog v-if="items" v-model="showModal" max-width="90%">
+        <img
+            v-if="quickGoSmallUrl"
+            :src="quickGoSmallUrl"
+            class="quickGoThumb"
+            alt="QuickGO chart of top GO terms."
+            @click="showModal = !showModal"
+        >
+        <v-skeleton-loader
+            v-else
+            class="quickGoThumb"
+            type="image"
+        />
+        <v-dialog
+            v-if="items"
+            v-model="showModal"
+            max-width="90%"
+        >
             <v-card>
-                <v-card-title>QuickGo {{ namespace.toString() }}</v-card-title>
+                <v-card-title>
+                    QuickGo {{ namespace.toString() }}
+                </v-card-title>
                 <v-card-text v-if="topN.length > 0">
                     This chart shows the relationship between the {{ topN.length }} most occurring GO terms:
                     {{ topNSentence }}.
-                    <br/>
+                    <br>
                     <a @click="openInBrowser(quickGoChartUrl)">
-                        <img 
-                            style="max-width: 80%; max-height: 600px; position: relative; left: 50%; transform: translateX(-50%); margin-top: 32px; margin-bottom: 32px;" 
-                            :src="quickGoChartUrl" 
+                        <img
+                            style="max-width: 80%; max-height: 600px; position: relative; left: 50%; transform: translateX(-50%); margin-top: 32px; margin-bottom: 32px;"
+                            :src="quickGoChartUrl"
                             :alt="'QuickGO chart of ' + topNSentence"
-                        />
+                        >
                     </a>
                     <div>
-                        Provided by <a @click="openInBrowser('https://www.ebi.ac.uk/QuickGO/annotations?goId=' + topN.map(x => x.code).join(','))" target="_blank">QuickGO</a>.
+                        Provided by
+                        <a
+                            target="_blank"
+                            @click="openInBrowser('https://www.ebi.ac.uk/QuickGO/annotations?goId=' + topN.map(x => x.code).join(','))"
+                        >
+                            QuickGO
+                        </a>.
                     </div>
                 </v-card-text>
                 <v-card-text v-else>
@@ -33,6 +54,7 @@
 import { GoNamespace, NetworkUtils } from '@/logic';
 import { computed, ref } from 'vue';
 import GoTableItem from '../tables/functional/GoTableItem';
+import { VSkeletonLoader } from "vuetify/labs/VSkeletonLoader";
 
 export interface Props {
     items: GoTableItem[]
@@ -46,7 +68,7 @@ const showModal = ref<boolean>(false);
 
 const topN = computed(() => {
     if(props.items) {
-        return props.items.sort((a, b) => b.count - a.count).slice(0, props.n);
+        return [...props.items].sort((a, b) => b.count - a.count).slice(0, props.n);
     }
 
     return [];

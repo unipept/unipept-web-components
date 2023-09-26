@@ -3,41 +3,50 @@
         <v-card-text>
             <v-row v-if="!analysisInProgress">
                 <v-col>
-                    <TrustLine
+                    <trust-line
                         class="mb-5"
-                        :trust="goProcessor?.getTrust()"
-                        :faKind="{
+                        :trust="goProcessor.getTrust()"
+                        :fa-kind="{
                             singular: 'GO term',
                             plural: 'GO terms'
                         }"
-                        :countKind="{
+                        :count-kind="{
                             singular: 'protein',
                             plural: 'proteins'
                         }"
+                        :clickable="ncbiTree !== undefined"
                     />
                 </v-col>
-                <v-col v-if="filter !== undefined" class="flex-grow-0">
-                    <v-btn icon @click="editFilterPercentageModalOpen = true">
-                        <v-icon color="grey darken-1">mdi-cog-outline</v-icon>
-                    </v-btn>
+                <v-col
+                    v-if="filter"
+                    class="flex-grow-0"
+                >
+                    <v-btn
+                        icon="mdi-cog-outline"
+                        size="small"
+                        variant="text"
+                        @click="editFilterPercentageModalOpen = true"
+                    />
                 </v-col>
             </v-row>
 
-            <h2 class="py-2">Biological Process</h2>
+            <h2 class="py-2">
+                Biological Process
+            </h2>
             <v-row>
-                <v-col cols=9>
-                    <GoTable 
+                <v-col cols="9">
+                    <GoTable
                         :items="biologicalProcessItems"
-                        :loading="analysisInProgress" 
-                        :showPercentage="showPercentage"
-                        :downloadItem="downloadItem"
-                        :ncbiTree="ncbiTree"
-                        :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
-                        :itemToPeptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
+                        :loading="analysisInProgress"
+                        :show-percentage="showPercentage"
+                        :download-item="downloadItem"
+                        :ncbi-tree="ncbiTree"
+                        :taxa-to-peptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor!.getAnnotationPeptideMapping() : undefined"
+                        :item-to-peptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
                     />
                 </v-col>
-                <v-col cols=3>
-                    <QuickGoCard 
+                <v-col cols="3">
+                    <QuickGoCard
                         :items="biologicalProcessItems"
                         :namespace="GoNamespace.BiologicalProcess"
                         :n="3"
@@ -45,53 +54,57 @@
                 </v-col>
             </v-row>
 
-            <h2 class="py-2">Cellular Component</h2>
+            <h2 class="py-2">
+                Cellular Component
+            </h2>
             <v-row>
-                <v-col cols=9>
-                    <GoTable 
+                <v-col cols="9">
+                    <GoTable
                         :items="cellularComponentItems"
-                        :loading="analysisInProgress" 
-                        :showPercentage="showPercentage"
-                        :downloadItem="downloadItem"
-                        :ncbiTree="ncbiTree"
-                        :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
-                        :itemToPeptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
+                        :loading="analysisInProgress"
+                        :show-percentage="showPercentage"
+                        :download-item="downloadItem"
+                        :ncbi-tree="ncbiTree"
+                        :taxa-to-peptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor!.getAnnotationPeptideMapping() : undefined"
+                        :item-to-peptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
                     />
                 </v-col>
-                <v-col cols=3>
-                    <QuickGoCard 
-                        :items="cellularComponentItems" 
+                <v-col cols="3">
+                    <QuickGoCard
+                        :items="cellularComponentItems"
                         :namespace="GoNamespace.CellularComponent"
                         :n="3"
                     />
                 </v-col>
             </v-row>
 
-            <h2 class="py-2">Molecular Function</h2>
+            <h2 class="py-2">
+                Molecular Function
+            </h2>
             <v-row>
-                <v-col cols=9>
-                    <GoTable 
+                <v-col cols="9">
+                    <GoTable
                         :items="molecularFunctionItems"
-                        :loading="analysisInProgress" 
-                        :showPercentage="showPercentage"
-                        :downloadItem="downloadItem"
-                        :ncbiTree="ncbiTree"
-                        :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
-                        :itemToPeptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
+                        :loading="analysisInProgress"
+                        :show-percentage="showPercentage"
+                        :download-item="downloadItem"
+                        :ncbi-tree="ncbiTree"
+                        :taxa-to-peptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor!.getAnnotationPeptideMapping() : undefined"
+                        :item-to-peptides="(goProcessor && ncbiTree) ? goProcessor.getAnnotationPeptideMapping() : undefined"
                     />
                 </v-col>
-                <v-col cols=3>
-                    <QuickGoCard 
-                        :items="molecularFunctionItems" 
+                <v-col cols="3">
+                    <QuickGoCard
+                        :items="molecularFunctionItems"
                         :namespace="GoNamespace.MolecularFunction"
                         :n="3"
                     />
                 </v-col>
             </v-row>
 
-            <EditFilterPercentageModal
+            <edit-filter-percentage-modal
                 :model-value="filterPercentage"
-                :openModal="editFilterPercentageModalOpen"
+                :open-modal="editFilterPercentageModalOpen"
                 @close="editFilterPercentageModalOpen = false"
                 @update:model-value="onUpdateFilterPercentage"
             />
@@ -112,7 +125,7 @@ export interface Props {
     analysisInProgress: boolean
     showPercentage: boolean
     filter: number
-    
+
     goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>
     goOntology: Ontology<GoCode, GoDefinition>
 
@@ -124,7 +137,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const emits = defineEmits(["filerPercentageChange"])
+const emits = defineEmits(["filterPercentageChange"])
 
 const editFilterPercentageModalOpen = ref<boolean>(false);
 const filterPercentage = ref<number>(props.filter);
@@ -154,7 +167,7 @@ const molecularFunctionItems = computed(() => {
 });
 
 const items = (
-    goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>, 
+    goProcessor: FunctionalCountTableProcessor<GoCode, GoDefinition>,
     goOntology: Ontology<GoCode, GoDefinition>,
     namespace: GoNamespace
 ) => {
@@ -162,8 +175,8 @@ const items = (
 
     const items: GoTableItem[] = [];
     countTable.toMap().forEach((count, code) => {
-        const definition = goOntology.getDefinition(code) || { 
-            name: "", 
+        const definition = goOntology.getDefinition(code) || {
+            name: "",
             code: code
         };
 
@@ -181,7 +194,7 @@ const items = (
 
 const onUpdateFilterPercentage = (newFilterPercentage: number) => {
     filterPercentage.value = newFilterPercentage;
-    emits("filerPercentageChange", newFilterPercentage);
+    emits("filterPercentageChange", newFilterPercentage);
 };
 
 watch(() => props.filter, (newFilter) => {

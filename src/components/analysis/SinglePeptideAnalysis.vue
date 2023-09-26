@@ -1,57 +1,73 @@
 <template>
     <v-card>
-        <v-tabs 
-            slider-color="secondary" 
-            background-color="primary" 
-            dark 
+        <v-tabs
             v-model="currentTab"
+            slider-color="secondary"
+            bg-color="primary"
+            dark
         >
-            <v-tab>Matched proteins</v-tab>
-            <v-tab>Lineage tree</v-tab>
-            <v-tab>Lineage table</v-tab>
-            <v-tab>GO terms</v-tab>
-            <v-tab>EC numbers</v-tab>
-            <v-tab>Interpro</v-tab>
+            <v-tab value="matched-proteins">
+                Matched proteins
+            </v-tab>
+            <v-tab value="lineage-tree">
+                Lineage tree
+            </v-tab>
+            <v-tab value="lineage-table">
+                Lineage table
+            </v-tab>
+            <v-tab value="go-terms">
+                GO terms
+            </v-tab>
+            <v-tab value="ec-numbers">
+                EC numbers
+            </v-tab>
+            <v-tab value="interpro">
+                Interpro
+            </v-tab>
         </v-tabs>
-        <v-tabs-items v-model="currentTab">
-            <v-tab-item>
-                <MatchedProteinsTable :assay="assay" />
-            </v-tab-item>
-            <v-tab-item>
-                <LineageTree :assay="assay" />
-            </v-tab-item>
-            <v-tab-item>
-                <LineageTable :assay="assay" />
-            </v-tab-item>
-            <v-tab-item>
-                <GoSummaryCard 
-                    :analysisInProgress="assay.analysisInProgress"
-                    :goProcessor="assay.goProteinCountTableProcessor"
-                    :goOntology="assay.goOntology"
+
+        <v-window v-model="currentTab">
+            <v-window-item value="matched-proteins">
+                <matched-proteins-table :assay="assay" />
+            </v-window-item>
+            <v-window-item value="lineage-tree">
+                <lineage-tree :assay="assay" />
+            </v-window-item>
+            <v-window-item value="lineage-table">
+                <lineage-table :assay="assay" />
+            </v-window-item>
+            <v-window-item value="go-terms">
+                <!-- @vue-ignore -->
+                <go-summary-card
+                    :analysis-in-progress="assay.analysisInProgress"
+                    :go-processor="assay.goProteinCountTableProcessor"
+                    :go-ontology="assay.goOntology"
                 />
-            </v-tab-item>
-            <v-tab-item>
-                <EcSummaryCard 
-                    :analysisInProgress="assay.analysisInProgress"
-                    :ecProcessor="assay.ecProteinCountTableProcessor"
-                    :ecOntology="assay.ecOntology"
-                    :ecTree="assay.ecTree"
+            </v-window-item>
+            <v-window-item value="ec-numbers">
+                <!-- @vue-ignore -->
+                <ec-summary-card
+                    :analysis-in-progress="assay.analysisInProgress"
+                    :ec-processor="assay.ecProteinCountTableProcessor"
+                    :ec-ontology="assay.ecOntology"
+                    :ec-tree="assay.ecTree"
                 />
-            </v-tab-item>
-            <v-tab-item>
-                <InterproSummaryCard
-                    :analysisInProgress="assay.analysisInProgress"
-                    :interproProcessor="assay.interproProteinCountTableProcessor"
-                    :interproOntology="assay.interproOntology"
+            </v-window-item>
+            <v-window-item value="interpro">
+                <!-- @vue-ignore -->
+                <interpro-summary-card
+                    :analysis-in-progress="assay.analysisInProgress"
+                    :interpro-processor="assay.interproProteinCountTableProcessor"
+                    :interpro-ontology="assay.interproOntology"
                 />
-            </v-tab-item>
-        </v-tabs-items>
+            </v-window-item>
+        </v-window>
     </v-card>
 </template>
 
 <script setup lang="ts">
 import { SinglePeptideAnalysisStatus } from "@/interface";
-import { defineProps, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import MatchedProteinsTable from "../tables/MatchedProteinsTable.vue";
 import LineageTable from "../tables/LineageTable.vue";
 import LineageTree from "../trees/LineageTree.vue";
@@ -61,16 +77,16 @@ import InterproSummaryCard from "../cards/InterproSummaryCard.vue";
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus
-    tab?: number
+    tab?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    tab: 0
+    tab: "matched-proteins"
 });
 
 const emits = defineEmits(["tabUpdate"]);
 
-const currentTab = ref<number>(props.tab);
+const currentTab = ref<string>(props.tab);
 
 watch(() => props.tab, (newTab) => {
     currentTab.value = newTab;

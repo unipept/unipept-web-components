@@ -9,24 +9,22 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
  * @returns A tuple with 2 items. The first item is a mapping between a peptide and it's frequency, and the second item
  * is the total frequency of all items combined (from the first map).
  */
- export default async function compute(
+export default async function compute(
     [
-        peptides, 
-        enableMissingCleavageHandling, 
-        filterDuplicates, 
+        peptides,
+        enableMissingCleavageHandling,
+        filterDuplicates,
         equateIl
     ]: [
-        Peptide[], 
-        boolean, 
+        Peptide[],
+        boolean,
         boolean,
         boolean
     ]
 ): Promise<[Map<Peptide, number>, number]> {
-    peptides = filter(peptides, enableMissingCleavageHandling, equateIl);
+    peptides = filter(peptides, enableMissingCleavageHandling);
     const peptideCounts = new Map<Peptide, number>();
-    let processed = 0;
     for (const peptide of peptides) {
-        processed++;
         const count = peptideCounts.get(peptide) || 0;
         if (filterDuplicates) {
             peptideCounts.set(peptide, 1);
@@ -43,22 +41,21 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
     return [peptideCounts, totalFrequency];
 }
 
-function filter(peptides: Peptide[], enableMissingCleavageHandling: boolean, equateIl: boolean): Peptide[] {
-    let out = cleavePeptides(peptides, enableMissingCleavageHandling);
-    out = filterShortPeptides(out);
-    return equateIL(out, equateIl);
+function filter(peptides: Peptide[], enableMissingCleavageHandling: boolean): Peptide[] {
+    const out = cleavePeptides(peptides, enableMissingCleavageHandling);
+    return filterShortPeptides(out);
 }
 
 /**
  * Split all peptides after every K or R if not followed by P if advancedMissedCleavageHandling isn't set.
  */
 function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boolean): Peptide[] {
-    // if (!advancedMissedCleavageHandling) {
-    //     return peptides.join("+")
-    //         .replace(/([KR])([^P])/g, "$1+$2")
-    //         .replace(/([KR])([^P+])/g, "$1+$2")
-    //         .split("+");
-    // }
+    if (!advancedMissedCleavageHandling) {
+        return peptides.join("+")
+            .replace(/([KR])([^P])/g, "$1+$2")
+            .replace(/([KR])([^P+])/g, "$1+$2")
+            .split("+");
+    }
     return peptides;
 }
 
@@ -67,14 +64,4 @@ function cleavePeptides(peptides: Peptide[], advancedMissedCleavageHandling: boo
  */
 function filterShortPeptides(peptides: Peptide[]): Peptide[] {
     return peptides.filter(p => p.length >= 5);
-}
-
-/**
- * Replaces every I with an L if equateIL is set to true.
- */
-function equateIL(peptides: Peptide[], equateIL: boolean): Peptide[] {
-    if (equateIL) {
-        return peptides.map(p => p.replace(/I/g, "L"));
-    }
-    return peptides;
 }

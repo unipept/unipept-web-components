@@ -1,4 +1,4 @@
-import Normalizer from "./Normalizer";
+import { Normalizer } from "./Normalizer";
 
 /**
  * Normalises a grid on a row-per-row basis. For each row the largest and smallest value is selected after which all

@@ -43,7 +43,7 @@ export default class ProteinResponseCommunicator {
 
         const data = JSON.stringify({
             peptide: peptide,
-            equateIl: equateIl
+            equate_il: equateIl
         });
 
         const response: MetaProteinResponse = await NetworkUtils.postJSON(

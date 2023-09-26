@@ -1,68 +1,90 @@
 <template>
     <div ref="wrapper">
-        <v-stepper v-model="currentStep" class="heatmap-wizard">
+        <v-stepper
+            v-model="currentStep"
+            class="heatmap-wizard"
+        >
             <v-stepper-header>
-                <v-stepper-step editable :complete="currentStep > 1" step="1">Horizontal axis</v-stepper-step>
-                <v-divider></v-divider>
-                <v-stepper-step editable :complete="currentStep > 2" step="2">Vertical axis</v-stepper-step>
-                <v-divider></v-divider>
-                <v-stepper-step editable :complete="currentStep > 3" step="3">Normalisation</v-stepper-step>
-                <v-divider></v-divider>
-                <v-stepper-step editable :complete="currentStep > 4" step="4">
-                    Heatmap
-                </v-stepper-step>
+                <v-stepper-item
+                    color="primary"
+                    editable
+                    title="Horizontal axis"
+                    :value="1"
+                    :complete="currentStep > 1"
+                />
+                <v-divider />
+                <v-stepper-item
+                    color="primary"
+                    editable
+                    title="Vertical axis"
+                    :value="2"
+                    :complete="currentStep > 2"
+                />
+                <v-divider />
+                <v-stepper-item
+                    color="primary"
+                    editable
+                    title="Normalization"
+                    :value="3"
+                    :complete="currentStep > 3"
+                />
+                <v-divider />
+                <v-stepper-item
+                    color="primary"
+                    editable
+                    title="Heatmap"
+                    :value="4"
+                    :complete="currentStep > 4"
+                />
             </v-stepper-header>
-            <v-stepper-items>
-                <v-stepper-content step="1">
-                    <DataSourceSingle
+            <v-stepper-window>
+                <v-stepper-window-item :value="1">
+                    <data-source-single
                         :loading="loading"
-                        :goCountTableProcessor="goCountTableProcessor"
-                        :goOntology="goOntology"
-                        :ecCountTableProcessor="ecCountTableProcessor"
-                        :ecOntology="ecOntology"
-                        :interproCountTableProcessor="interproCountTableProcessor"
-                        :interproOntology="interproOntology"
-                        :ncbiCountTableProcessor="ncbiCountTableProcessor"
-                        :ncbiOntology="ncbiOntology"
-                        :ncbiTree="ncbiTree"
+                        :go-count-table-processor="goCountTableProcessor"
+                        :go-ontology="goOntology"
+                        :ec-count-table-processor="ecCountTableProcessor"
+                        :ec-ontology="ecOntology"
+                        :interpro-count-table-processor="interproCountTableProcessor"
+                        :interpro-ontology="interproOntology"
+                        :ncbi-count-table-processor="ncbiCountTableProcessor"
+                        :ncbi-ontology="ncbiOntology"
+                        :ncbi-tree="ncbiTree"
                         @select="horizontalItems = $event"
                     />
-                    <v-btn class="continue-button" color="primary" @click="currentStep = 2">Continue</v-btn>
-                </v-stepper-content>
-                <v-stepper-content step="2">
-                    <DataSourceSingle
+                </v-stepper-window-item>
+                <v-stepper-window-item :value="2">
+                    <data-source-single
                         :loading="loading"
-                        :goCountTableProcessor="goCountTableProcessor"
-                        :goOntology="goOntology"
-                        :ecCountTableProcessor="ecCountTableProcessor"
-                        :ecOntology="ecOntology"
-                        :interproCountTableProcessor="interproCountTableProcessor"
-                        :interproOntology="interproOntology"
-                        :ncbiCountTableProcessor="ncbiCountTableProcessor"
-                        :ncbiOntology="ncbiOntology"
-                        :ncbiTree="ncbiTree"
+                        :go-count-table-processor="goCountTableProcessor"
+                        :go-ontology="goOntology"
+                        :ec-count-table-processor="ecCountTableProcessor"
+                        :ec-ontology="ecOntology"
+                        :interpro-count-table-processor="interproCountTableProcessor"
+                        :interpro-ontology="interproOntology"
+                        :ncbi-count-table-processor="ncbiCountTableProcessor"
+                        :ncbi-ontology="ncbiOntology"
+                        :ncbi-tree="ncbiTree"
                         @select="verticalItems = $event"
                     />
-                    <v-btn class="continue-button" color="primary" @click="currentStep = 3">Continue</v-btn>
-                </v-stepper-content>
-                <v-stepper-content step="3">
-                    <NormalizationSelector @update="normalizer = $event" />
-                    <v-btn class="continue-button" color="primary" @click="currentStep = 4">Continue</v-btn>
-                </v-stepper-content>
-                <v-stepper-content class="heatmap-stepper-content" step="4">
-                    <VisualizationControls
+                </v-stepper-window-item>
+                <v-stepper-window-item :value="3">
+                    <normalization-selector @update="normalizer = $event" />
+                </v-stepper-window-item>
+                <v-stepper-window-item :value="4">
+                    <visualization-controls
                         ref="heatmap"
                         caption="Scroll to zoom, drag to pan"
                         :loading="heatMapLoading"
-                        :fullscreen="() => toggle(heatmap)" 
+                        :fullscreen="() => toggle(heatmap)"
                         :download="() => downloadModalOpen = true"
                         :reset="() => heatmapReset = true"
                         :rotate="() => isRotated = !isRotated"
-                        :hideDownload="isFullscreen"
+                        :hide-download="isFullscreen"
                         overlap
                     >
                         <template #visualization>
-                            <HeatMap
+                            <heat-map
                                 :data="heatmapData"
                                 :row-labels="heatmapRows"
                                 :column-labels="heatmapColumns"
@@ -70,34 +92,37 @@
                                 :width="wrapper?.clientWidth"
                                 :fullscreen="isFullscreen"
                                 :rotated="isRotated"
-                                :doReset="heatmapReset"
-                                @reset="heatmapReset = false"
+                                :do-reset="heatmapReset"
                                 :download="downloadModalOpen"
+                                @reset="heatmapReset = false"
                                 @download="downloadModalOpen = $event"
                             />
                         </template>
-                    </VisualizationControls>
-                </v-stepper-content>
-            </v-stepper-items>
+                    </visualization-controls>
+                </v-stepper-window-item>
+            </v-stepper-window>
+            <v-stepper-actions
+                color="primary"
+                @click:prev="currentStep -= 1"
+                @click:next="currentStep += 1"
+            />
         </v-stepper>
     </div>
 </template>
 
 <script setup lang="ts">
-import DownloadImageModal from '@/components/modals/DownloadImageModal.vue';
 import useFullscreen from '@/composables/useFullscreen';
 import { EcCode, EcCountTableProcessor, EcDefinition, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, LcaCountTableProcessor, NcbiId, NcbiTaxon, NcbiTree, Normalizer, Ontology } from '@/logic';
 import { computed, ref, watch } from 'vue';
-import { VStepper, VStepperHeader, VStepperStep, VDivider, VStepperItems, VStepperContent, VBtn } from 'vuetify/lib';
 import VisualizationControls from '../../VisualizationControls.vue';
 import HeatMap from '../HeatMap.vue';
 import NormalizationSelector from '../NormalizationSelector.vue';
 import DataSourceSingle from './DataSourceSingle.vue';
 import DataSourceSingleItem from './DataSourceSingleItem';
+import { VStepper, VStepperActions, VStepperHeader, VStepperItem, VStepperWindow, VStepperWindowItem } from 'vuetify/labs/VStepper';
 
 export interface Props {
     loading: boolean
-
     goCountTableProcessor: GoCountTableProcessor
     goOntology: Ontology<GoCode, GoDefinition>
     ecCountTableProcessor: EcCountTableProcessor
@@ -128,8 +153,8 @@ const normalizer = ref<Normalizer>();
 const isRotated = ref<boolean>(false);
 
 const heatMapLoading = computed(() => {
-    return heatmapRows.value.length === 0 
-        || heatmapColumns.value.length === 0 
+    return heatmapRows.value.length === 0
+        || heatmapColumns.value.length === 0
         || currentStep.value < 4;
 });
 

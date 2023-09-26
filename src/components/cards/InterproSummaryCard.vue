@@ -3,39 +3,46 @@
         <v-card-text>
             <v-row v-if="!analysisInProgress">
                 <v-col>
-                    <TrustLine
+                    <trust-line
+                        v-if="interproProcessor"
                         class="mb-5"
-                        :trust="interproProcessor?.getTrust()"
-                        :faKind="{
+                        :trust="interproProcessor.getTrust()"
+                        :fa-kind="{
                             singular: 'InterPro entry',
                             plural: 'InterPro entries'
                         }"
-                        :countKind="{
+                        :count-kind="{
                             singular: 'protein',
                             plural: 'proteins'
                         }"
+                        :clickable="ncbiTree !== undefined"
                     />
                 </v-col>
-                <v-col v-if="filter !== undefined" class="flex-grow-0">
-                    <v-btn icon @click="editFilterPercentageModalOpen = true">
-                        <v-icon color="grey darken-1">mdi-cog-outline</v-icon>
-                    </v-btn>
+                <v-col
+                    v-if="filter"
+                    class="flex-grow-0"
+                >
+                    <v-btn
+                        icon="mdi-cog-outline"
+                        color="grey-darken-1"
+                        @click="editFilterPercentageModalOpen = true"
+                    />
                 </v-col>
             </v-row>
-            
-            <InterproTable 
+
+            <interpro-table
                 :items="items"
-                :loading="analysisInProgress" 
-                :showPercentage="showPercentage"
-                :downloadItem="downloadItem"
-                :ncbiTree="ncbiTree"
-                :taxaToPeptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor.getAnnotationPeptideMapping() : undefined"
-                :itemToPeptides="(interproProcessor && ncbiTree) ? interproProcessor.getAnnotationPeptideMapping() : undefined"
+                :loading="analysisInProgress"
+                :show-percentage="showPercentage"
+                :download-item="downloadItem"
+                :ncbi-tree="ncbiTree"
+                :taxa-to-peptides="(ncbiProcessor && ncbiTree) ? ncbiProcessor!.getAnnotationPeptideMapping() : undefined"
+                :item-to-peptides="(interproProcessor && ncbiTree) ? interproProcessor.getAnnotationPeptideMapping() : undefined"
             />
 
-            <EditFilterPercentageModal
+            <edit-filter-percentage-modal
                 :model-value="filterPercentage"
-                :openModal="editFilterPercentageModalOpen"
+                :open-modal="editFilterPercentageModalOpen"
                 @close="editFilterPercentageModalOpen = false"
                 @update:model-value="onUpdateFilterPercentage"
             />
@@ -50,13 +57,12 @@ import InterproTable from '../tables/functional/InterproTable.vue';
 import TrustLine from '../util/TrustLine.vue';
 import { computed, ref, watch } from 'vue';
 import EditFilterPercentageModal from '../modals/EditFilterPercentageModal.vue';
-import { VCard, VCardText, VRow, VCol, VBtn, VIcon } from 'vuetify/lib';
 
 export interface Props {
     analysisInProgress: boolean
     showPercentage: boolean
     filter: number
-    
+
     interproProcessor: FunctionalCountTableProcessor<InterproCode, InterproDefinition>
     interproOntology: Ontology<InterproCode, InterproDefinition>
 
@@ -68,7 +74,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const emits = defineEmits(["filerPercentageChange"])
+const emits = defineEmits(["filterPercentageChange"])
 
 const editFilterPercentageModalOpen = ref<boolean>(false);
 const filterPercentage = ref<number>(props.filter);
@@ -79,10 +85,10 @@ const items = computed(() => {
 
         const items: InterproTableItem[] = [];
         countTable.toMap().forEach((count, code) => {
-            const definition = props.interproOntology.getDefinition(code) || { 
-                name: "", 
+            const definition = props.interproOntology.getDefinition(code) || {
+                name: "",
                 code: code,
-                namespace: InterproNamespace.Unknown 
+                namespace: InterproNamespace.Unknown
             };
 
             items.push({
@@ -102,7 +108,7 @@ const items = computed(() => {
 
 const onUpdateFilterPercentage = (newFilterPercentage: number) => {
     filterPercentage.value = newFilterPercentage;
-    emits("filerPercentageChange", newFilterPercentage);
+    emits("filterPercentageChange", newFilterPercentage);
 };
 
 watch(() => props.filter, (newFilter) => {

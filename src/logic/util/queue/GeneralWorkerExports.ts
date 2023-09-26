@@ -17,18 +17,17 @@ export function createMessageEventListener(ctx: Worker): (event: MessageEvent) =
         const messageType: string = event.data.type;
         const args: any = event.data.args;
 
-        if (workerFunctionMap.has(messageType)) {
-            // @ts-ignore
-            const result = await workerFunctionMap.get(messageType)(args);
-
-            ctx.postMessage({
-                type: "result",
-                result: result
-            });
-        } else {
-            console.error("[WorkerQueue] Unknown message type: " + messageType);
-            return;
+        if (!workerFunctionMap.has(messageType)) {
+            throw new Error("[WorkerQueue] Unknown message type: " + messageType);
         }
+
+        // @ts-ignore
+        const result = await workerFunctionMap.get(messageType)(args);
+
+        ctx.postMessage({
+            type: "result",
+            result: result
+        });
 
         try {
             // This is unfortunately required to get the workers to stop consuming 100% CPU once they're done

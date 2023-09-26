@@ -1,13 +1,31 @@
 <template>
     <div>
-        <v-select :items="categories" v-model="selectedCategory" label="Category"></v-select>
+        <v-select
+            v-model="selectedCategory"
+            :items="categories"
+            label="Category"
+        />
 
-        <div class="table-extra-content" v-if="selectedItems.length > 0">
+        <div
+            v-if="selectedItems.length > 0"
+            class="table-extra-content"
+        >
             You selected {{ selectedItems.length }} out of {{ items.length }} items.
-            <a @click="selectAll" v-if="selectedItems.length !== items.length">Select all?</a>
-            <a @click="deselectAll" v-else>Deselect all?</a>
+            <a
+                v-if="selectedItems.length !== items.length"
+                @click="selectAll"
+            >
+                Select all?
+            </a>
+            <a
+                v-else
+                @click="deselectAll"
+            >
+                Deselect all?
+            </a>
         </div>
 
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
@@ -15,18 +33,18 @@
             :loading="loading"
             :search="selectedCategory"
             :custom-filter="categoryFilter"
-            
+            :items-per-page="5"
+            return-object
+            color="primary"
             show-select
-            :itemsPerPage="5"
-        >
-
-        </v-data-table>
+        />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import DataSourceItem from './DataSourceItem';
+import { ref, watch } from 'vue';
+import DataSourceItem from '@/components/tables/DataSourceItem';
+import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: DataSourceItem[]
@@ -41,23 +59,23 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits(['select']);
 
-const headers = computed(() => [
+const headers = ref([
     {
-        text: "Name",
+        title: "Name",
         align: "start",
-        value: "name",
-        width: "40%"
-    },,
-    {
-        text: props.identifier ? "Identifier" : "Rank",
-        align: "start",
-        value: props.identifier ? "id" : "category",
+        key: "name",
         width: "40%"
     },
     {
-        text: "# Peptides",
+        title: props.identifier ? "Identifier" : "Rank",
         align: "start",
-        value: "count",
+        key: props.identifier ? "id" : "category",
+        width: "40%"
+    },
+    {
+        title: "# Peptides",
+        align: "start",
+        key: "count",
         width: "20%"
     },
 ]);

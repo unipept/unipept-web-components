@@ -1,3 +1,3 @@
-export default interface Normalizer {
+export interface Normalizer {
     normalize(data: number[][]): number[][];
 }

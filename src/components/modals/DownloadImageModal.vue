@@ -1,7 +1,6 @@
 <template>
-    <v-dialog 
-        v-model="dialogOpen" 
-        max-width="820"
+    <v-dialog
+        v-model="dialogOpen"
         @click:outside="closeDialog"
     >
         <v-card v-if="preparingImage">
@@ -10,47 +9,71 @@
             </v-card-title>
             <v-card-text>
                 Loading preview...
-                <v-progress-linear indeterminate rounded />
+                <v-progress-linear
+                    indeterminate
+                    rounded
+                />
             </v-card-text>
         </v-card>
 
         <v-card v-else>
             <div class="d-flex justify-end">
-                <v-btn icon @click="closeDialog">
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
+                <v-btn
+                    icon="mdi-close"
+                    variant="plain"
+                    @click="closeDialog"
+                />
             </div>
 
             <div class="text-center">
-                <img :src="dataUrl" style="max-width: 800px; max-height: 400px; padding: 8px; border: 1px solid #80808069; border-radius: 4px;" />
+                <img
+                    :src="dataUrl"
+                    style="max-width: 800px; max-height: 400px; padding: 8px; border: 1px solid #80808069; border-radius: 4px;"
+                >
             </div>
 
             <div class="ma-4">
-                <div class="d-flex justify-start align-center">
-                    <span class="mr-2" style="position: relative; top: 3px;">Image format</span>
+                <div class="d-flex justify-start align-center mb-2">
+                    <span
+                        class="mr-2"
+                        style="position: relative; top: 3px;"
+                    >
+                        Image format
+                    </span>
                     <v-select
+                        v-model="formatValue"
                         :items="formatValues"
                         item-text="label"
-                        v-model="formatValue"
-                        dense
+                        density="compact"
                         hide-details
                     />
                 </div>
                 <div class="d-flex justify-start align-center">
-                    <span class="mr-2" style="position: relative; top: 3px;">Scaling factor</span>
+                    <span
+                        class="mr-2"
+                        style="position: relative; top: 3px;"
+                    >
+                        Scaling factor
+                    </span>
                     <v-select
-                        :items="enlargementValues"
-                        item-text="label"
                         v-model="scalingValue"
-                        dense
+                        :items="enlargementValues"
+                        item-title="label"
+                        density="compact"
                         hide-details
-                        :disabled="isSvg()">
-                    </v-select>
+                        :disabled="isSvg()"
+                    />
                 </div>
-                <div class="mt-4" v-if="isSvg()">
+                <div
+                    v-if="isSvg()"
+                    class="mt-4"
+                >
                     <span>SVG images are vector-based and are thus resolution independent.</span>
                 </div>
-                <div class="mt-4" v-else>
+                <div
+                    v-else
+                    class="mt-4"
+                >
                     <span>
                         Resulting resolution:
                         {{ resolutionWidth * scalingValue }}x{{ resolutionHeight * scalingValue }}
@@ -59,17 +82,26 @@
                 </div>
             </div>
             <v-card-actions class="justify-center">
-                <v-btn @click="saveImage()" id="download-png-btn" color="primary">
-                    <v-icon left>mdi-download</v-icon>Download image
+                <v-btn
+                    id="download-png-btn"
+                    color="primary"
+                    prepend-icon="mdi-download"
+                    variant="elevated"
+                    @click="saveImage()"
+                >
+                    Download image
                 </v-btn>
             </v-card-actions>
-            <v-divider/>
+            <v-divider />
             <v-card-text>
                 <br>
                 If you use this figure in a publication, please cite:
                 <br>
                 Mesuere et al. (2015) Proteomics
-                <a href="https://doi.org/10.1002/pmic.201400361" target="_blank">
+                <a
+                    href="https://doi.org/10.1002/pmic.201400361"
+                    target="_blank"
+                >
                     doi:10.1002/pmic.201400361
                 </a>
             </v-card-text>
@@ -81,12 +113,9 @@
 import useDownload from '@/composables/useDownload';
 import ImageSource from '@/logic/util/image/ImageSource';
 import { ref, watch } from 'vue';
-import { VDialog, VCard, VCardTitle, VCardText, VProgressLinear, VBtn, VIcon, VSelect, VCardActions, VDivider } from 'vuetify/lib';
-
 export interface Props {
     openModal: boolean
     supportsSvg?: boolean
-
     imageSource: ImageSource | undefined
 }
 

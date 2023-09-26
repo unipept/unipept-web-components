@@ -1,13 +1,13 @@
 <template>
     <div>
         <v-select
-            :items="dataSources"
             v-model="selectedDataSource"
+            :items="dataSources"
             label="test"
             class="flex-grow-0"
         />
 
-        <DataSourceTable
+        <data-source-table
             :items="selectedDataSourceItems"
             :categories="categories"
             :loading="loading"
@@ -23,7 +23,6 @@ import DataSourceTable from '@/components/tables/DataSourceTable.vue';
 import { computed, ref } from 'vue';
 import FunctionalDefinition from '@/logic/ontology/functional/FunctionalDefinition';
 import { LcaCountTableProcessor, Ontology, NcbiId, NcbiTaxon, NcbiRank, NcbiTree, EcCountTableProcessor, EcCode, EcDefinition, EcNamespace, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, GoNamespace, InterproNamespace } from '@/logic';
-import { VSelect } from 'vuetify/lib';
 
 export interface Props {
     loading: boolean
@@ -69,7 +68,6 @@ const categories = computed(() => {
     if (selectedDataSource.value === "NCBI taxonomy") {
         return ["All", ...Object.values(NcbiRank)];
     } else if (selectedDataSource.value === "Enzyme Commission") {
-        console.log('sdfsdf');
         return ["All", ...Object.values(EcNamespace)];
     } else if (selectedDataSource.value === "Gene Ontology") {
         return ["All", ...Object.values(GoNamespace)];
