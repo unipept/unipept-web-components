@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 
 import * as d3 from "d3";
@@ -8,7 +9,7 @@ function constructSearchtree(t: NcbiTree, il: boolean, rerootCallback = (x: any)
     /** ************* Private variables ***************/
 
     // parameters
-    let that = {},
+    const that = {},
         dataTree = t,
         data = t.root,
         equateIL = il ? "true" : "false";

@@ -13,8 +13,8 @@ export default class PeptideCountTableProcessor {
      */
     public async getPeptideCountTable(
         peptides: Peptide[],
-        enableMissingCleavageHandling: boolean, 
-        filterDuplicates: boolean, 
+        enableMissingCleavageHandling: boolean,
+        filterDuplicates: boolean,
         equateIl: boolean
     ): Promise<CountTable<Peptide>> {
         const [peptideCountsMapping, totalFrequency] = await QueueManager.getLongRunningQueue().pushTask<

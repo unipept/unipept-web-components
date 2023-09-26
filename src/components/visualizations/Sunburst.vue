@@ -1,24 +1,40 @@
 <template>
-    <div style="height: inherit;" v-if="!error">
-        <div v-if="!visualizationComputed" class="d-flex loading-container">
-            <v-progress-circular 
-                :width="5" 
-                :size="50" 
-                color="primary" 
-                indeterminate 
+    <div
+        v-if="!error"
+        style="height: inherit;"
+    >
+        <div
+            v-if="!visualizationComputed"
+            class="d-flex loading-container"
+        >
+            <v-progress-circular
+                :width="5"
+                :size="50"
+                color="primary"
+                indeterminate
             />
         </div>
-        <div style="height: inherit;" class="visualization-container" ref="visualization"></div>
+        <div
+            ref="visualization"
+            style="height: inherit;"
+            class="visualization-container"
+        />
     </div>
-    <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-        <div class="error-container">
-            <v-icon x-large>
+    <v-container
+        v-else
+        fluid
+        class="error-container mt-2 d-flex align-center"
+    >
+        <div class="d-flex flex-column align-center">
+            <v-icon
+                size="x-large"
+                color="error"
+            >
                 mdi-alert-circle-outline
             </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="initializeVisualisation()">continue</a>?
-            </p>
+            <span>
+                An error occurred during the analysis of this assay.
+            </span>
         </div>
     </v-container>
 </template>
@@ -26,8 +42,12 @@
 <script setup lang="ts">
 import { NcbiTree } from '@/logic';
 import { Sunburst as UnipeptSunburst, SunburstSettings } from 'unipept-visualizations';
-import { computed, onMounted, Ref, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { tooltipContent } from './VisualizationHelper';
+
+// The amount of milliseconds that the SunBurst should wait with animating movement before or after a filter was
+// changed.
+const rerootTimeout = 0;
 
 export interface Props {
     data: NcbiTree
@@ -40,6 +60,7 @@ export interface Props {
 
     loading?: boolean
     doReset?: boolean
+    error?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -49,7 +70,8 @@ const props = withDefaults(defineProps<Props>(), {
     isFixedColors: false,
     filterId: 1,
     loading: false,
-    doReset: false
+    doReset: false,
+    error: false
 });
 
 const emits = defineEmits(["reset", "update-selected-taxon-id"]);
@@ -57,7 +79,42 @@ const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptSunburst | undefined>(undefined);
 
-const error = ref<boolean>(false);
+const initializeVisualisation = () => {
+    visualizationComputed.value = undefined;
+
+    if(!props.data) return;
+
+    const settings = {
+        width: props.width,
+        height: props.height,
+        useFixedColors: props.isFixedColors,
+        rerootCallback: d => {
+            // Wait 500ms to start the animation to avoid stutter in the interface.
+            new Promise(resolve => setTimeout(resolve, rerootTimeout)).then(() => {
+                if (visualizationComputed.value) {
+                    emits("update-selected-taxon-id", d.id);
+                }
+            });
+        },
+        getTooltipText: d => tooltipContent(d)
+    } as SunburstSettings;
+
+    const sunburst = new UnipeptSunburst(
+        visualization.value as HTMLElement,
+        props.data.getRoot(),
+        settings,
+    );
+
+    if (props.autoResize) {
+        const svgEl = visualization.value?.querySelector("svg");
+        if(svgEl) {
+            svgEl.setAttribute("height", "100%");
+            svgEl.setAttribute("width", "100%");
+        }
+    }
+
+    return sunburst;
+}
 
 watch(() => props.loading, () => {
     if(props.loading) {
@@ -84,53 +141,19 @@ watch(() => props.doReset, () => {
 });
 
 watch(() => props.filterId, () => {
-    if(visualizationComputed.value) {
-        // @ts-ignore
-        visualizationComputed.value.reroot(props.filterId, false);
-    }
+    new Promise<void>((resolve) => setTimeout(resolve, rerootTimeout)).then(() => {
+        if (visualizationComputed.value) {
+            // @ts-ignore (reroot is not exported in the interface of the visualization)
+            visualizationComputed.value.reroot(props.filterId, false);
+        }
+    });
 });
 
 watch(() => props.isFixedColors, () => {
     visualizationComputed.value = initializeVisualisation();
-    // @ts-ignore
+    // @ts-ignore (reroot is not exported as part of the interface of the visualization)
     visualizationComputed.value.reroot(props.filterId, false);
 });
-
-const initializeVisualisation = () => {
-    error.value = false;
-    
-    visualizationComputed.value = undefined;
-
-    if(!props.data) return;
-
-    let settings = {
-        width: props.width,
-        height: props.height,
-        useFixedColors: props.isFixedColors,
-        rerootCallback: d => {
-            if(visualizationComputed.value) {
-                emits("update-selected-taxon-id", d.id);
-            }
-        },
-        getTooltipText: d => tooltipContent(d)
-    } as SunburstSettings;
-
-    const sunburst = new UnipeptSunburst(
-        visualization.value as HTMLElement,
-        props.data.getRoot(),
-        settings,
-    );
-
-    if (props.autoResize) {
-        const svgEl = visualization.value?.querySelector("svg");
-        if(svgEl) {
-            svgEl.setAttribute("height", "100%");
-            svgEl.setAttribute("width", "100%");
-        }
-    }
-
-    return sunburst;
-}
 
 onMounted(() => {
     if(!props.loading) {
@@ -147,7 +170,7 @@ onMounted(() => {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .loading-container {
         height: inherit;
         align-items: center;

@@ -1,24 +1,40 @@
 <template>
-    <div style="height: 100%;" v-if="!error">
-        <div v-if="!visualizationComputed" class="d-flex loading-container">
-            <v-progress-circular 
-                :width="5" 
-                :size="50" 
-                color="primary" 
-                indeterminate 
+    <div
+        v-if="!error"
+        style="height: 100%;"
+    >
+        <div
+            v-if="!visualizationComputed"
+            class="d-flex loading-container"
+        >
+            <v-progress-circular
+                :width="5"
+                :size="50"
+                color="primary"
+                indeterminate
             />
         </div>
-        <div once class="visualization-container" ref="visualization"></div>
+        <div
+            v-once
+            ref="visualization"
+            class="visualization-container"
+        />
     </div>
-    <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-        <div class="error-container">
-            <v-icon x-large>
+    <v-container
+        v-else
+        fluid
+        class="error-container mt-2 d-flex align-center"
+    >
+        <div class="d-flex flex-column align-center">
+            <v-icon
+                size="x-large"
+                color="error"
+            >
                 mdi-alert-circle-outline
             </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="initializeVisualisation()">continue</a>?
-            </p>
+            <span>
+                An error occurred during the analysis of this assay.
+            </span>
         </div>
     </v-container>
 </template>
@@ -26,7 +42,7 @@
 <script setup lang="ts">
 import { NcbiTree } from '@/logic';
 import { Treemap as UnipeptTreemap, TreemapSettings } from 'unipept-visualizations';
-import { onBeforeUpdate, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { tooltipContent } from './VisualizationHelper';
 
 export interface Props {
@@ -39,7 +55,9 @@ export interface Props {
 
     loading?: boolean
     doReset?: boolean
-    fullscreen?: boolean
+    fullscreen?: boolean,
+
+    error?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,15 +66,15 @@ const props = withDefaults(defineProps<Props>(), {
     filterId: 1,
     loading: false,
     doReset: false,
-    fullscreen: false
+    fullscreen: false,
+    error: false
 });
 
+// TODO these should also be properly typed.
 const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptTreemap | undefined>(undefined);
-
-const error = ref<boolean>(false);
 
 watch(() => props.loading, () => {
     if(props.loading) {
@@ -80,10 +98,10 @@ watch(() => props.data, () => {
 watch(() => props.fullscreen, () => {
     if(visualizationComputed.value) {
         if(props.fullscreen) {
-            // @ts-ignore
+            // @ts-ignore (ideally, in the future we should here if visualization actually has a value)
             visualizationComputed.value.resize(visualization.value?.clientWidth, visualization.value?.clientHeight - 20);
         } else {
-            // @ts-ignore
+            // @ts-ignore (ideally, in the future we should here if visualization actually has a value)
             visualizationComputed.value.resize(visualization.value?.clientWidth, props.height - 20);
         }
     }
@@ -97,23 +115,29 @@ watch(() => props.doReset, () => {
 
 watch(() => props.filterId, () => {
     if(visualizationComputed.value) {
-        // @ts-ignore
+        // @ts-ignore (reroot does exit on this value, but is not exposed in the interface)
         visualizationComputed.value.reroot(props.filterId, false);
     }
 });
 
 const initializeVisualisation = () => {
-    error.value = false;
-
     visualizationComputed.value = undefined;
     if(visualization.value) {
         visualization.value.innerHTML = "";
     }
 
-    console.log(props.width ? props.width : visualization.value?.clientWidth)
+    let width: number = props.width ? props.width : (visualization.value?.clientWidth || 0);
+    if (!props.width) {
+        let currentEl = visualization.value;
+        while (currentEl && currentEl.clientWidth === 0) {
+            // Wait until the visualization has a width
+            currentEl = currentEl.parentElement;
+        }
+        width = currentEl?.clientWidth || 0;
+    }
 
-    let settings = {
-        width: props.width ? props.width : visualization.value?.clientWidth,
+    const settings = {
+        width: width,
         height: props.height - 20,
         rerootCallback: d => {
             if(visualizationComputed.value) {
@@ -129,7 +153,7 @@ const initializeVisualisation = () => {
         settings,
     );
 
-    // @ts-ignore
+    // @ts-ignore (reroot does exist on this value, but is not exposed by the interface)
     treemap.reroot(props.filterId);
 
     if (props.autoResize) {
@@ -158,7 +182,7 @@ onMounted(() => {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .loading-container {
         height: inherit;
         align-items: center;

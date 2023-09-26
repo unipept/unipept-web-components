@@ -11,7 +11,7 @@ import ProteomicsCountTableProcessor from "../ProteomicsCountTableProcessor";
 import FunctionalTrust from "./FunctionalTrust";
 
 export default abstract class FunctionalCountTableProcessor<
-    OntologyId extends FunctionalCode, 
+    OntologyId extends FunctionalCode,
     DefinitionType extends FunctionalDefinition
 > implements ProteomicsCountTableProcessor<OntologyId> {
     public static DEFAULT_FILTER_PERCENTAGE = 5;

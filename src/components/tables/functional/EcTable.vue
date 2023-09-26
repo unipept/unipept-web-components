@@ -1,84 +1,121 @@
 <template>
     <div>
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
+            v-model:expanded="expanded"
             :headers="headers"
             :loading="loading"
             :items="items"
-            :sortBy="['count']"
-            :sortDesc="[true]"
-            :itemsPerPage="5"
-            item-key="code"
-            :expanded.sync="expanded"
+            :sort-by="['count']"
+            :sort-desc="[true]"
+            :items-per-page="5"
+            item-value="code"
             show-expand
         >
-            <template v-slot:header.action>
-                <Tooltip message="Download table as CSV">
-                    <v-icon @click="downloadCsv(items)">mdi-download</v-icon>
-                </Tooltip>
+            <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
+            <template #header.action>
+                <v-tooltip text="Download table as CSV">
+                    <template #activator="{ props }">
+                        <v-btn
+                            v-bind="props"
+                            icon="mdi-download"
+                            @click="downloadCsv(items)"
+                        />
+                    </template>
+                </v-tooltip>
             </template>
 
-            <template v-slot:item.data-table-expand="{ item }">
-                <v-btn v-if="ncbiTree" class="v-data-table__expand-icon" icon :disabled="item.totalAnnotations === 0" @click="onExpandClicked(item)">
-                    <v-icon v-if="expanded.findIndex(i => i.code === item.code) !== -1">mdi-chevron-up</v-icon>
-                    <v-icon v-else>mdi-chevron-down</v-icon>
-                </v-btn>
+            <template #item.data-table-expand="{ item }">
+                <v-btn
+                    v-if="ncbiTree"
+                    size="small"
+                    variant="plain"
+                    :icon="expanded.findIndex(i => i === item.raw.code) !== -1 ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                    :disabled="item.raw.totalAnnotations === 0"
+                    @click="onExpandClicked(item)"
+                />
             </template>
 
-            <template v-slot:item.count="{ item }">
-                <div :style="{
+            <template #item.count="{ item }">
+                <div
+                    :style="{
                         padding: '12px',
                         background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' +
-                            item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
-                    }">
-                    {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
+                            item.raw.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.raw.relativeCount * 100 + '%)',
+                    }"
+                >
+                    {{ showPercentage ? (item.raw.relativeCount * 100).toFixed(2) + " %" : item.raw.count }}
                 </div>
             </template>
 
-            <template v-slot:item.code="{ item }">
-                <a :href="url(item.code)" target="_blank" class="font-regular d-flex">
-                    {{ item.code }}
-                    <v-icon class="pl-2" x-small>mdi-open-in-new</v-icon>
+            <template #item.code="{ item }">
+                <a
+                    :href="url(item.raw.code)"
+                    target="_blank"
+                    class="font-regular"
+                >
+                    {{ item.raw.code }}
+                    <v-icon size="x-small">mdi-open-in-new</v-icon>
                 </a>
             </template>
 
-            <template v-slot:item.name="{ item }">
+            <template #item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
-                     {{ item.name }}
+                    {{ item.raw.name }}
                 </span>
             </template>
 
-            <template v-slot:item.action="{ item }">
-                <Tooltip
+            <template #item.action="{ item }">
+                <v-tooltip
                     v-if="downloadItem"
-                    message="Download CSV summary of the filtered functional annotation">
-                    <v-btn icon @click="downloadEcItem(item.code)">
-                        <v-icon>
-                            mdi-download
-                        </v-icon>
-                    </v-btn>
-                </tooltip>
+                    text="Download CSV summary of the filtered functional annotation"
+                >
+                    <template #activator="{ props }">
+                        <v-btn
+                            v-bind="props"
+                            icon="mdi-download"
+                            variant="plain"
+                            @click="downloadEcItem(item.raw.code)"
+                        />
+                    </template>
+                </v-tooltip>
             </template>
 
-            <template v-slot:expanded-item="{ headers, item }">
-                <td :colspan="headers.length" class="expand-container">
+            <template #expanded-row="{ columns, item }">
+                <td
+                    :colspan="columns.length"
+                    class="expand-container"
+                >
                     <VisualizationControls
+                        v-if="computingTree.has(item.raw.code) && !computingTree.get(item.raw.code)"
                         ref="treeview"
                         caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
-                        internalDownload
-                        :loading="!ncbiTree"
+                        internal-download
+                        :loading="computingTree.get(item.raw.code)!"
                     >
                         <template #visualization>
-                            <TreeView 
-                                :data="treeAvailable.get(item.code)"
-                                :loading="computingTree && !treeAvailable.get(item.code)"
-                                :autoResize="true"
-                                :height="350"
-                                :linkStrokeColor="linkStrokeColor"
-                                :nodeStrokeColor="highlightColorFunc"
-                                :nodeFillColor="highlightColorFunc"
+                            <TreeView
+                                :data="treeAvailable.get(item.raw.code)!"
+                                :loading="computingTree.get(item.raw.code)! && !treeAvailable.get(item.raw.code)"
+                                :auto-resize="true"
+                                :height="300"
+                                :link-stroke-color="linkStrokeColor"
+                                :node-stroke-color="highlightColorFunc"
+                                :node-fill-color="highlightColorFunc"
                             />
                         </template>
                     </VisualizationControls>
+                    <div
+                        v-else
+                        class="d-flex flex-column align-center pa-2"
+                    >
+                        <v-progress-circular
+                            indeterminate
+                            color="primary"
+                            size="50"
+                        />
+                        <span>Computing highlighted tree...</span>
+                    </div>
                 </td>
             </template>
         </v-data-table>
@@ -86,21 +123,17 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-
 import EcTableItem from './EcTableItem';
 import useCsvDownload from '@/composables/useCsvDownload';
-import { EcCode, FunctionalCode, GoCode, HighlightedTreeProcessor, NcbiId, NcbiTree, Peptide } from '@/logic';
-import Tooltip from '@/components/util/Tooltip.vue';
-import { ref } from 'vue';
-import { VDataTable, VIcon, VBtn } from 'vuetify/lib';
-import { DataNodeLike } from 'unipept-visualizations/types';
+import { EcCode, FunctionalCode, HighlightedTreeProcessor, NcbiId, NcbiTree, Peptide } from "@/logic";
+import { Ref, ref, toRaw } from "vue";
+import { DataNodeLike } from 'unipept-visualizations';
 import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
 import TreeView from '@/components/visualizations/TreeView.vue';
+import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: EcTableItem[],
-
     loading: boolean
     showPercentage: boolean,
     ncbiTree?: NcbiTree
@@ -117,35 +150,35 @@ const treeAvailable = new Map<string, DataNodeLike>();
 
 const highlightedTreeProcessor = new HighlightedTreeProcessor();
 
-const computingTree = ref(false);
+const computingTree: Ref<Map<EcCode, boolean>> = ref(new Map());
 
-const headers = [
+const headers = ref([
     {
-        text: "Peptides",
+        title: "Peptides",
         align: "start",
-        value: "count",
+        key: "count",
         width: "20%"
     },
     {
-        text: "EC-number",
+        title: "EC-number",
         align: "start",
-        value: "code",
+        key: "code",
         width: "30%"
     },
     {
-        text: "Name",
+        title: "Name",
         align: "start",
-        value: "name",
+        key: "name",
         width: "45%"
     },
     {
-        text: "",
+        title: "",
         align: "center",
-        value: "action",
+        key: "action",
         width: "5%",
         sortable: false
     }
-];
+]);
 
 const highlightColor: string = "#ffc107";
 const highlightColorFunc = (d: any) => d.extra.included ? highlightColor : "lightgrey";
@@ -170,31 +203,30 @@ const downloadEcItem = async (code: FunctionalCode) => {
     }
 }
 
-const onExpandClicked = (item: EcTableItem) => {
-    computingTree.value = true;
-
-    const idx: number = expanded.value.findIndex(i => i.code === item.code);
-
-    computeTree(item.code);
+// TODO fix the type annotation of item here once VDataTable is stable
+const onExpandClicked = (item: any) => {
+    const idx: number = expanded.value.findIndex(i => i === item.raw.code);
 
     if (idx >= 0) {
         expanded.value.splice(idx, 1);
     } else {
-        expanded.value.push(item);
+        computeTree(item.raw.code);
+        expanded.value.push(item.raw.code);
     }
 }
 
-const computeTree = (code: string) => {
-    if (props.taxaToPeptides) {
-        highlightedTreeProcessor.computeHighlightedTree(
-            props.itemToPeptides?.get(code) ?? [],
-            props.ncbiTree,
-            props.taxaToPeptides
-        ).then((rootNode: any) => {
-            treeAvailable.set(code, rootNode);
-            computingTree.value = false;
-        });
+const computeTree = async function(code: string) {
+    computingTree.value.set(code, true);
+    if (props.taxaToPeptides && props.ncbiTree) {
+        const rootNode: any = await highlightedTreeProcessor.computeHighlightedTree(
+            toRaw(props.itemToPeptides?.get(code)) ?? [],
+            toRaw(props.ncbiTree),
+            toRaw(props.taxaToPeptides)
+        );
+
+        treeAvailable.set(code, rootNode);
     }
+    computingTree.value.set(code, false);
 }
 </script>
 
@@ -206,6 +238,7 @@ const computeTree = (code: string) => {
 }
 
 a {
+    color: #2196f3;
     text-decoration: none;
 }
 

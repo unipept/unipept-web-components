@@ -1,8 +1,8 @@
 <template>
     <div>
         <v-select
-            :items="dataSources"
             v-model="selectedDataSource"
+            :items="dataSources"
             label="test"
             class="flex-grow-0"
         />
@@ -21,9 +21,8 @@
 import { computed, ref } from 'vue';
 import FunctionalDefinition from '@/logic/ontology/functional/FunctionalDefinition';
 import { Ontology, NcbiTaxon, NcbiRank, EcNamespace, GoNamespace, InterproNamespace, ProteomicsCountTableProcessor, OntologyType, Definition } from '@/logic';
-import { VSelect } from 'vuetify/lib';
 import DataSourceMultiTable from './DataSourceMultiTable.vue';
-import MultiProteomicsAnalysisStatus from '@/interface/MultiProteomicsAnalysis';
+import MultiProteomicsAnalysisStatus from '@/interface/MultiProteomicsAnalysisStatus';
 import DataSourceMultiItem from './DataSourceMultiItem';
 
 export interface Props {
@@ -92,7 +91,7 @@ const sourceMetadata: SourceMetadata[] = [
         showIdentifier: true,
         categoryTitle: "Namespace"
     }
-]; 
+];
 
 const selectedDataSource = ref<string>("NCBI taxonomy");
 const selectedDataSourceItems = computed(() => {
@@ -113,7 +112,6 @@ const categories = computed(() => {
     if (selectedDataSource.value === "NCBI taxonomy") {
         return ["All", ...Object.values(NcbiRank)];
     } else if (selectedDataSource.value === "Enzyme Commission") {
-        console.log('sdfsdf');
         return ["All", ...Object.values(EcNamespace)];
     } else if (selectedDataSource.value === "Gene Ontology") {
         return ["All", ...Object.values(GoNamespace)];
@@ -149,7 +147,7 @@ const computeItems = (
             }
             definitionCountMap.get(ontologyId)?.set(assay.assay.id, countTable.getCounts(ontologyId));
         }
-        dataItem.ontology(assay).toMap().forEach((val, key, _) => ontologyMap.set(key, val));
+        dataItem.ontology(assay).toMap().forEach((val, key) => ontologyMap.set(key, val));
     }
 
     const ontology: Ontology<OntologyType, Definition> = new Ontology(ontologyMap);
@@ -171,7 +169,7 @@ const computeItems = (
         }
 
         items.push({
-            // @ts-ignore
+            // @ts-ignore (should be fixed in the future)
             name: definition.name,
             id: ontologyId,
             count: Array.from(countMap.values()).reduce((acc, current) => acc + current, 0),

@@ -1,33 +1,50 @@
 <template>
     <div>
-        <v-select :items="selectableCategories" v-model="selectedCategory" label="Category"></v-select>
+        <v-select
+            v-model="selectedCategory"
+            :items="selectableCategories"
+            label="Category"
+        />
 
-        <div class="table-extra-content" v-if="selectedItems.length > 0">
+        <div
+            v-if="selectedItems.length > 0"
+            class="table-extra-content"
+        >
             You selected {{ selectedItems.length }} out of {{ items.length }} items.
-            <a @click="selectAll" v-if="selectedItems.length !== items.length">Select all?</a>
-            <a @click="deselectAll" v-else>Deselect all?</a>
+            <a
+                v-if="selectedItems.length !== items.length"
+                @click="selectAll"
+            >
+                Select all?
+            </a>
+            <a
+                v-else
+                @click="deselectAll"
+            >
+                Deselect all?
+            </a>
         </div>
 
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
             :items="items"
             show-select
             item-key="id"
-            :itemsPerPage="5"
-            sort-by="popularity"
+            :items-per-page="5"
+            :sort-by="['popularity']"
             sort-desc
             :loading="loading"
             :search="selectedCategory"
             :custom-filter="categoryFilter"
-        >
-
-        </v-data-table>
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: any[]

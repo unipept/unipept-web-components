@@ -9,7 +9,7 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
  * @returns A tuple with 2 items. The first item is a mapping between a peptide and it's frequency, and the second item
  * is the total frequency of all items combined (from the first map).
  */
- export default async function compute(
+export default async function compute(
     [
         peptides,
         enableMissingCleavageHandling,
@@ -22,11 +22,9 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
         boolean
     ]
 ): Promise<[Map<Peptide, number>, number]> {
-    peptides = filter(peptides, enableMissingCleavageHandling, equateIl);
+    peptides = filter(peptides, enableMissingCleavageHandling);
     const peptideCounts = new Map<Peptide, number>();
-    let processed = 0;
     for (const peptide of peptides) {
-        processed++;
         const count = peptideCounts.get(peptide) || 0;
         if (filterDuplicates) {
             peptideCounts.set(peptide, 1);
@@ -43,8 +41,8 @@ import Peptide from "../../../logic/ontology/peptide/Peptide";
     return [peptideCounts, totalFrequency];
 }
 
-function filter(peptides: Peptide[], enableMissingCleavageHandling: boolean, equateIl: boolean): Peptide[] {
-    let out = cleavePeptides(peptides, enableMissingCleavageHandling);
+function filter(peptides: Peptide[], enableMissingCleavageHandling: boolean): Peptide[] {
+    const out = cleavePeptides(peptides, enableMissingCleavageHandling);
     return filterShortPeptides(out);
 }
 

@@ -1,47 +1,49 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": true,
-    "emitDeclarationOnly": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "declaration": true,
-    "declarationDir": "./types",
-    "types": [
-      "webpack-env",
-      "vuetify",
-    ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
+    "compilerOptions": {
+        "baseUrl": ".",
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "strict": true,
+        "jsx": "preserve",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
+        "skipLibCheck": true,
+        "outDir": "./dist/types",
+        "declaration": true,
+        "noEmit": false,
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "plugins": [
+            {
+                "transform": "typescript-transform-paths",
+                "afterDeclarations": true
+            }
+        ]
     },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.tsx",
+        "src/**/*.vue"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
+    ],
+    "exclude": [
+        "node_modules",
+        "src/App.vue",
+        "src/main.ts"
     ]
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "vueCompilerOptions": {
-    "target": 2.7
-  }
 }

@@ -1,3 +1,3 @@
-import Tooltip from "./Tooltip.vue";
+import TrustLine from "./TrustLine.vue";
 
-export { Tooltip };
+export { TrustLine };

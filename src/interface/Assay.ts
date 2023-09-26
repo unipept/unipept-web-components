@@ -4,4 +4,4 @@ export default interface Assay {
     peptides: string[]
     amountOfPeptides: number
     createdAt: Date
-};
+}

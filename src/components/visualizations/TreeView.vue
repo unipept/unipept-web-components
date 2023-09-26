@@ -1,32 +1,47 @@
 <template>
-    <div style="height: inherit;" v-if="!error">
-        <div v-if="!visualizationComputed" class="d-flex loading-container">
-            <v-progress-circular 
-                :width="5" 
-                :size="50" 
-                color="primary" 
-                indeterminate 
+    <div
+        v-if="!error"
+        style="height: inherit;"
+    >
+        <div
+            v-if="!visualizationComputed"
+            class="d-flex loading-container"
+        >
+            <v-progress-circular
+                :width="5"
+                :size="50"
+                color="primary"
+                indeterminate
             />
         </div>
-        <div style="height: inherit;" class="treeview-container" ref="visualization"></div>
+        <div
+            ref="visualization"
+            :style="'height: ' + height + 'px'"
+            class="treeview-container"
+        />
     </div>
-    <v-container fluid v-else class="error-container mt-2 d-flex align-center">
-        <div class="error-container">
-            <v-icon x-large>
+    <v-container
+        v-else
+        fluid
+        class="error-container mt-2 d-flex align-center"
+    >
+        <div class="d-flex flex-column align-center">
+            <v-icon
+                size="x-large"
+                color="error"
+            >
                 mdi-alert-circle-outline
             </v-icon>
-            <p>
-                You're trying to visualise a very large sample. This will work in most cases, but it could take
-                some time to render. Are you sure you want to <a @click="initializeVisualisation()">continue</a>?
-            </p>
+            <span>
+                An error occurred during the analysis of this assay.
+            </span>
         </div>
     </v-container>
 </template>
 
 <script setup lang="ts">
 import { DataNodeLike, Treeview as UnipeptTreeView, TreeviewSettings } from 'unipept-visualizations';
-import TreeviewNode from 'unipept-visualizations/types/visualizations/treeview/TreeviewNode';
-import { computed, onMounted, Ref, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { tooltipContent } from './VisualizationHelper';
 
 export interface Props {
@@ -38,6 +53,8 @@ export interface Props {
     loading?: boolean
     doReset?: boolean
 
+    error?: boolean
+
     linkStrokeColor?: (d: any) => string
     nodeStrokeColor?: (d: any) => string
     nodeFillColor?: (d: any) => string
@@ -48,15 +65,14 @@ const props = withDefaults(defineProps<Props>(), {
     height: 300,
     autoResize: false,
     loading: false,
-    doReset: false
+    doReset: false,
+    error: false
 });
 
 const emits = defineEmits(["reset"]);
 
 const visualization = ref<HTMLElement | null>(null);
-const visualizationComputed = ref<UnipeptTreeView | undefined>(undefined);
-
-const error = ref<boolean>(false);
+const visualizationComputed = ref<UnipeptTreeView | undefined>();
 
 watch(() => props.loading, () => {
     if(props.loading || !props.data) {
@@ -74,10 +90,10 @@ watch(() => props.data, () => {
     }
 });
 
-// Watch wheter we have to perform a reset
+// Watch whether we have to perform a reset
 watch(() => props.doReset, () => {
-    if(visualizationComputed.value) {
-        // @ts-ignore
+    if (visualizationComputed.value) {
+        // @ts-ignore (This function has not been exposed by the UnipeptTreeView class, but it is available)
         visualizationComputed.value.reset();
 
         // Let the parent component know that the reset has been performed
@@ -86,9 +102,7 @@ watch(() => props.doReset, () => {
 });
 
 const initializeVisualisation = () => {
-    error.value = false;
-
-    let settings = {
+    const settings = {
         width: props.width,
         height: props.height,
         getTooltipText: d => tooltipContent(d)
@@ -130,22 +144,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
-    .error-container {
-        max-width: 600px;
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .loading-container {
-        height: inherit;
-        align-items: center;
-        justify-content: center;
-    }
+.error-container {
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
 
-   .treeview-container svg {
-        width: 100%;
-        max-height: 600px;
-    }
+.loading-container {
+    height: inherit;
+    align-items: center;
+    justify-content: center;
+}
+
+.treeview-container svg {
+    width: 100%;
+    max-height: 600px;
+}
 </style>
