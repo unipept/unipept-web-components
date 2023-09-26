@@ -79,6 +79,42 @@ const emits = defineEmits(["reset", "update-selected-taxon-id"]);
 const visualization = ref<HTMLElement | null>(null);
 const visualizationComputed = ref<UnipeptSunburst | undefined>(undefined);
 
+const initializeVisualisation = () => {
+    visualizationComputed.value = undefined;
+
+    if(!props.data) return;
+
+    const settings = {
+        width: props.width,
+        height: props.height,
+        useFixedColors: props.isFixedColors,
+        rerootCallback: d => {
+            // Wait 500ms to start the animation to avoid stutter in the interface.
+            new Promise(resolve => setTimeout(resolve, rerootTimeout)).then(() => {
+                if (visualizationComputed.value) {
+                    emits("update-selected-taxon-id", d.id);
+                }
+            });
+        },
+        getTooltipText: d => tooltipContent(d)
+    } as SunburstSettings;
+
+    const sunburst = new UnipeptSunburst(
+        visualization.value as HTMLElement,
+        props.data.getRoot(),
+        settings,
+    );
+
+    if (props.autoResize) {
+        const svgEl = visualization.value?.querySelector("svg");
+        if(svgEl) {
+            svgEl.setAttribute("height", "100%");
+            svgEl.setAttribute("width", "100%");
+        }
+    }
+
+    return sunburst;
+}
 
 watch(() => props.loading, () => {
     if(props.loading) {
@@ -118,43 +154,6 @@ watch(() => props.isFixedColors, () => {
     // @ts-ignore (reroot is not exported as part of the interface of the visualization)
     visualizationComputed.value.reroot(props.filterId, false);
 });
-
-const initializeVisualisation = () => {
-    visualizationComputed.value = undefined;
-
-    if(!props.data) return;
-
-    const settings = {
-        width: props.width,
-        height: props.height,
-        useFixedColors: props.isFixedColors,
-        rerootCallback: d => {
-            // Wait 500ms to start the animation to avoid stutter in the interface.
-            new Promise(resolve => setTimeout(resolve, rerootTimeout)).then(() => {
-                if (visualizationComputed.value) {
-                    emits("update-selected-taxon-id", d.id);
-                }
-            });
-        },
-        getTooltipText: d => tooltipContent(d)
-    } as SunburstSettings;
-
-    const sunburst = new UnipeptSunburst(
-        visualization.value as HTMLElement,
-        props.data.getRoot(),
-        settings,
-    );
-
-    if (props.autoResize) {
-        const svgEl = visualization.value?.querySelector("svg");
-        if(svgEl) {
-            svgEl.setAttribute("height", "100%");
-            svgEl.setAttribute("width", "100%");
-        }
-    }
-
-    return sunburst;
-}
 
 onMounted(() => {
     if(!props.loading) {
