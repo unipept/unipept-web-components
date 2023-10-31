@@ -7,7 +7,7 @@
             class="flex-grow-0"
         />
 
-        <DataSourceMultiTable
+        <data-source-table
             :items="selectedDataSourceItems"
             :categories="categories"
             :loading="loading"
@@ -24,6 +24,7 @@ import { Ontology, NcbiTaxon, NcbiRank, EcNamespace, GoNamespace, InterproNamesp
 import DataSourceMultiTable from './DataSourceMultiTable.vue';
 import MultiProteomicsAnalysisStatus from '@/interface/MultiProteomicsAnalysisStatus';
 import DataSourceMultiItem from './DataSourceMultiItem';
+import DataSourceTable from "@/components/tables/DataSourceTable.vue";
 
 export interface Props {
     loading: boolean
