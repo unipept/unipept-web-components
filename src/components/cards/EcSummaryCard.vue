@@ -3,7 +3,7 @@
         <v-card-text>
             <v-row v-if="!analysisInProgress">
                 <v-col>
-                    <TrustLine
+                    <trust-line
                         class="mb-5"
                         :trust="ecProcessor.getTrust()"
                         :fa-kind="{
@@ -23,7 +23,8 @@
                 >
                     <v-btn
                         icon="mdi-cog-outline"
-                        color="grey-darken-1"
+                        size="small"
+                        variant="text"
                         @click="editFilterPercentageModalOpen = true"
                     />
                 </v-col>
