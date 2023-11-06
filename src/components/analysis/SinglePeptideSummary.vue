@@ -27,6 +27,7 @@
                     <a
                         :href="taxonomyUrl(lca(assay))"
                         target="_blank"
+                        class="link primary--text"
                     >
                         {{ lca(assay)?.name }}
                     </a> ({{ lca(assay)?.rank }}).
@@ -42,6 +43,7 @@
                                 v-if="node"
                                 :href="`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${node.id}`"
                                 target="_blank"
+                                class="link primary--text"
                             >
                                 {{ node.name }}
                             </a>
