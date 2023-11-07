@@ -6,39 +6,45 @@
         >
             <v-stepper-header>
                 <v-stepper-item
+                    color="primary"
                     editable
                     title="Horizontal axis"
+                    :value="1"
                     :complete="currentStep > 1"
                     step="1"
                 />
                 <v-divider />
                 <v-stepper-item
+                    color="primary"
                     editable
                     title="Normalization"
+                    :value="2"
                     :complete="currentStep > 2"
                     step="2"
                 />
                 <v-divider />
                 <v-stepper-item
+                    color="primary"
                     editable
                     title="Heatmap"
+                    :value="3"
                     :complete="currentStep > 3"
                     step="3"
                 />
             </v-stepper-header>
             <v-stepper-window>
                 <v-stepper-window-item :value="1">
-                    <DataSourceMulti
+                    <data-source-multi
                         :loading="loading"
                         :assays="assays"
                         @select="verticalItems = $event"
                     />
                 </v-stepper-window-item>
                 <v-stepper-window-item :value="2">
-                    <NormalizationSelector @update="normalizer = $event" />
+                    <normalization-selector @update="normalizer = $event" />
                 </v-stepper-window-item>
                 <v-stepper-window-item :value="3">
-                    <VisualizationControls
+                    <visualization-controls
                         ref="heatmap"
                         caption="Scroll to zoom, drag to pan"
                         :loading="heatMapLoading"
@@ -50,7 +56,7 @@
                         overlap
                     >
                         <template #visualization>
-                            <HeatMap
+                            <heat-map
                                 :data="heatmapData"
                                 :row-labels="heatmapRows"
                                 :column-labels="heatmapColumns"
@@ -64,7 +70,7 @@
                                 @download="downloadModalOpen = $event"
                             />
                         </template>
-                    </VisualizationControls>
+                    </visualization-controls>
                 </v-stepper-window-item>
             </v-stepper-window>
             <v-stepper-actions
@@ -85,6 +91,7 @@ import NormalizationSelector from '../NormalizationSelector.vue';
 import DataSourceMulti from './DataSourceMulti.vue';
 import DataSourceMultiItem from './DataSourceMultiItem';
 import MultiProteomicsAnalysisStatus from "@/interface/MultiProteomicsAnalysisStatus";
+import { VStepper, VStepperActions, VStepperHeader, VStepperItem, VStepperWindow, VStepperWindowItem } from 'vuetify/labs/VStepper';
 
 export interface Props {
     loading: boolean

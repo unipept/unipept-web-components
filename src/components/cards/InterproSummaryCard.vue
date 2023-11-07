@@ -24,7 +24,8 @@
                 >
                     <v-btn
                         icon="mdi-cog-outline"
-                        color="grey-darken-1"
+                        size="small"
+                        variant="text"
                         @click="editFilterPercentageModalOpen = true"
                     />
                 </v-col>
