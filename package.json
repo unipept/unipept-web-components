@@ -1,6 +1,6 @@
 {
     "name": "unipept-web-components",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "scripts": {
         "dev": "vite",
         "build": "vue-tsc --emitDeclarationOnly && vite build && tsc --emitDeclarationOnly && tsc-alias && rm -rf types/test types/plugins types/main.d.ts",
