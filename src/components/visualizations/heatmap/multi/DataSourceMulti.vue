@@ -3,7 +3,7 @@
         <v-select
             v-model="selectedDataSource"
             :items="dataSources"
-            label="test"
+            label="Feature type"
             class="flex-grow-0"
         />
 
