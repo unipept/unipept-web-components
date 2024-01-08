@@ -42,7 +42,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import DataSourceMultiItem from './DataSourceMultiItem';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: DataSourceMultiItem[]

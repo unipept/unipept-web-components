@@ -44,7 +44,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import DataSourceItem from '@/components/tables/DataSourceItem';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: DataSourceItem[]

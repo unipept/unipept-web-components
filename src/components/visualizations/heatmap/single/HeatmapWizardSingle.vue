@@ -119,7 +119,6 @@ import HeatMap from '../HeatMap.vue';
 import NormalizationSelector from '../NormalizationSelector.vue';
 import DataSourceSingle from './DataSourceSingle.vue';
 import DataSourceSingleItem from './DataSourceSingleItem';
-import { VStepper, VStepperActions, VStepperHeader, VStepperItem, VStepperWindow, VStepperWindowItem } from 'vuetify/labs/VStepper';
 
 export interface Props {
     loading: boolean

@@ -54,7 +54,6 @@
 import { GoNamespace, NetworkUtils } from '@/logic';
 import { computed, ref } from 'vue';
 import GoTableItem from '../tables/functional/GoTableItem';
-import { VSkeletonLoader } from "vuetify/labs/VSkeletonLoader";
 
 export interface Props {
     items: GoTableItem[]
