@@ -31,6 +31,7 @@
             </a>
         </div>
 
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
@@ -47,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, watch } from "vue";
+import { readonly, ref, toRaw, watch } from "vue";
 import DataSourceItem from '@/components/tables/DataSourceItem';
 
 export interface Props {
@@ -63,7 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits(['select']);
 
-const headers = ref([
+const headers = readonly([
     {
         title: "Name",
         align: "start",
