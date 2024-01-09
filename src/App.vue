@@ -25,10 +25,22 @@
                     :ncbi-count-table-processor="lcaProcessor!"
                 />
 
-                <go-summary-card
+<!--                <go-summary-card-->
+<!--                    :analysis-in-progress="loading"-->
+<!--                    :go-processor="goProcessor!"-->
+<!--                    :go-ontology="goOntology!"-->
+<!--                    :ncbi-processor="lcaProcessor!"-->
+<!--                    :ncbi-tree="ncbiTree!"-->
+<!--                    :show-percentage="true"-->
+<!--                    :filter="5"-->
+<!--                    @filter-percentage-change="() => {}"-->
+<!--                />-->
+
+                <ec-summary-card
                     :analysis-in-progress="loading"
-                    :go-processor="goProcessor!"
-                    :go-ontology="goOntology!"
+                    :ec-processor="ecProcessor!"
+                    :ec-ontology="ecOntology!"
+                    :ec-tree="ecTree!"
                     :ncbi-processor="lcaProcessor!"
                     :ncbi-tree="ncbiTree!"
                     :show-percentage="true"

@@ -1,5 +1,6 @@
 <template>
     <div>
+        <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
         <v-data-table
             v-model:expanded="expanded"
             :headers="headers"
@@ -24,6 +25,7 @@
                 </v-tooltip>
             </template>
 
+            <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
             <template #item.data-table-expand="{ item }">
                 <v-btn
                     v-if="ncbiTree"
@@ -142,7 +144,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const expanded = ref<EcTableItem[]>([]);
+const expanded = ref<EcCode[]>([]);
 
 const treeAvailable = new Map<string, DataNodeLike>();
 

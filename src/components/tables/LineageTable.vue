@@ -23,7 +23,7 @@
                         <tbody>
                             <tr
                                 v-for="item in items"
-                                :key="item.name"
+                                :key="item.definition.name"
                             >
                                 <td>
                                     <span class="font-small font-weight-bold">

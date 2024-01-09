@@ -25,6 +25,7 @@
                 </v-tooltip>
             </template>
 
+            <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
             <template #item.data-table-expand="{ item }">
                 <v-btn
                     v-if="ncbiTree"

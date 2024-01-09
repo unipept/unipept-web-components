@@ -185,7 +185,8 @@ const items = (
             namespace: namespace,
             code: definition.code,
             count: count,
-            relativeCount: count / goProcessor.getTrust().totalAmountOfItems
+            relativeCount: count / goProcessor.getTrust().totalAmountOfItems,
+            totalAnnotations: goProcessor.getTrust().totalAmountOfItems
         });
     });
 
