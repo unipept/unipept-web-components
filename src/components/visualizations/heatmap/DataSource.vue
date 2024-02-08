@@ -44,7 +44,6 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: any[]

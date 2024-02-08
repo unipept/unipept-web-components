@@ -3,4 +3,5 @@ export default interface TableItem {
     code: string
     count: number
     relativeCount: number
+    totalAnnotations: number
 };

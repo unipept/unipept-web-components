@@ -91,7 +91,6 @@ import NormalizationSelector from '../NormalizationSelector.vue';
 import DataSourceMulti from './DataSourceMulti.vue';
 import DataSourceMultiItem from './DataSourceMultiItem';
 import MultiProteomicsAnalysisStatus from "@/interface/MultiProteomicsAnalysisStatus";
-import { VStepper, VStepperActions, VStepperHeader, VStepperItem, VStepperWindow, VStepperWindowItem } from 'vuetify/labs/VStepper';
 
 export interface Props {
     loading: boolean

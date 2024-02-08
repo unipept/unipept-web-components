@@ -97,7 +97,8 @@ const items = computed(() => {
                 code: definition.code,
                 namespace: definition.namespace,
                 count: count,
-                relativeCount: count / props.interproProcessor.getTrust().totalAmountOfItems
+                relativeCount: count / props.interproProcessor.getTrust().totalAmountOfItems,
+                totalAnnotations: props.interproProcessor.getTrust().totalAmountOfItems
             });
         });
 

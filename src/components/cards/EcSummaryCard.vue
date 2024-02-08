@@ -141,7 +141,8 @@ const items = computed(() => {
                 name: definition.name,
                 code: definition.code,
                 count: count,
-                relativeCount: count / props.ecProcessor.getTrust().totalAmountOfItems
+                relativeCount: count / props.ecProcessor.getTrust().totalAmountOfItems,
+                totalAnnotations: props.ecProcessor.getTrust().totalAmountOfItems
             });
         });
 

@@ -19,12 +19,12 @@
             item-value="code"
             show-expand
         >
-            <!-- @vue-ignore (TODO: types should work once data tables are not in labs anymore) -->
             <template #header.action>
                 <v-tooltip text="Download table as CSV">
                     <template #activator="{ props }">
                         <v-btn
                             v-bind="props"
+                            variant="plain"
                             icon="mdi-download"
                             @click="downloadCsv(items, selectedNamespace)"
                         />
@@ -37,8 +37,8 @@
                     v-if="ncbiTree"
                     size="small"
                     variant="plain"
-                    :icon="expanded.findIndex(i => i === item.raw.code) !== -1 ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                    :disabled="item.raw.totalAnnotations === 0"
+                    :icon="expanded.findIndex(i => i === item.code) !== -1 ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                    :disabled="item.totalAnnotations === 0"
                     @click="onExpandClicked(item)"
                 />
             </template>
@@ -48,33 +48,33 @@
                     :style="{
                         padding: '12px',
                         background: 'linear-gradient(90deg, rgb(221, 221, 221) 0%, rgb(221, 221, 221) ' +
-                            item.raw.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.raw.relativeCount * 100 + '%)',
+                            item.relativeCount * 100 + '%, rgba(255,255,255,0) ' + item.relativeCount * 100 + '%)',
                     }"
                 >
-                    {{ showPercentage ? (item.raw.relativeCount * 100).toFixed(2) + " %" : item.raw.count }}
+                    {{ showPercentage ? (item.relativeCount * 100).toFixed(2) + " %" : item.count }}
                 </div>
             </template>
 
             <template #item.code="{ item }">
                 <a
-                    :href="url(item.raw.code)"
+                    :href="url(item.code)"
                     target="_blank"
                     class="font-regular"
                 >
-                    {{ item.raw.code }}
+                    {{ item.code }}
                     <v-icon size="x-small">mdi-open-in-new</v-icon>
                 </a>
             </template>
 
             <template #item.name="{ item }">
                 <span style="text-overflow: ellipsis;">
-                    {{ item.raw.name }}
+                    {{ item.name }}
                 </span>
             </template>
 
             <template #item.namespace="{ item }">
                 <span style="text-overflow: ellipsis;">
-                    {{ item.raw.namespace }}
+                    {{ item.namespace }}
                 </span>
             </template>
 
@@ -88,7 +88,7 @@
                             v-bind="props"
                             icon="mdi-download"
                             variant="plain"
-                            @click="downloadInterproItem(item.raw.code)"
+                            @click="downloadInterproItem(item.code)"
                         />
                     </template>
                 </v-tooltip>
@@ -100,16 +100,16 @@
                     class="expand-container"
                 >
                     <VisualizationControls
-                        v-if="computingTree.has(item.raw.code) && !computingTree.get(item.raw.code)"
+                        v-if="computingTree.has(item.code) && !computingTree.get(item.code)"
                         ref="treeview"
                         caption="Scroll to zoom, drag to pan, click a node to expand, right click a node to set as root"
                         internal-download
-                        :loading="computingTree.get(item.raw.code)!"
+                        :loading="computingTree.get(item.code)!"
                     >
                         <template #visualization>
                             <TreeView
-                                :data="treeAvailable.get(item.raw.code)!"
-                                :loading="computingTree.get(item.raw.code)! && !treeAvailable.get(item.raw.code)"
+                                :data="treeAvailable.get(item.code)!"
+                                :loading="computingTree.get(item.code)! && !treeAvailable.get(item.code)"
                                 :auto-resize="true"
                                 :height="300"
                                 :link-stroke-color="linkStrokeColor"
@@ -143,7 +143,6 @@ import useCsvDownload from '@/composables/useCsvDownload';
 import VisualizationControls from '@/components/visualizations/VisualizationControls.vue';
 import TreeView from '@/components/visualizations/TreeView.vue';
 import { DataNodeLike } from 'unipept-visualizations';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: InterproTableItem[],
@@ -239,13 +238,13 @@ const downloadInterproItem = async (code: FunctionalCode) => {
 
 // TODO fix the type annotation of item here once VDataTable is stable
 const onExpandClicked = (item: any) => {
-    const idx: number = expanded.value.findIndex(i => i === item.raw.code);
+    const idx: number = expanded.value.findIndex(i => i === item.code);
 
     if (idx >= 0) {
         expanded.value.splice(idx, 1);
     } else {
-        computeTree(item.raw.code);
-        expanded.value.push(item.raw.code);
+        computeTree(item.code);
+        expanded.value.push(item.code);
     }
 }
 

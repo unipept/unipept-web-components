@@ -13,13 +13,19 @@
             You selected {{ selectedItems.length }} out of {{ items.length }} items.
             <a
                 v-if="selectedItems.length !== items.length"
-                @click="selectAll"
+                @click.prevent="selectAll"
+                class="text-primary"
+                style="text-decoration: none;"
+                href="#"
             >
                 Select all?
             </a>
             <a
                 v-else
                 @click="deselectAll"
+                class="text-primary"
+                style="text-decoration: none;"
+                href="#"
             >
                 Deselect all?
             </a>
@@ -29,7 +35,7 @@
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
-            :items="items"
+            :items="allItems"
             :loading="loading"
             :search="selectedCategory"
             :custom-filter="categoryFilter"
@@ -42,9 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { readonly, ref, toRaw, watch } from "vue";
 import DataSourceItem from '@/components/tables/DataSourceItem';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 
 export interface Props {
     items: DataSourceItem[]
@@ -59,7 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits(['select']);
 
-const headers = ref([
+const headers = readonly([
     {
         title: "Name",
         align: "start",
@@ -81,14 +86,15 @@ const headers = ref([
 ]);
 
 const selectedCategory = ref<string>("All");
-const selectedItems = ref<any[]>([]);
+const selectedItems = ref<DataSourceItem[]>([]);
+const allItems = ref<DataSourceItem[]>(props.items);
 
 const selectAll = () => {
     selectedItems.value = props.items;
 };
 
 const deselectAll = () => {
-    selectedItems.value.splice(0, selectedItems.value.length);
+    selectedItems.value = [];
 };
 
 const categoryFilter = (value: any, category: string, item: any) => {
@@ -99,9 +105,9 @@ const categoryFilter = (value: any, category: string, item: any) => {
     return item.category === category;
 }
 
-watch(() => props.items, () => deselectAll());
-
-watch(selectedItems, (selected) => {
-    emits('select', selected);
+watch(() => props.items, () => {
+    deselectAll();
 });
+
+watch(selectedItems, (selected) => emits('select', selected));
 </script>

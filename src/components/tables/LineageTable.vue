@@ -23,15 +23,15 @@
                         <tbody>
                             <tr
                                 v-for="item in items"
-                                :key="item.raw.name"
+                                :key="item.definition.name"
                             >
                                 <td>
                                     <span class="font-small font-weight-bold">
-                                        {{ item.raw.definition.name }}
+                                        {{ item.definition.name }}
                                     </span>
                                 </td>
                                 <td
-                                    v-for="l in item.raw.lineage"
+                                    v-for="l in item.lineage"
                                     :key="l ? l.id : generateId()"
                                     :class="[ l ? getColour(l.name) : '', 'lineage-cell', 'px-2']"
                                 >
@@ -58,7 +58,6 @@
 import { SinglePeptideAnalysisStatus } from '@/interface';
 import { NcbiRank, NcbiTaxon } from '@/logic';
 import { computed, ref } from 'vue';
-import { VDataTable } from 'vuetify/labs/VDataTable'
 
 export interface Props {
     assay: SinglePeptideAnalysisStatus
