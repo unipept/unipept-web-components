@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import DataSourceSingleItem from './DataSourceSingleItem';
 import DataSourceTable from '@/components/tables/DataSourceTable.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw } from "vue";
 import FunctionalDefinition from '@/logic/ontology/functional/FunctionalDefinition';
 import { LcaCountTableProcessor, Ontology, NcbiId, NcbiTaxon, NcbiRank, NcbiTree, EcCountTableProcessor, EcCode, EcDefinition, EcNamespace, GoCode, GoCountTableProcessor, GoDefinition, InterproCode, InterproCountTableProcessor, InterproDefinition, GoNamespace, InterproNamespace } from '@/logic';
 
@@ -51,13 +51,14 @@ const dataSources: string[] = [
 
 const selectedDataSource = ref<string>("NCBI taxonomy");
 const selectedDataSourceItems = computed(() => {
-    if (selectedDataSource.value === "NCBI taxonomy") {
+    const selectedSource = toRaw(selectedDataSource.value);
+    if (selectedSource === "NCBI taxonomy") {
         return ncbiItems.value;
-    } else if (selectedDataSource.value === "Enzyme Commission") {
+    } else if (selectedSource === "Enzyme Commission") {
         return ecItems.value;
-    } else if (selectedDataSource.value === "Gene Ontology") {
+    } else if (selectedSource === "Gene Ontology") {
         return goItems.value;
-    } else if (selectedDataSource.value === "Interpro") {
+    } else if (selectedSource === "Interpro") {
         return interproItems.value;
     } else {
         return [];
@@ -65,13 +66,14 @@ const selectedDataSourceItems = computed(() => {
 });
 
 const categories = computed(() => {
-    if (selectedDataSource.value === "NCBI taxonomy") {
+    const selectedSource = toRaw(selectedDataSource.value);
+    if (selectedSource === "NCBI taxonomy") {
         return ["All", ...Object.values(NcbiRank)];
-    } else if (selectedDataSource.value === "Enzyme Commission") {
+    } else if (selectedSource === "Enzyme Commission") {
         return ["All", ...Object.values(EcNamespace)];
-    } else if (selectedDataSource.value === "Gene Ontology") {
+    } else if (selectedSource === "Gene Ontology") {
         return ["All", ...Object.values(GoNamespace)];
-    } else if (selectedDataSource.value === "Interpro") {
+    } else if (selectedSource === "Interpro") {
         return ["All", ...Object.values(InterproNamespace)];
     } else {
         return [];
@@ -105,7 +107,7 @@ const computeItems = (
         let category: string = "";
         let count: number = 0;
 
-        if("rank" in definition) {
+        if ("rank" in definition) {
             category = definition["rank"];
             count = props.ncbiTree.nodes.get(id)?.count || 0;
         } else {

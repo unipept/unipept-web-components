@@ -35,7 +35,7 @@
         <v-data-table
             v-model="selectedItems"
             :headers="headers"
-            :items="allItems"
+            :items="items"
             :loading="loading"
             :search="selectedCategory"
             :custom-filter="categoryFilter"
@@ -87,7 +87,6 @@ const headers = readonly([
 
 const selectedCategory = ref<string>("All");
 const selectedItems = ref<DataSourceItem[]>([]);
-const allItems = ref<DataSourceItem[]>(props.items);
 
 const selectAll = () => {
     selectedItems.value = props.items;
